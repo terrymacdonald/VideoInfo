@@ -892,7 +892,7 @@ namespace DisplayMagicianShared.AMD
                     else
                     {
                         // If we get here then there are less than two displays connected. Eyefinity cannot be enabled in this case!
-                        SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: There are less than two displays connected to this adapter so Eyefinity cannot be enabled.");
+                        SharedLogger.logger.Info($"AMDLibrary/GetAMDDisplayConfig: There are less than two displays connected to this adapter so Eyefinity cannot be enabled.");
                     }
 
 
@@ -951,6 +951,7 @@ namespace DisplayMagicianShared.AMD
                         catch (Exception ex)
                         {
                             displayConnector = ADL_DISPLAY_CONNECTION_TYPE.Unknown;
+                            SharedLogger.logger.Warn(ex,$"AMDLibrary/GetAMDDisplayConfig: Exception caused whilst trying to find which display connector display {displayTarget.DisplayID} on adapter {adapterIndex} has:");
                         }
                         SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: Display {displayTarget.DisplayID} on AMD adapter #{adapterIndex} has a {displayConnector} connector.");
                         // Then only get the HDR config stuff if the connection actually suports getting the HDR info!
@@ -1607,7 +1608,19 @@ namespace DisplayMagicianShared.AMD
             // We want to check the AMD profile can be used now
             SharedLogger.logger.Trace($"AMDLibrary/IsPossibleConfig: Testing whether the AMD display configuration is possible to be used now");
 
-            // Check that we have all the displayConfig DisplayIdentifiers we need available now
+            // If both display identifiers are 0 then no displays were connected via AMD and we should just return true.
+            if (displayConfig.DisplayIdentifiers.Count == 0 && _allConnectedDisplayIdentifiers.Count == 0)
+            {
+                return true;
+            }
+            // but if only allconnected count is 0 then we have a problem
+            else if (_allConnectedDisplayIdentifiers.Count == 0)
+            {
+                return false;
+            }
+
+            // Otherwise we need to actuially check through things
+            // Check that we have all the displayConfig DisplayIdentifiers we need available now            
             if (displayConfig.DisplayIdentifiers.All(value => _allConnectedDisplayIdentifiers.Contains(value)))
             {
                 SharedLogger.logger.Trace($"AMDLibrary/IsPossibleConfig: Success! The AMD display configuration is possible to be used now");

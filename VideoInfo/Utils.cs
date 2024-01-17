@@ -163,7 +163,7 @@ namespace DisplayMagicianShared
 
 
     [Flags]
-    public enum SET_WINDOW_POSITION_FLAGS: UInt32
+    public enum SET_WINDOW_POSITION_FLAGS : UInt32
     {
         SWP_ASYNCWINDOWPOS = 0x4000,
         SWP_DEFERERASE = 0x2000,
@@ -210,9 +210,9 @@ namespace DisplayMagicianShared
     }
 
     [Flags]
-    public enum MOUSEKEYS: UInt32
+    public enum MOUSEKEYS : UInt32
     {
-        MK_LBUTTON = 0x1, 
+        MK_LBUTTON = 0x1,
         MK_RBUTTON = 0x2,
         MK_SHIFT = 0x4,
         MK_CONTROL = 0x8,
@@ -261,7 +261,7 @@ namespace DisplayMagicianShared
 
     class Utils
     {
-        
+
 
         #region enum HChangeNotifyEventID
         /// <summary>
@@ -693,14 +693,14 @@ namespace DisplayMagicianShared
         public const int WM_WINDOWPOSCHANGING = 0x0046;
         public const int WM_WINDOWPOSCHANGED = 0x0047;
         public const int WM_SYSCOMMAND = 0x112;
-        public const int WM_NOTIFY = 0xA005; 
+        public const int WM_NOTIFY = 0xA005;
         public const int WM_SETTINGCHANGE = 0x001a;
         public const int WM_THEMECHANGED = 0x031a;
         public const int WM_MOUSEMOVE = 0x0200;
         public const int SPI_SETWORKAREA = 0x002F;
         public const int SHELLHOOK = 0xC028;
         public const int WM_USER_REFRESHTASKBAR = 0x05CA;
-        public const int WM_USER_451 = 0x05C3; 
+        public const int WM_USER_451 = 0x05C3;
         public const int WM_USER_440 = 0x05B8;
         public const int WM_USER_336 = 0x0550;
         public const int WM_USER_92 = 0x045C;
@@ -747,7 +747,7 @@ namespace DisplayMagicianShared
         public const int CCHDEVICENAME = 32;
         public const uint MONITORINFOF_PRIMARY = 1;
 
-        
+
     }
 
 

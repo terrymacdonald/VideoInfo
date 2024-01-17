@@ -534,7 +534,7 @@ namespace DisplayMagicianShared.NVIDIA
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_NOT_SUPPORTED)
                 {
-                    SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported with the existing hardware. NvAPI_Mosaic_GetCurrentTopo() returned error code {NVStatus}");
+                    SharedLogger.logger.Debug($"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported with the existing hardware. NvAPI_Mosaic_GetCurrentTopo() returned error code {NVStatus}");
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_ARGUMENT)
                 {
@@ -607,7 +607,7 @@ namespace DisplayMagicianShared.NVIDIA
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_NOT_SUPPORTED)
                 {
-                    SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported with the existing hardware. NvAPI_Mosaic_GetTopoGroup() returned error code {NVStatus}");
+                    SharedLogger.logger.Debug($"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported with the existing hardware. NvAPI_Mosaic_GetTopoGroup() returned error code {NVStatus}");
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_ARGUMENT)
                 {
@@ -749,7 +749,7 @@ namespace DisplayMagicianShared.NVIDIA
                         }
                         else if (NVStatus == NVAPI_STATUS.NVAPI_NOT_SUPPORTED)
                         {
-                            SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported with the existing hardware. NvAPI_Mosaic_EnumDisplayModes() returned error code {NVStatus}");
+                            SharedLogger.logger.Debug($"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported with the existing hardware. NvAPI_Mosaic_EnumDisplayModes() returned error code {NVStatus}");
                         }
                         else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_ARGUMENT)
                         {
@@ -911,7 +911,7 @@ namespace DisplayMagicianShared.NVIDIA
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_OK && pathInfoCount == 0)
                 {
-                    SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: The call was successful but no display paths were found. NvAPI_DISP_GetDisplayConfig() returned error code {NVStatus} on first pass");
+                    SharedLogger.logger.Debug($"NVIDIALibrary/GetNVIDIADisplayConfig: The call was successful but no display paths were found. NvAPI_DISP_GetDisplayConfig() returned error code {NVStatus} on first pass");
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_ARGUMENT)
                 {
@@ -951,7 +951,7 @@ namespace DisplayMagicianShared.NVIDIA
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_NVIDIA_DEVICE_NOT_FOUND)
                 {
-                    SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: There are no NVIDIA video cards in this computer. NvAPI_DISP_GetGDIPrimaryDisplayId() returned error code {NVStatus}");
+                    SharedLogger.logger.Info($"NVIDIALibrary/GetNVIDIADisplayConfig: There are no NVIDIA video cards currently in use within this computer. This may be due to another GPU being used instead e.g. embedded GPU within the CPU. NvAPI_DISP_GetGDIPrimaryDisplayId() returned error code {NVStatus}");
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_ARGUMENT)
                 {
@@ -1390,7 +1390,7 @@ namespace DisplayMagicianShared.NVIDIA
                     }
                     else if (NVStatus == NVAPI_STATUS.NVAPI_NVIDIA_DEVICE_NOT_FOUND)
                     {
-                        SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: GDI Primary not on an NVIDIA GPU. NvAPI_DISP_GetDisplayIdByDisplayName() returned error code {NVStatus}");
+                        SharedLogger.logger.Debug($"NVIDIALibrary/GetNVIDIADisplayConfig: GDI Primary not on an NVIDIA GPU. NvAPI_DISP_GetDisplayIdByDisplayName() returned error code {NVStatus}");
                     }
                     else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_ARGUMENT)
                     {
@@ -3258,6 +3258,18 @@ namespace DisplayMagicianShared.NVIDIA
             // We want to check the NVIDIA profile can be used now
             SharedLogger.logger.Trace($"NVIDIALibrary/IsPossibleConfig: Testing whether the NVIDIA display configuration is possible to be used now");
 
+
+            // If both display identifiers are 0 then no displays were connected via NVIDIA and we should just return true.
+            if (displayConfig.DisplayIdentifiers.Count == 0 && _allConnectedDisplayIdentifiers.Count == 0)
+            {
+                return true;
+            }
+            // but if only allconnected count is 0 then we have a problem
+            else if (_allConnectedDisplayIdentifiers.Count == 0)
+            {
+                return false;
+            }
+
             // CHeck that we have all the displayConfig DisplayIdentifiers we need available now
             if (displayConfig.DisplayIdentifiers.All(value => _allConnectedDisplayIdentifiers.Contains(value)))
             //if (currentAllIds.Intersect(displayConfig.DisplayIdentifiers).Count() == displayConfig.DisplayIdentifiers.Count)
@@ -3343,7 +3355,7 @@ namespace DisplayMagicianShared.NVIDIA
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_NOT_SUPPORTED)
                 {
-                    SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported with the existing hardware. NvAPI_Mosaic_GetCurrentTopo() returned error code {NVStatus}");
+                    SharedLogger.logger.Debug($"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported with the existing hardware. NvAPI_Mosaic_GetCurrentTopo() returned error code {NVStatus}");
                 }
                 else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_ARGUMENT)
                 {
