@@ -2183,17 +2183,26 @@ namespace DisplayMagicianShared.NVIDIA
     public struct NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2 : IEquatable<NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2>, ICloneable
     {
         public UInt32 DisplayId;  //!< Display ID
-        public NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1 Details;    //!< NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO - May be NULL if no advanced settings are required
-        public UInt32 WindowsCCDTargetId;   //!< Windows CCD target ID. Must be present only for non-NVIDIA adapter, for NVIDIA adapter this parameter is ignored.
+        public NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1? Details;    //!< NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO - May be NULL if no advanced settings are required
+        public UInt32? WindowsCCDTargetId;   //!< Windows CCD target ID. Must be present only for non-NVIDIA adapter, for NVIDIA adapter this parameter is ignored.
 
         public override bool Equals(object obj) => obj is NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2 other && this.Equals(other);
 
         public bool Equals(NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2 other)
-        => DisplayId == other.DisplayId &&
-           Details.Equals(other.Details) &&
-           WindowsCCDTargetId == other.WindowsCCDTargetId;
+        {
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (Details == null || other.Details != null) return false;
+            if (other.Details == null || Details != null) return false;
+            if (WindowsCCDTargetId == null || other.WindowsCCDTargetId != null) return false;
+            if (other.WindowsCCDTargetId == null || WindowsCCDTargetId != null) return false;
+            if (DisplayId == other.DisplayId && Details.Equals(other.Details) && WindowsCCDTargetId == other.WindowsCCDTargetId) {
+                return true;
+            }
+            return false;
+        }
 
-        public override Int32 GetHashCode()
+    public override Int32 GetHashCode()
         {
             return (DisplayId, Details, WindowsCCDTargetId).GetHashCode();
         }
@@ -2204,7 +2213,10 @@ namespace DisplayMagicianShared.NVIDIA
         public object Clone()
         {
             NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2 otherTargetInfo = (NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2)MemberwiseClone();
-            otherTargetInfo.Details = (NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1)Details.Clone();
+            if (Details != null)
+            {
+                otherTargetInfo.Details = (NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1?)Details.Value.Clone() ?? null;
+            }
             return otherTargetInfo;
         }
     }
@@ -2214,13 +2226,22 @@ namespace DisplayMagicianShared.NVIDIA
     public struct NV_DISPLAYCONFIG_PATH_TARGET_INFO_V1 : IEquatable<NV_DISPLAYCONFIG_PATH_TARGET_INFO_V1>, ICloneable
     {
         public UInt32 DisplayId;  //!< Display ID
-        public NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1 Details;    //!< May be NULL if no advanced settings are required
+        public NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1? Details;    //!< May be NULL if no advanced settings are required
 
         public override bool Equals(object obj) => obj is NV_DISPLAYCONFIG_PATH_TARGET_INFO_V1 other && this.Equals(other);
 
         public bool Equals(NV_DISPLAYCONFIG_PATH_TARGET_INFO_V1 other)
-        => DisplayId == other.DisplayId &&
-           Details.Equals(other.Details);
+        {
+            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (Details == null || other.Details != null) return false;
+            if (other.Details == null || Details != null) return false;
+            if (DisplayId == other.DisplayId && Details.Equals(other.Details)) {
+                return true;
+            }
+            return false;
+        }
+       
 
         public override Int32 GetHashCode()
         {
@@ -2233,9 +2254,13 @@ namespace DisplayMagicianShared.NVIDIA
         public object Clone()
         {
             NV_DISPLAYCONFIG_PATH_TARGET_INFO_V1 other = (NV_DISPLAYCONFIG_PATH_TARGET_INFO_V1)MemberwiseClone();
-            other.Details = (NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1)Details.Clone();
+            if (Details != null)
+            {
+                other.Details = (NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1?)Details.Value.Clone() ?? null;
+            }
             return other;
         }
+
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -4866,10 +4891,19 @@ namespace DisplayMagicianShared.NVIDIA
                             Marshal.StructureToPtr(advInfo, currentAdvTargetPointer, true);
 
                             // Now connect the Advanced details we created to the details in the TargetInfo array item
+                            /*var details = PathInfos[x].TargetInfo[y].Details;
+                            if (details.HasValue)
+                            {*/
+                            /*}
+                            else
+                            {
+                                targetInforArray[y].Details = IntPtr.Zero;
+                            }*/
                             targetInforArray[y].Details = new IntPtr(currentAdvTargetPointer.ToInt64());
                             Marshal.StructureToPtr(targetInforArray[y], currentTargetInfoPointer, true);
                             currentTargetInfoPointer = new IntPtr(currentTargetInfoPointer.ToInt64() + onePathTargetMemSize);
                             currentAdvTargetPointer = new IntPtr(currentAdvTargetPointer.ToInt64() + oneAdvTargetMemSize + oneTimingMemSize + oneTimingExtraMemSize);
+
                             //currentTimingPointer = new IntPtr(currentTimingPointer.ToInt64() + oneTimingMemSize);
                             //currentTimingExtraPointer = new IntPtr(currentTimingExtraPointer.ToInt64() + oneTimingExtraMemSize);
                         }
@@ -4927,7 +4961,7 @@ namespace DisplayMagicianShared.NVIDIA
                                     // And turn the memory pointer to NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2_INTERNAL into an actual object and populate the our wanted object
                                     NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2_INTERNAL returnedTargetInfo = (NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2_INTERNAL)Marshal.PtrToStructure(currentTargetInfoPointer, typeof(NV_DISPLAYCONFIG_PATH_TARGET_INFO_V2_INTERNAL));
                                     // Next we need to get access to the details object.
-                                    NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL returnedAdvTarget = (NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL)Marshal.PtrToStructure(returnedTargetInfo.Details, typeof(NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL));
+                                    //NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL returnedAdvTarget = (NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL)Marshal.PtrToStructure(returnedTargetInfo.Details, typeof(NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL));
                                     // Next we need to get access to the timing object.
                                     //NV_TIMING_INTERNAL returnedTiming = (NV_TIMING_INTERNAL)Marshal.PtrToStructure(returnedAdvTarget.Timing, typeof(NV_TIMING_INTERNAL));
                                     // Next we need to get access to the timing extra object.
@@ -4944,14 +4978,61 @@ namespace DisplayMagicianShared.NVIDIA
                                     PathInfos[i].TargetInfo[y].Details.Timing.Extra.TimingStandard = returnedTimingExtra.TimingStandard;
                                     PathInfos[i].TargetInfo[y].Details.Timing.Extra.VerticalAspect = returnedTimingExtra.VerticalAspect;*/
 
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Extra.Flags = returnedAdvTarget.Timing.Extra.Flags;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Extra.FrequencyInMillihertz = returnedAdvTarget.Timing.Extra.FrequencyInMillihertz;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Extra.HorizontalAspect = returnedAdvTarget.Timing.Extra.HorizontalAspect;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Extra.HorizontalPixelRepetition = returnedAdvTarget.Timing.Extra.HorizontalPixelRepetition;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Extra.Name = returnedAdvTarget.Timing.Extra.Name;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Extra.RefreshRate = returnedAdvTarget.Timing.Extra.RefreshRate;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Extra.TimingStandard = returnedAdvTarget.Timing.Extra.TimingStandard;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Extra.VerticalAspect = returnedAdvTarget.Timing.Extra.VerticalAspect;
+                                    // If the Details structure is populated, then the WindowsCCDTargetId should be null
+                                    if (returnedTargetInfo.Details != IntPtr.Zero)
+                                    {
+
+                                        //}
+                                        //var details = PathInfos[i].TargetInfo[y].Details;
+                                        //if (details.HasValue)
+                                        //{
+                                        // Next we need to get access to the details object.
+                                        NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL returnedAdvTarget = (NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL)Marshal.PtrToStructure(returnedTargetInfo.Details, typeof(NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1_INTERNAL));
+
+                                        PathInfos[i].TargetInfo[y].Details = new NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1() { };
+                                        var detailsValue = PathInfos[i].TargetInfo[y].Details.Value;
+                                        detailsValue.Timing.Extra.Flags = returnedAdvTarget.Timing.Extra.Flags ;
+                                        detailsValue.Timing.Extra.FrequencyInMillihertz = returnedAdvTarget.Timing.Extra.FrequencyInMillihertz;
+                                        detailsValue.Timing.Extra.HorizontalAspect = returnedAdvTarget.Timing.Extra.HorizontalAspect;
+                                        detailsValue.Timing.Extra.HorizontalPixelRepetition = returnedAdvTarget.Timing.Extra.HorizontalPixelRepetition;
+                                        detailsValue.Timing.Extra.Name = returnedAdvTarget.Timing.Extra.Name;
+                                        detailsValue.Timing.Extra.RefreshRate = returnedAdvTarget.Timing.Extra.RefreshRate;
+                                        detailsValue.Timing.Extra.TimingStandard = returnedAdvTarget.Timing.Extra.TimingStandard;
+                                        detailsValue.Timing.Extra.VerticalAspect = returnedAdvTarget.Timing.Extra.VerticalAspect;
+
+                                        detailsValue.Timing.HBorder = returnedAdvTarget.Timing.HBorder;
+                                        detailsValue.Timing.HFrontPorch = returnedAdvTarget.Timing.HFrontPorch;
+                                        detailsValue.Timing.HSyncPol = returnedAdvTarget.Timing.HSyncPol;
+                                        detailsValue.Timing.HSyncWidth = returnedAdvTarget.Timing.HSyncWidth;
+                                        detailsValue.Timing.HTotal = returnedAdvTarget.Timing.HTotal;
+                                        detailsValue.Timing.HVisible = returnedAdvTarget.Timing.HVisible;
+                                        detailsValue.Timing.Pclk = returnedAdvTarget.Timing.Pclk;
+                                        detailsValue.Timing.ScanMode = returnedAdvTarget.Timing.ScanMode;
+                                        detailsValue.Timing.VBorder = returnedAdvTarget.Timing.VBorder;
+                                        detailsValue.Timing.VFrontPorch = returnedAdvTarget.Timing.VFrontPorch;
+                                        detailsValue.Timing.VSyncPol = returnedAdvTarget.Timing.VSyncPol;
+                                        detailsValue.Timing.VSyncWidth = returnedAdvTarget.Timing.VSyncWidth;
+                                        detailsValue.Timing.VTotal = returnedAdvTarget.Timing.VTotal;
+                                        detailsValue.Timing.VVisible = returnedAdvTarget.Timing.VVisible;
+
+                                        // Next, we'll deal with the advanced details
+                                        detailsValue.ConnectorType = returnedAdvTarget.ConnectorType;
+                                        detailsValue.Flags = returnedAdvTarget.Flags;
+                                        detailsValue.RefreshRateInMillihertz = returnedAdvTarget.RefreshRateInMillihertz;
+                                        detailsValue.Rotation = returnedAdvTarget.Rotation;
+                                        detailsValue.Scaling = returnedAdvTarget.Scaling;
+                                        detailsValue.TimingOverride = returnedAdvTarget.TimingOverride;
+                                        detailsValue.TvFormat = returnedAdvTarget.TvFormat;
+                                        detailsValue.Version = returnedAdvTarget.Version;
+
+                                        PathInfos[i].TargetInfo[y].WindowsCCDTargetId = null;
+                                    }
+                                    else
+                                    {
+                                        PathInfos[i].TargetInfo[y].Details = null;
+
+                                        PathInfos[i].TargetInfo[y].WindowsCCDTargetId = returnedTargetInfo.WindowsCCDTargetId;
+                                    }
 
 
                                     // Next, we'll fill in the Timing info we want to return
@@ -4970,35 +5051,9 @@ namespace DisplayMagicianShared.NVIDIA
                                     PathInfos[i].TargetInfo[y].Details.Timing.VTotal = returnedTiming.VTotal;
                                     PathInfos[i].TargetInfo[y].Details.Timing.VVisible = returnedTiming.VVisible;*/
 
-                                    PathInfos[i].TargetInfo[y].Details.Timing.HBorder = returnedAdvTarget.Timing.HBorder;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.HFrontPorch = returnedAdvTarget.Timing.HFrontPorch;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.HSyncPol = returnedAdvTarget.Timing.HSyncPol;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.HSyncWidth = returnedAdvTarget.Timing.HSyncWidth;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.HTotal = returnedAdvTarget.Timing.HTotal;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.HVisible = returnedAdvTarget.Timing.HVisible;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.Pclk = returnedAdvTarget.Timing.Pclk;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.ScanMode = returnedAdvTarget.Timing.ScanMode;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.VBorder = returnedAdvTarget.Timing.VBorder;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.VFrontPorch = returnedAdvTarget.Timing.VFrontPorch;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.VSyncPol = returnedAdvTarget.Timing.VSyncPol;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.VSyncWidth = returnedAdvTarget.Timing.VSyncWidth;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.VTotal = returnedAdvTarget.Timing.VTotal;
-                                    PathInfos[i].TargetInfo[y].Details.Timing.VVisible = returnedAdvTarget.Timing.VVisible;
-
-                                    // Next, we'll deal with the advanced details
-                                    PathInfos[i].TargetInfo[y].Details.ConnectorType = returnedAdvTarget.ConnectorType;
-                                    PathInfos[i].TargetInfo[y].Details.Flags = returnedAdvTarget.Flags;
-                                    PathInfos[i].TargetInfo[y].Details.RefreshRateInMillihertz = returnedAdvTarget.RefreshRateInMillihertz;
-                                    PathInfos[i].TargetInfo[y].Details.Rotation = returnedAdvTarget.Rotation;
-                                    PathInfos[i].TargetInfo[y].Details.Scaling = returnedAdvTarget.Scaling;
-                                    PathInfos[i].TargetInfo[y].Details.TimingOverride = returnedAdvTarget.TimingOverride;
-                                    PathInfos[i].TargetInfo[y].Details.TvFormat = returnedAdvTarget.TvFormat;
-                                    PathInfos[i].TargetInfo[y].Details.Version = returnedAdvTarget.Version;
-
                                     // We'll finish with the TargetInfo
                                     PathInfos[i].TargetInfo[y].DisplayId = returnedTargetInfo.DisplayId;
-                                    PathInfos[i].TargetInfo[y].WindowsCCDTargetId = returnedTargetInfo.WindowsCCDTargetId;
-
+                                    
 
                                     currentTargetInfoPointer = new IntPtr(currentTargetInfoPointer.ToInt64() + onePathTargetMemSize);
                                 }
@@ -5253,7 +5308,7 @@ namespace DisplayMagicianShared.NVIDIA
 
                         NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1 advInfo = new NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1();
 
-                        advInfo.Timing.Extra.Flags = pathInfos[x].TargetInfo[y].Details.Timing.Extra.Flags;
+                       /* advInfo.Timing.Extra.Flags = pathInfos[x].TargetInfo[y].Details.Timing.Extra.Flags;
                         advInfo.Timing.Extra.FrequencyInMillihertz = pathInfos[x].TargetInfo[y].Details.Timing.Extra.FrequencyInMillihertz;
                         advInfo.Timing.Extra.HorizontalAspect = pathInfos[x].TargetInfo[y].Details.Timing.Extra.HorizontalAspect;
                         advInfo.Timing.Extra.HorizontalPixelRepetition = pathInfos[x].TargetInfo[y].Details.Timing.Extra.HorizontalPixelRepetition;
@@ -5292,7 +5347,7 @@ namespace DisplayMagicianShared.NVIDIA
                         targetInfoArray[y].Details = currentAdvTargetPointer;
                         targetInfoArray[y].DisplayId = pathInfos[x].TargetInfo[y].DisplayId;
                         targetInfoArray[y].WindowsCCDTargetId = pathInfos[x].TargetInfo[y].WindowsCCDTargetId;
-                        Marshal.StructureToPtr(targetInfoArray[y], currentTargetInfoPointer, true);
+                        Marshal.StructureToPtr(targetInfoArray[y], currentTargetInfoPointer, true);*/
 
                         // Prepare the pointers for the next objects
                         currentTargetInfoPointer = new IntPtr(currentTargetInfoPointer.ToInt64() + onePathTargetMemSize);
