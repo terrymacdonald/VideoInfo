@@ -229,21 +229,8 @@ namespace DisplayMagicianShared.AMD
 
         ~AMDLibrary()
         {
-            SharedLogger.logger.Trace("AMDLibrary/~AMDLibrary: Destroying AMD ADL2 library interface");
-            // If the ADL2 library was initialised, then we need to free it up.
-            if (_initialised)
-            {
-                try
-                {
-                    ADLImport.ADL2_Main_Control_Destroy(_adlContextHandle);
-                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADL2 library was destroyed successfully");
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Exception destroying AMD ADL2 library. ADL2_Main_Control_Destroy() caused an exception.");
-                }
-
-            }
+            SharedLogger.logger.Trace("AMDLibrary/~AMDLibrary: Destroying AMD Library");
+            Dispose(false);
         }
 
         // Public implementation of Dispose pattern callable by consumers.
@@ -264,6 +251,28 @@ namespace DisplayMagicianShared.AMD
 
                 // Dispose managed state (managed objects).
                 _safeHandle?.Dispose();
+            }
+
+            // Dispose unmanaged resources
+            if (_adlContextHandle != IntPtr.Zero)
+            {
+
+                SharedLogger.logger.Trace("AMDLibrary/Dispose: Destroying AMD ADL2 library interface");
+                // If the ADL2 library was initialised, then we need to free it up.
+                if (_initialised)
+                {
+                    try
+                    {
+                        ADLImport.ADL2_Main_Control_Destroy(_adlContextHandle);
+                        _adlContextHandle = IntPtr.Zero;
+                        SharedLogger.logger.Trace($"AMDLibrary/Dispose: AMD ADL2 library was destroyed successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Trace(ex, $"AMDLibrary/Dispose: Exception destroying AMD ADL2 library. ADL2_Main_Control_Destroy() caused an exception.");
+                    }
+
+                }
             }
 
             _disposed = true;
@@ -309,6 +318,11 @@ namespace DisplayMagicianShared.AMD
 
         public static AMDLibrary GetLibrary()
         {
+            if (_instance == null)
+            {
+                _instance = new AMDLibrary();
+            }
+
             return _instance;
         }
 

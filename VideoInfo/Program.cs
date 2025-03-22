@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿﻿using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Text;
@@ -279,11 +279,11 @@ namespace VideoInfo
 
                 if (!string.IsNullOrWhiteSpace(json))
                 {
-                    SharedLogger.logger.Error($"VideoInfo/saveToFile: Saving the display settings to {filename}.");
+                    SharedLogger.logger.Info($"VideoInfo/saveToFile: Saving the display settings to {filename}.");
 
                     File.WriteAllText(filename, json, Encoding.Unicode);
 
-                    SharedLogger.logger.Error($"VideoInfo/saveToFile: Display settings successfully saved to {filename}.");
+                    SharedLogger.logger.Info($"VideoInfo/saveToFile: Display settings successfully saved to {filename}.");
                     Console.WriteLine($"Display settings successfully saved to {filename}.");
                 }
                 else
