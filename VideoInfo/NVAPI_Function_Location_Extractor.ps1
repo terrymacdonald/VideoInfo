@@ -1,6 +1,6 @@
 # Written by Soroush Falahati
-$filename = "..\..\..\video-driver-sdks\NVIDIA\R525-developer\amd64\nvapi64.lib"
-$dumpbinAddress = "E:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\bin\Hostx64\x64\dumpbin.exe"
+$filename = "..\..\..\video-driver-sdks\NVIDIA\R510-developer\amd64\nvapi64.lib"
+$dumpbinAddress = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64\dumpbin.exe"
 $dumpbinParameter = "/DISASM $filename"
 Start-Process $dumpbinAddress $dumpbinParameter -Wait -WindowStyle Hidden -RedirectStandardOutput "$filename.asm"
 $content = Get-Content "$filename.asm"
@@ -32,7 +32,7 @@ foreach ($line in $content)
 		{
 			$functionName = $functionName.Replace("NvAPI_","NvId_")
 			$functionAddress = $functionAddressNumberic.ToString("X")
-			Write-Host "private const UInt32 $functionName = 0x$functionAddress;"
+			Write-Host "private const uint $functionName = 0x$functionAddress;"
 			$functionName = ""
 			continue;
 		}
