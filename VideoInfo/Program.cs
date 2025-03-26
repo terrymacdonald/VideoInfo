@@ -9,6 +9,7 @@ using DisplayMagicianShared.AMD;
 using DisplayMagicianShared.Windows;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 
 namespace VideoInfo
 {
@@ -34,18 +35,19 @@ namespace VideoInfo
             // Prepare NLog for logging
             var config = new NLog.Config.LoggingConfiguration();
 
-            // Targets where to log to: File and Console
-            //string date = DateTime.Now.ToString("yyyyMMdd.HHmmss");
-            string AppLogFilename = Path.Combine($"VideoInfo.log");
-
             // Rules for mapping loggers to targets          
             NLog.LogLevel logLevel = NLog.LogLevel.Trace;
+
+            // Targets where to log to: File and Console
+            string AppLogFilename = $"VideoInfo-{DateTime.UtcNow.ToString("yyyy-MM-dd-HHmm", CultureInfo.InvariantCulture)}.log";
 
             // Create the log file target
             var logfile = new NLog.Targets.FileTarget("logfile")
             {
                 FileName = AppLogFilename,
-                DeleteOldFileOnStartup = true
+                MaxArchiveFiles = 10,
+                ArchiveAboveSize = 41943040, // 40MB max file size
+                Layout = "${longdate}|${level:uppercase=true}|${logger}|${message}|${onexception:EXCEPTION OCCURRED \\:${exception::format=toString,Properties,Data}"
             };
 
             // Create a logging rule to use the log file target
@@ -60,7 +62,8 @@ namespace VideoInfo
 
             // Start the Log file
             SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.8.4");
-
+            // Log the commandline options
+            SharedLogger.logger.Info($"VideoInfo/Main: cmdline options: {string.Join(" ", args)}");
 
             Console.WriteLine($"\nVideoInfo v1.8.4");
             Console.WriteLine($"=================");
