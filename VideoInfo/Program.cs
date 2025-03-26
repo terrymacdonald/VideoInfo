@@ -349,23 +349,32 @@ namespace VideoInfo
                     bool itWorkedforAMDOverride = false;
                     bool errorApplyingSomething = false;
 
-                    if (nvidiaLibrary.IsInstalled)                        
+                    if (nvidiaLibrary.IsInstalled)
                     {
-                        if (myDisplayConfig.NVIDIAConfig.DisplayIdentifiers.Count > 0)
+                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA NvAPI DLL is available to use on this computer.");
+                        if (myDisplayConfig.NVIDIAConfig.IsInUse)
                         {
-                            if (nvidiaLibrary.IsPossibleConfig(myDisplayConfig.NVIDIAConfig))
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings are used in this display profile.");
+                            if (myDisplayConfig.NVIDIAConfig.DisplayIdentifiers.Count > 0)
                             {
-                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} are possible to use right now, so we'll use attempt to use them shortly.");
-                                applyNVIDIASettings = true;
+                                if (nvidiaLibrary.IsPossibleConfig(myDisplayConfig.NVIDIAConfig))
+                                {
+                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} are possible to use right now, so we'll use attempt to use them shortly.");
+                                    applyNVIDIASettings = true;
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were NOT possible to be applied.");
+                                }
                             }
                             else
                             {
-                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were NOT possible to be applied.");
+                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying NVIDIA display settings as no screens are connected to the NVIDIA video card.");
                             }
                         }
                         else
                         {
-                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying NVIDIA display settings as no screens are connected to the NVIDIA video card.");
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying NVIDIA display settings as the NVIDIA settings are not in use in this display profile.");
                         }
                     }
                     else
@@ -375,21 +384,31 @@ namespace VideoInfo
 
                     if (amdLibrary.IsInstalled)
                     {
-                        if (myDisplayConfig.AMDConfig.DisplayIdentifiers.Count > 0)
+                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD ADL DLL is available to use on this computer.");
+                        if (myDisplayConfig.AMDConfig.IsInUse)
                         {
-                            if (amdLibrary.IsPossibleConfig(myDisplayConfig.AMDConfig))
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings are used in this display profile.");
+
+                            if (myDisplayConfig.AMDConfig.DisplayIdentifiers.Count > 0)
                             {
-                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} are possible to use right now, so we'll use attempt to use them.");
-                                applyAMDSettings = true;
+                                if (amdLibrary.IsPossibleConfig(myDisplayConfig.AMDConfig))
+                                {
+                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} are possible to use right now, so we'll use attempt to use them.");
+                                    applyAMDSettings = true;
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were NOT possible to be applied.");
+                                }
                             }
                             else
                             {
-                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were NOT possible to be applied.");
+                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display settings as the AMD library isn't installed.");
                             }
                         }
                         else
                         {
-                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display settings as the AMD library isn't installed.");
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display settings as the NVIDIA settings are not in use in this display profile.");
                         }
 
                     }
