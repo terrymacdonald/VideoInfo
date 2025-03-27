@@ -67,7 +67,7 @@ namespace VideoInfo
 
             Console.WriteLine($"\nVideoInfo v1.8.5");
             Console.WriteLine($"=================");
-            Console.WriteLine($"(c) Terry MacDonald 2023\n");
+            Console.WriteLine($"(c) Terry MacDonald 2025\n");
 
             // First check that we have an Video Card in this PC that we support
             List<string> videoCardVendors = WinLibrary.GetLibrary().GetAllPCIVideoCardVendors();
