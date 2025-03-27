@@ -69,17 +69,6 @@ namespace VideoInfo
             Console.WriteLine($"=================");
             Console.WriteLine($"(c) Terry MacDonald 2025\n");
 
-            // First check that we have an Video Card in this PC that we support
-            List<string> videoCardVendors = WinLibrary.GetLibrary().GetAllPCIVideoCardVendors();
-            if (!NVIDIALibrary.GetLibrary().PCIVendorIDs.All(value => videoCardVendors.Contains(value)))
-            {
-                SharedLogger.logger.Error($"VideoInfo/Main: There are no NVIDIA Video Cards enabled within this computer. VideoInfo requires at least one NVIDIA Video Card to work. Please use DisplayMagician instead.");
-                Console.WriteLine($"ERROR - There are no NVIDIA Video Cards enabled within this computer. VideoInfo requires at least one NVIDIA Video Card to work.");
-                Console.WriteLine($"        Please use DisplayMagician instead. See https://displaymagician.littlebitbig.com for more information.");
-                Console.WriteLine();
-                Environment.Exit(1);
-            }
-
             // Update the configuration
             nvidiaLibrary = NVIDIALibrary.GetLibrary();
             amdLibrary = AMDLibrary.GetLibrary();
