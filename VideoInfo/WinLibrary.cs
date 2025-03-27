@@ -1542,7 +1542,7 @@ namespace DisplayMagicianShared.Windows
 
             SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: SUCCESS! The display configuration has been successfully applied");
 
-            SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting 0.1 second to let the display change take place before adjusting the Windows CCD Source DPI scaling settings");
+            /*SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting 0.1 second to let the display change take place before adjusting the Windows CCD Source DPI scaling settings");
             System.Threading.Thread.Sleep(100);
 
             SharedLogger.logger.Trace($"WinLibrary/SetWindowsDisplayConfig: Attempting to set Windows DPI Scaling setting for display sources.");
@@ -1567,7 +1567,7 @@ namespace DisplayMagicianShared.Windows
                     SharedLogger.logger.Warn($"WinLibrary/SetWindowsDisplayConfig: WARNING - Unable to set DPI value for source {displaySourceEntry.Value[0].SourceId} to {displayScalingInfo.ScaleRel}.");
                 }
             }
-            CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
+            CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);*/
 
 
             // NOTE: There is currently no way within Windows CCD API to set the HDR settings to any particular setting

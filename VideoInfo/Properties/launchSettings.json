@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "VideoInfo save cfg1": {
+      "commandName": "Project",
+      "commandLineArgs": "save test-config1.cfg",
+      "nativeDebugging": true
+    },
+    "VideoInfo save cfg2": {
+      "commandName": "Project",
+      "commandLineArgs": "save test-config2.cfg",
+      "nativeDebugging": true
+    },
+    "VideoInfo load cfg1": {
+      "commandName": "Project",
+      "commandLineArgs": "load test-config1.cfg",
+      "nativeDebugging": true
+    },
+    "VideoInfo load cfg2": {
+      "commandName": "Project",
+      "commandLineArgs": "load test-config2.cfg",
+      "nativeDebugging": true
+    }
+  }
+}
