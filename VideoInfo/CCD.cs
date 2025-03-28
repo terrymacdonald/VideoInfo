@@ -389,7 +389,7 @@ namespace DisplayMagicianShared.Windows
         * @brief The value we want to set. The value should be relative to the recommended DPI scaling value of source.
         * eg. if scaleRel == 1, and recommended value is 175% => we are trying to set 200% scaling for the source
         */
-        public UInt32 ScaleRel;
+        public Int32 ScaleRel;
     };
 
     [StructLayout(LayoutKind.Sequential)]

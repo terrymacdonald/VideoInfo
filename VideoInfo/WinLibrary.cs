@@ -522,6 +522,78 @@ namespace DisplayMagicianShared.Windows
             return sourceDPIScalingInfo;
         }
 
+        public bool SetDPISettings(LUID pathSourceAdapterId, uint pathSourceId, uint pathTargetId, DPIScalingInfo suppliedDPIScalingInfo)
+        {
+            // Get the current settigns as we stand so we know how much we need to adjust by
+            DPIScalingInfo currentDPIScalingInfo = GetDPISettings(pathSourceAdapterId, pathSourceId, pathTargetId);
+
+            // Skip doing anything if we're the same DPI!
+            if (suppliedDPIScalingInfo.Current == currentDPIScalingInfo.Current)
+            {
+                return true;
+            }
+
+            // Otherwise we need to figure out how how much relative scaling we need to do
+
+            if (suppliedDPIScalingInfo.Current < currentDPIScalingInfo.Minimum)
+            {
+                suppliedDPIScalingInfo.Current = currentDPIScalingInfo.Minimum;
+            }
+            else if (suppliedDPIScalingInfo.Current > currentDPIScalingInfo.Maximum)
+            {
+                suppliedDPIScalingInfo.Current = currentDPIScalingInfo.Maximum;
+            }
+
+            // Get the indexes of the array items that we want  - the location of the value we want to set, and location of the recommended value
+            int idxDPIValueWeWant = -1;
+            int idxDPIRecommendedValue = -1;
+
+            for (int i=0; i < CCDImport.DPI_VALUE_LIST.Length; i++)
+            {
+                if (CCDImport.DPI_VALUE_LIST[i] == suppliedDPIScalingInfo.Current)
+                {
+                    idxDPIValueWeWant = i;
+                }
+                if (CCDImport.DPI_VALUE_LIST[i] == currentDPIScalingInfo.Recommended)
+                {
+                    idxDPIRecommendedValue = i;
+                }
+            }
+
+            if ((idxDPIValueWeWant == -1) || (idxDPIRecommendedValue == -1))
+            {
+                // Didn't manage to find the entries in the list, so there is something wrong!
+                SharedLogger.logger.Warn($"WinLibrary/SetDPISettings: WARNING - Cannot find the DPI settings supplied in our known list of DPI settings for display {pathTargetId}. We were looking for {suppliedDPIScalingInfo.Current} in the following list {String.Join(",",CCDImport.DPI_VALUE_LIST)}");
+                return false;
+            }
+
+            // Now calculate the all important relative scaling value we need to actually make the change
+            int dpiRelativeVal = idxDPIValueWeWant - idxDPIRecommendedValue;
+            SharedLogger.logger.Trace($"WinLibrary/SetDPISettings: Found the DPI value we want ({suppliedDPIScalingInfo.Current}) is at index {idxDPIValueWeWant}, and the value of the current recommended ({currentDPIScalingInfo.Recommended}) is at index {idxDPIRecommendedValue} for display {pathTargetId}. The DPI relative value we need is therefore {dpiRelativeVal}.");
+
+            // We only need to set the source on the first display source
+            // Set the Windows Scaling DPI per source
+            DISPLAYCONFIG_SOURCE_DPI_SCALE_SET displayScalingInfo = new DISPLAYCONFIG_SOURCE_DPI_SCALE_SET();
+            displayScalingInfo.Header.Type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_SET_DPI_SCALE;
+            displayScalingInfo.Header.Size = (uint)Marshal.SizeOf<DISPLAYCONFIG_SOURCE_DPI_SCALE_SET>(); ;
+            displayScalingInfo.Header.AdapterId = pathSourceAdapterId;
+            displayScalingInfo.Header.Id = pathSourceId;
+            displayScalingInfo.ScaleRel = dpiRelativeVal;
+            WIN32STATUS err = CCDImport.DisplayConfigSetDeviceInfo(ref displayScalingInfo);
+            if (err == WIN32STATUS.ERROR_SUCCESS)
+            {
+                SharedLogger.logger.Trace($"WinLibrary/SetDPISettings: Setting DPI relative value for source {pathSourceAdapterId} to {displayScalingInfo.ScaleRel} ({suppliedDPIScalingInfo.Current}).");
+                return true;
+            }
+            else
+            {
+                SharedLogger.logger.Warn($"WinLibrary/SetDPISettings: WARNING - Unable to set DPI relative value for source {pathSourceAdapterId} to {displayScalingInfo.ScaleRel} ({suppliedDPIScalingInfo.Current}).");
+                return false;
+
+            }
+
+        }
+
         public bool UpdateActiveConfig(bool fastScan = true)
         {
             SharedLogger.logger.Trace($"WinLibrary/UpdateActiveConfig: Updating the currently active config");
@@ -668,7 +740,6 @@ namespace DisplayMagicianShared.Windows
                 bool isClonedPath = false;
 
                 // Get the Windows Scaling DPI per display
-                Int32 sourceDpiScalingRel = 0;
                 DPIScalingInfo sourceDPIScalingInfo = GetDPISettings(paths[i].SourceInfo.AdapterId, paths[i].SourceInfo.Id, paths[i].TargetInfo.Id);
 
                 // get display source name
@@ -1575,32 +1646,27 @@ namespace DisplayMagicianShared.Windows
 
             SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: SUCCESS! The display configuration has been successfully applied");
 
-            /*SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting 0.1 second to let the display change take place before adjusting the Windows CCD Source DPI scaling settings");
+            SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting 0.1 second to let the display change take place before adjusting the Windows CCD Source DPI scaling settings");
             System.Threading.Thread.Sleep(100);
 
-            SharedLogger.logger.Trace($"WinLibrary/SetWindowsDisplayConfig: Attempting to set Windows DPI Scaling setting for display sources.");
+            SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set Windows DPI Scaling setting for display sources.");
             CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
             foreach (var displaySourceEntry in displayConfig.DisplaySources)
             {
                 // We only need to set the source on the first display source
                 // Set the Windows Scaling DPI per source
-                DISPLAYCONFIG_SOURCE_DPI_SCALE_SET displayScalingInfo = new DISPLAYCONFIG_SOURCE_DPI_SCALE_SET();
-                displayScalingInfo.Header.Type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_SET_DPI_SCALE;
-                displayScalingInfo.Header.Size = (uint)Marshal.SizeOf<DISPLAYCONFIG_SOURCE_DPI_SCALE_SET>(); ;
-                displayScalingInfo.Header.AdapterId = displaySourceEntry.Value[0].AdapterId;
-                displayScalingInfo.Header.Id = displaySourceEntry.Value[0].SourceId;
-                displayScalingInfo.ScaleRel = displaySourceEntry.Value[0].SourceDpiScalingRel;
-                err = CCDImport.DisplayConfigSetDeviceInfo(ref displayScalingInfo);
-                if (err == WIN32STATUS.ERROR_SUCCESS)
+                if (SetDPISettings(displaySourceEntry.Value[0].AdapterId, displaySourceEntry.Value[0].SourceId, displaySourceEntry.Value[0].TargetId, displaySourceEntry.Value[0].SourceDPIScalingInfo))
                 {
-                    SharedLogger.logger.Trace($"WinLibrary/SetWindowsDisplayConfig: Setting DPI value for source {displaySourceEntry.Value[0].SourceId} to {displayScalingInfo.ScaleRel}.");
+                    SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Set the DPI scaling settings for display source {displaySourceEntry.Value[0].SourceId}");
                 }
                 else
                 {
-                    SharedLogger.logger.Warn($"WinLibrary/SetWindowsDisplayConfig: WARNING - Unable to set DPI value for source {displaySourceEntry.Value[0].SourceId} to {displayScalingInfo.ScaleRel}.");
+                    SharedLogger.logger.Error($"WinLibrary/SetActiveConfig: ERROR - Unable to set the DPI scaling settings for display source {displaySourceEntry.Value[0].SourceId}");
+                    return false;
                 }
+
             }
-            CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);*/
+            CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
 
 
             // NOTE: There is currently no way within Windows CCD API to set the HDR settings to any particular setting
