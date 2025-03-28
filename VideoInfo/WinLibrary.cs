@@ -15,6 +15,7 @@ using Windows.ApplicationModel;
 using EDIDParser;
 using static DisplayMagicianShared.NVIDIA.DisplayTopologyStatus;
 using System.Runtime.Intrinsics.Arm;
+using DisplayMagicianShared.Helpers;
 
 namespace DisplayMagicianShared.Windows
 {
@@ -1527,7 +1528,10 @@ namespace DisplayMagicianShared.Windows
             GDIImport.ResetGraphicsStack();
 
             // Also reapply the current configuration to just wake up any monitors that are currently asleep.
-            CCDImport.SetDisplayConfig(0, null, 0, null, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT);
+            //CCDImport.SetDisplayConfig(0, null, 0, null, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT);
+
+            // Poke all monitors using DDC/CI to wake them up
+            //DdcCiHelper.PokeAllMonitors();
 
             return true;
         }
