@@ -582,12 +582,12 @@ namespace DisplayMagicianShared.Windows
             WIN32STATUS err = CCDImport.DisplayConfigSetDeviceInfo(ref displayScalingInfo);
             if (err == WIN32STATUS.ERROR_SUCCESS)
             {
-                SharedLogger.logger.Trace($"WinLibrary/SetDPISettings: Setting DPI relative value for source {pathSourceAdapterId} to {displayScalingInfo.ScaleRel} ({suppliedDPIScalingInfo.Current}).");
+                SharedLogger.logger.Trace($"WinLibrary/SetDPISettings: Successfully set the DPI relative value for source {pathSourceId} to {displayScalingInfo.ScaleRel} ({suppliedDPIScalingInfo.Current}).");
                 return true;
             }
             else
             {
-                SharedLogger.logger.Warn($"WinLibrary/SetDPISettings: WARNING - Unable to set DPI relative value for source {pathSourceAdapterId} to {displayScalingInfo.ScaleRel} ({suppliedDPIScalingInfo.Current}).");
+                SharedLogger.logger.Warn($"WinLibrary/SetDPISettings: WARNING - Unable to set DPI relative value for source {pathSourceId} to {displayScalingInfo.ScaleRel} ({suppliedDPIScalingInfo.Current}).");
                 return false;
 
             }
