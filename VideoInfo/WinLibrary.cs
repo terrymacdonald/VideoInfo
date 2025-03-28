@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 using static DisplayMagicianShared.Windows.TaskBarLayout;
 using System.Diagnostics;
 using Windows.ApplicationModel;
+using EDIDParser;
+using static DisplayMagicianShared.NVIDIA.DisplayTopologyStatus;
+using System.Runtime.Intrinsics.Arm;
 
 namespace DisplayMagicianShared.Windows
 {
@@ -1513,6 +1516,22 @@ namespace DisplayMagicianShared.Windows
             return stringToReturn;
         }
 
+        public bool WakeUpAllDisplays()
+        {
+            // Attempt to wake any displays that are asleep by emulaing a Ctrl + Shift + Windows key + B kjeypress to reset the windows graphic display driver.
+            // This is a workaround for a bug in Windows 10 where the display driver can sometimes go to sleep and not wake up. Here's what it does:
+            // - It calls DxgkDdiResetFromTimeout() internally.
+            // - Resets the GPU driver stack(WDDM).
+            // - Reinitialises the display pipeline.
+            // - Can "wake" sleeping or non - responding displays, including those with bad EDID or DP handshake issues.
+            GDIImport.ResetGraphicsStack();
+
+            // Also reapply the current configuration to just wake up any monitors that are currently asleep.
+            CCDImport.SetDisplayConfig(0, null, 0, null, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT);
+
+            return true;
+        }
+
         public bool SetActiveConfig(WINDOWS_DISPLAY_CONFIG displayConfig)
         {
             //bool needToRestartExplorer = false;
@@ -2526,8 +2545,6 @@ namespace DisplayMagicianShared.Windows
                 return false;
             }
         }
-
-
 
         public static bool RepositionMainTaskBar(TaskBarEdge edge)
         {

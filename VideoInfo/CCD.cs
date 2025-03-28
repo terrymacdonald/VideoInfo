@@ -36,9 +36,14 @@ namespace DisplayMagicianShared.Windows
         // See https://github.com/lihas/windows-DPI-scaling-sample/blob/master/DPIHelper/DpiHelper.h from Sahil Singh
         DISPLAYCONFIG_DEVICE_INFO_GET_MONITOR_INTERNAL_INFO = DISPLAYCONFIG_DEVICE_INFO_GET_MONITOR_BRIGHTNESS_INFO, //alias for DISPLAYCONFIG_DEVICE_INFO_GET_MONITOR_BRIGHTNESS_INFO since it returns values other than brightness
         DISPLAYCONFIG_DEVICE_INFO_GET_MONITOR_UNIQUE_NAME = DISPLAYCONFIG_DEVICE_INFO_GET_MONITOR_BRIGHTNESS_INFO, //Another Alias since we are using the parameter mainly for getting the display unique name
+        DISPLAYCONFIG_DEVICE_INFO_TERRY_TEST_MINUS_EIGHT = -8, //???
         DISPLAYCONFIG_DEVICE_INFO_GET_MONITOR_BRIGHTNESS_INFO = -7, //Get monitor brightness info
+        DISPLAYCONFIG_DEVICE_INFO_TERRY_TEST_MINUS_SIX = -6, //???
+        DISPLAYCONFIG_DEVICE_INFO_TERRY_TEST_MINUS_FIVE = -5, //???
         DISPLAYCONFIG_DEVICE_INFO_SET_DPI_SCALE = -4, // Set current dpi scaling value for a display
         DISPLAYCONFIG_DEVICE_INFO_GET_DPI_SCALE = -3, // Returns min, max, suggested, and currently applied DPI scaling values.
+        DISPLAYCONFIG_DEVICE_INFO_TERRY_TEST_MINUS_TWO = -2, //???
+        DISPLAYCONFIG_DEVICE_INFO_TERRY_TEST_MINUS_ONE = -1, //???
 
         // MS Public API
         Zero = 0,

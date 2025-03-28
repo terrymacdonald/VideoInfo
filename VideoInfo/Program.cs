@@ -341,6 +341,10 @@ namespace VideoInfo
                     bool itWorkedforAMDOverride = false;
                     bool errorApplyingSomething = false;
 
+
+                    // Wake up all attached displays in case they have gone to sleep
+                    winLibrary.WakeUpAllDisplays();
+
                     if (nvidiaLibrary.IsInstalled)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA NvAPI DLL is available to use on this computer.");
