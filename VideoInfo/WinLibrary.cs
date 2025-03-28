@@ -11,6 +11,7 @@ using Microsoft.Win32;
 using System.Threading.Tasks;
 using static DisplayMagicianShared.Windows.TaskBarLayout;
 using System.Diagnostics;
+using Windows.ApplicationModel;
 
 namespace DisplayMagicianShared.Windows
 {
@@ -48,19 +49,21 @@ namespace DisplayMagicianShared.Windows
         public string DevicePath;
         //The value we want to set. The value should be relative to the recommended DPI scaling value of source.
         // eg. if scaleRel == 1, and recommended value is 175% => we are trying to set 200% scaling for the source
-        public UInt32 SourceDpiScalingRel;
+        public Int32 SourceDpiScalingRel;
+        public DPIScalingInfo SourceDPIScalingInfo;
 
         public override bool Equals(object obj) => obj is DISPLAY_SOURCE other && this.Equals(other);
         public bool Equals(DISPLAY_SOURCE other)
         =>  //SourceId.Equals(other.SourceId) &&  // Source ID needs to be ignored in this case, as windows moves the source ids around :(
             TargetId.Equals(other.TargetId) &&
             DevicePath.Equals(other.DevicePath) &&
-            SourceDpiScalingRel.Equals(other.SourceDpiScalingRel);
+            SourceDpiScalingRel.Equals(other.SourceDpiScalingRel) &&
+            SourceDPIScalingInfo.Equals(other.SourceDPIScalingInfo);
         //=> true;
         public override int GetHashCode()
         {
             //return (SourceId, TargetId, DevicePath, SourceDpiScalingRel).GetHashCode(); // Source ID needs to be ignored in this case, as windows moves the source ids around :(
-            return (TargetId, DevicePath, SourceDpiScalingRel).GetHashCode();
+            return (TargetId, DevicePath, SourceDpiScalingRel, SourceDPIScalingInfo).GetHashCode();
         }
 
         public static bool operator ==(DISPLAY_SOURCE lhs, DISPLAY_SOURCE rhs) => lhs.Equals(rhs);
@@ -619,7 +622,8 @@ namespace DisplayMagicianShared.Windows
                 bool isClonedPath = false;
 
                 // Get the Windows Scaling DPI per display
-                UInt32 sourceDpiScalingRel = 0;
+                Int32 sourceDpiScalingRel = 0;
+                DPIScalingInfo sourceDPIScalingInfo = new DPIScalingInfo();
                 DISPLAYCONFIG_SOURCE_DPI_SCALE_GET displayScalingInfo = new DISPLAYCONFIG_SOURCE_DPI_SCALE_GET();
                 displayScalingInfo.Header.Type = DISPLAYCONFIG_DEVICE_INFO_TYPE.DISPLAYCONFIG_DEVICE_INFO_GET_DPI_SCALE;
                 displayScalingInfo.Header.Size = (uint)Marshal.SizeOf<DISPLAYCONFIG_SOURCE_DPI_SCALE_GET>(); ;
@@ -629,6 +633,32 @@ namespace DisplayMagicianShared.Windows
                 if (err == WIN32STATUS.ERROR_SUCCESS)
                 {
                     SharedLogger.logger.Trace($"WinLibrary/GetWindowsDisplayConfig: Found Windows DPI scaling value for source {paths[i].SourceInfo.Id} is {displayScalingInfo.CurrrentScaleRel}.");
+                    // We just got a relative identifier for the scaling, but we need to derive the absolute value from it n order to be able to store it.
+                    // First up we make sure the value is within the limits of what the OS can show
+                    if (displayScalingInfo.CurrrentScaleRel < displayScalingInfo.MinScaleRel)
+                    {
+                        displayScalingInfo.CurrrentScaleRel = displayScalingInfo.MinScaleRel;
+                    }
+                    else if (displayScalingInfo.CurrrentScaleRel > displayScalingInfo.MaxScaleRel)
+                    {
+                        displayScalingInfo.CurrrentScaleRel = displayScalingInfo.MaxScaleRel;
+                    }                    
+
+                    Int32 minAbs = Math.Abs((int)displayScalingInfo.MinScaleRel);
+                    if (CCDImport.DPI_VALUE_LIST.Length >= (minAbs + displayScalingInfo.MaxScaleRel + 1))
+                    {//all ok
+                        sourceDPIScalingInfo.Minimum = CCDImport.DPI_VALUE_LIST[minAbs + displayScalingInfo.MinScaleRel];
+                        sourceDPIScalingInfo.Current = CCDImport.DPI_VALUE_LIST[minAbs + displayScalingInfo.CurrrentScaleRel];
+                        sourceDPIScalingInfo.Recommended = CCDImport.DPI_VALUE_LIST[minAbs];
+                        sourceDPIScalingInfo.Maximum = CCDImport.DPI_VALUE_LIST[minAbs + displayScalingInfo.MaxScaleRel];
+                        SharedLogger.logger.Trace($"WinLibrary/GetWindowsDisplayConfig: Display {paths[i].TargetInfo.Id} is currently set to DPI value {sourceDPIScalingInfo.Current} and the DPI value recommended is {sourceDPIScalingInfo.Recommended}. The current DPI value offset is {displayScalingInfo.CurrrentScaleRel}");
+                    }
+                    else
+                    {
+                        // Warning! The information returned from windows is different to what we were expecting.
+                        SharedLogger.logger.Warn($"WinLibrary/GetWindowsDisplayConfig: WARNING - Windows DPI Scaling info returned from windows is different from its expected values for display {paths[i].TargetInfo.Id}.");
+                    }
+
                     sourceDpiScalingRel = displayScalingInfo.CurrrentScaleRel;
 
                 }
@@ -658,6 +688,7 @@ namespace DisplayMagicianShared.Windows
                         ds.SourceId = paths[i].SourceInfo.Id;
                         ds.TargetId = paths[i].TargetInfo.Id;
                         ds.SourceDpiScalingRel = sourceDpiScalingRel;
+                        ds.SourceDPIScalingInfo = sourceDPIScalingInfo;
                         windowsDisplayConfig.DisplaySources[sourceInfo.ViewGdiDeviceName].Add(ds);
                         isClonedPath = true;
                         isClonedProfile = true;
@@ -672,6 +703,7 @@ namespace DisplayMagicianShared.Windows
                         ds.SourceId = paths[i].SourceInfo.Id;
                         ds.TargetId = paths[i].TargetInfo.Id;
                         ds.SourceDpiScalingRel = sourceDpiScalingRel;
+                        ds.SourceDPIScalingInfo = sourceDPIScalingInfo;
                         sources.Add(ds);
                         windowsDisplayConfig.DisplaySources.Add(sourceInfo.ViewGdiDeviceName, sources);
                     }
