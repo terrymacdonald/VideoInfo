@@ -24,6 +24,11 @@
       "commandName": "Project",
       "commandLineArgs": "save test-config3.cfg",
       "nativeDebugging": true
+    },
+    "VideoInfo load cfg3": {
+      "commandName": "Project",
+      "commandLineArgs": "load test-config3.cfg",
+      "nativeDebugging": true
     }
   }
 }

@@ -1781,7 +1781,7 @@ namespace DisplayMagicianShared.NVIDIA
                     }
                 }
 
-                // Now we set the NVIDIA Display Config (if we have one!)
+                /*// Now we set the NVIDIA Display Config (if we have one!)
                 // If the display profile is a cloned config then NVIDIA GetDisplayConfig doesn't work
                 // so we need to check for that. We just skip the SetDisplayConfig as it won't exist
                 if (displayConfig.DisplayConfigs.Count > 0)
@@ -1833,7 +1833,7 @@ namespace DisplayMagicianShared.NVIDIA
                 else
                 {
                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Skipping setting the NVIDIA Display Config as there isn't one provided in the configuration.");
-                }
+                }*/
 
                /* try
                 {
@@ -2044,7 +2044,7 @@ namespace DisplayMagicianShared.NVIDIA
                     SetDisplayTopologyFlag setTopoFlags = SetDisplayTopologyFlag.NoFlag;
 
                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Mosaic config that is currently set is no longer needed. Removing Mosaic config.");
-                    IGridTopology[] individualScreensTopology = CreateSingleScreenMosaicTopology().Cast<IGridTopology>().ToArray();
+                    GridTopologyV2[] individualScreensTopology = CreateSingleScreenMosaicTopology().ToArray();
 
                     try
                     {
@@ -3069,7 +3069,7 @@ namespace DisplayMagicianShared.NVIDIA
             {
                 // Get Current Mosaic Display Topology settings using the Grid topologies numbers we got before
                 //NV_MOSAIC_TOPO myGridTopo = gridTopo;
-                IDisplaySettings[] mosaicDisplaySettings = new IDisplaySettings[0];
+                DisplaySettingsV2[] mosaicDisplaySettings = new DisplaySettingsV2[0];
                 try
                 {
                     SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Attempting to get the current mosaic display modes for the current mosaic grid topology from the NVIDIA Driver.");
@@ -3083,20 +3083,13 @@ namespace DisplayMagicianShared.NVIDIA
 
                 for (int displayIndexToUse = 0; displayIndexToUse < gridTopo.Displays.Count(); displayIndexToUse++)
                 {
-                    GridTopologyV2 thisScreen = new GridTopologyV2(1,1, gridTopo.Displays.Cast<GridTopologyDisplayV2>().ToArray(), gridTopo.DisplaySettings,false,false,false,false,false,false);
+                    GridTopologyV2 thisScreen = new GridTopologyV2(1,1, gridTopo.Displays.ToArray(), gridTopo.DisplaySettings,false,false,false,false,false,false);
                     screensToReturn.Add(thisScreen);
                 }
 
             }
 
             return screensToReturn.ToArray();
-        }
-
-
-        private GridTopologyV2 convertIGridTopologyToGridTopologyV2(IGridTopology obj)
-        {
-            //do something to cast Type1 into Type2
-            return new GridTopologyV2();
         }
 
         public static bool ListOfArraysEqual(List<Rectangle[]> a1, List<Rectangle[]> a2)

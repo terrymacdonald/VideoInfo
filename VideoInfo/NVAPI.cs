@@ -2007,7 +2007,7 @@ namespace DisplayMagicianShared.NVIDIA
         /// <exception cref="NVIDIAApiException">Status.Error: Miscellaneous error occurred.</exception>
         /// <exception cref="NVIDIANotSupportedException">This operation is not supported.</exception>
         /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-        public static IDisplaySettings[] EnumDisplayModes(GridTopologyV2 gridTopology)
+        public static DisplaySettingsV2[] EnumDisplayModes(GridTopologyV2 gridTopology)
         {
             var mosaicEnumDisplayModes = DelegateFactory.GetDelegate<MosaicDelegates.NvAPI_Mosaic_EnumDisplayModes>();
 
@@ -2023,7 +2023,7 @@ namespace DisplayMagicianShared.NVIDIA
 
                 if (totalAvailable == 0)
                 {
-                    return new IDisplaySettings[0];
+                    return new DisplaySettingsV2[0];
                 }
 
                 foreach (var acceptType in mosaicEnumDisplayModes.Accepts(2))
@@ -2047,7 +2047,7 @@ namespace DisplayMagicianShared.NVIDIA
                             throw new NVIDIAApiException(status);
                         }
 
-                        return displaySettingByRef.ToArray<IDisplaySettings>((int)counts, acceptType);
+                        return displaySettingByRef.ToArray<DisplaySettingsV2>((int)counts, acceptType);
                     }
                 }
 
@@ -2403,10 +2403,10 @@ namespace DisplayMagicianShared.NVIDIA
         /// <exception cref="NVIDIAApiException">Status.NoImplementation: This entry point not available.</exception>
         /// <exception cref="NVIDIAApiException">Status.Error: Miscellaneous error occurred.</exception>
         public static DisplayTopologyStatus[] ValidateDisplayGrids(
-            IGridTopology[] gridTopologies,
+            GridTopologyV2[] gridTopologies,
             SetDisplayTopologyFlag flags = SetDisplayTopologyFlag.NoFlag)
         {
-            using (var gridTopologiesByRef = ValueTypeArray.FromArray(gridTopologies.AsEnumerable()))
+            using (var gridTopologiesByRef = ValueTypeArray.FromArray(gridTopologies))
             {
                 var statuses =
                     typeof(DisplayTopologyStatus).Instantiate<DisplayTopologyStatus>().Repeat(gridTopologies.Length);
