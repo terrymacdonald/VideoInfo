@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using Windows.Graphics;
 using static DisplayMagicianShared.NVIDIA.DisplayTopologyStatus;
 
 namespace DisplayMagicianShared.NVIDIA
@@ -862,7 +863,7 @@ namespace DisplayMagicianShared.NVIDIA
                         myAdapter.Displays = new Dictionary<uint, NVIDIA_PER_DISPLAY_CONFIG>();
 
                         //This function retrieves the number of display IDs we know about
-                        IDisplayIds[] displayIds;
+                        DisplayIdsV2[] displayIds;
                         try
                         {
                             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the list of connected display ids that VIDIA knows about.");
@@ -872,7 +873,7 @@ namespace DisplayMagicianShared.NVIDIA
                         catch (Exception ex)
                         {
                             SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the list of connected display ids that VIDIA knows about.");
-                            displayIds = new IDisplayIds[0];
+                            displayIds = new DisplayIdsV2[0];
                         }
 
                         // Time to get the color settings, HDR capabilities and settings for each display
@@ -1161,7 +1162,7 @@ namespace DisplayMagicianShared.NVIDIA
                         {
                             if (nex.Status == Status.NvidiaDeviceNotFound)
                             {
-                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: The display named '{displayName}' is not connected via an NVIDIA device.");
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The display named '{displayName}' is not connected via an NVIDIA device. Skipping adding this Display Name.");
                             }
                             else
                             {
@@ -2718,6 +2719,39 @@ namespace DisplayMagicianShared.NVIDIA
                 return new List<string>();
             }
 
+            // Now we need to loop through each of the windows paths so we can record the Windows DisplayName to DisplayID mapping
+            // This is needed for us to piece together the Screen layout for when we draw the NVIDIA screens!
+            Dictionary<string, string> DisplayNames = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, List<uint>> displaySource in WinLibrary.GetDisplaySourceNames())
+            {
+                // Now we try to get the information about the displayIDs and map them to windows \\DISPLAY names e.g. \\DISPLAY1
+                string displayName = displaySource.Key;
+                UInt32 displayId = 0;
+                try
+                {
+                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Windows DisplayName to DisplayID mappings for Display ID {displayName}.");
+                    displayId = NVAPI.GetDisplayIdByDisplayName(displayName);
+                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the Windows DisplayName to DisplayID mappings for Display ID {displayName} is set to {displayId}.");
+                    DisplayNames.Add(displayId.ToString(), displayName);
+                }
+                catch (NVIDIAApiException nex)
+                {
+                    if (nex.Status == Status.NvidiaDeviceNotFound)
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The display named '{displayName}' is not connected via an NVIDIA device. Skipping adding this Display Name.");
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Exception occurred whilst getting the Windows DisplayName to DisplayID mappings for Display ID {displayName}.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the Windows DisplayName to DisplayID mappings for Display ID {displayName}.");
+                }
+
+            }
+
             // Go through the Physical GPUs one by one
             for (uint physicalGpuIndex = 0; physicalGpuIndex < physicalGpus.Length; physicalGpuIndex++)
             {
@@ -2763,17 +2797,34 @@ namespace DisplayMagicianShared.NVIDIA
 
                 // Next, we need to get all the connected Display IDs. 
                 //This function retrieves the number of display IDs we know about
-                IDisplayIds[] displayIds = new IDisplayIds[0];
-                try
+                DisplayIdsV2[] displayIds = new DisplayIdsV2[0];
+                if (allDisplays)
                 {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the list of displays currently connected to the physical GPU #{physicalGpuIndex + 1}.");
-                    displayIds = NVAPI.GetConnectedDisplayIds(physicalGpus[physicalGpuIndex], ConnectedIdsFlag.UnCached | ConnectedIdsFlag.SLI | ConnectedIdsFlag.Fake);
-                    SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the list of displays currently connected to the physical GPU #{physicalGpuIndex + 1}. There are currently {displayIds.Length} displays connected.");
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the list of all displays connected to the physical GPU #{physicalGpus[physicalGpuIndex]}.");
+                        displayIds = NVAPI.GetAllDisplayIds(physicalGpus[physicalGpuIndex]);
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the list of all displays connected to the physical GPU #{physicalGpus[physicalGpuIndex]}. There are currently {displayIds.Length} displays connected.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the list of all displays connected to the physical GPU #{physicalGpus[physicalGpuIndex]}.");
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the list of displays currently connected to the physical GPU #{physicalGpuIndex + 1}.");
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the list of displays currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}.");
+                        displayIds = NVAPI.GetConnectedDisplayIds(physicalGpus[physicalGpuIndex], ConnectedIdsFlag.UnCached | ConnectedIdsFlag.SLI | ConnectedIdsFlag.Fake);
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the list of displays currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}. There are currently {displayIds.Length} displays connected.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the list of displays currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}.");
+                    }
                 }
+                    
 
 
                 // Now, we want to go through the displays as we ONLY want to record the GPUs and displays that are available now 
@@ -2792,26 +2843,27 @@ namespace DisplayMagicianShared.NVIDIA
                     OutputId gpuOutputId = OutputId.Invalid;
                     try
                     {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the GPU output ID of display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpuIndex + 1}.");
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the GPU output ID of display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}.");
                         NVAPI.GetGpuAndOutputIdFromDisplayId(oneDisplay.DisplayId, out physicalGpu, out gpuOutputId);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the GPU output ID of display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpuIndex + 1}. There are currently {displayIds.Length} displays connected.");
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the GPU output ID of display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpu} on Output ID #{gpuOutputId}. There are currently {displayIds.Length} displays connected.");
                     }
                     catch (Exception ex)
                     {
                         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the GPU output ID of display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpuIndex + 1}.");
                     }
 
+                    // The GetEDID function in NVIDIA doesn't work reliably, and often errors saying that the driver cannot get the EDDID information. 
                     // Lets set some EDID default in case the EDID doesn't work
                     string manufacturerName = "Unknown";
                     UInt32 productCode = 0;
                     UInt32 serialNumber = 0;
                     // We try to get an EDID block and extract the info                        
-                    IEDID edidInfo = new EDIDV3();
+                    EDIDV3 edidInfo = new EDIDV3();
                     try
                     {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the EDID information from display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpuIndex + 1}.");
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the EDID information from display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}.");
                         edidInfo = (EDIDV3)NVAPI.GetEDID(physicalGpu, gpuOutputId, 0);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the EDID information from display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpuIndex + 1}. There are currently {displayIds.Length} displays connected.");
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the EDID information from display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}. There are currently {displayIds.Length} displays connected.");
                         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to parse the EDID information from display ID #{oneDisplay.DisplayId} so that we can read it.");
                         EDID edidParsedInfo = new EDID(edidInfo.Data);
                         manufacturerName = edidParsedInfo.ManufacturerCode;
@@ -2822,7 +2874,22 @@ namespace DisplayMagicianShared.NVIDIA
                     }
                     catch (Exception ex)
                     {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the EDID information from display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpuIndex + 1}.");
+                        SharedLogger.logger.Warn(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the EDID information from display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}. This is unforuntately cpommon now, and appears to be a bug in the NVIDIA driver.");
+
+          /*              // We need to try the backup method of accessing the EDID information via windows
+                        string winDisplayName = DisplayNames[oneDisplay.DisplayId.ToString()];
+                        List<DisplayMonitorInfo> monitors = WinLibrary.GetLibrary().GetAllConnectedMonitors();
+
+                        foreach (DisplayMonitorInfo monitor in monitors)
+                        {
+                            if (monitor.DevicePath == winDisplayName)
+                            {
+                                manufacturerName = monitor.ManufacturerId.ToString();
+                                productCode = monitor.ProductCodeId;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Found that the manufacturer name is {manufacturerName}, the product code is {productCode}, and the serial number is {serialNumber}.");
+                            }
+                        }*/
+
                     }
 
 

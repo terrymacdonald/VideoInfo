@@ -4693,7 +4693,7 @@ namespace DisplayMagicianShared.NVIDIA
         /// <exception cref="NVIDIAApiException">Status.NvidiaDeviceNotFound: No NVIDIA GPU driving a display was found</exception>
         /// <exception cref="NVIDIAApiException">Status.ExpectedPhysicalGPUHandle: gpuHandle was not a physical GPU handle</exception>
         /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-        public static IDisplayIds[] GetConnectedDisplayIds(PhysicalGPUHandle gpuHandle, ConnectedIdsFlag flags)
+        public static DisplayIdsV2[] GetConnectedDisplayIds(PhysicalGPUHandle gpuHandle, ConnectedIdsFlag flags)
         {
             var gpuGetConnectedDisplayIds =
                 DelegateFactory.GetDelegate<GPUDelegates.NvAPI_GPU_GetConnectedDisplayIds>();
@@ -4713,7 +4713,7 @@ namespace DisplayMagicianShared.NVIDIA
 
             if (count == 0)
             {
-                return new IDisplayIds[0];
+                return new DisplayIdsV2[0];
             }
 
             foreach (var acceptType in gpuGetConnectedDisplayIds.Accepts())
@@ -4734,16 +4734,17 @@ namespace DisplayMagicianShared.NVIDIA
 
                 if (instances.Length <= 0)
                 {
-                    return new IDisplayIds[0];
+                    return new DisplayIdsV2[0];
                 }
 
                 // After allocation, we should make sure to dispose objects
                 // In this case however, the responsibility is on the user shoulders
-                //instances = instances.AllocateAll().ToArray();
+                instances = instances.AllocateAll().ToArray();
 
+                // Convert IDisplayIds instances to DisplayIdsV2 instances
+                var displayIdsV2 = instances.OfType<DisplayIdsV2>().ToArray();
 
-
-                return instances;
+                return displayIdsV2;
                 //return instances.ToArray<DisplayIdsV2>((int)count);
             }
 
