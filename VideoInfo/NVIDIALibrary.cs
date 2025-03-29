@@ -1788,50 +1788,27 @@ namespace DisplayMagicianShared.NVIDIA
                 {
                     try
                     {
-                        /*PathInfoV2[] myPathInfos = new PathInfoV2[1];
+                        // Set up the most basic path info that we can, as that is all that SetDisplayConfig will support
+                        PathInfoV2[] myPathInfos = new PathInfoV2[1];
                         myPathInfos[0] = new PathInfoV2();
-
-                        SourceModeInfo smi = new SourceModeInfo();
-                        smi.Resolution = displayConfig.DisplayConfigs[0].SourceModeInfo.Resolution;
-                        smi.ColorFormat = displayConfig.DisplayConfigs[0].SourceModeInfo.ColorFormat;
-                        smi.Position = displayConfig.DisplayConfigs[0].SourceModeInfo.Position;
-                        smi.SpanningOrientation = displayConfig.DisplayConfigs[0].SourceModeInfo.SpanningOrientation;
-                        smi.IsGDIPrimary = displayConfig.DisplayConfigs[0].SourceModeInfo.IsGDIPrimary;
-                        smi.IsSLIFocus = displayConfig.DisplayConfigs[0].SourceModeInfo.IsSLIFocus;
-
+                       
                         PathTargetInfoV2 pti = new PathTargetInfoV2();
                         PathTargetInfoV2 dcpti = (PathTargetInfoV2)displayConfig.DisplayConfigs[0].TargetsInfo[0];
 
                         pti.DisplayId = dcpti.DisplayId;
-                        pti.Details = dcpti.Details;
+                        //pti.Details = dcpti.Details;
                         pti.WindowsCCDTargetId = 0;
 
-                        List<IPathTargetInfo> ptiList = new List<IPathTargetInfo>();
+                        List<PathTargetInfoV2> ptiList = new List<PathTargetInfoV2>();
                         ptiList.Add(pti);
 
                         myPathInfos[0].Version = displayConfig.DisplayConfigs[0].Version;
-                        myPathInfos[0].SourceModeInfo = default(SourceModeInfo);
-                        //myPathInfos[0].SourceModeInfo = smi;
                         myPathInfos[0].TargetsInfo = ptiList;
                         myPathInfos[0].TargetInfoCount = (uint)ptiList.Count;
-                        myPathInfos[0].IsNonNVIDIAAdapter = displayConfig.DisplayConfigs[0].IsNonNVIDIAAdapter;
-                        myPathInfos[0].OSAdapterLUID = displayConfig.DisplayConfigs[0].OSAdapterLUID;
-                        myPathInfos[0].SourceId = displayConfig.DisplayConfigs[0].SourceId;*/
-
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to set the displayconfig layout based on one we create now.");
-                        NVAPI.SetDisplayConfig(displayConfig.DisplayConfigs.ToArray(), DisplayConfigFlags.SaveToPersistence | DisplayConfigFlags.DriverReloadAllowed | DisplayConfigFlags.ForceModeEnumeration);
-                        //NVAPI.SetDisplayConfig(myPathInfos, DisplayConfigFlags.SaveToPersistence);
+                        
+                        NVAPI.SetDisplayConfig(myPathInfos, DisplayConfigFlags.SaveToPersistence);
                         SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully set the displayconfig layout.");
 
-
-
-                        /*SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to set the displayconfig layout.");
-                        //NVAPI.SetDisplayConfig(displayConfig.DisplayConfigs.ToArray(), DisplayConfigFlags.SaveToPersistence);
-                        NVAPI.SetDisplayConfig(displayConfig.DisplayConfigs.ToArray(), DisplayConfigFlags.None);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully set the displayconfig layout.");
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Display Config layout change take place before continuing");
-                        System.Threading.Thread.Sleep(500);
-*/
                     }
                     catch (Exception ex)
                     {

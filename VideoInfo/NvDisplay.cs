@@ -6374,7 +6374,7 @@ namespace DisplayMagicianShared.NVIDIA
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     [StructureVersion(2)]
     // ReSharper disable once RedundantExtendsListEntry
-    public struct PathInfoV2 : IPathInfo, IInitializable, IAllocatable, IEquatable<PathInfoV2>
+    public struct PathInfoV2 : IInitializable, IAllocatable, IEquatable<PathInfoV2>
     {
         internal StructureVersion _Version;
         internal uint _SourceId;
@@ -6449,10 +6449,11 @@ namespace DisplayMagicianShared.NVIDIA
         }
 
         /// <inheritdoc />
-        public List<IPathTargetInfo> TargetsInfo
+        public List<PathTargetInfoV2> TargetsInfo
         {
             //get => _TargetsInfo.ToArray((int)_TargetInfoCount)?.Cast<IPathTargetInfo>().ToArray() ?? new IPathTargetInfo[0];
-            get => _TargetsInfo.ToArray((int)_TargetInfoCount).Cast<IPathTargetInfo>().ToList();
+            //get => _TargetsInfo.ToArray((int)_TargetInfoCount).Cast<IPathTargetInfo>().ToList();
+            get => _TargetsInfo.ToArray((int)_TargetInfoCount).ToList();
             //set => _TargetsInfo = ValueTypeArray<PathTargetInfoV2>.FromList(value.Cast<PathTargetInfoV2>().ToList());
             //set => _TargetsInfo = ValueTypeArray<PathTargetInfoV2>.FromArray(value.Cast<PathTargetInfoV2>().ToArray());
             set
