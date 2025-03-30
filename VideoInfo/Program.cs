@@ -183,7 +183,7 @@ namespace VideoInfo
                     SharedLogger.logger.Debug($"VideoInfo/Main: showing all display ids as allids command was provided");
                     Console.WriteLine("All connected display identifiers are:");
                     SharedLogger.logger.Info($"VideoInfo/Main: All connected display identifiers are:");
-                    foreach (string displayId in nvidiaLibrary.GetAllConnectedDisplayIdentifiers())
+                    foreach (string displayId in nvidiaLibrary.GetAllConnectedDisplayIdentifiers(out bool failure))
                     {
                         Console.WriteLine(@displayId);
                         SharedLogger.logger.Info($@"{displayId}");
