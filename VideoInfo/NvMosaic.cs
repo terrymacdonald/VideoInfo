@@ -1355,10 +1355,10 @@ namespace DisplayMagicianShared.NVIDIA
                 throw new ArgumentException("Too many displays.");
             }
 
-            /*if (displays.Length != rows * columns)
+            if (displays.Length != rows * columns)
             {
                 throw new ArgumentException("Number of displays should match the arrangement.", nameof(displays));
-            }*/
+            }
 
             this = typeof(GridTopologyV2).Instantiate<GridTopologyV2>();
             _Rows = (uint)rows;

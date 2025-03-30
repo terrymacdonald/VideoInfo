@@ -8,6 +8,7 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using Windows.Graphics;
+using Windows.Storage.Provider;
 using static DisplayMagicianShared.NVIDIA.DisplayTopologyStatus;
 
 namespace DisplayMagicianShared.NVIDIA
@@ -2041,119 +2042,224 @@ namespace DisplayMagicianShared.NVIDIA
                     // We need to disable the Mosaic Topology
 
                     //NV_MOSAIC_SETDISPLAYTOPO_FLAGS setTopoFlags = NV_MOSAIC_SETDISPLAYTOPO_FLAGS.ALLOW_INVALID;
+                    //NV_MOSAIC_SETDISPLAYTOPO_FLAGS setTopoFlags = NV_MOSAIC_SETDISPLAYTOPO_FLAGS.NONE;
                     SetDisplayTopologyFlag setTopoFlags = SetDisplayTopologyFlag.NoFlag;
 
                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Mosaic config that is currently set is no longer needed. Removing Mosaic config.");
-                    GridTopologyV2[] individualScreensTopology = CreateSingleScreenMosaicTopology().ToArray();
+                    GridTopologyV2[] individualScreensTopology = CreateSingleScreenMosaicTopology();
 
-                    try
+                    // WARNING - Validation is disabled at present. This is mostly because there are errors in my NvAPI_Mosaic_ValidateDisplayGrids,
+                    // but also because the config is coming from the NVIDIA Control Panel which will already do it's own validation checks.
+                    /*// Firstly try to see if the oneScreenTopology is a valid config
+                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Checking if the 1x1 DisplayGrid we chose is valid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout.");
+                    NV_MOSAIC_DISPLAY_TOPO_STATUS_V1[] individualScreensStatuses = new NV_MOSAIC_DISPLAY_TOPO_STATUS_V1[(UInt32)individualScreensTopology.Length];
+                    NVStatus = NVImport.NvAPI_Mosaic_ValidateDisplayGrids(setTopoFlags, individualScreensTopology, ref individualScreensStatuses, (UInt32)individualScreensTopology.Length);
+                    if (NVStatus == NVAPI_STATUS.NVAPI_OK)
                     {
-                        // WARNING - Validation is disabled at present. This is mostly because there are errors in my NvAPI_Mosaic_ValidateDisplayGrids,
-                        // but also because the config is coming from the NVIDIA Control Panel which will already do it's own validation checks.
-                        // Firstly try to see if the oneScreenTopology is a valid config
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Checking if the 1x1 DisplayGrid we chose is valid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout.");
-                        DisplayTopologyStatus[] individualScreensStatuses = new DisplayTopologyStatus[(UInt32)individualScreensTopology.Length];
-                        individualScreensStatuses = NVAPI.ValidateDisplayGrids(individualScreensTopology, setTopoFlags);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully checked if the 1x1 DisplayGrid we chose is valid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout. It is ok.");
+                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_ValidateDisplayGrids returned OK.");
                         SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Mosaic display change take place before continuing");
                         System.Threading.Thread.Sleep(500);
                     }
-                    catch (Exception ex)
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_NO_ACTIVE_SLI_TOPOLOGY)
                     {
-                        /*if (status == Status.NVAPI_NO_ACTIVE_SLI_TOPOLOGY)
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: No matching GPU topologies could be found. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_TOPO_NOT_POSSIBLE)
+                    {
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: The topology passed in is not currently possible. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_DISPLAY_ID)
+                    {
+                        SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: The Display ID of the first display is not currently possible to use. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}. Trying again with the next display.");
+                        return false;
+                    }
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_INVALID_ARGUMENT)
+                    {
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: One or more arguments passed in are invalid. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_API_NOT_INITIALIZED)
+                    {
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: The NvAPI API needs to be initialized first. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_NO_IMPLEMENTATION)
+                    {
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: This entry point not available in this NVIDIA Driver. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_INCOMPATIBLE_STRUCT_VERSION)
+                    {
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: The version of the structure passed in is not compatible with this entrypoint. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_MODE_CHANGE_FAILED)
+                    {
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: There was an error changing the display mode. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }
+                    else if (NVStatus == NVAPI_STATUS.NVAPI_ERROR)
+                    {
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: A miscellaneous error occurred. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Some non standard error occurred while getting Mosaic Display Grids! NvAPI_Mosaic_ValidateDisplayGrids() returned error code {NVStatus}");
+                        return false;
+                    }*/
+
+
+                    // If we get here then the display is valid, so now we actually apply the new Mosaic Topology
+                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout.");
+                    try
+                    {
+                        NVAPI.SetDisplayGrids(individualScreensTopology, setTopoFlags);
+                    }
+                    catch (NVIDIAApiException nex)
+                    {
+                        if (nex.Status == Status.Ok)
                         {
-                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: No matching GPU topologies could be found. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids returned OK.");
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Mosaic display change take place before continuing");
+                            System.Threading.Thread.Sleep(500);
+                        }
+                        else if (nex.Status == Status.NoActiveSLITopology)
+                        {
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: No matching GPU topologies could be found. NvAPI_Mosaic_SetDisplayGrids() returned error code NoActiveSLITopology");
                             return false;
                         }
-                        else if (status == Status.NVAPI_TOPO_NOT_POSSIBLE)
+                        else if (nex.Status == Status.TopologyNotPossible)
                         {
-                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: The topology passed in is not currently possible. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: The topology passed in is not currently possible. NvAPI_Mosaic_SetDisplayGrids() returned error code TopologyNotPossible");
                             return false;
                         }
-                        else if (status == Status.InvalidDisplayId)
+                        else if (nex.Status == Status.InvalidDisplayId)
                         {
-                            SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: The Display ID of the first display is not currently possible to use. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}. Trying again with the next display.");
+                            SharedLogger.logger.Warn(nex, $"NVIDIALibrary/SetActiveConfig: The Display ID of the first display is not currently possible to use. NvAPI_Mosaic_SetDisplayGrids() returned error code InvalidDisplayId. Trying again with the next display.");
                             return false;
                         }
-                        else if (status == Status.InvalidArgument)
+                        else if (nex.Status == Status.InvalidArgument)
                         {
-                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: One or more arguments passed in are invalid. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: One or more arguments passed in are invalid. NvAPI_Mosaic_SetDisplayGrids() returned error code InvalidArgument");
                             return false;
                         }
-                        else if (status == Status.ApiNotInitialized)
+                        else if (nex.Status == Status.ApiNotInitialized)
                         {
-                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: The NvAPI API needs to be initialized first. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: The NvAPI API needs to be initialized first. NvAPI_Mosaic_SetDisplayGrids() returned error code ApiNotInitialized");
                             return false;
                         }
-                        else if (status == Status.NoImplementation)
+                        else if (nex.Status == Status.NoImplementation)
                         {
-                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: This entry point not available in this NVIDIA Driver. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: This entry point not available in this NVIDIA Driver. NvAPI_Mosaic_SetDisplayGrids() returned error code NoImplementation");
                             return false;
                         }
-                        else if (status == Status.IncompatibleStructureVersion)
+                        else if (nex.Status == Status.IncompatibleStructureVersion)
                         {
-                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: The version of the structure passed in is not compatible with this entrypoint. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: The version of the structure passed in is not compatible with this entrypoint. NvAPI_Mosaic_SetDisplayGrids() returned error code IncompatibleStructureVersion");
                             return false;
                         }
-                        else if (status == Status.ModeChangeFailed)
+                        else if (nex.Status == Status.ModeChangeFailed)
                         {
-                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: There was an error changing the display mode. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: There was an error changing the display mode. NvAPI_Mosaic_SetDisplayGrids() returned error code ModeChangeFailed");
                             return false;
                         }
-                        else if (status == Status.Error)
+                        else if (nex.Status == Status.Error)
                         {
-                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: A miscellaneous error occurred. NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: A miscellaneous error occurred. NvAPI_Mosaic_SetDisplayGrids() returned error code Error");
                             return false;
                         }
                         else
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Some non standard error occurred while getting Mosaic Display Grids! NvAPI_Mosaic_ValidateDisplayGrids() returned error code {status}");
-                            return false;
+                            // If we get here, we may have an error, or it may have worked successfully! So we need to check again :( 
+                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: NVIDIAApiException while trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout.");
                         }
-                        */
-                    }                    
-
-                    // Turn off the Mosaic currently in use
-                    try
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to disable the current mosaic topology to set the display layout to individual screens.");
-                        NVAPI.EnableCurrentTopology(false);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully disabled the current mosaic topology to set the display layout to individual screens.");
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Mosaic display change take place before continuing");
-                        System.Threading.Thread.Sleep(500);
                     }
                     catch (Exception ex)
                     {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to disable the current mosaic topology to set the display layout to individual screens.");
+                        // If we get here, we may have an error, or it may have worked successfully! So we need to check again :( 
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: General Exception while trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout.");;
                     }
-
                     // If we get here, it may or it may not have worked successfully! So we need to check again :( 
                     // We don't want to do a full ceck, so we do a quick check instead.
                     if (MosaicIsOn())
                     {
                         // If the Mosaic is still on, then the last mosaic disable failed, so we need to then try turning it off this using NvAPI_Mosaic_EnableCurrentTopo(0)
                         SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Previous attempt to turn off Mosaic. Now trying to use NvAPI_Mosaic_EnableCurrentTopo to disable Mosaic instead.");
-                        // If we get here then the display is valid, so now we actually apply the new Mosaic Topology
                         try
                         {
-                            // If we get here then the display is valid, so now we actually apply the new Mosaic Topology
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to set a 1x1 mosaic display grid to disable the current mosiac layout.");
-                            GridTopologyV2[] individualScreensTopology2 = individualScreensTopology.Cast<GridTopologyV2>().ToArray();
-                            NVAPI.SetDisplayGrids(individualScreensTopology2, setTopoFlags);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully set a 1x1 mosaic display grid to disable the current mosiac layout.");
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Mosaic display change take place before continuing");
-                            System.Threading.Thread.Sleep(500);
-                            logicalGPURefreshNeeded = true;
+                            NVAPI.EnableCurrentTopology(false);
+                        }
+                        catch (NVIDIAApiException nex)
+                        {
+                            if (nex.Status == Status.Ok)
+                            {
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids attempt 2 returned OK.");
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Mosaic display change take place before continuing");
+                                System.Threading.Thread.Sleep(500);
+                            }
+                            else if (nex.Status == Status.NoActiveSLITopology)
+                            {
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: No matching GPU topologies could be found. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code NoActiveSLITopology");
+                                return false;
+                            }
+                            else if (nex.Status == Status.TopologyNotPossible)
+                            {
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: The topology passed in is not currently possible. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code TopologyNotPossible");
+                                return false;
+                            }
+                            else if (nex.Status == Status.InvalidDisplayId)
+                            {
+                                SharedLogger.logger.Warn(nex, $"NVIDIALibrary/SetActiveConfig: The Display ID of the first display is not currently possible to use. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code InvalidDisplayId. Trying again with the next display.");
+                                return false;
+                            }
+                            else if (nex.Status == Status.InvalidArgument)
+                            {
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: One or more arguments passed in are invalid. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code InvalidArgument");
+                                return false;
+                            }
+                            else if (nex.Status == Status.ApiNotInitialized)
+                            {
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: The NvAPI API needs to be initialized first. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code ApiNotInitialized");
+                                return false;
+                            }
+                            else if (nex.Status == Status.NoImplementation)
+                            {
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: This entry point not available in this NVIDIA Driver. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code NoImplementation");
+                                return false;
+                            }
+                            else if (nex.Status == Status.IncompatibleStructureVersion)
+                            {
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: The version of the structure passed in is not compatible with this entrypoint. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code IncompatibleStructureVersion");
+                                return false;
+                            }
+                            else if (nex.Status == Status.ModeChangeFailed)
+                            {
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: There was an error changing the display mode. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code ModeChangeFailed");
+                                return false;
+                            }
+                            else if (nex.Status == Status.Error)
+                            {
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: A miscellaneous error occurred. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code Error");
+                                return false;
+                            }
+                            else
+                            {
+                                // If we get here, we may have an error, or it may have worked successfully! So we need to check again :( 
+                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: NVIDIAApiException while trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_EnableCurrentTopo attempt 2 mosaic layout.");
+                            }
                         }
                         catch (Exception ex)
                         {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to set a 1x1 mosaic display grid to disable the current mosiac layout.");
+                            // If we get here, we may have an error, or it may have worked successfully! So we need to check again :( 
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: General Exception while trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_EnableCurrentTopo attempt 2 mosaic layout."); ;
                         }
-
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Mosaic successfully disabled using NvAPI_Mosaic_SetDisplayGrids method.");
+                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Mosaic successfully disabled using NvAPI_Mosaic_EnableCurrentTopo attempt 2  method.");
                     }
                 }
                 else if (!displayConfig.MosaicConfig.IsMosaicEnabled && !ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
@@ -2830,7 +2936,7 @@ namespace DisplayMagicianShared.NVIDIA
                     }
 
                     // The GetEDID function in NVIDIA doesn't work reliably, and often errors saying that the driver cannot get the EDDID information. 
-                    // Lets set some EDID default in case the EDID doesn't work
+                    // Lets set some EDID default in case the EDID doesn't work (which is likely to happen now as NVIDIA EDID is unreliable at best :( )
                     string manufacturerName = "Unknown";
                     UInt32 productCode = 0;
                     UInt32 serialNumber = 0;
@@ -2851,25 +2957,8 @@ namespace DisplayMagicianShared.NVIDIA
                     }
                     catch (Exception ex)
                     {
-                        SharedLogger.logger.Warn(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the EDID information from display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}. This is unforuntately cpommon now, and appears to be a bug in the NVIDIA driver.");
-
-          /*              // We need to try the backup method of accessing the EDID information via windows
-                        string winDisplayName = DisplayNames[oneDisplay.DisplayId.ToString()];
-                        List<DisplayMonitorInfo> monitors = WinLibrary.GetLibrary().GetAllConnectedMonitors();
-
-                        foreach (DisplayMonitorInfo monitor in monitors)
-                        {
-                            if (monitor.DevicePath == winDisplayName)
-                            {
-                                manufacturerName = monitor.ManufacturerId.ToString();
-                                productCode = monitor.ProductCodeId;
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Found that the manufacturer name is {manufacturerName}, the product code is {productCode}, and the serial number is {serialNumber}.");
-                            }
-                        }*/
-
+                        SharedLogger.logger.Warn(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the EDID information from display ID #{oneDisplay.DisplayId} currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}. This is unfortuntately common now, and appears to be a bug in the NVIDIA driver.");
                     }
-
-
 
                     // Create an array of all the important display info we need to record
                     List<string> displayInfo = new List<string>();
@@ -3083,7 +3172,12 @@ namespace DisplayMagicianShared.NVIDIA
 
                 for (int displayIndexToUse = 0; displayIndexToUse < gridTopo.Displays.Count(); displayIndexToUse++)
                 {
-                    GridTopologyV2 thisScreen = new GridTopologyV2(1,1, gridTopo.Displays.ToArray(), gridTopo.DisplaySettings,false,false,false,false,false,false);
+                    GridTopologyDisplayV2[] displayArray = new GridTopologyDisplayV2[1];
+                    displayArray[0] = gridTopo.Displays[displayIndexToUse];
+
+                    SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Creating new Grid Topology with multiple 1x1 grids based on each display in the current Moasiac grid. This will separate each display on its own.");
+                    GridTopologyV2 thisScreen = new GridTopologyV2(1,1, displayArray, gridTopo.DisplaySettings,false,false,false,false,false,false);
+
                     screensToReturn.Add(thisScreen);
                 }
 
