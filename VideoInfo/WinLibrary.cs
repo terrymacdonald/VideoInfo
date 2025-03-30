@@ -1529,6 +1529,11 @@ namespace DisplayMagicianShared.Windows
 
         public bool WakeUpAllDisplays()
         {
+            // Poke all monitors using DDC/CI to wake them up
+            DdcCiHelper.PokeAllMonitors();
+
+            Thread.Sleep(100);
+
             // Attempt to wake any displays that are asleep by emulaing a Ctrl + Shift + Windows key + B kjeypress to reset the windows graphic display driver.
             // This is a workaround for a bug in Windows 10 where the display driver can sometimes go to sleep and not wake up. Here's what it does:
             // - It calls DxgkDdiResetFromTimeout() internally.
@@ -1541,8 +1546,6 @@ namespace DisplayMagicianShared.Windows
             // Also reapply the current configuration to just wake up any monitors that are currently asleep.
             //CCDImport.SetDisplayConfig(0, null, 0, null, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT);
 
-            // Poke all monitors using DDC/CI to wake them up
-            //DdcCiHelper.PokeAllMonitors();
 
             return true;
         }
