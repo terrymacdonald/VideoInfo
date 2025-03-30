@@ -573,9 +573,10 @@ namespace DisplayMagicianShared.NVIDIA
             foreach (var acceptType in getDisplayConfig.Accepts())
             {
                 var count = allAvailable;
-                var instances = acceptType.Instantiate<IPathInfo>().Repeat((int)allAvailable);
+                var instances = acceptType.Instantiate<PathInfoV2>().Repeat((int)allAvailable);
 
-                using (var pathInfos = ValueTypeArray.FromArray(instances, acceptType))
+                //using (var pathInfos = ValueTypeArray.FromArray(instances, acceptType))
+                using (var pathInfos = ValueTypeArray.FromArray(instances))
                 {
                     // Second call to GetDisplayConfig returns the available paths in array, but missing the sourcemodeinfo
                     status = getDisplayConfig(ref count, pathInfos);
@@ -585,7 +586,7 @@ namespace DisplayMagicianShared.NVIDIA
                         throw new NVIDIAApiException(status);
                     }
 
-                    instances = pathInfos.ToArray<IPathInfo>((int)count, acceptType);
+                    instances = pathInfos.ToArray<PathInfoV2>((int)count, acceptType);
                 }
 
                 if (instances.Length <= 0)
@@ -598,7 +599,7 @@ namespace DisplayMagicianShared.NVIDIA
                 // In this case however, the responsibility is on the user shoulders
                 instances = instances.AllocateAll().ToArray();
 
-                using (var pathInfos = ValueTypeArray.FromArray(instances, acceptType))
+                using (var pathInfos = ValueTypeArray.FromArray(instances))
                 {
                     // Third call to GetDisplayConfig returns the available paths in array, with sourcemodeinfo included
                     status = getDisplayConfig(ref count, pathInfos);
@@ -4718,9 +4719,9 @@ namespace DisplayMagicianShared.NVIDIA
 
             foreach (var acceptType in gpuGetConnectedDisplayIds.Accepts())
             {
-                var instances = acceptType.Instantiate<IDisplayIds>().Repeat((int)count);
+                var instances = acceptType.Instantiate<DisplayIdsV2>().Repeat((int)count);
 
-                using (var displayIds = ValueTypeArray.FromArray(instances, acceptType))
+                using (var displayIds = ValueTypeArray.FromArray(instances))
                 {
                     status = gpuGetConnectedDisplayIds(gpuHandle, displayIds, ref count, flags);
 
@@ -4729,7 +4730,7 @@ namespace DisplayMagicianShared.NVIDIA
                         throw new NVIDIAApiException(status);
                     }
 
-                    instances = displayIds.ToArray<IDisplayIds>((int)count, acceptType);
+                    instances = displayIds.ToArray<DisplayIdsV2>((int)count, acceptType);
                 }
 
                 if (instances.Length <= 0)
@@ -4739,12 +4740,12 @@ namespace DisplayMagicianShared.NVIDIA
 
                 // After allocation, we should make sure to dispose objects
                 // In this case however, the responsibility is on the user shoulders
-                instances = instances.AllocateAll().ToArray();
+                //instances = instances.AllocateAll().ToArray();
 
                 // Convert IDisplayIds instances to DisplayIdsV2 instances
-                var displayIdsV2 = instances.OfType<DisplayIdsV2>().ToArray();
+                //var displayIdsV2 = instances.OfType<DisplayIdsV2>().ToArray();
 
-                return displayIdsV2;
+                return instances;
                 //return instances.ToArray<DisplayIdsV2>((int)count);
             }
 

@@ -415,33 +415,45 @@ namespace VideoInfo
 
                     if (applyNVIDIASettings)
                     {
-                        Console.WriteLine($"Attempting to apply NVIDIA display config from {filename}");
+                        Console.Write($"Attempting to apply NVIDIA display config from {filename}...");
                         itWorkedforNVIDIA = nvidiaLibrary.SetActiveConfig(myDisplayConfig.NVIDIAConfig);
                         if (itWorkedforNVIDIA)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were sucessfully applied.");
+                            Console.WriteLine($"Done.");
                         }
                         else
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were NOT applied successfully.");
+                            Console.WriteLine($"\nERROR - NVIDIA display settings were not applied correctly.");
                             errorApplyingSomething = true;
                         }
+                    } else
+                    {
+                        Console.WriteLine($"Skipping NVIDIA Settings as they are not used in {filename}.");
                     }
 
                     if (applyAMDSettings)
                     {
-                        Console.WriteLine($"Attempting to apply AMD display config from {filename}");
+                        Console.Write($"Attempting to apply AMD display config from {filename}...");
                         itWorkedforAMD = amdLibrary.SetActiveConfig(myDisplayConfig.AMDConfig);
                         if (itWorkedforAMD)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were sucessfully applied.");
+                            Console.WriteLine($"Done.");
                         }
                         else
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were NOT applied successfully.");
+                            Console.WriteLine($"\nERROR - AMD display settings were not applied correctly.");
                             errorApplyingSomething = true;
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine($"Skipping AMD Settings as they are not used in {filename}.");
+                    }
+
 
                     // If either AMD or NVIDIA settings were applied, then we need to update our windows layout to make sure it
                     // matches current reality.
@@ -451,31 +463,35 @@ namespace VideoInfo
                         // NVIDIA and AMD make such large changes to the available screens in windows, we need to do this.
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: NVIDIA and/or AMD display settings within {filename} were applied successfully, so updating Windows Active Config so it knows of the changes made."); 
                         winLibrary.UpdateActiveConfig();                        
-                    }                                     
+                    }
 
                     // Then let's try to also apply the windows changes
                     // Note: we are unable to check if the Windows CCD display config is possible, as it won't match if either the current display config is a Mosaic config,
                     // or if the display config we want to change to is a Mosaic config. So we just have to assume that it will work!
+                    Console.Write($"Attempting to apply Windows display config from {filename}...");
                     itWorkedforWindows = winLibrary.SetActiveConfig(myDisplayConfig.WindowsConfig);
 
                     if (itWorkedforWindows)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Windows CCD display settings within {filename} were applied correctly, so now attempting to apply any overrides.");
+                        Console.WriteLine($"Done.");
 
                         if (applyNVIDIASettings)
                         {
                             if (itWorkedforNVIDIA)
                             {
+                                Console.Write($"Attempting to apply 2nd part of the NVIDIA display config from {filename}...");
                                 itWorkedforNVIDIAOverride = nvidiaLibrary.SetActiveConfigOverride(myDisplayConfig.NVIDIAConfig);
 
                                 if (itWorkedforNVIDIAOverride)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings that override windows within {filename} were applied correctly.");
+                                    Console.WriteLine($"Done.");
                                 }
                                 else
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings that override windows within {filename} were NOT applied correctly.");
-                                    Console.WriteLine($"ERROR - VideoInfo NVIDIA Override settings were not applied correctly.");
+                                    Console.WriteLine($"ERROR - 2nd part of NVIDIA settings were not applied correctly.");
                                     errorApplyingSomething = true;
                                 }
                             }
@@ -484,6 +500,7 @@ namespace VideoInfo
                                 if (nvidiaLibrary.IsInstalled)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying NVIDIA display overrides as the NVIDIA display settings didn't apply correctly!");
+                                    Console.Write($"Skipping 2nd part of the NVIDIA display config from {filename} as the 1st part didn't work...");
                                 }
                                 else
                                 {
@@ -494,22 +511,26 @@ namespace VideoInfo
                         else
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying NVIDIA display overrides as the NVIDIA video card doesn't have any displays in this profile.");
+                            Console.WriteLine($"Skipping 2nd part of NVIDIA Settings as they are not used in {filename}.");
                         }
+                    
 
                         if (applyAMDSettings)
                         {
                             if (itWorkedforAMD)
                             {
+                                Console.Write($"Attempting to apply 2nd part of the AMD display config from {filename}...");
                                 itWorkedforAMDOverride = amdLibrary.SetActiveConfigOverride(myDisplayConfig.AMDConfig);
 
                                 if (itWorkedforAMDOverride)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings that override windows within {filename} were applied correctly.");
+                                    Console.WriteLine($"Done.");
                                 }
                                 else
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings that override windows within {filename} were NOT applied correctly.");
-                                    Console.WriteLine($"ERROR - VideoInfo AMD Override settings were not applied correctly.");
+                                    Console.WriteLine($"ERROR - 2nd part of AMD settings were not applied correctly.");
                                     errorApplyingSomething = true;
                                 }
                             }
@@ -518,6 +539,7 @@ namespace VideoInfo
                                 if (amdLibrary.IsInstalled)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display overrides as the AMD display settings didn't apply correctly!");
+                                    Console.Write($"Skipping 2nd part of the AMD display config from {filename} as the 1st part didn't work...");
                                 }
                                 else
                                 {
@@ -528,6 +550,7 @@ namespace VideoInfo
                         else
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display overrides as the AMD video card doesn't have any displays in this profile.");
+                            Console.WriteLine($"Skipping 2nd part of AMD Settings as they are not used in {filename}.");
                         }
 
                     }
@@ -536,6 +559,9 @@ namespace VideoInfo
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Windows CCD display settings within {filename} were NOT applied correctly, so skipping setting the overrides.");
                         Console.WriteLine($"ERROR - VideoInfo Windows CCD settings were not applied correctly so skipping setting the overrides.");
                     }
+
+                    // Write a blank line to the console
+                    Console.WriteLine();
 
                     // Give the final error if there are any
                     if (errorApplyingSomething)

@@ -2899,7 +2899,7 @@ namespace DisplayMagicianShared.NVIDIA
                     try
                     {
                         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the list of displays currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}.");
-                        displayIds = NVAPI.GetConnectedDisplayIds(physicalGpus[physicalGpuIndex], ConnectedIdsFlag.UnCached | ConnectedIdsFlag.SLI | ConnectedIdsFlag.Fake);
+                        displayIds = NVAPI.GetConnectedDisplayIds(physicalGpus[physicalGpuIndex], ConnectedIdsFlag.None);
                         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the list of displays currently connected to the physical GPU #{physicalGpus[physicalGpuIndex]}. There are currently {displayIds.Length} displays connected.");
                     }
                     catch (Exception ex)
