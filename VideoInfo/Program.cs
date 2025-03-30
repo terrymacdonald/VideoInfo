@@ -39,7 +39,7 @@ namespace VideoInfo
             NLog.LogLevel logLevel = NLog.LogLevel.Trace;
 
             // Targets where to log to: File and Console
-            string AppLogFilename = $"VideoInfo-{DateTime.UtcNow.ToString("yyyy-MM-dd-HHmm", CultureInfo.InvariantCulture)}.log";
+            string AppLogFilename = $"VideoInfo-{DateTime.Now.ToString("yyyy-MM-dd-HHmm", CultureInfo.InvariantCulture)}.log";
 
             // Create the log file target
             var logfile = new NLog.Targets.FileTarget("logfile")
