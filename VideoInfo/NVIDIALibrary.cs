@@ -1536,10 +1536,6 @@ namespace DisplayMagicianShared.NVIDIA
                 foreach (var physicalGPU in displayConfig.PhysicalAdapters)
                 {
                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Processing settings for Physical GPU #{physicalGPU.Key}");
-
-                    // Wake up the Physical GPU if it's asleep
-                    NVAPI.GetUsages(physicalGPU.Key);
-
                     NVIDIA_PER_ADAPTER_CONFIG myAdapter = physicalGPU.Value;
                     UInt32 myAdapterIndex = physicalGPU.Key;
                     foreach (var displayDict in myAdapter.Displays)
