@@ -2027,6 +2027,9 @@ namespace DisplayMagicianShared.Windows
                 SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: The current taskbar settings are the same as the one's we want, so skipping setting them!");
             }*/
 
+            // Force a reapply of all taskbars (inn case NVIDIA Surround mucks it up)
+            TaskbarHelper.ForceTaskbarRedraw();
+
             return true;
         }
 
