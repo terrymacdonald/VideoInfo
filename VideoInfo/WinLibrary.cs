@@ -251,8 +251,6 @@ namespace DisplayMagicianShared.Windows
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.DisplaySources = new Dictionary<string, List<DISPLAY_SOURCE>>();
             myDefaultConfig.GdiDisplaySettings = new Dictionary<string, GDI_DISPLAY_SETTING>();
-            myDefaultConfig.TaskBarLayout = new Dictionary<string, TaskBarLayout>();
-            myDefaultConfig.TaskBarSettings = new TaskBarSettings();
             myDefaultConfig.IsCloned = false;
 
             return myDefaultConfig;

@@ -196,7 +196,6 @@ namespace DisplayMagicianShared.NVIDIA
         {
             if (!(IsInUse == other.IsInUse && 
             IsCloned == other.IsCloned &&
-            IsOptimus == other.IsOptimus &&
             PhysicalAdapters.SequenceEqual(other.PhysicalAdapters) &&
             MosaicConfig.Equals(other.MosaicConfig) &&
             DRSSettings.SequenceEqual(other.DRSSettings) &&
@@ -216,7 +215,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCloned, IsOptimus, MosaicConfig, PhysicalAdapters, DisplayConfigs, DisplayIdentifiers, DRSSettings).GetHashCode();
+            return (IsInUse, IsCloned, MosaicConfig, PhysicalAdapters, DisplayConfigs, DisplayIdentifiers, DRSSettings).GetHashCode();
         }
         public static bool operator ==(NVIDIA_DISPLAY_CONFIG lhs, NVIDIA_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -401,7 +400,6 @@ namespace DisplayMagicianShared.NVIDIA
             myDefaultConfig.DisplayNames = new Dictionary<string, string>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.IsCloned = false;
-            myDefaultConfig.IsOptimus = false;
             myDefaultConfig.IsInUse = false;
 
             return myDefaultConfig;
