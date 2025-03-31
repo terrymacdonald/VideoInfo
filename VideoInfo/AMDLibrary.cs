@@ -153,6 +153,8 @@ namespace DisplayMagicianShared.AMD
 
     class AMDLibrary : IDisposable
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr LoadLibrary(string lpFileName);
 
         // Static members are 'eagerly initialized', that is, 
         // immediately when class is loaded for the first time.
@@ -280,6 +282,10 @@ namespace DisplayMagicianShared.AMD
             _disposed = true;
         }
 
+        public static void KeepVideoCardOn()
+        {
+            LoadLibrary("AMDExportsDLL.dll");
+        }
 
         public bool IsInstalled
         {
@@ -343,6 +349,7 @@ namespace DisplayMagicianShared.AMD
             myDefaultConfig.DisplayTargets = new List<ADL_DISPLAY_TARGET>();
             myDefaultConfig.HdrConfigs = new Dictionary<int, AMD_HDR_CONFIG>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
+            myDefaultConfig.IsInUse = false;
 
             return myDefaultConfig;
         }
@@ -411,6 +418,13 @@ namespace DisplayMagicianShared.AMD
                         }
                         // Free the memory used by the buffer                        
                         Marshal.FreeCoTaskMem(adapterInfoBuffer);
+                    }
+                    else
+                    {
+                        // Free the memory used by the buffer                        
+                        Marshal.FreeCoTaskMem(adapterInfoBuffer);
+                        // Return the default config as there are no adapters to get info from
+                        return myDisplayConfig;
                     }
 
                     // Now go through each adapter and get the information we need from it
@@ -496,6 +510,9 @@ namespace DisplayMagicianShared.AMD
                         ADL_DISPLAY_TARGET[] displayTargetArray = { };
                         if (numDisplayTargets > 0)
                         {
+                            // At this point we know there is at least one screen connected to an adapter
+                            myDisplayConfig.IsInUse = true;
+
                             IntPtr currentDisplayTargetBuffer = displayTargetBuffer;
                             //displayTargetArray = new ADL_DISPLAY_TARGET[numDisplayTargets];
                             displayTargetArray = new ADL_DISPLAY_TARGET[numDisplayTargets];
@@ -519,6 +536,13 @@ namespace DisplayMagicianShared.AMD
                             // Save the item                            
                             //savedAdapterConfig.DisplayTargets = new ADL_DISPLAY_TARGET[numDisplayTargets];
                             myDisplayConfig.DisplayTargets = displayTargetArray.ToList<ADL_DISPLAY_TARGET>();
+                        }
+                        else
+                        {
+                            // Free the memory used by the buffer                        
+                            Marshal.FreeCoTaskMem(displayTargetBuffer);
+                            // Return the default config as there are no display targets to get info from
+                            return myDisplayConfig;
                         }
 
                         // Loop through all the displayTargets currently in use

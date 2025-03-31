@@ -342,6 +342,11 @@ namespace VideoInfo
                     bool errorApplyingSomething = false;
 
 
+                    // Wake up all discrete videocards in case they have gone to sleep (e.g. NVIDIA Optimus laptops)
+                    // and keep them on (IMPORTANT! - THIS WILL IMPACT YOUR BATTERY LIFE)
+                    //NVIDIALibrary.KeepVideoCardOn();
+                    AMDLibrary.KeepVideoCardOn();
+
                     // Wake up all attached displays in case they have gone to sleep
                     winLibrary.WakeUpAllDisplays();
 
@@ -353,6 +358,8 @@ namespace VideoInfo
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings are used in this display profile.");
                             if (myDisplayConfig.NVIDIAConfig.DisplayIdentifiers.Count > 0)
                             {
+                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: There are {myDisplayConfig.NVIDIAConfig.DisplayIdentifiers.Count} displays connected to the NVIDIA video card.");
+
                                 if (nvidiaLibrary.IsPossibleConfig(myDisplayConfig.NVIDIAConfig))
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} are possible to use right now, so we'll use attempt to use them shortly.");
@@ -387,6 +394,7 @@ namespace VideoInfo
 
                             if (myDisplayConfig.AMDConfig.DisplayIdentifiers.Count > 0)
                             {
+                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: There are {myDisplayConfig.AMDConfig.DisplayIdentifiers.Count} displays connected to the AMD video card.");
                                 if (amdLibrary.IsPossibleConfig(myDisplayConfig.AMDConfig))
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} are possible to use right now, so we'll use attempt to use them.");

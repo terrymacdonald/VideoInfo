@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using Windows.Devices.I2c.Provider;
 using Windows.Graphics;
 using Windows.Storage.Provider;
 using static DisplayMagicianShared.NVIDIA.DisplayTopologyStatus;
@@ -226,6 +227,9 @@ namespace DisplayMagicianShared.NVIDIA
     public class NVIDIALibrary : IDisposable
     {
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr LoadLibrary(string lpFileName);
+
         // Static members are 'eagerly initialized', that is, 
         // immediately when class is loaded for the first time.
         // .NET guarantees thread safety for static initialization
@@ -235,6 +239,7 @@ namespace DisplayMagicianShared.NVIDIA
         private NVIDIA_DISPLAY_CONFIG _activeDisplayConfig;
         public List<MonitorConnectionType> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
+        public List<uint> _allConnectedDisplayIds = new List<uint>();
         private bool _mosaic_supported = true;
 
         // To detect redundant calls
@@ -369,6 +374,11 @@ namespace DisplayMagicianShared.NVIDIA
             }
         }
 
+        public static void KeepVideoCardOn()
+        {
+            LoadLibrary("NVIDIAExportsDLL.dll");
+        }
+
         public static NVIDIALibrary GetLibrary()
         {
             return _instance;
@@ -393,6 +403,7 @@ namespace DisplayMagicianShared.NVIDIA
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.IsCloned = false;
             myDefaultConfig.IsOptimus = false;
+            myDefaultConfig.IsInUse = false;
 
             return myDefaultConfig;
         }
@@ -453,8 +464,32 @@ namespace DisplayMagicianShared.NVIDIA
                 {
                     SharedLogger.logger.Error(ex,$"NVIDIALibrary/GetNVIDIADisplayConfig: Error getting physical GPU count.");
                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Returning the blank NVIDIA config to try and allow other video libraries to work.");
-                    // Return the default config to see if we can keep going.
-                    return myDisplayConfig;
+                    try
+                    {
+                        // Load the library that keeps the NVIDIA video card visible to this application (potentially wasting laptop power)
+                        NVIDIALibrary.KeepVideoCardOn();
+
+                        // Enumerate all the Physical GPUs
+                        physicalGpus = NVAPI.EnumPhysicalGPUs();
+                        physicalGpuCount = physicalGpus.Length;
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_EnumPhysicalGPUs returned {physicalGpuCount} Physical GPUs");
+
+                        // This check is to make sure that we only continue in this function if there are physical GPUs to actually do anything with
+                        // If the driver is installed, but not physical GPUs are present then we just want to return a default blank config.
+                        if (physicalGpuCount == 0)
+                        {
+                            // Return the default config
+                            return CreateDefaultConfig();
+                        }
+
+                    }
+                    catch (Exception nex)
+                    {
+                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Error getting physical GPU count.");
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Returning the blank NVIDIA config to try and allow other video libraries to work.");
+                        // Return the default config to see if we can keep going.
+                        return myDisplayConfig;
+                    }
                 }
 
                 try
@@ -494,10 +529,11 @@ namespace DisplayMagicianShared.NVIDIA
                 }
 
 
-                // This try/catch is to handle the case where there is an NVIDIA GPU in the machine but it's not being used!
+                // This try/catch is to handle the case where there is an NVIDIA GPU in the machine but it's not being used! e.g. display not connected to it
                 try
                 {
-
+                    // If we reach here, then the nmvidia display is in use!
+                    myDisplayConfig.IsInUse = true;
 
                     // Go through the Physical GPUs one by one to get the logical adapter information
                     for (uint physicalGpuIndex = 0; physicalGpuIndex < physicalGpuCount; physicalGpuIndex++)
@@ -1543,7 +1579,7 @@ namespace DisplayMagicianShared.NVIDIA
                         NVIDIA_PER_DISPLAY_CONFIG myDisplay = displayDict.Value;
                         UInt32 displayId = displayDict.Key;
 
-                        if (!ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays.ContainsKey(displayId))
+                        if (!_allConnectedDisplayIds.Contains(displayId))
                         {
                             SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Display {displayId} doesn't exist in this setup, so skipping changing any NVIDIA display Settings.");
                             continue;
@@ -1649,6 +1685,14 @@ namespace DisplayMagicianShared.NVIDIA
                             SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused while turning off prior NVIDIA HDR colour settings for display {displayId}.");
                         } */
                     } 
+                }
+
+                // If we get to here and there are no displays connected, then we need to return, as all the following settings back out custom settings per display
+                // which are obviously not needed if the screens are off!
+                if (!ActiveDisplayConfig.IsInUse)
+                {
+                    // we need to return true as everything is working as it should!
+                    return true;
                 }
 
                 // Set the DRS Settings only if we need to
@@ -2271,10 +2315,10 @@ namespace DisplayMagicianShared.NVIDIA
                 }
 
                 // If the NVIDIA topology has changed, then we need to refresh our active config so it stays valid. 
-                if (logicalGPURefreshNeeded)
-                {
-                    UpdateActiveConfig();
-                }
+                //if (logicalGPURefreshNeeded)
+                //{
+                //    UpdateActiveConfig();
+                //}
 
 
             }
@@ -2293,6 +2337,9 @@ namespace DisplayMagicianShared.NVIDIA
             if (_initialised)
             {
 
+                // We need to first update the active config to make sure it's set
+                UpdateActiveConfig();
+
                 // Go through the physical adapters
                 foreach (var physicalGPU in displayConfig.PhysicalAdapters)
                 {
@@ -2308,7 +2355,7 @@ namespace DisplayMagicianShared.NVIDIA
                         // Now we try to set each display settings
                         SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to process settings for display {displayId}.");
 
-                        if (!ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays.ContainsKey(displayId))
+                        if (!_allConnectedDisplayIds.Contains(displayId))
                         {
                             SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Display {displayId} doesn't exist in this setup, so skipping overriding any NVIDIA display Settings.");
                             continue;
@@ -2891,6 +2938,11 @@ namespace DisplayMagicianShared.NVIDIA
                         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the list of all displays connected to the physical GPU #{physicalGpus[physicalGpuIndex]}.");
                         displayIds = NVAPI.GetAllDisplayIds(physicalGpus[physicalGpuIndex]);
                         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the list of all displays connected to the physical GPU #{physicalGpus[physicalGpuIndex]}. There are currently {displayIds.Length} displays connected.");
+                        // Update the latest list of all connected display ids
+                        _allConnectedDisplayIds.Clear();
+                        foreach (DisplayIdsV2 displayId in displayIds) {
+                            _allConnectedDisplayIds.Add(displayId.DisplayId);
+                        }
                     }
                     catch (Exception ex)
                     {
