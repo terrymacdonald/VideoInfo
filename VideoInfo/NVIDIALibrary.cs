@@ -180,7 +180,6 @@ namespace DisplayMagicianShared.NVIDIA
     {
         public bool IsInUse;
         public bool IsCloned;
-        public bool IsOptimus;
         public NVIDIA_MOSAIC_CONFIG MosaicConfig;
         public Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG> PhysicalAdapters;
         public List<PathInfoV2> DisplayConfigs;

@@ -10,6 +10,8 @@ using DisplayMagicianShared.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using System.Globalization;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace VideoInfo
 {
@@ -478,7 +480,7 @@ namespace VideoInfo
                     // or if the display config we want to change to is a Mosaic config. So we just have to assume that it will work!
                     Console.Write($"Attempting to apply Windows display config from {filename}...");
                     itWorkedforWindows = winLibrary.SetActiveConfig(myDisplayConfig.WindowsConfig);
-
+                    
                     if (itWorkedforWindows)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Windows CCD display settings within {filename} were applied correctly, so now attempting to apply any overrides.");

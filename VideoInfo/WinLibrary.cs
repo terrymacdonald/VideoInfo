@@ -88,8 +88,6 @@ namespace DisplayMagicianShared.Windows
         public DISPLAYCONFIG_MODE_INFO[] DisplayConfigModes;
         public List<ADVANCED_HDR_INFO_PER_PATH> DisplayHDRStates;
         public Dictionary<string, GDI_DISPLAY_SETTING> GdiDisplaySettings;
-        public Dictionary<string, TaskBarLayout> TaskBarLayout;
-        public TaskBarSettings TaskBarSettings;
         public bool IsCloned;
         // Note: We purposely have left out the DisplaySources from the Equals as it's order keeps changing after each reboot and after each profile swap
         // and it is informational only and doesn't contribute to the configuration (it's used for generating the Screens structure, and therefore for
@@ -130,12 +128,6 @@ namespace DisplayMagicianShared.Windows
 
 
         }
-
-        // NOTE: I have disabled the TaskBar specific matching for now due to errors I cannot fix
-        // WinLibrary will still track the location of the taskbars, but won't actually set them as the setting of the taskbars doesnt work at the moment.
-        /*&&
-        TaskBarLayout.Values.SequenceEqual(other.TaskBarLayout.Values) &&
-        TaskBarSettings.Equals(other.TaskBarSettings);*/
 
         public override int GetHashCode()
         {
@@ -1022,7 +1014,7 @@ namespace DisplayMagicianShared.Windows
             }
 
 
-            Dictionary<string, TaskBarLayout> taskBarStuckRectangles = new Dictionary<string, TaskBarLayout>();
+            /*Dictionary<string, TaskBarLayout> taskBarStuckRectangles = new Dictionary<string, TaskBarLayout>();
 
             // Now attempt to get the windows taskbar location for each display
             SharedLogger.logger.Trace($"WinLibrary/GetWindowsDisplayConfig: Attempting to get the Windows Taskbar Layouts.");
@@ -1060,14 +1052,14 @@ namespace DisplayMagicianShared.Windows
 
             // Now we try to get the taskbar settings too
             SharedLogger.logger.Trace($"WinLibrary/GetWindowsDisplayConfig: Attempting to get the Windows Taskbar Settings.");
-            TaskBarSettings taskBarSettings = TaskBarSettings.GetCurrent();
+            TaskBarSettings taskBarSettings = TaskBarSettings.GetCurrent();*/
 
             // Store the active paths and modes in our display config object
             windowsDisplayConfig.DisplayConfigPaths = paths;
             windowsDisplayConfig.DisplayConfigModes = modes;
             windowsDisplayConfig.GdiDisplaySettings = GetGdiDisplaySettings();
-            windowsDisplayConfig.TaskBarLayout = taskBarStuckRectangles;
-            windowsDisplayConfig.TaskBarSettings = taskBarSettings;
+            //windowsDisplayConfig.TaskBarLayout = taskBarStuckRectangles;
+            //windowsDisplayConfig.TaskBarSettings = taskBarSettings;
 
             return windowsDisplayConfig;
         }
@@ -1756,7 +1748,7 @@ namespace DisplayMagicianShared.Windows
 
             }
 
-
+/*
             // Get the existing displays config
             Dictionary<string, GDI_DISPLAY_SETTING> currentGdiDisplaySettings = GetGdiDisplaySettings();
 
@@ -1936,7 +1928,7 @@ namespace DisplayMagicianShared.Windows
                     SharedLogger.logger.Error($"WinLibrary/SetActiveConfig: Unknown error while trying to apply the new GDI modes.");
                     return false;
                 }
-            }
+            }*/
 
 
             // NOTE: I have disabled the TaskBar setting logic for now due to errors I cannot fix in this code.
