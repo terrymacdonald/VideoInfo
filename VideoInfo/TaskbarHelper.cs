@@ -117,20 +117,23 @@ public static class TaskbarHelper
     /// </summary>
     public static void ForceTaskbarRedraw()
     {
+        SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: Waiting 500ms for the main display layout changes to take effect.");
+        Thread.Sleep(500);
+
         if (!AreTaskbarsVisibleOnAllScreens())
         {
             SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: Windows Taskbar is missing from a display. It is neither shown onscreen nor hidden. We need to try and get that taskbar working again.");
             SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: Attempting to get Windows to redraw the screen by sending a windows message that the screen layout has changed.");
             NudgeShellToRefresh();
             SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: Waiting 500ms for the windows message to take effect.");
-            Thread.Sleep(500);
+            Thread.Sleep(100);
             // Check if taskbars are visible on all screens before reapplying the display config again
             if (!AreTaskbarsVisibleOnAllScreens())
             {
                 SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: The windows taskbar is still missing from a display. Attempting to get Windows to reapply the current display layout to force it to redraw the screens.");
                 ReapplyCurrentDisplayConfig();
                 SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: Waiting 500ms for the windows message to take effect.");
-                Thread.Sleep(500);
+                Thread.Sleep(100);
             }
             // Check if taskbars are visible on all screens before restarting Explorer
             if (!AreTaskbarsVisibleOnAllScreens())
@@ -138,7 +141,16 @@ public static class TaskbarHelper
                 SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: The windows taskbar is still missing from a display. Attempting to get Windows to restart windows explorer using windows restart manager so that explorer keeps it's current configuration.");
                 RestartExplorer();
                 SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: Waiting 500ms for the windows explorer restart to take effect.");
-                Thread.Sleep(500);
+                Thread.Sleep(100);
+            }
+            // Check if taskbars are visible on all screens before restarting Explorer
+            if (AreTaskbarsVisibleOnAllScreens())
+            {
+                SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: All windows taskbars are available (but may be set to auto-hide).");
+            }
+            else
+            {
+                SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: At least one windows taskbar is still missing from a display, even though we tried getting it back. THere is nothign further we can do in this instance.");                
             }
         }
         else
