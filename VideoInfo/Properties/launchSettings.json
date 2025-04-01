@@ -39,6 +39,11 @@
       "commandName": "Project",
       "commandLineArgs": "load test-config4.cfg",
       "nativeDebugging": true
+    },
+    "VideoInfo zip": {
+      "commandName": "Project",
+      "commandLineArgs": "zip",
+      "nativeDebugging": true
     }
   }
 }

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Threading;
+using System.IO.Compression;
 
 namespace VideoInfo
 {
@@ -169,6 +170,11 @@ namespace VideoInfo
                         Environment.Exit(1);
                     }
                 }
+                else if (args[0] == "zip")
+                {
+                    SharedLogger.logger.Debug($"VideoInfo/Main: zipping useful debugging information as zip command was provided");
+                    createSupportZipFile(AppLogFilename);
+                }
                 else if (args[0] == "currentids")
                 {
                     SharedLogger.logger.Debug($"VideoInfo/Main: showing currently connected display ids as currentids command was provided");
@@ -238,6 +244,48 @@ namespace VideoInfo
             Console.WriteLine($"\t'VideoInfo currentids' will display the display identifiers for all active displays.");
             Console.WriteLine($"\t'VideoInfo allids' will display the display identifiers for all displays that are active or can be \n\t\tmade active.");
             Console.WriteLine($"\nUse DisplayMagician to store display settings for each game you have. https://github.com/terrymacdonald/DisplayMagician\n");
+        }
+
+        static void createSupportZipFile(string currentLogFilename)
+        {
+            string zipFilename = $"VideoInfo-Support-{DateTime.Now.ToString("yyyy-MM-dd-HHmm", CultureInfo.InvariantCulture)}.zip";
+            Console.Write($"Creating Support ZIP File {zipFilename}...");
+            SharedLogger.logger.Trace($"Program/createSupportZipFile: Attempting to create a support zip file for debugging purposes called {zipFilename}");            
+            try
+            {
+                // Retrieve all .cfg and .log files from the current directory
+                var filesToZip = Directory.EnumerateFiles(Directory.GetCurrentDirectory(), "*.*")
+                                          .Where(file => (file.EndsWith(".cfg", StringComparison.OrdinalIgnoreCase) ||
+                                                         file.EndsWith(".log", StringComparison.OrdinalIgnoreCase) && 
+                                                         !file.EndsWith(currentLogFilename, StringComparison.OrdinalIgnoreCase)))
+                                          .ToList();
+
+                // Check if there are files to zip
+                if (filesToZip.Count == 0)
+                {
+                    SharedLogger.logger.Warn("Program/createSupportZipFile: WARNING - No .cfg or .log files found in the current directory.");
+                    Console.WriteLine($"\nWARNING - No .cfg or .log files found in the current directory.");
+                    return;
+                }
+
+                // Create the ZIP file
+                using (var zipArchive = ZipFile.Open(zipFilename, ZipArchiveMode.Create))
+                {
+                    foreach (var file in filesToZip)
+                    {
+                        // Add each file to the ZIP archive
+                        zipArchive.CreateEntryFromFile(file, Path.GetFileName(file), CompressionLevel.Optimal);
+                    }
+                }
+
+                SharedLogger.logger.Info($"Program/createSupportZipFile: Support ZIP file created successfully.");
+                Console.WriteLine($"Done.");
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Error($"Program/createSupportZipFile: An error occurred while creating the support ZIP file: {ex.Message}");
+                Console.WriteLine($"\nERROR - Support ZIP file created successfully: {zipFilename}");
+            }
         }
 
         static void saveToFile(string filename)
