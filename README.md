@@ -10,6 +10,7 @@ Command line examples:
 - Save the settings you currently are using to a file to use later: `VideoInfo save my-cool-settings.cfg`
 - Load the settings you saved earlier and use them now: `VideoInfo load my-cool-settings.cfg`
 - Show whether the display config file can be used: `VideoInfo possible my-cool-settings.cfg`
+- Create a Support ZIP File for uploading to Github (collects .cfg and .log files): `VideoInfo zip`
 
 
 ## To setup this software:
