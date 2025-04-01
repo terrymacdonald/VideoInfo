@@ -209,6 +209,10 @@ namespace DisplayMagicianShared.AMD
                         _initialised = true;
                         SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADL2 library was initialised successfully");
                         SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Running UpdateActiveConfig to ensure there is a config to use later");
+
+                        // Force the AMD Video card to stay on when AMDLibrary is runnning
+                        KeepVideoCardOn();
+
                         _activeDisplayConfig = GetActiveConfig();
                         _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers();
                     }

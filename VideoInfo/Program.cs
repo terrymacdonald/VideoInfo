@@ -343,12 +343,6 @@ namespace VideoInfo
                     bool itWorkedforAMDOverride = false;
                     bool errorApplyingSomething = false;
 
-
-                    // Wake up all discrete videocards in case they have gone to sleep (e.g. NVIDIA Optimus laptops)
-                    // and keep them on (IMPORTANT! - THIS WILL IMPACT YOUR BATTERY LIFE)
-                    //NVIDIALibrary.KeepVideoCardOn();
-                    AMDLibrary.KeepVideoCardOn();
-
                     // Wake up all attached displays in case they have gone to sleep
                     winLibrary.WakeUpAllDisplays();
 
