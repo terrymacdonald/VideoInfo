@@ -702,8 +702,8 @@ namespace VideoInfo
 
                 if (nvidiaLibrary.IsPossibleConfig(myDisplayConfig.NVIDIAConfig) && winLibrary.IsPossibleConfig(myDisplayConfig.WindowsConfig))
                 {
-                    SharedLogger.logger.Trace($"VideoInfo/possibleFromFile: The NVIDIA & Windows CCD display settings in {filename} are compatible with this computer.");
-                    Console.WriteLine($"The NVIDIA display settings in {filename} are compatible with this computer.");
+                    SharedLogger.logger.Trace($"VideoInfo/possibleFromFile: The display settings in {filename} are compatible with this computer.");
+                    Console.WriteLine($"The display settings in {filename} are compatible with this computer.");
                     Console.WriteLine($"You can apply them with the command 'VideoInfo load {filename}'");
                 }
                 else
@@ -796,14 +796,14 @@ namespace VideoInfo
                     return;
                 }
 
-                if (displayConfig.WindowsConfig.Equals(otherDisplayConfig.WindowsConfig) && displayConfig.NVIDIAConfig.Equals(otherDisplayConfig.NVIDIAConfig))
+                if (displayConfig.WindowsConfig.Equals(otherDisplayConfig.WindowsConfig) && displayConfig.NVIDIAConfig.Equals(otherDisplayConfig.NVIDIAConfig) && displayConfig.AMDConfig.Equals(otherDisplayConfig.AMDConfig))
                 {
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The NVIDIA display settings in {filename} and {otherFilename} are equal.");
+                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and {otherFilename} are equal.");
                     Console.WriteLine($"The NVIDIA display settings in {filename} and {otherFilename} are equal.");
                 }
                 else
                 {
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The NVIDIA display settings in {filename} and {otherFilename} are NOT equal.");
+                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and {otherFilename} are NOT equal.");
                     Console.WriteLine($"The NVIDIA display settings in {filename} and {otherFilename} are NOT equal.");
                 }
 
@@ -854,17 +854,17 @@ namespace VideoInfo
                     SharedLogger.logger.Error(ex, $"VideoInfo/equalFromFile: Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
                     return;
                 }
-                if (displayConfig.WindowsConfig.Equals(WinLibrary.GetLibrary().GetActiveConfig()) && displayConfig.NVIDIAConfig.Equals(NVIDIALibrary.GetLibrary().GetActiveConfig()))
-                //if (displayConfig.NVIDIAConfig.Equals(NVIDIALibrary.GetLibrary().GetActiveConfig()))
-                //if (displayConfig.WindowsConfig.Equals(WinLibrary.GetLibrary().GetActiveConfig()))
+                if (displayConfig.WindowsConfig.Equals(WinLibrary.GetLibrary().GetActiveConfig()) && 
+                    displayConfig.NVIDIAConfig.Equals(NVIDIALibrary.GetLibrary().GetActiveConfig()) && 
+                    displayConfig.AMDConfig.Equals(AMDLibrary.GetLibrary().GetActiveConfig()))
                 { 
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The NVIDIA display settings in {filename} and the currently active display configuration are equal.");
-                    Console.WriteLine($"The NVIDIA display settings in {filename} and the currently active display configuration are equal.");
+                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and the currently active display configuration are equal.");
+                    Console.WriteLine($"The display settings in {filename} and the currently active display configuration are equal.");
                 }
                 else
                 {
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The NVIDIA display settings in {filename} and the currently active display configuration are NOT equal.");
-                    Console.WriteLine($"The NVIDIA display settings in {filename} and the currently active display configuration are NOT equal.");
+                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and the currently active display configuration are NOT equal.");
+                    Console.WriteLine($"The display settings in {filename} and the currently active display configuration are NOT equal.");
                 }
 
             }

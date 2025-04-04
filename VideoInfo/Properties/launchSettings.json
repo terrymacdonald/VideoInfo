@@ -44,6 +44,11 @@
       "commandName": "Project",
       "commandLineArgs": "zip",
       "nativeDebugging": true
+    },
+    "equal cfg1 cfg1b": {
+      "commandName": "Project",
+      "commandLineArgs": "equal test-config1.cfg test-config1b.cfg",
+      "nativeDebugging": true
     }
   }
 }
