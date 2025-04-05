@@ -7,7 +7,8 @@ using System.Text.RegularExpressions;
 using NLog.Targets;
 using System.Threading;
 using System.Threading.Tasks;
-using DisplayMagicianShared.NVIDIA;
+using DisplayMagicianShared;
+using System.Diagnostics;
 
 namespace DisplayMagicianShared.Windows
 {
@@ -1489,6 +1490,23 @@ namespace DisplayMagicianShared.Windows
             // Also reapply the current configuration to just wake up any monitors that are currently asleep.
             //CCDImport.SetDisplayConfig(0, null, 0, null, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT);
 
+
+            return true;
+        }
+
+        // Force a full restart of the Windows Explorer process to redraw the taskbars
+        public bool ForceRestartExplorer()
+        {
+            // Restart the Windows Explorer process to redraw the taskbars
+            SharedLogger.logger.Trace($"WinLibrary/ForceRestartExplorer: Restarting Windows Explorer to redraw the taskbars");
+            Process[] processes = Process.GetProcessesByName("explorer");
+            foreach (Process process in processes)
+            {
+                process.Kill();
+            }
+
+            // Start a new instance of explorer.exe
+            Process.Start("explorer.exe");
 
             return true;
         }
