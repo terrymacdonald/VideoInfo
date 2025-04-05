@@ -47,7 +47,7 @@
     },
     "equal cfg1 cfg1b": {
       "commandName": "Project",
-      "commandLineArgs": "equal test-config1.cfg test-config1b.cfg",
+      "commandLineArgs": "equal test-config1.cfg",
       "nativeDebugging": true
     }
   }

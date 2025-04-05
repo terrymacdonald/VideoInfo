@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using NLog.Targets;
 using System.Threading;
 using System.Threading.Tasks;
+using DisplayMagicianShared.NVIDIA;
 
 namespace DisplayMagicianShared.Windows
 {
@@ -101,7 +102,8 @@ namespace DisplayMagicianShared.Windows
             }
 
             // Now we need to go through the HDR states comparing vaues, as the order changes if there is a cloned display
-            if (!WinLibrary.EqualButDifferentOrder<ADVANCED_HDR_INFO_PER_PATH>(DisplayHDRStates, other.DisplayHDRStates))
+            //if (!CollectionComparer.AreEquivalent(DisplayHDRStates, other.DisplayHDRStates))
+            if (!CollectionComparer.EqualButDifferentOrder<ADVANCED_HDR_INFO_PER_PATH>(DisplayHDRStates, other.DisplayHDRStates))                
             {
                 return false;
             }
