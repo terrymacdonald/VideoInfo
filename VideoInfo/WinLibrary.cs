@@ -1473,23 +1473,38 @@ namespace DisplayMagicianShared.Windows
 
         public bool WakeUpAllDisplays()
         {
+            SharedLogger.logger.Info($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays ready for display layout change.");
+
+            SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using DDC/CI low level power commands.");
             // Poke all monitors using DDC/CI to wake them up
-            DdcCiHelper.PokeAllMonitors();
+            DdcCiHelper.WakeAllMonitors();
 
-            Thread.Sleep(100);
+            Thread.Sleep(1000);
 
-            // Attempt to wake any displays that are asleep by emulaing a Ctrl + Shift + Windows key + B kjeypress to reset the windows graphic display driver.
+            // Attempt to wake any displays that are asleep by emulaing a Ctrl + Shift + Windows key + B keypress to reset the windows graphic display driver.
             // This is a workaround for a bug in Windows 10 where the display driver can sometimes go to sleep and not wake up. Here's what it does:
             // - It calls DxgkDdiResetFromTimeout() internally.
             // - Resets the GPU driver stack(WDDM).
             // - Reinitialises the display pipeline.
             // - Can "wake" sleeping or non - responding displays, including those with bad EDID or DP handshake issues.
+            SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using emulated Ctrl + Shift + Windows key + B keypress.");
             GDIImport.ResetGraphicsStack();
 
-            Thread.Sleep(200);
-            // Also reapply the current configuration to just wake up any monitors that are currently asleep.
-            //CCDImport.SetDisplayConfig(0, null, 0, null, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT);
+            Thread.Sleep(1000);
 
+            // Also reapply the current configuration to just wake up any monitors that are currently asleep.
+            SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays by reapplying the current config.");
+            WIN32STATUS result = CCDImport.SetDisplayConfig(0, IntPtr.Zero, 0, IntPtr.Zero, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT);
+            if (result != 0)
+            {
+                SharedLogger.logger.Warn($"WinLibrary/WakeUpAllDisplays: WARNING - Failed to reapply the current display config. Result: {result.ToString()}");
+            }
+            else
+            {
+                SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Successfully reapplied the current display config.");
+            }
+
+            Thread.Sleep(1000);
 
             return true;
         }

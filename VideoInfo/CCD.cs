@@ -1224,6 +1224,9 @@ namespace DisplayMagicianShared.Windows
         public static extern WIN32STATUS SetDisplayConfig([In] uint numPathArrayElements, [In] DISPLAYCONFIG_PATH_INFO[] pathArray, [In] uint numModeInfoArrayElements, [In] DISPLAYCONFIG_MODE_INFO[] modeInfoArray, [In] SDC flags);
 
         [DllImport("user32")]
+        public static extern WIN32STATUS SetDisplayConfig([In] uint numPathArrayElements, [In] IntPtr pathArray, [In] uint numModeInfoArrayElements, IntPtr modeInfoArray, [In] SDC flags);
+
+        [DllImport("user32")]
         public static extern bool SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT value);
 
 
