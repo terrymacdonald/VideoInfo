@@ -64,11 +64,11 @@ namespace VideoInfo
             NLog.LogManager.Configuration = config;
 
             // Start the Log file
-            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.8.10");
+            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.8.11");
             // Log the commandline options
             SharedLogger.logger.Info($"VideoInfo/Main: cmdline options: {string.Join(" ", args)}");
 
-            Console.WriteLine($"\nVideoInfo v1.8.10");
+            Console.WriteLine($"\nVideoInfo v1.8.11");
             Console.WriteLine($"=================");
             Console.WriteLine($"(c) Terry MacDonald 2025\n");
 
