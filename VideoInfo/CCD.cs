@@ -1221,10 +1221,10 @@ namespace DisplayMagicianShared.Windows
 
         // SetDisplayConfig
         [DllImport("user32")]
-        public static extern WIN32STATUS SetDisplayConfig([In] uint numPathArrayElements, [In] DISPLAYCONFIG_PATH_INFO[] pathArray, [In] uint numModeInfoArrayElements, [In] DISPLAYCONFIG_MODE_INFO[] modeInfoArray, [In] SDC flags);
+        public static extern WIN32STATUS SetDisplayConfig([In] uint numPathArrayElements, [In, Optional] DISPLAYCONFIG_PATH_INFO[] pathArray, [In] uint numModeInfoArrayElements, [In, Optional] DISPLAYCONFIG_MODE_INFO[] modeInfoArray, [In] SDC flags);
 
         [DllImport("user32")]
-        public static extern WIN32STATUS SetDisplayConfig([In] uint numPathArrayElements, [In] IntPtr pathArray, [In] uint numModeInfoArrayElements, IntPtr modeInfoArray, [In] SDC flags);
+        public static extern WIN32STATUS SetDisplayConfig([In] uint numPathArrayElements, [In,Optional] IntPtr pathArray, [In] uint numModeInfoArrayElements, [In,Optional] IntPtr modeInfoArray, [In] SDC flags);
 
         [DllImport("user32")]
         public static extern bool SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT value);

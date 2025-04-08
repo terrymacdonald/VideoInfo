@@ -1471,7 +1471,7 @@ namespace DisplayMagicianShared.Windows
             return stringToReturn;
         }
 
-        public bool WakeUpAllDisplays()
+        public static bool WakeUpAllDisplays()
         {
             SharedLogger.logger.Info($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays ready for display layout change.");
 
@@ -1492,20 +1492,11 @@ namespace DisplayMagicianShared.Windows
 
             Thread.Sleep(1000);
 
-            // Also reapply the current configuration to just wake up any monitors that are currently asleep.
-            SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays by reapplying the current config.");
-            WIN32STATUS result = CCDImport.SetDisplayConfig(0, IntPtr.Zero, 0, IntPtr.Zero, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT);
-            if (result != 0)
-            {
-                SharedLogger.logger.Warn($"WinLibrary/WakeUpAllDisplays: WARNING - Failed to reapply the current display config. Result: {result.ToString()}");
-            }
-            else
-            {
-                SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Successfully reapplied the current display config.");
-            }
+/*            SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using EnableAllConnectedDisplays");
+            EnableAllConnectedDisplays();
 
             Thread.Sleep(1000);
-
+*/
             return true;
         }
 
@@ -1524,6 +1515,31 @@ namespace DisplayMagicianShared.Windows
             Process.Start("explorer.exe");
 
             return true;
+        }
+
+        public static bool EnableAllConnectedDisplays()
+        {
+
+            SharedLogger.logger.Trace("WinLibraryEnableAllConnectedDisplays: The temporary display configuration is valid, so we are going to apply it to enable all connected displays.");
+            // Set the display configuration to enable all connected displays.
+            // - We use the topology supplied flag, where we specify the order of the displays, but SetDisplayCConfig is free to find the modes that work best.
+            // - We also use the SDC_NO_OPTIMIZATION flag to prevent Windows from trying to optimize the display configuration.
+            // - We use the SDC_ALLOW_CHANGES flag to allow Windows to make changes to the display configuration to just make something work.
+            // - We use the SDC_ALLOW_PATH_ORDER_CHANGES flag to allow Windows to change the order of the display paths we supplied.
+            // The outcome of this process should be a configuration that enables all connected displays.
+            WIN32STATUS err = CCDImport.SetDisplayConfig(0, null, 0, null, SDC.SDC_APPLY | SDC.SDC_USE_DATABASE_CURRENT );
+
+            if (err == WIN32STATUS.ERROR_SUCCESS)
+            {
+                SharedLogger.logger.Trace("WinLibraryEnableAllConnectedDisplays: Successfully applied configuration to enable all connected displays.");
+                Thread.Sleep(2000);
+                return true;
+            }
+            else
+            {
+                SharedLogger.logger.Warn($"WinLibraryEnableAllConnectedDisplays: Failed to set display config: {err}");
+                return false;
+            }
         }
 
         public bool SetActiveConfig(WINDOWS_DISPLAY_CONFIG displayConfig)
