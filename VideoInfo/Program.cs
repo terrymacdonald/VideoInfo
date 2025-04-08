@@ -506,20 +506,19 @@ namespace VideoInfo
                         Console.WriteLine($"Skipping AMD Settings as they are not used in {filename}.");
                     }
 
-                    Thread.Sleep(5000); // Give it a second to wake up the displays
-                    WinLibrary.EnableAllConnectedDisplays();
-                    Thread.Sleep(5000); // Give it a second to wake up the displays
-                    winLibrary.UpdateActiveConfig();
 
-                    /*// If either AMD or NVIDIA settings were applied, then we need to update our windows layout to make sure it
+                    // If either AMD or NVIDIA settings were applied, then we need to update our windows layout to make sure it
                     // matches current reality.
                     if ((amdLibrary.IsInstalled && itWorkedforAMD) || (nvidiaLibrary.IsInstalled && itWorkedforNVIDIA))
                     {
+                        Thread.Sleep(200); // Give it a second to wake up the displays
+                        WinLibrary.EnableAllConnectedDisplays();
+                        Thread.Sleep(200); // Give it a second to wake up the displays                        
                         // if other changes were made, then ets update the screens so Windows knows whats happening
                         // NVIDIA and AMD make such large changes to the available screens in windows, we need to do this.
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: NVIDIA and/or AMD display settings within {filename} were applied successfully, so updating Windows Active Config so it knows of the changes made."); 
                         winLibrary.UpdateActiveConfig();                        
-                    }*/
+                    }
 
                     // Then let's try to also apply the windows changes
                     // Note: we are unable to check if the Windows CCD display config is possible, as it won't match if either the current display config is a Mosaic config,

@@ -1479,7 +1479,7 @@ namespace DisplayMagicianShared.Windows
             // Poke all monitors using DDC/CI to wake them up
             DdcCiHelper.WakeAllMonitors();
 
-            Thread.Sleep(1000);
+            Thread.Sleep(200);
 
             // Attempt to wake any displays that are asleep by emulaing a Ctrl + Shift + Windows key + B keypress to reset the windows graphic display driver.
             // This is a workaround for a bug in Windows 10 where the display driver can sometimes go to sleep and not wake up. Here's what it does:
@@ -1490,7 +1490,7 @@ namespace DisplayMagicianShared.Windows
             SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using emulated Ctrl + Shift + Windows key + B keypress.");
             GDIImport.ResetGraphicsStack();
 
-            Thread.Sleep(1000);
+            Thread.Sleep(200);
 
 /*            SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using EnableAllConnectedDisplays");
             EnableAllConnectedDisplays();
@@ -1532,7 +1532,7 @@ namespace DisplayMagicianShared.Windows
             if (err == WIN32STATUS.ERROR_SUCCESS)
             {
                 SharedLogger.logger.Trace("WinLibraryEnableAllConnectedDisplays: Successfully applied configuration to enable all connected displays.");
-                Thread.Sleep(2000);
+                Thread.Sleep(500);
                 return true;
             }
             else
@@ -1742,7 +1742,7 @@ namespace DisplayMagicianShared.Windows
                 SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting 0.1 second to let the display change take place before adjusting other specific Windows Display Settings");
                 System.Threading.Thread.Sleep(100);
 
-                /*SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set Windows DPI Scaling setting for display sources.");
+                SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set Windows DPI Scaling setting for display sources.");
                 CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
                 foreach (var displaySourceEntry in displayConfig.DisplaySources)
                 {
@@ -1759,7 +1759,7 @@ namespace DisplayMagicianShared.Windows
                     }
 
                 }
-                CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);*/
+                CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
 
 
                 // NOTE: There is currently no way within Windows CCD API to set the HDR settings to any particular setting

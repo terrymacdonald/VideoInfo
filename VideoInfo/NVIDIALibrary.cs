@@ -2073,9 +2073,6 @@ namespace DisplayMagicianShared.NVIDIA
 
                         SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn on colour if it's user set colour.");
                         // Now we try to set each display color
-
-
-
                         ColorDataV5 colorData = (ColorDataV5)myDisplay.ColorData;
                         try
                         {

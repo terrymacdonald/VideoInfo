@@ -177,9 +177,6 @@ namespace DisplayMagicianShared.Windows
         /// </summary>
         public static void ForceTaskbarRedraw()
         {
-            SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: Waiting 500ms for the main display layout changes to take effect.");
-            Thread.Sleep(500);
-
             if (!AreTaskbarsVisibleOnAllScreens())
             {
                 SharedLogger.logger.Trace("TasbkbarHelper/ForceTaskbarRedraw: Windows Taskbar is missing from a display. It is neither shown onscreen nor hidden. We need to try and get that taskbar working again.");
