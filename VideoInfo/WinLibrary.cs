@@ -1516,15 +1516,14 @@ namespace DisplayMagicianShared.Windows
             return stringToReturn;
         }
 
-        public static bool WakeUpAllDisplays()
+        public static bool WakeUpAllDisplays(int delayInMs)
         {
             SharedLogger.logger.Info($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays ready for display layout change.");
 
             SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using DDC/CI low level power commands.");
             // Poke all monitors using DDC/CI to wake them up
             DdcCiHelper.WakeAllMonitors();
-
-            Thread.Sleep(200);
+            Thread.Sleep(delayInMs);
 
             // Attempt to wake any displays that are asleep by emulaing a Ctrl + Shift + Windows key + B keypress to reset the windows graphic display driver.
             // This is a workaround for a bug in Windows 10 where the display driver can sometimes go to sleep and not wake up. Here's what it does:
@@ -1534,14 +1533,12 @@ namespace DisplayMagicianShared.Windows
             // - Can "wake" sleeping or non - responding displays, including those with bad EDID or DP handshake issues.
             SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using emulated Ctrl + Shift + Windows key + B keypress.");
             GDIImport.ResetGraphicsStack();
+            Thread.Sleep(delayInMs);
 
-            Thread.Sleep(200);
-
-/*            SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using EnableAllConnectedDisplays");
+            /*SharedLogger.logger.Trace($"WinLibrary/WakeUpAllDisplays: Attempting to wake all displays using EnableAllConnectedDisplays");
             EnableAllConnectedDisplays();
+            Thread.Sleep(delayInMs);*/
 
-            Thread.Sleep(1000);
-*/
             return true;
         }
 
@@ -1577,7 +1574,6 @@ namespace DisplayMagicianShared.Windows
             if (err == WIN32STATUS.ERROR_SUCCESS)
             {
                 SharedLogger.logger.Trace("WinLibraryEnableAllConnectedDisplays: Successfully applied configuration to enable all connected displays.");
-                Thread.Sleep(500);
                 return true;
             }
             else
@@ -1587,7 +1583,7 @@ namespace DisplayMagicianShared.Windows
             }
         }
 
-        public bool SetActiveConfig(WINDOWS_DISPLAY_CONFIG displayConfig)
+        public bool SetActiveConfig(WINDOWS_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
 
             bool displayConfigPassedValidation = false;
@@ -1664,6 +1660,8 @@ namespace DisplayMagicianShared.Windows
                 {
                     displayConfigAppliedSuccessfully = true;
                     SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Successfully set the display configuration to the settings supplied on attempt #1!");
+                    SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting {delayInMs} milliseconds after a successful attempt #1 to continue.");
+                    Thread.Sleep(delayInMs);
                 }
                 else if (err == WIN32STATUS.ERROR_INVALID_PARAMETER)
                 {
@@ -1694,9 +1692,8 @@ namespace DisplayMagicianShared.Windows
             // If the display config didn't pass validation, then we can try and apply it again in exactly the same way as sometimes it isn't applied correctly the first time
             if (displayConfigPassedValidation && !displayConfigAppliedSuccessfully)
             {
-                SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempt #1 failed, so waiting 0.5 seconds to try again!");
-                Thread.Sleep(500);
-
+                SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempt #1 failed, so waiting {delayInMs * 2} milliseconds seconds to try again!");
+                Thread.Sleep(delayInMs*2);
                 SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set the display configuration A SECOND TIME with {myPathsCount} display config paths and {myModesCount} modes. Sometimes it doesn't work the first time!");
                 // Try it again, because in some systems it doesn't work at the first try
                 err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, SDC.DISPLAYMAGICIAN_SET);
@@ -1704,6 +1701,8 @@ namespace DisplayMagicianShared.Windows
                 {
                     displayConfigAppliedSuccessfully = true;
                     SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Retry. Successfully set the display configuration to the settings supplied on attempt #2!");
+                    SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting {delayInMs} milliseconds after a successful attempt #2 to continue.");
+                    Thread.Sleep(delayInMs);
                 }
                 else if (err == WIN32STATUS.ERROR_INVALID_PARAMETER)
                 {
@@ -1736,8 +1735,8 @@ namespace DisplayMagicianShared.Windows
             // This can avoid some issues if the supplied modes are no longer valid.
             if (displayConfigPassedValidation && !displayConfigAppliedSuccessfully)
             {
-                SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempt #2 failed, so waiting 1 second to try again!");
-                Thread.Sleep(1000);
+                SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempt #2 failed, so waiting {delayInMs*3} milliseconds try again!");
+                Thread.Sleep(delayInMs*3);
 
                 SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set the display configuration A THIRD TIME, this time just supplying {myPathsCount} display config paths and letting Windows figure out the best modes to use. This may work but is hit and miss.");
                 // Try it again, because in some systems it doesn't work at the first try
@@ -1746,6 +1745,8 @@ namespace DisplayMagicianShared.Windows
                 {
                     displayConfigAppliedSuccessfully = true;
                     SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Retry 2. Successfully set the display configuration to the settings supplied on attempt #3!");
+                    SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting {delayInMs} milliseconds after a successful attempt #3 to continue.");
+                    Thread.Sleep(delayInMs);
                 }
                 else if (err == WIN32STATUS.ERROR_INVALID_PARAMETER)
                 {
@@ -1783,10 +1784,7 @@ namespace DisplayMagicianShared.Windows
             if (displayConfigAppliedSuccessfully)
             {
                 SharedLogger.logger.Info($"WinLibrary/SetActiveConfig: SUCCESS! The display configuration has been successfully applied");
-
-                SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Waiting 0.1 second to let the display change take place before adjusting other specific Windows Display Settings");
-                System.Threading.Thread.Sleep(100);
-
+                
                 SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set Windows DPI Scaling setting for display sources.");
                 CCDImport.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
                 foreach (var displaySourceEntry in displayConfig.DisplaySources)

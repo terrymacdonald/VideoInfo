@@ -99,7 +99,36 @@ namespace VideoInfo
                 }
                 else if (args[0] == "load")
                 {
+                    int delayInMs = 0;
                     SharedLogger.logger.Debug($"VideoInfo/Main: The load command was provided");
+                    if (args.Length == 3)
+                    {
+                        try
+                        {
+                            delayInMs = int.Parse(args[2]);
+                            if (delayInMs < 0)
+                            {
+                                delayInMs = 500;
+                            }
+                            else if (delayInMs > 10000)
+                            {
+                                delayInMs = 10000;
+                            }
+                        }
+                        catch (FormatException ex)
+                        {
+                            SharedLogger.logger.Error(ex,$"VideoInfo/Main: ERROR - The delay value provided is not a valid integer.");
+                            Environment.Exit(1);
+                            // Make the default delay 500ms if user provides junk
+                            delayInMs = 500;
+                        }
+                    }
+                    else
+                    {
+                        // Make the default delay 500ms if not provided by user
+                        delayInMs = 500;
+                    }
+
                     if (args.Length != 2)
                     {
                         Console.WriteLine($"ERROR - You need to provide a filename from which to load display settings");
@@ -113,7 +142,7 @@ namespace VideoInfo
                         SharedLogger.logger.Error($"VideoInfo/Main: ERROR - Couldn't find the file {args[1]} to load settings from it");
                         Environment.Exit(1);
                     }
-                    loadFromFile(args[1]);
+                    loadFromFile(args[1], delayInMs);
                 }
                 else if (args[0] == "possible")
                 {
@@ -340,7 +369,7 @@ namespace VideoInfo
             }
         }
 
-        static void loadFromFile(string filename)
+        static void loadFromFile(string filename, int delayInMs)
         {
             string json = "";
             try
@@ -392,7 +421,7 @@ namespace VideoInfo
                     bool errorApplyingSomething = false;
 
                     // Wake up all attached displays in case they have gone to sleep
-                    WinLibrary.WakeUpAllDisplays();
+                    WinLibrary.WakeUpAllDisplays(delayInMs);
 
                     if (nvidiaLibrary.IsInstalled)
                     {
@@ -468,7 +497,8 @@ namespace VideoInfo
                     if (applyNVIDIASettings)
                     {
                         Console.Write($"Attempting to apply NVIDIA display config from {filename}...");
-                        itWorkedforNVIDIA = nvidiaLibrary.SetActiveConfig(myDisplayConfig.NVIDIAConfig);
+                        itWorkedforNVIDIA = nvidiaLibrary.SetActiveConfig(myDisplayConfig.NVIDIAConfig, delayInMs);
+                        Thread.Sleep(delayInMs); // Give it a second to wake up the displays
                         if (itWorkedforNVIDIA)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were sucessfully applied.");
@@ -485,10 +515,12 @@ namespace VideoInfo
                         Console.WriteLine($"Skipping NVIDIA Settings as they are not used in {filename}.");
                     }
 
+
                     if (applyAMDSettings)
                     {
                         Console.Write($"Attempting to apply AMD display config from {filename}...");
-                        itWorkedforAMD = amdLibrary.SetActiveConfig(myDisplayConfig.AMDConfig);
+                        itWorkedforAMD = amdLibrary.SetActiveConfig(myDisplayConfig.AMDConfig, delayInMs);
+                        Thread.Sleep(delayInMs); // Give it a second to wake up the displays
                         if (itWorkedforAMD)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were sucessfully applied.");
@@ -511,9 +543,8 @@ namespace VideoInfo
                     // matches current reality.
                     if ((amdLibrary.IsInstalled && itWorkedforAMD) || (nvidiaLibrary.IsInstalled && itWorkedforNVIDIA))
                     {
-                        Thread.Sleep(200); // Give it a second to wake up the displays
                         WinLibrary.EnableAllConnectedDisplays();
-                        Thread.Sleep(200); // Give it a second to wake up the displays                        
+                        Thread.Sleep(delayInMs); // Give it a second to wake up the displays
                         // if other changes were made, then ets update the screens so Windows knows whats happening
                         // NVIDIA and AMD make such large changes to the available screens in windows, we need to do this.
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: NVIDIA and/or AMD display settings within {filename} were applied successfully, so updating Windows Active Config so it knows of the changes made."); 
@@ -524,8 +555,8 @@ namespace VideoInfo
                     // Note: we are unable to check if the Windows CCD display config is possible, as it won't match if either the current display config is a Mosaic config,
                     // or if the display config we want to change to is a Mosaic config. So we just have to assume that it will work!
                     Console.Write($"Attempting to apply Windows display config from {filename}...");
-                    itWorkedforWindows = winLibrary.SetActiveConfig(myDisplayConfig.WindowsConfig);
-                    
+                    itWorkedforWindows = winLibrary.SetActiveConfig(myDisplayConfig.WindowsConfig, delayInMs);
+                    Thread.Sleep(delayInMs);
                     if (itWorkedforWindows)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Windows CCD display settings within {filename} were applied correctly, so now attempting to apply any overrides.");
@@ -536,8 +567,8 @@ namespace VideoInfo
                             if (itWorkedforNVIDIA)
                             {
                                 Console.Write($"Attempting to apply 2nd part of the NVIDIA display config from {filename}...");
-                                itWorkedforNVIDIAOverride = nvidiaLibrary.SetActiveConfigOverride(myDisplayConfig.NVIDIAConfig);
-
+                                itWorkedforNVIDIAOverride = nvidiaLibrary.SetActiveConfigOverride(myDisplayConfig.NVIDIAConfig, delayInMs);
+                                Thread.Sleep(delayInMs);
                                 if (itWorkedforNVIDIAOverride)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings that override windows within {filename} were applied correctly.");
@@ -575,8 +606,8 @@ namespace VideoInfo
                             if (itWorkedforAMD)
                             {
                                 Console.Write($"Attempting to apply 2nd part of the AMD display config from {filename}...");
-                                itWorkedforAMDOverride = amdLibrary.SetActiveConfigOverride(myDisplayConfig.AMDConfig);
-
+                                itWorkedforAMDOverride = amdLibrary.SetActiveConfigOverride(myDisplayConfig.AMDConfig, delayInMs);
+                                Thread.Sleep(delayInMs);
                                 if (itWorkedforAMDOverride)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings that override windows within {filename} were applied correctly.");

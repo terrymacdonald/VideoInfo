@@ -1571,7 +1571,7 @@ namespace DisplayMagicianShared.AMD
             return stringToReturn;
         }
 
-        public bool SetActiveConfig(AMD_DISPLAY_CONFIG displayConfig)
+        public bool SetActiveConfig(AMD_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
 
             if (_initialised)
@@ -1592,6 +1592,7 @@ namespace DisplayMagicianShared.AMD
                         if (ADLRet == ADL_STATUS.ADL_OK)
                         {
                             SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_SetState successfully set the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                            Thread.Sleep(delayInMs * 3);
                         }
                         else
                         {
@@ -1625,7 +1626,7 @@ namespace DisplayMagicianShared.AMD
                                 if (newSlsMapIndex != -1)
                                 {
                                     SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_Create successfully created the new SLSMAP we just created with index {newSlsMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-
+                                    Thread.Sleep(delayInMs * 3);
                                     // At this point we have created a new AMD Eyefinity Config
                                 }
                                 else
@@ -1661,6 +1662,7 @@ namespace DisplayMagicianShared.AMD
                             if (ADLRet == ADL_STATUS.ADL_OK)
                             {
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_SetState successfully disabled the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                Thread.Sleep(delayInMs * 3);
                             }
                             else
                             {

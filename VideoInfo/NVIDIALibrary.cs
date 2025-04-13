@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Runtime.InteropServices.ComTypes;
 using Windows.Devices.I2c.Provider;
 using Windows.Graphics;
@@ -1770,7 +1771,7 @@ namespace DisplayMagicianShared.NVIDIA
             return stringToReturn;
         }
 
-        public bool SetActiveConfig(NVIDIA_DISPLAY_CONFIG displayConfig)
+        public bool SetActiveConfig(NVIDIA_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
 
             if (_initialised)
@@ -2060,8 +2061,8 @@ namespace DisplayMagicianShared.NVIDIA
                             // If we get here then the display is valid, so now we actually apply the new Mosaic Topology
                             NVAPI.SetDisplayGrids(displayConfig.MosaicConfig.MosaicGridTopos, setTopoFlags);
                             SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids returned OK.");
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Mosaic display change take place before continuing");
-                            System.Threading.Thread.Sleep(500);
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
+                            Thread.Sleep(delayInMs * 3);
                             logicalGPURefreshNeeded = true;
                         }
                         catch (NVIDIAApiException nex)
@@ -2097,8 +2098,8 @@ namespace DisplayMagicianShared.NVIDIA
                         if (nex.Status == Status.Ok)
                         {
                             SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids returned OK.");
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Mosaic display change take place before continuing");
-                            System.Threading.Thread.Sleep(500);
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
+                            Thread.Sleep(delayInMs * 3);
                         }
                         else if (nex.Status == Status.NoActiveSLITopology)
                         {
@@ -2171,8 +2172,8 @@ namespace DisplayMagicianShared.NVIDIA
                             if (nex.Status == Status.Ok)
                             {
                                 SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids attempt 2 returned OK.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting 0.5 second to let the Mosaic display change take place before continuing");
-                                System.Threading.Thread.Sleep(500);
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting {delayInMs * 3}  milliseconds to let the Mosaic display change take place before continuing");
+                                Thread.Sleep(delayInMs * 3);
                             }
                             else if (nex.Status == Status.NoActiveSLITopology)
                             {
@@ -2260,7 +2261,7 @@ namespace DisplayMagicianShared.NVIDIA
             return true;
         }
 
-        public bool SetActiveConfigOverride(NVIDIA_DISPLAY_CONFIG displayConfig)
+        public bool SetActiveConfigOverride(NVIDIA_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
 
             if (_initialised)
