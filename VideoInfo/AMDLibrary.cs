@@ -1686,7 +1686,7 @@ namespace DisplayMagicianShared.AMD
         }
 
 
-        public bool SetActiveConfigOverride(AMD_DISPLAY_CONFIG displayConfig)
+        public bool SetActiveConfigOverride(AMD_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
             if (_initialised)
             {
