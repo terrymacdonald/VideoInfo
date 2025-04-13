@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Display.Core;
 
 namespace DisplayMagicianShared.Windows
 {
@@ -339,11 +340,30 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DPIScalingInfo other && this.Equals(other);
         public bool Equals(DPIScalingInfo other)
-        =>  Minimum.Equals(other.Minimum) &&
-            Maximum.Equals(other.Maximum) &&
-            Current.Equals(other.Current) &&
-            Recommended.Equals(other.Recommended);
-        //=> true;
+        {
+            if (!(Minimum.Equals(other.Minimum))
+            {
+                SharedLogger.logger.Trace($"DPIScalingInfo/Equals: The Minimum values don't equal each other");
+                return false;
+            }
+            if (!Maximum.Equals(other.Maximum))
+            {
+                SharedLogger.logger.Trace($"DPIScalingInfo/Equals: The Maximum values don't equal each other");
+                return false;
+            }
+            if (!Current.Equals(other.Current))
+            {
+                SharedLogger.logger.Trace($"DPIScalingInfo/Equals: The Current values don't equal each other");
+                return false;
+            }
+            if (!Recommended.Equals(other.Recommended))
+            {
+                SharedLogger.logger.Trace($"DPIScalingInfo/Equals: The Recommended values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        
         public override int GetHashCode()
         {
             return (Minimum, Maximum, Current, Recommended).GetHashCode();
@@ -408,10 +428,24 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_DEVICE_INFO_HEADER other && this.Equals(other);
 
         public bool Equals(DISPLAYCONFIG_DEVICE_INFO_HEADER other)
-            => Type == other.Type &&
-                Size == other.Size &&
-                // AdapterId.Equals(other.AdapterId) && // Removed the AdapterId from the Equals, as it changes after reboot.
-                Id == other.Id;
+        {
+            if(Type != other.Type)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_DEVICE_INFO_HEADER/Equals: The Type values don't equal each other");
+                return false;
+            }
+            if(Size != other.Size)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_DEVICE_INFO_HEADER/Equals: The Size values don't equal each other");
+                return false;
+            }
+            if(Id != other.Id)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_DEVICE_INFO_HEADER/Equals: The Id values don't equal each other");
+                return false;
+            }
+            return true;    
+        }
 
         public override int GetHashCode()
         {
@@ -441,10 +475,30 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO other && this.Equals(other);
 
         public bool Equals(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO other)
-            => Header.Equals(other.Header) &&
-                Value == other.Value &&
-                ColorEncoding.Equals(other.ColorEncoding) &&
-                BitsPerColorChannel == other.BitsPerColorChannel;
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if(Value != other.Value)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO/Equals: The Value values don't equal each other");
+                return false;
+            }
+            if (!ColorEncoding.Equals(other.ColorEncoding))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO/Equals: The ColorEncoding values don't equal each other");
+                return false;
+            }
+            if(BitsPerColorChannel != other.BitsPerColorChannel)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO/Equals: The BitsPerColorChannel values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+            
 
         public override int GetHashCode()
         {
@@ -464,8 +518,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is POINTL other && this.Equals(other);
         public bool Equals(POINTL other)
-            => X == other.X &&
-               Y == other.Y;
+        {
+            if (X != other.X)
+            {
+                SharedLogger.logger.Trace($"POINTL/Equals: The X values don't equal each other");
+                return false;
+            }
+            if (Y != other.Y)
+            {
+                SharedLogger.logger.Trace($"POINTL/Equals: The Y values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -487,8 +552,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is LUID other && this.Equals(other);
         public bool Equals(LUID other)
-            => LowPart == other.LowPart &&
-                HighPart == other.HighPart;
+        {
+            if(LowPart != other.LowPart)
+            {
+                SharedLogger.logger.Trace($"LUID/Equals: The LowPart values don't equal each other");
+                return false;
+            }
+            if(HighPart != other.HighPart)
+            {
+                SharedLogger.logger.Trace($"LUID/Equals: The HighPart values don't equal each other");
+                return false;
+            }
+            return true;    
+        }
 
         public override int GetHashCode()
         {
@@ -512,11 +588,30 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SOURCE_MODE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SOURCE_MODE other)
-            => Width == other.Width &&
-                Height == other.Height &&
-                PixelFormat.Equals(other.PixelFormat) &&
-                Position.Equals(other.Position);
-
+        {
+            if(Width != other.Width)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SOURCE_MODE/Equals: The Width values don't equal each other");
+                return false;
+            }
+            if(Height != other.Height)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SOURCE_MODE/Equals: The Height values don't equal each other");
+                return false;
+            }
+            if (!PixelFormat.Equals(other.PixelFormat))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SOURCE_MODE/Equals: The PixelFormat values don't equal each other");
+                return false;
+            }
+            if (!Position.Equals(other.Position))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SOURCE_MODE/Equals: The Position values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+            
         public override int GetHashCode()
         {
             return (Width, Height, PixelFormat, Position).GetHashCode();
@@ -535,8 +630,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_RATIONAL other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_RATIONAL other)
-            => Numerator == other.Numerator &&
-                Denominator == other.Denominator;
+        {
+            if(Numerator != other.Numerator)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_RATIONAL/Equals: The Numerator values don't equal each other");
+                return false;
+            }
+            if(Denominator != other.Denominator)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_RATIONAL/Equals: The Denominator values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -557,9 +663,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_2DREGION other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_2DREGION other)
-            => Cx == other.Cx &&
-               Cy == other.Cy;
-
+        {
+            if(Cx != other.Cx)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_2DREGION/Equals: The Cx values don't equal each other");
+                return false;
+            }
+            if(Cy != other.Cy)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_2DREGION/Equals: The Cy values don't equal each other");
+                return false;
+            }
+            return true;
+        }
         public override int GetHashCode()
         {
             return (Cx, Cy).GetHashCode();
@@ -579,9 +695,24 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_DESKTOP_IMAGE_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_DESKTOP_IMAGE_INFO other)
-            => PathSourceSize.Equals(other.PathSourceSize) &&
-               DesktopImageRegion.Equals(other.DesktopImageRegion) &&
-               DesktopImageClip.Equals(other.DesktopImageClip);
+        {
+            if (!PathSourceSize.Equals(other.PathSourceSize))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_DESKTOP_IMAGE_INFO/Equals: The PathSourceSize values don't equal each other");
+                return false;
+            }
+            if (!DesktopImageRegion.Equals(other.DesktopImageRegion))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_DESKTOP_IMAGE_INFO/Equals: The DesktopImageRegion values don't equal each other");
+                return false;
+            }
+            if (!DesktopImageClip.Equals(other.DesktopImageClip))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_DESKTOP_IMAGE_INFO/Equals: The DesktopImageClip values don't equal each other");
+                return false;
+            }
+            return true;    
+        }
 
         public override int GetHashCode()
         {
@@ -606,13 +737,44 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_VIDEO_SIGNAL_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_VIDEO_SIGNAL_INFO other)
-            => PixelRate == other.PixelRate &&
-                HSyncFreq.Equals(other.HSyncFreq) &&
-                VSyncFreq.Equals(other.VSyncFreq) &&
-                ActiveSize.Equals(other.ActiveSize) &&
-                TotalSize.Equals(other.TotalSize) &&
-                VideoStandard == other.VideoStandard &&
-                ScanLineOrdering.Equals(other.ScanLineOrdering);
+        {
+            if(PixelRate != other.PixelRate)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_VIDEO_SIGNAL_INFO/Equals: The PixelRate values don't equal each other");
+                return false;
+            }
+            if (!HSyncFreq.Equals(other.HSyncFreq))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_VIDEO_SIGNAL_INFO/Equals: The HSyncFreq values don't equal each other");
+                return false;
+            }
+            if (!VSyncFreq.Equals(other.VSyncFreq))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_VIDEO_SIGNAL_INFO/Equals: The VSyncFreq values don't equal each other");
+                return false;
+            }
+            if (!ActiveSize.Equals(other.ActiveSize))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_VIDEO_SIGNAL_INFO/Equals: The ActiveSize values don't equal each other");
+                return false;
+            }
+            if (!TotalSize.Equals(other.TotalSize))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_VIDEO_SIGNAL_INFO/Equals: The TotalSize values don't equal each other");
+                return false;
+            }
+            if(VideoStandard != other.VideoStandard)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_VIDEO_SIGNAL_INFO/Equals: The VideoStandard values don't equal each other");
+                return false;
+            }
+            if (!ScanLineOrdering.Equals(other.ScanLineOrdering))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_VIDEO_SIGNAL_INFO/Equals: The ScanLineOrdering values don't equal each other");
+                return false;
+            }
+            return true;
+        }            
 
         public override int GetHashCode()
         {
@@ -631,7 +793,14 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_MODE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_MODE other)
-            => TargetVideoSignalInfo.Equals(other.TargetVideoSignalInfo);
+        {
+            if (!TargetVideoSignalInfo.Equals(other.TargetVideoSignalInfo))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_MODE/Equals: The TargetVideoSignalInfo values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -661,10 +830,21 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_PATH_SOURCE_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_PATH_SOURCE_INFO other)
-            => // AdapterId.Equals(other.AdapterId) && // Removed the AdapterId from the Equals, as it changes after a reboot.
-               //Id == other.Id &&  // Removed the ID from the list as the Display ID it maps to will change after a switch from surround to non-surround profile
-                ModeInfoIdx == other.ModeInfoIdx &&
-                StatusFlags.Equals(other.StatusFlags);
+        {
+            // AdapterId.Equals(other.AdapterId) && // Removed the AdapterId from the Equals, as it changes after a reboot.
+            //Id == other.Id &&  // Removed the ID from the list as the Display ID it maps to will change after a switch from surround to non-surround profile
+            if (ModeInfoIdx != other.ModeInfoIdx)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_SOURCE_INFO/Equals: The ModeInfoIdx values don't equal each other");
+                return false;
+            }
+            if (!StatusFlags.Equals(other.StatusFlags))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_SOURCE_INFO/Equals: The StatusFlags values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -708,16 +888,51 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_PATH_TARGET_INFO other && this.Equals(other);
 
         public bool Equals(DISPLAYCONFIG_PATH_TARGET_INFO other)
-            => // AdapterId.Equals(other.AdapterId) && // Removed the AdapterId from the Equals, as it changes after reboot.
-               // Id == other.Id && // Removed as ID changes after reboot when the display is a cloned copy :(
-                ModeInfoIdx == other.ModeInfoIdx &&
-                OutputTechnology.Equals(other.OutputTechnology) &&
-                Rotation.Equals(other.Rotation) &&
-                Scaling.Equals(other.Scaling) &&
-                RefreshRate.Equals(other.RefreshRate) &&
-                ScanLineOrdering.Equals(other.ScanLineOrdering) &&
-                TargetAvailable == other.TargetAvailable &&
-                StatusFlags.Equals(StatusFlags);
+        {
+            // AdapterId.Equals(other.AdapterId) && // Removed the AdapterId from the Equals, as it changes after a reboot.
+            // Id == other.Id &&  // Removed the ID from the list as the Display ID it maps to will change after a switch from surround to non-surround profile
+            if (ModeInfoIdx != other.ModeInfoIdx)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_TARGET_INFO/Equals: The ModeInfoIdx values don't equal each other");
+                return false;
+            }
+            if (!OutputTechnology.Equals(other.OutputTechnology))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_TARGET_INFO/Equals: The OutputTechnology values don't equal each other");
+                return false;
+            }
+            if (!Rotation.Equals(other.Rotation))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_TARGET_INFO/Equals: The Rotation values don't equal each other");
+                return false;
+            }
+            if (!Scaling.Equals(other.Scaling))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_TARGET_INFO/Equals: The Scaling values don't equal each other");
+                return false;
+            }
+            if (!RefreshRate.Equals(other.RefreshRate))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_TARGET_INFO/Equals: The RefreshRate values don't equal each other");
+                return false;
+            }
+            if (!ScanLineOrdering.Equals(other.ScanLineOrdering))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_TARGET_INFO/Equals: The ScanLineOrdering values don't equal each other");
+                return false;
+            }
+            if (TargetAvailable != other.TargetAvailable)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_TARGET_INFO/Equals: The TargetAvailable values don't equal each other");
+                return false;
+            }
+            if (!StatusFlags.Equals(StatusFlags))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_TARGET_INFO/Equals: The StatusFlags values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -738,9 +953,24 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_PATH_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_PATH_INFO other)
-            => SourceInfo.Equals(other.SourceInfo) &&
-               TargetInfo.Equals(other.TargetInfo) &&
-               Flags.Equals(other.Flags);
+        {
+            if (!SourceInfo.Equals(other.SourceInfo))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_INFO/Equals: The SourceInfo values don't equal each other");
+                return false;
+            }
+            if (!TargetInfo.Equals(other.TargetInfo))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_INFO/Equals: The TargetInfo values don't equal each other");
+                return false;
+            }
+            if (!Flags.Equals(other.Flags))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_PATH_INFO/Equals: The Flags values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -807,6 +1037,7 @@ namespace DisplayMagicianShared.Windows
                 SourceMode.Equals(other.SourceMode))
                 return true;
 
+            SharedLogger.logger.Trace($"DISPLAYCONFIG_MODE_INFO/Equals: The Flags values don't equal each other");
             return false;
         }
 
@@ -845,8 +1076,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SOURCE_DEVICE_NAME other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SOURCE_DEVICE_NAME other)
-            => Header.Equals(other.Header) &&
-               ViewGdiDeviceName == other.ViewGdiDeviceName;
+        {
+            if(!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SOURCE_DEVICE_NAME/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if(ViewGdiDeviceName != other.ViewGdiDeviceName)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SOURCE_DEVICE_NAME/Equals: The ViewGdiDeviceName values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -865,7 +1107,15 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS other)
-            => Value == other.Value;
+        {
+            if(Value != other.Value)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS/Equals: The Value values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+            
 
         public bool FriendlyNameFromEdid => (Value & 0x1) == 0x1; // Might be this broken?
         public bool FriendlyNameForced => (Value & 0x2) == 0x2;
@@ -897,14 +1147,49 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_DEVICE_NAME other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_DEVICE_NAME other)
-            => Header.Equals(other.Header) &&
-               Flags.Equals(other.Flags) &&
-               OutputTechnology.Equals(other.OutputTechnology) &&
-               EdidManufactureId == other.EdidManufactureId &&
-               EdidProductCodeId == other.EdidProductCodeId &&
-               ConnectorInstance == other.ConnectorInstance &&
-               MonitorFriendlyDeviceName == other.MonitorFriendlyDeviceName &&
-               MonitorDevicePath == other.MonitorDevicePath;
+        {
+            if(!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if (!Flags.Equals(other.Flags))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME/Equals: The Flags values don't equal each other");
+                return false;
+            }
+            if(!OutputTechnology.Equals(other.OutputTechnology)) 
+            { 
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME/Equals: The OutputTechnology values don't equal each other"); 
+                return false; 
+            }
+            if(EdidManufactureId != other.EdidManufactureId)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME/Equals: The EdidManufactureId values don't equal each other");
+                return false;
+            }
+            if(EdidProductCodeId != other.EdidProductCodeId)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME/Equals: The EdidProductCodeId values don't equal each other");
+                return false;
+            }
+            if(ConnectorInstance != other.ConnectorInstance)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME/Equals: The ConnectorInstance values don't equal each other");
+                return false;
+            }
+            if(MonitorFriendlyDeviceName != other.MonitorFriendlyDeviceName)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME/Equals: The MonitorFriendlyDeviceName values don't equal each other");
+                return false;
+            }
+            if(MonitorDevicePath != other.MonitorDevicePath)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_DEVICE_NAME/Equals: The MonitorDevicePath values don't equal each other");
+                return false;
+            }
+            return true;
+        }               
 
         public override int GetHashCode()
         {
@@ -927,10 +1212,29 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_PREFERRED_MODE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_PREFERRED_MODE other)
-            => Header.Equals(other.Header) &&
-               Width == other.Width &&
-               Height == other.Height &&
-               TargetMode.Equals(other.TargetMode);
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_PREFERRED_MODE/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if (Width != other.Width)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_PREFERRED_MODE/Equals: The Width values don't equal each other");
+                return false;
+            }
+            if (Height != other.Height)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_PREFERRED_MODE/Equals: The Height values don't equal each other");
+                return false;
+            }
+            if (!TargetMode.Equals(other.TargetMode))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_PREFERRED_MODE/Equals: The TargetMode values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -951,8 +1255,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_ADAPTER_NAME other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_ADAPTER_NAME other)
-            => Header.Equals(other.Header) &&
-               AdapterDevicePath == other.AdapterDevicePath;
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_ADAPTER_NAME/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if (AdapterDevicePath != other.AdapterDevicePath)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_ADAPTER_NAME/Equals: The AdapterDevicePath values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -977,8 +1292,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SUPPORT_VIRTUAL_RESOLUTION other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SUPPORT_VIRTUAL_RESOLUTION other)
-            => Header.Equals(other.Header) &&
-               Value == other.Value;
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SUPPORT_VIRTUAL_RESOLUTION/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if (Value != other.Value)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SUPPORT_VIRTUAL_RESOLUTION/Equals: The Value values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -1004,8 +1330,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SET_TARGET_PERSISTENCE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SET_TARGET_PERSISTENCE other)
-            => Header.Equals(other.Header) &&
-               Value == other.Value;
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SET_TARGET_PERSISTENCE/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if (Value != other.Value)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SET_TARGET_PERSISTENCE/Equals: The Value values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -1027,8 +1364,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_BASE_TYPE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_BASE_TYPE other)
-            => Header.Equals(other.Header) &&
-               BaseOutputTechnology == other.BaseOutputTechnology;
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_BASE_TYPE/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if (BaseOutputTechnology != other.BaseOutputTechnology)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_TARGET_BASE_TYPE/Equals: The BaseOutputTechnology values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -1065,8 +1413,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE other)
-            => Header.Equals(other.Header) &&
-               Value == other.Value;
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if (Value != other.Value)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE/Equals: The Value values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -1092,9 +1451,19 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SDR_WHITE_LEVEL other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SDR_WHITE_LEVEL other)
-            => Header.Equals(other.Header) &&
-               SDRWhiteLevel == other.SDRWhiteLevel;
-
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SDR_WHITE_LEVEL/Equals: The Header values don't equal each other");
+                return false;
+            }
+            if (SDRWhiteLevel != other.SDRWhiteLevel)
+            {
+                SharedLogger.logger.Trace($"DISPLAYCONFIG_SDR_WHITE_LEVEL/Equals: The SDRWhiteLevel values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -1129,10 +1498,29 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is RECTL other && this.Equals(other);
         public bool Equals(RECTL other)
-            => Left == other.Left &&
-               Top == other.Top &&
-               Right == other.Right &&
-               Bottom == other.Bottom;
+        {
+            if (Left != other.Left)
+            {
+                SharedLogger.logger.Trace($"RECTL/Equals: The Left values don't equal each other");
+                return false;
+            }
+            if (Top != other.Top)
+            {
+                SharedLogger.logger.Trace($"RECTL/Equals: The Top values don't equal each other");
+                return false;
+            }
+            if (Right != other.Right)
+            {
+                SharedLogger.logger.Trace($"RECTL/Equals: The Right values don't equal each other");
+                return false;
+            }
+            if (Bottom != other.Bottom)
+            {
+                SharedLogger.logger.Trace($"RECTL/Equals: The Bottom values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {

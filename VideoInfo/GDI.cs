@@ -373,27 +373,54 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is DEVICE_MODE other && this.Equals(other);
 
         public bool Equals(DEVICE_MODE other)
-            => //DeviceName.Equals(other.DeviceName) &&  // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-               //SpecificationVersion == other.SpecificationVersion &&
-               //DriverVersion.Equals(other.DriverVersion) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-               //Size.Equals(other.Size) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-               //DriverExtra.Equals(other.DriverExtra) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-               //Fields.Equals(other.Fields) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-               //Position.Equals(other.Position) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-                DisplayOrientation.Equals(other.DisplayOrientation) &&
-                //DisplayFixedOutput.Equals(other.DisplayFixedOutput) &&
-                //Color.Equals(other.Color) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-                //Duplex.Equals(other.Duplex) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-                //YResolution.Equals(other.YResolution) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-                //TrueTypeOption.Equals(other.TrueTypeOption) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-                //Collate.Equals(other.Collate) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-                //FormName.Equals(other.FormName) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-                //LogicalInchPixels.Equals(other.LogicalInchPixels) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
-                BitsPerPixel.Equals(other.BitsPerPixel) &&
-                //PixelsWidth.Equals(other.PixelsWidth) && 
-                //PixelsHeight.Equals(other.PixelsHeight) && 
-                DisplayFlags.Equals(other.DisplayFlags) &&
-                DisplayFrequency == other.DisplayFrequency;
+        {
+            //DeviceName.Equals(other.DeviceName) &&  // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //SpecificationVersion == other.SpecificationVersion &&
+            //DriverVersion.Equals(other.DriverVersion) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //Size.Equals(other.Size) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //DriverExtra.Equals(other.DriverExtra) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //Fields.Equals(other.Fields) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //Position.Equals(other.Position) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+
+            if (!DisplayOrientation.Equals(other.DisplayOrientation))
+            {
+                SharedLogger.logger.Trace($"DEVICE_MODE/Equals: The DisplayOrientation values don't equal each other");
+                return false;
+            }
+
+            //DisplayFixedOutput.Equals(other.DisplayFixedOutput) &&
+            //Color.Equals(other.Color) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //Duplex.Equals(other.Duplex) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //YResolution.Equals(other.YResolution) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //TrueTypeOption.Equals(other.TrueTypeOption) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //Collate.Equals(other.Collate) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //FormName.Equals(other.FormName) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+            //LogicalInchPixels.Equals(other.LogicalInchPixels) && // Removed specifically for DisplayMagician matching. Remove if you need true equality matching
+
+            if (!DisplayOrientation.Equals(other.DisplayOrientation))
+            {
+                SharedLogger.logger.Trace($"DEVICE_MODE/Equals: The DisplayOrientation values don't equal each other");
+                return false;
+            }
+            if (!BitsPerPixel.Equals(other.BitsPerPixel))
+            {
+                SharedLogger.logger.Trace($"DEVICE_MODE/Equals: The BitsPerPixel values don't equal each other");
+                return false;
+            }
+            //PixelsWidth.Equals(other.PixelsWidth) && 
+            //PixelsHeight.Equals(other.PixelsHeight) && 
+            if (!DisplayFlags.Equals(other.DisplayFlags))
+            {
+                SharedLogger.logger.Trace($"DEVICE_MODE/Equals: The DisplayFlags values don't equal each other");
+                return false;
+            }
+            if(DisplayFrequency != other.DisplayFrequency)
+            {
+                SharedLogger.logger.Trace($"DEVICE_MODE/Equals: The DisplayFrequency values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -433,12 +460,24 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is DISPLAY_DEVICE other && this.Equals(other);
 
         public bool Equals(DISPLAY_DEVICE other)
-            => Size == other.Size &&
-                // DeviceName == other.DeviceName && // Had to remove this as the device name often changes after a reboot!
-                DeviceString == other.DeviceString &&
-                //StateFlags == other.StateFlags &&
-                DeviceId == other.DeviceId;
-        //DeviceKey == other.DeviceKey;
+        {
+            if(Size != other.Size)
+            {
+                SharedLogger.logger.Trace($"DISPLAY_DEVICE/Equals: The Size values don't equal null");
+                return false;
+            }
+            if(DeviceString != other.DeviceString)
+            {
+                SharedLogger.logger.Trace($"DISPLAY_DEVICE/Equals: The DeviceString values don't equal each other");
+                return false;
+            }
+            if (DeviceId != other.DeviceId)
+            {
+                SharedLogger.logger.Trace($"DISPLAY_DEVICE/Equals: The DeviceId values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -467,9 +506,24 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is GAMMA_RAMP other && this.Equals(other);
 
         public bool Equals(GAMMA_RAMP other)
-            => Red.SequenceEqual(other.Red) &&
-                Green.SequenceEqual(other.Green) &&
-                Blue.SequenceEqual(other.Blue);
+        {
+            if (!Red.SequenceEqual(other.Red))
+            {
+                SharedLogger.logger.Trace($"GAMMA_RAMP/Equals: The Red values don't equal each other");
+                return false;
+            }
+            if (!Green.SequenceEqual(other.Green))
+            {
+                SharedLogger.logger.Trace($"GAMMA_RAMP/Equals: The Green values don't equal each other");
+                return false;
+            }
+            if (!Blue.SequenceEqual(other.Blue))
+            {
+                SharedLogger.logger.Trace($"GAMMA_RAMP/Equals: The Blue values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -496,11 +550,34 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is MONITOR_INFO other && this.Equals(other);
 
         public bool Equals(MONITOR_INFO other)
-            => Size == other.Size &&
-                Bounds.Equals(other.Bounds) &&
-                WorkingArea.Equals(other.WorkingArea) &&
-                Flags == other.Flags &&
-                DisplayName == other.DisplayName;
+        {
+            if(!Size.Equals(other.Size))
+            {
+                SharedLogger.logger.Trace($"MONITOR_INFO/Equals: The Size values don't equal null");
+                return false;
+            }
+            if (!Bounds.Equals(other.Bounds))
+            {
+                SharedLogger.logger.Trace($"MONITOR_INFO/Equals: The Bounds values don't equal each other");
+                return false;
+            }
+            if (!WorkingArea.Equals(other.WorkingArea))
+            {
+                SharedLogger.logger.Trace($"MONITOR_INFO/Equals: The WorkingArea values don't equal each other");
+                return false;
+            }
+            if (!Flags.Equals(other.Flags))
+            {
+                SharedLogger.logger.Trace($"MONITOR_INFO/Equals: The Flags values don't equal each other");
+                return false;
+            }
+            if(DisplayName != other.DisplayName)
+            {
+                SharedLogger.logger.Trace($"MONITOR_INFO/Equals: The DisplayName values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -522,10 +599,24 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is GDI_DISPLAY_SETTING other && this.Equals(other);
 
         public bool Equals(GDI_DISPLAY_SETTING other)
-            => IsEnabled == other.IsEnabled &&
-                //IsPrimary == other.IsPrimary &&
-                Device.Equals(other.Device) &&
-                DeviceMode.Equals(other.DeviceMode);
+        {
+            if(!IsEnabled.Equals(other.IsEnabled))
+            {
+                SharedLogger.logger.Trace($"GDI_DISPLAY_SETTING/Equals: The IsEnabled values don't equal each other");
+                return false;
+            }
+            if (!Device.Equals(other.Device))
+            {
+                SharedLogger.logger.Trace($"GDI_DISPLAY_SETTING/Equals: The Device values don't equal each other");
+                return false;
+            }
+            if (!DeviceMode.Equals(other.DeviceMode))
+            {
+                SharedLogger.logger.Trace($"GDI_DISPLAY_SETTING/Equals: The DeviceMode values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {

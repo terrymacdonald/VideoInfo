@@ -31,10 +31,22 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is ADVANCED_HDR_INFO_PER_PATH other && this.Equals(other);
         public bool Equals(ADVANCED_HDR_INFO_PER_PATH other)
-        => // AdapterId.Equals(other.AdapterId) && // Removed the AdapterId from the Equals, as it changes after reboot.
+        {
+            // AdapterId.Equals(other.AdapterId) && // Removed the AdapterId from the Equals, as it changes after reboot.
            //Id == other.Id && // Removed the ID too, as that changes if the user has a Clone!
-           AdvancedColorInfo.Equals(other.AdvancedColorInfo) &&
-           SDRWhiteLevel.Equals(other.SDRWhiteLevel);
+           if(!AdvancedColorInfo.Equals(other.AdvancedColorInfo))
+           {
+                SharedLogger.logger.Trace($"ADVANCED_HDR_INFO_PER_PATH\Equals: Advanced Color Info is not equal.");
+                return false;
+           }
+            if (!SDRWhiteLevel.Equals(other.SDRWhiteLevel))
+            {
+                SharedLogger.logger.Trace($"ADVANCED_HDR_INFO_PER_PATH\Equals: SDR White Level is not equal.");
+                return false;
+            }
+            return true;
+        }
+        
         public override int GetHashCode()
         {
             return (Id, AdvancedColorInfo, SDRWhiteLevel).GetHashCode();
@@ -56,11 +68,24 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAY_SOURCE other && this.Equals(other);
         public bool Equals(DISPLAY_SOURCE other)
-        =>  //SourceId.Equals(other.SourceId) &&  // Source ID needs to be ignored in this case, as windows moves the source ids around :(
-            TargetId.Equals(other.TargetId) &&
-            DevicePath.Equals(other.DevicePath) &&
-            SourceDPIScalingInfo.Equals(other.SourceDPIScalingInfo);
-        //=> true;
+        {
+            //SourceId.Equals(other.SourceId) &&  // Source ID needs to be ignored in this case, as windows moves the source ids around :(
+            if (!TargetId.Equals(other.TargetId))
+            {
+                SharedLogger.logger.Trace($"DISPLAY_SOURCE\Equals: Target ID is not equal.");
+                return false;
+            }
+            if (!DevicePath.Equals(other.DevicePath))
+            {
+                SharedLogger.logger.Trace($"DISPLAY_SOURCE\Equals: Device Path is not equal.");
+                return false;
+            }
+            if (!SourceDPIScalingInfo.Equals(other.SourceDPIScalingInfo)){
+                SharedLogger.logger.Trace($"DISPLAY_SOURCE\Equals: Source DPI Scaling Info is not equal.");
+                return false;
+            }
+            return true;
+        }
         public override int GetHashCode()
         {
             return (TargetId, DevicePath, SourceDPIScalingInfo).GetHashCode();
@@ -90,22 +115,39 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is WINDOWS_DISPLAY_CONFIG other && this.Equals(other);
         public bool Equals(WINDOWS_DISPLAY_CONFIG other)
         {
-            if (!(IsCloned == other.IsCloned &&
-           DisplayConfigPaths.SequenceEqual(other.DisplayConfigPaths) &&
-           DisplayConfigModes.SequenceEqual(other.DisplayConfigModes) &&
+            if (!IsCloned == other.IsCloned)
+            {
+                SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG\Equals: IsCloned is not equal.");
+                return false;
+            }
+            if(!DisplayConfigPaths.SequenceEqual(other.DisplayConfigPaths))
+            {
+                SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG\Equals: DisplayConfigPaths is not equal.");
+                return false;
+            }
+            if (!DisplayConfigModes.SequenceEqual(other.DisplayConfigModes))
+            {
+                SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG\Equals: DisplayConfigModes is not equal.");
+                return false;
+            }
            // The dictionary keys sometimes change after returning from NVIDIA Surround, so we need to only focus on comparing the values of the GDISettings.
            // Additionally, we had to disable the DEviceKey from the equality testing within the GDI library itself as that waould also change after changing back from NVIDIA surround
            // This still allows us to detect when refresh rates change, which will allow DisplayMagician to detect profile differences.
-           GdiDisplaySettings.Values.SequenceEqual(other.GdiDisplaySettings.Values) &&
-           DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers)))
+            if (!GdiDisplaySettings.Values.SequenceEqual(other.GdiDisplaySettings.Values))
             {
+                SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG\Equals: GdiDisplaySettings is not equal.");
                 return false;
             }
-
+            if (!DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
+            {
+                SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG\Equals: DisplayIdentifiers is not equal.");
+                return false;
+            }
             // Now we need to go through the HDR states comparing vaues, as the order changes if there is a cloned display
             //if (!CollectionComparer.AreEquivalent(DisplayHDRStates, other.DisplayHDRStates))
             if (!CollectionComparer.EqualButDifferentOrder<ADVANCED_HDR_INFO_PER_PATH>(DisplayHDRStates, other.DisplayHDRStates))                
             {
+                SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG\Equals: DisplayHDRStates is not equal.");
                 return false;
             }
 
@@ -114,12 +156,11 @@ namespace DisplayMagicianShared.Windows
             {
                 if (!DisplaySources.ElementAt(i).Value.SequenceEqual(other.DisplaySources.ElementAt(i).Value))
                 {
+                    SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG\Equals: DisplaySources is not equal.");
                     return false;
                 }
             }
             return true;
-
-
         }
 
         public override int GetHashCode()
