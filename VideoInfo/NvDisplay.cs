@@ -6610,10 +6610,7 @@ namespace DisplayMagicianShared.NVIDIA
             }
             set
             {
-                if (value != null)
-                {
-                    _OSAdapterLUID = ValueTypeReference<LUID>.FromValueType(value, value.GetType());
-                }
+                _OSAdapterLUID = ValueTypeReference<LUID>.FromValueType(value, value.GetType());
             }
                 
         }

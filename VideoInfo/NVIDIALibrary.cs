@@ -448,7 +448,7 @@ namespace DisplayMagicianShared.NVIDIA
         private static NVIDIALibrary _instance = new NVIDIALibrary();
 
         private bool _initialised = false;
-        private NVIDIA_DISPLAY_CONFIG _activeDisplayConfig;
+        private NVIDIA_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<MonitorConnectionType> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
         public List<uint> _allConnectedDisplayIds = new List<uint>();
@@ -564,7 +564,7 @@ namespace DisplayMagicianShared.NVIDIA
             {
                 if (_activeDisplayConfig == null)
                     _activeDisplayConfig = CreateDefaultConfig();
-                return _activeDisplayConfig;
+                return _activeDisplayConfig.Value;
             }
         }
 
@@ -574,7 +574,7 @@ namespace DisplayMagicianShared.NVIDIA
             {
                 if (_activeDisplayConfig == null)
                     _activeDisplayConfig = CreateDefaultConfig();
-                return _activeDisplayConfig.DisplayIdentifiers;
+                return _activeDisplayConfig.Value.DisplayIdentifiers;
             }
         }
 
@@ -3260,8 +3260,5 @@ namespace DisplayMagicianShared.NVIDIA
         public NVIDIALibraryException() { }
         public NVIDIALibraryException(string message) : base(message) { }
         public NVIDIALibraryException(string message, Exception inner) : base(message, inner) { }
-        protected NVIDIALibraryException(
-            System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }

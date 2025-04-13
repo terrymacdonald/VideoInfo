@@ -274,7 +274,7 @@ namespace DisplayMagicianShared.AMD
         public override bool Equals(object obj) => obj is ADL_DISPLAY_TARGET other && this.Equals(other);
         public bool Equals(ADL_DISPLAY_TARGET other)
         {
-            if (!DisplayID.Equals(other.DisplayID)
+            if (!DisplayID.Equals(other.DisplayID))
             {
                 SharedLogger.logger.Trace($"ADL_DISPLAY_TARGET/Equals: The DisplayID values don't equal each other");
                 return false;
@@ -633,9 +633,9 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"ADL_ADAPTER_INFO/Equals: The BusNumber values don't equal each other");
                 return false;
             }
-            if (DriverNumber != other.DriverNumber)
+            if (DeviceNumber != other.DeviceNumber)
             {
-                SharedLogger.logger.Trace($"ADL_ADAPTER_INFO/Equals: The DriverNumber values don't equal each other");
+                SharedLogger.logger.Trace($"ADL_ADAPTER_INFO/Equals: The DeviceNumber values don't equal each other");
                 return false;
             }
             if (FunctionNumber != other.FunctionNumber)

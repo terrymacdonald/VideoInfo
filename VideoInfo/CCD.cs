@@ -341,7 +341,7 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is DPIScalingInfo other && this.Equals(other);
         public bool Equals(DPIScalingInfo other)
         {
-            if (!(Minimum.Equals(other.Minimum))
+            if (!Minimum.Equals(other.Minimum))
             {
                 SharedLogger.logger.Trace($"DPIScalingInfo/Equals: The Minimum values don't equal each other");
                 return false;

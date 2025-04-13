@@ -292,7 +292,7 @@ namespace DisplayMagicianShared.AMD
         // Instantiate a SafeHandle instance.
         private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
         private IntPtr _adlContextHandle = IntPtr.Zero;
-        private AMD_DISPLAY_CONFIG _activeDisplayConfig;
+        private AMD_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
 
@@ -435,7 +435,12 @@ namespace DisplayMagicianShared.AMD
         {
             get
             {
-                return _activeDisplayConfig;
+                if(_activeDisplayConfig == null)
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/ActiveDisplayConfig: ActiveDisplayConfig is null, so creating a new one");
+                    _activeDisplayConfig = CreateDefaultConfig();
+                }
+                return _activeDisplayConfig.Value;
             }
             set
             {
@@ -447,7 +452,7 @@ namespace DisplayMagicianShared.AMD
         {
             get
             {
-                return _activeDisplayConfig.DisplayIdentifiers;
+                return _activeDisplayConfig.Value.DisplayIdentifiers;
             }
         }
 
@@ -2190,8 +2195,5 @@ namespace DisplayMagicianShared.AMD
         public AMDLibraryException() { }
         public AMDLibraryException(string message) : base(message) { }
         public AMDLibraryException(string message, Exception inner) : base(message, inner) { }
-        protected AMDLibraryException(
-            System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
     }
 }
