@@ -697,7 +697,14 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override bool Equals(object obj) => obj is StructureVersion other && this.Equals(other);
         public bool Equals(StructureVersion other)
-        => _version == other._version;
+        {
+            if (_version != other._version)
+            {
+                SharedLogger.logger.Debug($"StructureVersion/Equals: Version values don't equal each other");
+                return false;
+            }
+            return true;
+        }
 
         public override int GetHashCode()
         {
@@ -872,10 +879,27 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(ChipsetInfoV1 other)
         {
-            return _VendorId == other._VendorId &&
-                   _DeviceId == other._DeviceId &&
-                   _VendorName.Equals(other._VendorName) &&
-                   _ChipsetName.Equals(other._ChipsetName);
+            if (_VendorId != other._VendorId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: VendorId values don't equal each other");
+                return false;
+            }
+            if(_DeviceId != other._DeviceId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: DeviceId values don't equal each other");
+                return false;
+            }
+            if (!_VendorName.Equals(other._VendorName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: VendorName values don't equal each other");
+                return false;
+            }
+            if (!_ChipsetName.Equals(other._ChipsetName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: ChipsetName values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
@@ -964,11 +988,32 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(ChipsetInfoV2 other)
         {
-            return _VendorId == other._VendorId &&
-                   _DeviceId == other._DeviceId &&
-                   _VendorName.Equals(other._VendorName) &&
-                   _ChipsetName.Equals(other._ChipsetName) &&
-                   _Flags == other._Flags;
+            if (_VendorId != other._VendorId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: VendorId values don't equal each other");
+                return false;
+            }
+            if (_DeviceId != other._DeviceId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: DeviceId values don't equal each other");
+                return false;
+            }
+            if (!_VendorName.Equals(other._VendorName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: VendorName values don't equal each other");
+                return false;
+            }
+            if (!_ChipsetName.Equals(other._ChipsetName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: ChipsetName values don't equal each other");
+                return false;
+            }
+            if (!_Flags.Equals(other._Flags))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: Flags values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
@@ -1061,14 +1106,47 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(ChipsetInfoV3 other)
         {
-            return _VendorId == other._VendorId &&
-                   _DeviceId == other._DeviceId &&
-                   _VendorName.Equals(other._VendorName) &&
-                   _ChipsetName.Equals(other._ChipsetName) &&
-                   _Flags == other._Flags &&
-                   _SubSystemVendorId == other._SubSystemVendorId &&
-                   _SubSystemDeviceId == other._SubSystemDeviceId &&
-                   _SubSystemVendorName.Equals(other._SubSystemVendorName);
+            if (_VendorId != other._VendorId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: VendorId values don't equal each other");
+                return false;
+            }
+            if(_DeviceId != other._DeviceId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: DeviceId values don't equal each other");
+                return false;
+            }
+            if (!_VendorName.Equals(other._VendorName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: VendorName values don't equal each other");
+                return false;
+            }
+            if (!_ChipsetName.Equals(other._ChipsetName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: ChipsetName values don't equal each other");
+                return false;
+            }
+            if(_Flags != other._Flags)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: Flags values don't equal each other");
+                return false;
+            }
+            if(_SubSystemVendorId != other._SubSystemVendorId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: SubSystemVendorId values don't equal each other");
+                return false;
+            }
+            if(_SubSystemDeviceId != other._SubSystemDeviceId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: SubSystemDeviceId values don't equal each other");
+                return false;
+            }
+            if (!_SubSystemVendorName.Equals(other._SubSystemVendorName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: SubSystemVendorName values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
@@ -1192,18 +1270,68 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(ChipsetInfoV4 other)
         {
-            return _VendorId == other._VendorId &&
-                   _DeviceId == other._DeviceId &&
-                   _VendorName.Equals(other._VendorName) &&
-                   _ChipsetName.Equals(other._ChipsetName) &&
-                   _Flags == other._Flags &&
-                   _SubSystemVendorId == other._SubSystemVendorId &&
-                   _SubSystemDeviceId == other._SubSystemDeviceId &&
-                   _SubSystemVendorName.Equals(other._SubSystemVendorName) &&
-                   _HostBridgeVendorId == other._HostBridgeVendorId &&
-                   _HostBridgeDeviceId == other._HostBridgeDeviceId &&
-                   _HostBridgeSubSystemVendorId == other._HostBridgeSubSystemVendorId &&
-                   _HostBridgeSubSystemDeviceId == other._HostBridgeSubSystemDeviceId;
+
+            if (_VendorId != other._VendorId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: VendorId values don't equal each other");
+                return false;
+            }
+            if (_DeviceId != other._DeviceId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: DeviceId values don't equal each other");
+                return false;
+            }
+            if (!_VendorName.Equals(other._VendorName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: VendorName values don't equal each other");
+                return false;
+            }
+            if (!_ChipsetName.Equals(other._ChipsetName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: ChipsetName values don't equal each other");
+                return false;
+            }
+            if (_Flags != other._Flags)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: Flags values don't equal each other");
+                return false;
+            }
+            if (_SubSystemVendorId != other._SubSystemVendorId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: SubSystemVendorId values don't equal each other");
+                return false;
+            }
+            if (_SubSystemDeviceId != other._SubSystemDeviceId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: SubSystemDeviceId values don't equal each other");
+                return false;
+            }
+            if (!_SubSystemVendorName.Equals(other._SubSystemVendorName))
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: SubSystemVendorName values don't equal each other");
+                return false;
+            }
+            if(_HostBridgeVendorId != other._HostBridgeVendorId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: HostBridgeVendorId values don't equal each other");
+                return false;
+            }
+            if(_HostBridgeDeviceId != other._HostBridgeDeviceId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: HostBridgeDeviceId values don't equal each other");
+                return false;
+            }
+            if(_HostBridgeSubSystemVendorId != other._HostBridgeSubSystemVendorId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: HostBridgeSubSystemVendorId values don't equal each other");
+                return false;
+            }
+            if(_HostBridgeSubSystemDeviceId != other._HostBridgeSubSystemDeviceId)
+            {
+                SharedLogger.logger.Debug($"ChipsetInfoV1/Equals: HostBridgeSubSystemDeviceId values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
@@ -1433,12 +1561,37 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(LidDockParameters other)
         {
-            return _CurrentLIDState == other._CurrentLIDState &&
-                   _CurrentDockState == other._CurrentDockState &&
-                   _CurrentLIDPolicy == other._CurrentLIDPolicy &&
-                   _CurrentDockPolicy == other._CurrentDockPolicy &&
-                   _ForcedLIDMechanismPresent == other._ForcedLIDMechanismPresent &&
-                   _ForcedDockMechanismPresent == other._ForcedDockMechanismPresent;
+            if (_CurrentLIDState != other._CurrentLIDState)
+            {
+                SharedLogger.logger.Debug($"LidDockParameters/Equals: CurrentLIDState values don't equal each other");
+                return false;
+            }
+            if(_CurrentDockState != other._CurrentDockState)
+            {
+                SharedLogger.logger.Debug($"LidDockParameters/Equals: CurrentDockState values don't equal each other");
+                return false;
+            }
+            if(_CurrentLIDPolicy != other._CurrentLIDPolicy)
+            {
+                SharedLogger.logger.Debug($"LidDockParameters/Equals: CurrentLIDPolicy values don't equal each other");
+                return false;
+            }
+            if(_CurrentDockPolicy != other._CurrentDockPolicy)
+            {
+                SharedLogger.logger.Debug($"LidDockParameters/Equals: CurrentDockPolicy values don't equal each other");
+                return false;
+            }
+            if(_ForcedLIDMechanismPresent != other._ForcedLIDMechanismPresent)
+            {
+                SharedLogger.logger.Debug($"LidDockParameters/Equals: ForcedLIDMechanismPresent values don't equal each other");
+                return false;
+            }
+            if(_ForcedDockMechanismPresent != other._ForcedDockMechanismPresent)
+            {
+                SharedLogger.logger.Debug($"LidDockParameters/Equals: ForcedDockMechanismPresent values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />

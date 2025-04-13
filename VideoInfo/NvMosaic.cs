@@ -389,28 +389,62 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(DisplaySettingsV1 other)
         {
-            return _Width == other._Width &&
-                   _Height == other._Height &&
-                   _BitsPerPixel == other._BitsPerPixel &&
-                   _Frequency == other._Frequency;
+            if (_Width != other._Width)
+            {
+                SharedLogger.logger.Debug($"DisplaySettingsV1/Equals: Width values don't equal each other");
+                return false;
+            }
+            if (_Height != other._Height)
+            {
+                SharedLogger.logger.Debug($"DisplaySettingsV1/Equals: Height values don't equal each other");
+                return false;
+            }
+            if (_BitsPerPixel != other._BitsPerPixel)
+            {
+                SharedLogger.logger.Debug($"DisplaySettingsV1/Equals: BitsPerPixel values don't equal each other");
+                return false;
+            }
+            if (_Frequency != other._Frequency)
+            {
+                SharedLogger.logger.Debug($"DisplaySettingsV1/Equals: Frequency values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
         public bool Equals(DisplaySettingsV2 other)
         {
-            return _Width == other._Width &&
-                   _Height == other._Height &&
-                   _BitsPerPixel == other._BitsPerPixel &&
-                   _Frequency == other._Frequency;
+            if (_Width != other._Width)
+            {
+                SharedLogger.logger.Debug($"DisplaySettingsV1/Equals: Width values don't equal each other (v2)");
+                return false;
+            }
+            if (_Height != other._Height)
+            {
+                SharedLogger.logger.Debug($"DisplaySettingsV1/Equals: Height values don't equal each other (v2)");
+                return false;
+            }
+            if (_BitsPerPixel != other._BitsPerPixel)
+            {
+                SharedLogger.logger.Debug($"DisplaySettingsV1/Equals: BitsPerPixel values don't equal each other (v2)");
+                return false;
+            }
+            if (_Frequency != other._Frequency)
+            {
+                SharedLogger.logger.Debug($"DisplaySettingsV1/Equals: Frequency values don't equal each other (v2)");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            /*if (ReferenceEquals(null, obj))
             {
                 return false;
-            }
+            }*/
 
             return obj is DisplaySettingsV1 v1 && Equals(v1);
         }

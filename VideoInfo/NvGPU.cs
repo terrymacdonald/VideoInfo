@@ -1607,16 +1607,21 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(BoardInfo other)
         {
-            return _SerialNumber.SequenceEqual(other._SerialNumber);
+            if (!_SerialNumber.SequenceEqual(other._SerialNumber))
+            {
+                SharedLogger.logger.Debug($"BoardInfo/Equals: SerialNumber values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            /*if (ReferenceEquals(null, obj))
             {
                 return false;
-            }
+            }*/
 
             return obj is BoardInfo info && Equals(info);
         }

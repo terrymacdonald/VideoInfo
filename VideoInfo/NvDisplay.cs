@@ -2467,7 +2467,17 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(ColorDataColorCoordinate other)
         {
-            return _X == other._X && _Y == other._Y;
+            if (_X != other._X )
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: X values don't equal each other");
+                return false;
+            }
+            if (_Y != other._Y)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: Y values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
@@ -3577,17 +3587,65 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override bool Equals(object obj) => obj is DVStaticMetadata other && this.Equals(other);
         public bool Equals(DVStaticMetadata other)
-        => _Flags == other._Flags &&
-           _TargetMinLuminance == other._TargetMinLuminance &&
-           _TargetMaxLuminance == other._TargetMaxLuminance &&
-           _CCRedX == other._CCRedX &&
-           _CCRedY == other._CCRedY &&
-           _CCGreenX == other._CCGreenX &&
-            _CCGreenY == other._CCGreenY &&
-            _CCBlueX == other._CCBlueX &&
-            _CCBlueY == other._CCBlueY &&
-            _CCWhiteX == other._CCWhiteX &&
-            _CCWhiteY == other._CCWhiteY;
+        {
+            if(_Flags != other._Flags)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _Flags values don't equal each other");
+                return false;
+            }
+           if (_TargetMinLuminance != other._TargetMinLuminance)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _TargetMinLuminance values don't equal each other");
+                return false;
+            }
+            if (_TargetMaxLuminance != other._TargetMaxLuminance)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _TargetMaxLuminance values don't equal each other");
+                return false;
+            }
+            if (_CCRedX != other._CCRedX)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _CCRedX values don't equal each other");
+                return false;
+            }
+            if (_CCRedY != other._CCRedY)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _CCRedY values don't equal each other");
+                return false;
+            }
+            if (_CCGreenX != other._CCGreenX)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _CCGreenX values don't equal each other");
+                return false;
+            }
+            if (_CCGreenY != other._CCGreenY)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _CCGreenY values don't equal each other");
+                return false;
+            }
+            if (_CCBlueX != other._CCBlueX)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _CCBlueX values don't equal each other");
+                return false;
+            }
+            if (_CCBlueY != other._CCBlueY)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _CCBlueY values don't equal each other");
+                return false;
+            }
+            if (_CCWhiteX != other._CCWhiteX)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _CCWhiteX values don't equal each other");
+                return false;
+            }
+            if (_CCWhiteY != other._CCWhiteY)
+            {
+                SharedLogger.logger.Debug($"ColorDataColorCoordinate/Equals: _CCWhiteY values don't equal each other");
+                return false;
+            }
+            return true;            
+        }
+        
 
         public override Int32 GetHashCode()
         {
@@ -5270,16 +5328,26 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(LUID other)
         {
-            return LowPart == other.LowPart && HighPart == other.HighPart;
+            if(LowPart != other.LowPart)
+            {
+                SharedLogger.logger.Debug($"LUID/Equals: LowPart values don't equal each other");
+                return false;
+            }
+            if(HighPart != other.HighPart)
+            {
+                SharedLogger.logger.Debug($"LUID/Equals: HighPart values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+           /* if (ReferenceEquals(null, obj))
             {
                 return false;
-            }
+            }*/
 
             return obj is LUID luid && Equals(luid);
         }
@@ -6023,14 +6091,52 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(PathAdvancedTargetInfo other)
         {
-            return _Rotation == other._Rotation &&
-                   _Scaling == other._Scaling &&
-                   _RefreshRateInMillihertz == other._RefreshRateInMillihertz &&
-                   (TVFormat == TVFormat.None || _ConnectorType == other._ConnectorType) &&
-                   _TVFormat == other._TVFormat &&
-                   _TimingOverride == other._TimingOverride &&
-                   _Timing.Equals(other._Timing) &&
-                   _RawReserved == other._RawReserved;
+            if (_Version != other._Version)
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: Version values don't equal each other");
+                return false;
+            }
+            if(_Rotation != other._Rotation)
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: Rotation values don't equal each other");
+                return false;
+            }
+            if (_Scaling != other._Scaling)
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: Scaling values don't equal each other");
+                return false;
+            }
+            if (_RefreshRateInMillihertz != other._RefreshRateInMillihertz)
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: RefreshRateInMillihertz values don't equal each other");
+                return false;
+            }
+            if ((TVFormat == TVFormat.None && _ConnectorType != other._ConnectorType))
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: ConnectorType values don't equal each other when the TVFormat is set to None");
+                return false;
+            }
+            if (_TVFormat != other._TVFormat)
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: TVFormat values don't equal each other");
+                return false;
+            }
+            if (_TimingOverride != other._TimingOverride)
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: TimingOverride values don't equal each other");
+                return false;
+            }
+            if (!_Timing.Equals(other._Timing))
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: Timing values don't equal each other");
+                return false;
+            }
+            if (_RawReserved != other._RawReserved)
+            {
+                SharedLogger.logger.Debug($"PathAdvancedTargetInfo/Equals: RawReserved values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         public override bool Equals(object obj) => obj is PathAdvancedTargetInfo other && this.Equals(other);
@@ -6249,18 +6355,36 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(PathInfoV1 other)
         {
-            return _TargetInfoCount == other._TargetInfoCount &&
-                   _TargetsInfo.Equals(other._TargetsInfo) &&
-                   _SourceModeInfo.Equals(other._SourceModeInfo);
+            if (_Version != other._Version)
+            {
+                SharedLogger.logger.Debug($"PathInfoV1/Equals: Version values don't equal each other");
+                return false;
+            }
+            if(_TargetInfoCount != other._TargetInfoCount)
+            {
+                SharedLogger.logger.Debug($"PathInfoV1/Equals: TargetInfoCount values don't equal each other");
+                return false;
+            }
+            if (_TargetsInfo.Equals(other._TargetsInfo))
+            {
+                SharedLogger.logger.Debug($"PathInfoV1/Equals: TargetsInfo values don't equal each other");
+                return false;
+            }
+            if(_SourceModeInfo.Equals(other._SourceModeInfo))
+            {
+                SharedLogger.logger.Debug($"PathInfoV1/Equals: SourceModeInfo values don't equal each other");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj))
+            /*if (ReferenceEquals(null, obj))
             {
                 return false;
-            }
+            }*/
 
             return obj is PathInfoV1 && Equals((PathInfoV1)obj);
         }

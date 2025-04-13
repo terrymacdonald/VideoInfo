@@ -31,13 +31,47 @@ namespace DisplayMagicianShared.NVIDIA
         public override bool Equals(object obj) => obj is NVIDIA_MOSAIC_CONFIG other && this.Equals(other);
 
         public bool Equals(NVIDIA_MOSAIC_CONFIG other)
-        => IsMosaicEnabled == other.IsMosaicEnabled &&
-           MosaicTopologyBrief.Equals(other.MosaicTopologyBrief) &&
-           MosaicDisplaySettings.Equals(other.MosaicDisplaySettings) &&
-           OverlapX == other.OverlapX &&
-           OverlapY == other.OverlapY &&
-           MosaicGridTopos.SequenceEqual(other.MosaicGridTopos) &&
-           MosaicGridCount == other.MosaicGridCount;
+        {
+            try
+            {
+                if (IsMosaicEnabled != other.IsMosaicEnabled)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The IsMosaicEnabled fields don't match!");
+                }
+
+                if (!MosaicTopologyBrief.Equals(other.MosaicTopologyBrief))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicTopologyBrief structs don't match!");
+                }
+                if (!MosaicDisplaySettings.Equals(other.MosaicDisplaySettings))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicDisplaySettings structs don't match!");
+                }
+                if (OverlapX != other.OverlapX)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The OverlapX fields don't match!");
+                }
+                if (OverlapY != other.OverlapY)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The OverlapY fields don't match!");
+                }
+                if (!MosaicGridTopos.SequenceEqual(other.MosaicGridTopos))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridTopos struct arrays don't match!");
+                }
+                if (MosaicGridCount != other.MosaicGridCount)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridCount fields don't match!");
+                }
+                // If we make it here then the two configs are equal
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Error(ex, $"NVIDIA_MOSAIC_CONFIG/Equals: Exception comparing the NVIDIA Mosaic Configs");
+                return false;
+            }
+        }
 
         public override int GetHashCode()
         {
@@ -63,19 +97,77 @@ namespace DisplayMagicianShared.NVIDIA
 
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_DISPLAY_CONFIG other && this.Equals(other);
+
         public bool Equals(NVIDIA_PER_DISPLAY_CONFIG other)
-        => HasNvHdrEnabled == other.HasNvHdrEnabled &&
-            HdrCapabilities.Equals(other.HdrCapabilities) &&
-            HdrColorData.Equals(other.HdrColorData) &&
-            // Disabled the Adaptive Sync equality matching as we are having trouble applying it, which is causing issues in profile matching in DisplayMagician
-            // To fix this bit, we need to test the SetActiveConfigOverride Adaptive Sync part of the codebase to apply this properly.
-            // But for now, we'll exclude it from the equality matching and also stop trying to use the adaptive sync config.
-            //HasAdaptiveSync == other.HasAdaptiveSync &&
-            //AdaptiveSyncConfig.Equals(other.AdaptiveSyncConfig) &&
-            HasColorData == other.HasColorData &&
-            ColorData.Equals(other.ColorData) &&
-            HasCustomDisplay == other.HasCustomDisplay &&
-            CustomDisplays.SequenceEqual(other.CustomDisplays);
+        {
+            try
+            {
+                if (HasNvHdrEnabled != other.HasNvHdrEnabled)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasNvHdrEnabled fields don't match!");
+                    return false;
+                }
+
+                if (!HdrCapabilities.Equals(other.HdrCapabilities))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HdrCapabilities structs don't match!");
+                    return false;
+                }
+
+                if (!HdrColorData.Equals(other.HdrColorData))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HdrColorData structs don't match!");
+                    return false;
+                }
+
+                // Disabled the Adaptive Sync equality matching as we are having trouble applying it
+                /*
+                if (HasAdaptiveSync != other.HasAdaptiveSync)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasAdaptiveSync fields don't match!");
+                    return false;
+                }
+                
+                if (!AdaptiveSyncConfig.Equals(other.AdaptiveSyncConfig))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The AdaptiveSyncConfig structs don't match!");
+                    return false;
+                }
+                */
+
+                if (HasColorData != other.HasColorData)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasColorData fields don't match!");
+                    return false;
+                }
+
+                if (!ColorData.Equals(other.ColorData))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The ColorData structs don't match!");
+                    return false;
+                }
+
+                if (HasCustomDisplay != other.HasCustomDisplay)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasCustomDisplay fields don't match!");
+                    return false;
+                }
+
+                if (!CustomDisplays.SequenceEqual(other.CustomDisplays))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The CustomDisplays lists don't match!");
+                    return false;
+                }
+
+                // If we make it here then the two configs are equal
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Error(ex, $"NVIDIA_PER_DISPLAY_CONFIG/Equals: Exception comparing the NVIDIA Per Display Configs");
+                return false;
+            }
+        }
 
         public override int GetHashCode()
         {
@@ -119,9 +211,37 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override bool Equals(object obj) => obj is NVIDIA_DRS_CONFIG other && this.Equals(other);
         public bool Equals(NVIDIA_DRS_CONFIG other)
-        => IsBaseProfile == other.IsBaseProfile &&
-            ProfileInfo == other.ProfileInfo &&
-            DriverSettings.SequenceEqual(other.DriverSettings);
+        {
+            try
+            {
+                if (IsBaseProfile != other.IsBaseProfile)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DRS_CONFIG/Equals: The IsBaseProfile fields don't match!");
+                    return false;
+                }
+
+                if (!ProfileInfo.Equals(other.ProfileInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DRS_CONFIG/Equals: The ProfileInfo structs don't match!");
+                    return false;
+                }
+
+                if (!DriverSettings.SequenceEqual(other.DriverSettings))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DRS_CONFIG/Equals: The DriverSettings lists don't match!");
+                    return false;
+                }
+
+                // If we make it here then the two configs are equal
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Error(ex, $"NVIDIA_DRS_CONFIG/Equals: Exception comparing the NVIDIA DRS Configs");
+                return false;
+            }
+        }
+
 
         public override int GetHashCode()
         {
@@ -149,16 +269,79 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_ADAPTER_CONFIG other && this.Equals(other);
         public bool Equals(NVIDIA_PER_ADAPTER_CONFIG other)
-        => IsQuadro == other.IsQuadro &&
-            HasLogicalGPU == other.HasLogicalGPU &&
-            SystemType == other.SystemType &&
-            AdapterName.Equals(other.AdapterName) &&
-            GPUType == other.GPUType &&
-            BusType == other.BusType &&
-            BusId == other.BusId &&
-            BusSlotId == other.BusSlotId &&
-            DisplayCount == other.DisplayCount &&
-            CollectionComparer.AreEquivalent(Displays, other.Displays);
+        {
+            try
+            {
+                if (IsQuadro != other.IsQuadro)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The IsQuadro fields don't match!");
+                    return false;
+                }
+
+                if (HasLogicalGPU != other.HasLogicalGPU)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The HasLogicalGPU fields don't match!");
+                    return false;
+                }
+
+                if (SystemType != other.SystemType)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The SystemType fields don't match!");
+                    return false;
+                }
+
+                if (!AdapterName.Equals(other.AdapterName))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The AdapterName fields don't match!");
+                    return false;
+                }
+
+                if (GPUType != other.GPUType)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The GPUType fields don't match!");
+                    return false;
+                }
+
+                if (BusType != other.BusType)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The BusType fields don't match!");
+                    return false;
+                }
+
+                if (BusId != other.BusId)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The BusId fields don't match!");
+                    return false;
+                }
+
+                if (BusSlotId != other.BusSlotId)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The BusSlotId fields don't match!");
+                    return false;
+                }
+
+                if (DisplayCount != other.DisplayCount)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The DisplayCount fields don't match!");
+                    return false;
+                }
+
+                if (!CollectionComparer.AreEquivalent(Displays, other.Displays))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The Displays dictionaries don't match!");
+                    return false;
+                }
+
+                // If we make it here then the two configs are equal
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Error(ex, $"NVIDIA_PER_ADAPTER_CONFIG/Equals: Exception comparing the NVIDIA Per Adapter Configs");
+                return false;
+            }
+        }
+
 
         public override int GetHashCode()
         {
@@ -188,25 +371,61 @@ namespace DisplayMagicianShared.NVIDIA
 
         public bool Equals(NVIDIA_DISPLAY_CONFIG other)
         {
-            if (!(IsInUse == other.IsInUse && 
-            IsCloned == other.IsCloned &&
-            PhysicalAdapters.SequenceEqual(other.PhysicalAdapters) &&
-            MosaicConfig.Equals(other.MosaicConfig) &&
-            DRSSettings.SequenceEqual(other.DRSSettings) &&
-            DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers)))
+            try
             {
+                if (IsInUse != other.IsInUse)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The IsInUse fields don't match!");
+                    return false;
+                }
+
+                if (IsCloned != other.IsCloned)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The IsCloned fields don't match!");
+                    return false;
+                }
+
+                if (!PhysicalAdapters.SequenceEqual(other.PhysicalAdapters))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The PhysicalAdapters dictionaries don't match!");
+                    return false;
+                }
+
+                if (!MosaicConfig.Equals(other.MosaicConfig))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The MosaicConfig structs don't match!");
+                    return false;
+                }
+
+                if (!DRSSettings.SequenceEqual(other.DRSSettings))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DRSSettings lists don't match!");
+                    return false;
+                }
+
+                if (!DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DisplayIdentifiers lists don't match!");
+                    return false;
+                }
+
+                // Now we need to go through the display configs comparing values, as the order changes if there is a cloned display
+                if (!CollectionComparer.EqualButDifferentOrder<PathInfoV2>(DisplayConfigs, other.DisplayConfigs))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DisplayConfigs lists don't match!");
+                    return false;
+                }
+
+                // If we make it here then the two configs are equal
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Error(ex, $"NVIDIA_DISPLAY_CONFIG/Equals: Exception comparing the NVIDIA Display Configs");
                 return false;
             }
-
-            // Now we need to go through the display configs comparing values, as the order changes if there is a cloned display
-            //if (!CollectionComparer.AreEquivalent(DisplayConfigs, other.DisplayConfigs))
-            if (!CollectionComparer.EqualButDifferentOrder<PathInfoV2>(DisplayConfigs, other.DisplayConfigs))
-            {
-                return false;
-            }
-
-            return true;
         }
+
 
         public override int GetHashCode()
         {
