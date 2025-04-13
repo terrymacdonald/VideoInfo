@@ -442,10 +442,6 @@ namespace DisplayMagicianShared.AMD
                 }
                 return _activeDisplayConfig.Value;
             }
-            set
-            {
-                _activeDisplayConfig = value;
-            }
         }
 
         public List<string> CurrentDisplayIdentifiers
@@ -598,6 +594,48 @@ namespace DisplayMagicianShared.AMD
                             SharedLogger.logger.Warn($"AMDLibrary/GetSomeDisplayIdentifiers: WARNING - ADL2_Adapter_Active_Get returned ADL_STATUS {ADLRet} when trying to see if AMD Adapter #{adapterIndex} is active. Trying to skip this adapter so something at least works.");
                             continue;
                         }
+
+                        // Go grab the DisplayInfo as that is useful infor for creating screens
+                        int forceDetect = 0;
+                        int numDisplays;
+                        IntPtr displayInfoBuffer;
+                        ADLRet = ADLImport.ADL2_Display_DisplayInfo_Get(_adlContextHandle, adapterIndex, out numDisplays, out displayInfoBuffer, forceDetect);
+                        if (ADLRet == ADL_STATUS.ADL_OK)
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DisplayInfo_Get returned information about all displaytargets connected to AMD adapter #{adapterIndex}.");
+                        }
+                        else if (ADLRet == ADL_STATUS.ADL_ERR_NULL_POINTER || ADLRet == ADL_STATUS.ADL_ERR_NOT_SUPPORTED)
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DisplayInfo_Get returned ADL_ERR_NULL_POINTER so skipping getting display info from AMD adapter #{adapterIndex}.");
+                            continue;
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - ADL2_Display_DisplayInfo_Get returned ADL_STATUS {ADLRet} when trying to get the display target info from AMD adapter #{adapterIndex}.");
+                        }
+
+                        ADL_DISPLAY_INFO[] displayInfoArray = { };
+                        if (numDisplays > 0)
+                        {
+                            IntPtr currentDisplayInfoBuffer = displayInfoBuffer;
+                            displayInfoArray = new ADL_DISPLAY_INFO[numDisplays];
+                            for (int i = 0; i < numDisplays; i++)
+                            {
+                                // build a structure in the array slot
+                                displayInfoArray[i] = new ADL_DISPLAY_INFO();
+                                // fill the array slot structure with the data from the buffer
+                                displayInfoArray[i] = (ADL_DISPLAY_INFO)Marshal.PtrToStructure(currentDisplayInfoBuffer, typeof(ADL_DISPLAY_INFO));
+                                // destroy the bit of memory we no longer need
+                                Marshal.DestroyStructure(currentDisplayInfoBuffer, typeof(ADL_DISPLAY_INFO));
+                                // advance the buffer forwards to the next object
+                                currentDisplayInfoBuffer = (IntPtr)((long)currentDisplayInfoBuffer + Marshal.SizeOf(displayInfoArray[i]));
+                                //currentDisplayTargetBuffer = (IntPtr)((long)currentDisplayTargetBuffer + Marshal.SizeOf(displayTargetArray[i]));
+
+                            }
+                            // Free the memory used by the buffer                        
+                            Marshal.FreeCoTaskMem(displayInfoBuffer);
+                        }
+
 
                         // Go grab the DisplayMaps and DisplayTargets as that is useful infor for creating screens
                         int numDisplayTargets = 0;
@@ -1069,46 +1107,6 @@ namespace DisplayMagicianShared.AMD
                         }
 
 
-                        int forceDetect = 0;
-                        int numDisplays;
-                        IntPtr displayInfoBuffer;
-                        ADLRet = ADLImport.ADL2_Display_DisplayInfo_Get(_adlContextHandle, adapterIndex, out numDisplays, out displayInfoBuffer, forceDetect);
-                        if (ADLRet == ADL_STATUS.ADL_OK)
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DisplayInfo_Get returned information about all displaytargets connected to AMD adapter #{adapterIndex}.");
-                        }
-                        else if (ADLRet == ADL_STATUS.ADL_ERR_NULL_POINTER || ADLRet == ADL_STATUS.ADL_ERR_NOT_SUPPORTED)
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DisplayInfo_Get returned ADL_ERR_NULL_POINTER so skipping getting display info from AMD adapter #{adapterIndex}.");
-                            continue;
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - ADL2_Display_DisplayInfo_Get returned ADL_STATUS {ADLRet} when trying to get the display target info from AMD adapter #{adapterIndex}.");
-                        }
-
-                        ADL_DISPLAY_INFO[] displayInfoArray = { };
-                        if (numDisplays > 0)
-                        {
-                            IntPtr currentDisplayInfoBuffer = displayInfoBuffer;
-                            displayInfoArray = new ADL_DISPLAY_INFO[numDisplays];
-                            for (int i = 0; i < numDisplays; i++)
-                            {
-                                // build a structure in the array slot
-                                displayInfoArray[i] = new ADL_DISPLAY_INFO();
-                                // fill the array slot structure with the data from the buffer
-                                displayInfoArray[i] = (ADL_DISPLAY_INFO)Marshal.PtrToStructure(currentDisplayInfoBuffer, typeof(ADL_DISPLAY_INFO));
-                                // destroy the bit of memory we no longer need
-                                Marshal.DestroyStructure(currentDisplayInfoBuffer, typeof(ADL_DISPLAY_INFO));
-                                // advance the buffer forwards to the next object
-                                currentDisplayInfoBuffer = (IntPtr)((long)currentDisplayInfoBuffer + Marshal.SizeOf(displayInfoArray[i]));
-                                //currentDisplayTargetBuffer = (IntPtr)((long)currentDisplayTargetBuffer + Marshal.SizeOf(displayTargetArray[i]));
-
-                            }
-                            // Free the memory used by the buffer                        
-                            Marshal.FreeCoTaskMem(displayInfoBuffer);
-                        }
-
                         myDisplayConfig.HdrConfigs = new Dictionary<int, AMD_HDR_CONFIG>();
 
                         // Now we need to get all the displays connected to this adapter so that we can get their HDR state
@@ -1116,7 +1114,7 @@ namespace DisplayMagicianShared.AMD
                         {
                             // We need to skip recording anything that doesn't support color communication
                             // Firstly find the display connector if we can
-                            ADL_DISPLAY_CONNECTION_TYPE displayConnector;
+                            /*ADL_DISPLAY_CONNECTION_TYPE displayConnector;
                             try
                             {
                                 displayConnector = displayInfoArray.First(d => d.DisplayID == displayTarget.DisplayID).DisplayConnector;
@@ -1126,10 +1124,10 @@ namespace DisplayMagicianShared.AMD
                                 displayConnector = ADL_DISPLAY_CONNECTION_TYPE.Unknown;
                                 SharedLogger.logger.Warn(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception caused whilst trying to find which display connector display {displayTarget.DisplayID} on adapter {adapterIndex} has:");
                             }
-                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: Display {displayTarget.DisplayID} on AMD adapter #{adapterIndex} has a {displayConnector} connector.");
+                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: Display {displayTarget.DisplayID} on AMD adapter #{adapterIndex} has a {displayConnector} connector.");*/
                             // Then only get the HDR config stuff if the connection actually suports getting the HDR info!
-                            if (!SkippedColorConnectionTypes.Contains(displayConnector))
-                            {
+                            /*if (!SkippedColorConnectionTypes.Contains(displayConnector))
+                            {*/
                                 // Go through each display and see if HDR is supported
                                 int supported = 0;
                                 int enabled = 0;
@@ -1166,7 +1164,7 @@ namespace DisplayMagicianShared.AMD
                                     // Save the new display config only if we haven't already
                                     myDisplayConfig.HdrConfigs.Add(displayTarget.DisplayID.DisplayLogicalIndex, hdrConfig);
                                 }
-                            }
+                            //}
                         }
 
                     }

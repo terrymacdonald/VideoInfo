@@ -253,7 +253,7 @@ namespace DisplayMagicianShared.AMD
     }
 
     /// <summary> ADLDisplayTarget </summary>
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ADL_DISPLAY_TARGET : IEquatable<ADL_DISPLAY_TARGET>
     {
         /// <summary> Display IDs. </summary>
@@ -1124,7 +1124,7 @@ namespace DisplayMagicianShared.AMD
     }
 
     /// <summary> ADLDisplayID Structure</summary>
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ADL_DISPLAY_ID : IEquatable<ADL_DISPLAY_ID>
     {
         /// <summary> Display Logical Index </summary>
