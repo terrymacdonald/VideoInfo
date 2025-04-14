@@ -295,6 +295,7 @@ namespace DisplayMagicianShared.AMD
         private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
         //private IntPtr _adlContextHandle = IntPtr.Zero;
         private ADLXHelper _adlxHelper;
+        private IADLXSystem _adlxSystem;
         private AMD_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
@@ -336,9 +337,24 @@ namespace DisplayMagicianShared.AMD
                     SharedLogger.logger.Equals($"AMDLibrary/AMDLibrary: Error intialising AMD ADLX library. ADLXHelper.Initialize() returned error code {status}");
                 }
                 else
-                {
-                    _initialised = true;
-                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADLX library was initialised successfully");
+                {                   
+                    try
+                    {
+                        // Get system services
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to get the ADLX system services");
+                        _adlxSystem = _adlxHelper.GetSystemServices();
+                        _initialised = true;
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADLX library was initialised successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Exception getting the ADLX system services");
+                        SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Terminating the ADLXHelper to avoid memory leaks");
+                        _adlxHelper.Terminate();
+                        SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Setting ADLXHelper to null");
+                        _adlxHelper = null;
+                    }
+
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Display Configuration");
                     _activeDisplayConfig = GetActiveConfig();
                     //SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Connected Display Identifiers");
@@ -527,50 +543,22 @@ namespace DisplayMagicianShared.AMD
 
             if (_initialised)
             {
-                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;
-                IADLXSystem systemServices;
+                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;                
                 IADLXDisplayServices displayService;
-                IADLXDisplayList displayList;
-                IADLXDisplay display;
-                
-                try
+                IADLXDisplayList displayList;              
+
+                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display services");
+                SWIGTYPE_p_p_adlx__IADLXDisplayServices s = ADLX.new_displaySerP_Ptr();
+                status = _adlxSystem.GetDisplaysServices(s);
+                displayService = ADLX.displaySerP_Ptr_value(s);
+                if (status != ADLX_RESULT.ADLX_OK)
                 {
-                    // Get system services
-                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX system services");
-                    systemServices = _adlxHelper.GetSystemServices();
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Trace(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting the ADLX system services");
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
                     return myDisplayConfig;
-                }
-
-
-                if (systemServices != null)
-                {
-                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the ADLX system services");
-                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display services");
-                    SWIGTYPE_p_p_adlx__IADLXDisplayServices s = ADLX.new_displaySerP_Ptr();
-                    status = systemServices.GetDisplaysServices(s);
-                    displayService = ADLX.displaySerP_Ptr_value(s);
-                    if (status != ADLX_RESULT.ADLX_OK)
-                    {
-                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
-                        return myDisplayConfig;
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display services");
-                    }
                 }
                 else
                 {
-                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Unable to get the ADLX display services");
-                    return myDisplayConfig;
-                }
-
-                if (status == ADLX_RESULT.ADLX_OK)
-                {
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display services");
                     // Get the display services
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display list");
                     // Get display list
@@ -585,8 +573,90 @@ namespace DisplayMagicianShared.AMD
                     else
                     {
                         SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display list");
+                        // Iterate through the display list
+                        uint it = displayList.Begin();
+                        for (; it != displayList.Size(); it++)
+                        {
+                            SWIGTYPE_p_p_adlx__IADLXDisplay ppDisplay = ADLX.new_displayP_Ptr();
+                            status = displayList.At(it, ppDisplay);
+                            IADLXDisplay display = ADLX.displayP_Ptr_value(ppDisplay);
+
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
+                                display.Name(ppName);
+                                String name = ADLX.charP_Ptr_value(ppName);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                display.DisplayType(pDisType);
+                                ADLX_DISPLAY_TYPE disType = ADLX.displayTypeP_value(pDisType);
+
+                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                display.ManufacturerID(pMID);
+                                long mid = ADLX.uintP_value(pMID);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                display.ConnectorType(pConnect);
+                                ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.disConnectTypeP_value(pConnect);
+
+                                SWIGTYPE_p_p_char ppEDIE = ADLX.new_charP_Ptr();
+                                display.EDID(ppEDIE);
+                                String edid = ADLX.charP_Ptr_value(ppEDIE);
+
+                                SWIGTYPE_p_int pH = ADLX.new_intP();
+                                SWIGTYPE_p_int pV = ADLX.new_intP();
+                                display.NativeResolution(pH, pV);
+                                int h = ADLX.intP_value(pH);
+                                int v = ADLX.intP_value(pV);
+
+                                SWIGTYPE_p_double pRefRate = ADLX.new_doubleP();
+                                display.RefreshRate(pRefRate);
+                                double refRate = ADLX.doubleP_value(pRefRate);
+
+                                SWIGTYPE_p_unsigned_int pPixClock = ADLX.new_uintP();
+                                display.PixelClock(pPixClock);
+                                long pixClock = ADLX.uintP_value(pPixClock);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
+                                display.ScanType(pScanType);
+                                ADLX_DISPLAY_SCAN_TYPE scanType = ADLX.disScanTypeP_value(pScanType);
+
+                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
+                                display.UniqueId(pID);
+                                uint id = ADLX.adlx_sizeP_value(pID);
+
+                                Console.WriteLine(String.Format("\nThe display [{0}]:", it));
+                                Console.WriteLine(String.Format("\tName: {0}", name));
+                                Console.WriteLine(String.Format("\tType: {0}", disType));
+                                Console.WriteLine(String.Format("\tConnector type: {0}", connect));
+                                Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));
+                                Console.WriteLine(String.Format("\tEDID: {0}", edid));
+                                Console.WriteLine(String.Format("\tResolution:  h: {0}  v: {1}", h, v));
+                                Console.WriteLine(String.Format("\tRefresh rate: {0}", refRate));
+                                Console.WriteLine(String.Format("\tPixel clock: {0}", pixClock));
+                                Console.WriteLine(String.Format("\tScan type: {0}", scanType));
+                                Console.WriteLine(String.Format("\tUnique id: {0}", id));
+
+                                // Release display interface
+                                display.Release();
+                            }
+                        }
                     }
+                    // Release display list interface
+                    displayList.Release();
                 }
+
+
+                
+                    
+
+                
+
+
+                // Release display services interface
+                displayService.Release();
+
+
 
                 /*try
                 {
@@ -1255,6 +1325,9 @@ namespace DisplayMagicianShared.AMD
                     // Return the default config to see if we can keep going.
                     return CreateDefaultConfig();
                 }*/
+
+                // Terminate ADLX
+                status = _adlxHelper.Terminate();
             }
             else
             {
