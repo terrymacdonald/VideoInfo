@@ -8,6 +8,8 @@ using DisplayMagicianShared;
 using System.ComponentModel;
 using DisplayMagicianShared.Windows;
 using System.Threading;
+using DisplayMagicianShared.NVIDIA;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace DisplayMagicianShared.AMD
 {
@@ -84,7 +86,7 @@ namespace DisplayMagicianShared.AMD
 
         public bool Equals(AMD_SLSMAP_CONFIG other)
         {
-            if(SLSMap != other.SLSMap)
+            if(!SLSMap.Equals(other.SLSMap))
             {
                 SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The SLSMap values don't equal each other");
                 return false;
@@ -291,10 +293,12 @@ namespace DisplayMagicianShared.AMD
 
         // Instantiate a SafeHandle instance.
         private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
-        private IntPtr _adlContextHandle = IntPtr.Zero;
+        //private IntPtr _adlContextHandle = IntPtr.Zero;
+        private ADLXHelper _adlxHelper;
         private AMD_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
+        public const string AMD_ADLX_BINDING_DLL = "ADLXCSharpBind.dll";
 
         static AMDLibrary() { }
         public AMDLibrary()
@@ -312,55 +316,57 @@ namespace DisplayMagicianShared.AMD
             _activeDisplayConfig = CreateDefaultConfig();
             try
             {
-                SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADL DLL {ADLImport.ATI_ADL_DLL}");
-                // Attempt to prelink all of the NVAPI functions
-                Marshal.PrelinkAll(typeof(ADLImport));
+                SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX Binding DLL {AMD_ADLX_BINDING_DLL}");
+                // Attempt to prelink all of the ADLX functions
+                LoadLibrary(AMD_ADLX_BINDING_DLL);
+                //Marshal.PrelinkAll(typeof(ADLImport));
 
-                SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Intialising AMD ADL2 library interface");
+                SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Intialising AMD ADLX library interface");
                 // Second parameter is 1 so that we only the get connected adapters in use now
 
                 // We set the environment variable as a workaround so that ADL2_Display_SLSMapConfigX2_Get works :(
                 // This is a weird thing that AMD even set in their own code! WTF! Who programmed that as a feature?
                 Environment.SetEnvironmentVariable("ADL_4KWORKAROUND_CANCEL", "TRUE");
 
-                try
+                // Initialize ADLX with ADLXHelper
+                _adlxHelper = new ADLXHelper();
+                ADLX_RESULT status = _adlxHelper.Initialize();
+                if (status != ADLX_RESULT.ADLX_OK)
                 {
-                    ADL_STATUS ADLRet;
-                    ADLRet = ADLImport.ADL2_Main_Control_Create(ADLImport.ADL_Main_Memory_Alloc, ADLImport.ADL_TRUE, out _adlContextHandle);
-                    if (ADLRet == ADL_STATUS.ADL_OK)
-                    {
-                        _initialised = true;
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADL2 library was initialised successfully");
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Running UpdateActiveConfig to ensure there is a config to use later");
-
-                        // Force the AMD Video card to stay on when AMDLibrary is runnning
-                        KeepVideoCardOn();
-
-                        _activeDisplayConfig = GetActiveConfig();
-                        _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers();
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Error intialising AMD ADL2 library. ADL2_Main_Control_Create() returned error code {ADLRet}");
-                    }
+                    SharedLogger.logger.Equals($"AMDLibrary/AMDLibrary: Error intialising AMD ADLX library. ADLXHelper.Initialize() returned error code {status}");
                 }
-                catch (Exception ex)
+                else
                 {
-                    SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Exception intialising AMD ADL2 library. ADL2_Main_Control_Create() caused an exception.");
+                    _initialised = true;
+                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADLX library was initialised successfully");
+                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Display Configuration");
+                    _activeDisplayConfig = GetActiveConfig();
+                    //SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Connected Display Identifiers");
+                    //_allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
                 }
 
+            }
+            catch (TypeInitializationException ex)
+            {
+                SharedLogger.logger.Info(ex, $"AMDLibrary/AMDLibrary: TypeInitializationException trying to load the AMD ADLX DLL {AMD_ADLX_BINDING_DLL}. This generally means you don't have the AMD ADLX driver installed.");
+                return;
             }
             catch (DllNotFoundException ex)
             {
                 // If we get here then the AMD ADL DLL wasn't found. We can't continue to use it, so we log the error and exit
-                SharedLogger.logger.Info(ex, $"AMDLibrary/AMDLibrary: Exception trying to load the AMD ADL DLL {ADLImport.ATI_ADL_DLL}. This generally means you don't have the AMD ADL driver installed.");
+                SharedLogger.logger.Info(ex, $"AMDLibrary/AMDLibrary: DllNotFoundException trying to load the AMD ADLX DLL {AMD_ADLX_BINDING_DLL}. This generally means you don't have the AMD ADLX driver installed.");
+                return;
             }
-
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Info(ex, $"AMDLibrary/AMDLibrary: A general exception trying to load the AMD ADLX DLL {AMD_ADLX_BINDING_DLL}.");
+                return;
+            }
         }
 
         ~AMDLibrary()
         {
-            SharedLogger.logger.Trace("AMDLibrary/~AMDLibrary: Destroying AMD Library");
+            SharedLogger.logger.Trace("AMDLibrary/~AMDLibrary: Destroying AMDX Library");
             Dispose(false);
         }
 
@@ -377,30 +383,35 @@ namespace DisplayMagicianShared.AMD
 
             if (disposing)
             {
-
-                //ADLImport.ADL_Main_Control_Destroy();
-
                 // Dispose managed state (managed objects).
                 _safeHandle?.Dispose();
             }
 
             // Dispose unmanaged resources
-            if (_adlContextHandle != IntPtr.Zero)
+            if (_adlxHelper != null)
             {
 
-                SharedLogger.logger.Trace("AMDLibrary/Dispose: Destroying AMD ADL2 library interface");
+                SharedLogger.logger.Trace("AMDLibrary/Dispose: Destroying AMD ADLX library interface");
                 // If the ADL2 library was initialised, then we need to free it up.
                 if (_initialised)
                 {
                     try
                     {
-                        ADLImport.ADL2_Main_Control_Destroy(_adlContextHandle);
-                        _adlContextHandle = IntPtr.Zero;
-                        SharedLogger.logger.Trace($"AMDLibrary/Dispose: AMD ADL2 library was destroyed successfully");
+                        // Terminate ADLX
+                        ADLX_RESULT status = _adlxHelper.Terminate();
+                        _adlxHelper = null;
+                        if (status != ADLX_RESULT.ADLX_OK)
+                        {
+                            SharedLogger.logger.Error($"AMDLibrary/Dispose: Error destroying AMD ADLX library. _adlxHelper.Terminate() returned error code {status}");
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/Dispose: AMD ADLX library was destroyed successfully");
+                        }
                     }
                     catch (Exception ex)
                     {
-                        SharedLogger.logger.Trace(ex, $"AMDLibrary/Dispose: Exception destroying AMD ADL2 library. ADL2_Main_Control_Destroy() caused an exception.");
+                        SharedLogger.logger.Trace(ex, $"AMDLibrary/Dispose: Exception destroying AMD ADL2 library. _adlxHelper.Terminate() caused an exception.");
                     }
 
                 }
@@ -516,7 +527,68 @@ namespace DisplayMagicianShared.AMD
 
             if (_initialised)
             {
+                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;
+                IADLXSystem systemServices;
+                IADLXDisplayServices displayService;
+                IADLXDisplayList displayList;
+                IADLXDisplay display;
+                
                 try
+                {
+                    // Get system services
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX system services");
+                    systemServices = _adlxHelper.GetSystemServices();
+                }
+                catch (Exception ex)
+                {
+                    SharedLogger.logger.Trace(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting the ADLX system services");
+                    return myDisplayConfig;
+                }
+
+
+                if (systemServices != null)
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the ADLX system services");
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display services");
+                    SWIGTYPE_p_p_adlx__IADLXDisplayServices s = ADLX.new_displaySerP_Ptr();
+                    status = systemServices.GetDisplaysServices(s);
+                    displayService = ADLX.displaySerP_Ptr_value(s);
+                    if (status != ADLX_RESULT.ADLX_OK)
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
+                        return myDisplayConfig;
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display services");
+                    }
+                }
+                else
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Unable to get the ADLX display services");
+                    return myDisplayConfig;
+                }
+
+                if (status == ADLX_RESULT.ADLX_OK)
+                {
+                    // Get the display services
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display list");
+                    // Get display list
+                    SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
+                    status = displayService.GetDisplays(ppDisplayList);
+                    displayList = ADLX.displayListP_Ptr_value(ppDisplayList);
+                    if (status != ADLX_RESULT.ADLX_OK)
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                        return myDisplayConfig;
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display list");
+                    }
+                }
+
+                /*try
                 {
                     // Get the Adapter info for ALL adapter and put it in the AdapterBuffer
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Running ADL2_Adapter_AdapterInfoX4_Get to get the information about all AMD Adapters.");
@@ -1182,7 +1254,7 @@ namespace DisplayMagicianShared.AMD
                     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception trying to get the NVIDIA Configuration when we know there is an NVIDIA Physical GPU present.");
                     // Return the default config to see if we can keep going.
                     return CreateDefaultConfig();
-                }
+                }*/
             }
             else
             {
@@ -1205,7 +1277,7 @@ namespace DisplayMagicianShared.AMD
             stringToReturn += $"****** AMD VIDEO CARDS *******\n";
 
 
-            if (_initialised)
+            /*if (_initialised)
             {
                 // Get the number of AMD adapters that the OS knows about
                 int numAdapters = 0;
@@ -1560,7 +1632,7 @@ namespace DisplayMagicianShared.AMD
             {
                 SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - Tried to run GetSomeDisplayIdentifiers but the AMD ADL library isn't initialised!");
                 throw new AMDLibraryException($"Tried to run PrintActiveConfig but the AMD ADL library isn't initialised!");
-            }
+            }*/
 
 
 
@@ -1574,7 +1646,7 @@ namespace DisplayMagicianShared.AMD
         public bool SetActiveConfig(AMD_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
 
-            if (_initialised)
+            /*if (_initialised)
             {
                 // Set the initial state of the ADL_STATUS
                 ADL_STATUS ADLRet = 0;
@@ -1680,7 +1752,7 @@ namespace DisplayMagicianShared.AMD
             {
                 SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the AMD ADL library isn't initialised!");
                 throw new AMDLibraryException($"Tried to run SetActiveConfig but the AMD ADL library isn't initialised!");
-            }
+            }*/
 
             return true;
         }
@@ -1688,7 +1760,7 @@ namespace DisplayMagicianShared.AMD
 
         public bool SetActiveConfigOverride(AMD_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
-            if (_initialised)
+            /*if (_initialised)
             {
                 // Set the initial state of the ADL_STATUS
                 ADL_STATUS ADLRet = 0;
@@ -1747,7 +1819,7 @@ namespace DisplayMagicianShared.AMD
             {
                 SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfigOverride but the AMD ADL library isn't initialised!");
                 throw new AMDLibraryException($"Tried to run SetActiveConfigOverride but the AMD ADL library isn't initialised!");
-            }
+            }*/
             return true;
         }
 
@@ -1840,7 +1912,7 @@ namespace DisplayMagicianShared.AMD
 
             List<string> displayIdentifiers = new List<string>();
 
-            if (_initialised)
+            /*if (_initialised)
             {
                 // Get the number of AMD adapters that the OS knows about
                 int numAdapters = 0;
@@ -2184,7 +2256,7 @@ namespace DisplayMagicianShared.AMD
 
 
             // Sort the display identifiers
-            displayIdentifiers.Sort();
+            displayIdentifiers.Sort();*/
 
             return displayIdentifiers;
         }

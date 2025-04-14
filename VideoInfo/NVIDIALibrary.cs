@@ -478,15 +478,18 @@ namespace DisplayMagicianShared.NVIDIA
             {
                 SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Attempting to load the NVIDIA NVAPI DLL");
 
-                // If we get here then we definitely have the NVIDIA driver available.
                 Status status = Status.Error;
                 SharedLogger.logger.Trace("NVIDIALibrary/NVIDIALibrary: Intialising NVIDIA NVAPI library interface");
                 // Step 1: Initialise the NVAPI
                 _initialised = false;
                 try
                 {
+                    // The NVAPI.DLL is loaded by the NVAPI library when the NVAPI object is created, so just by calling this we are
+                    // loading the NVAPI DLLs. We don't need to do anything else here. If this causes an exception then the NVAPI DLL
+                    // is not available..
                     if (NVAPI.IsAvailable())
                     {
+                        // If we get here then we definitely have the NVIDIA driver available.
                         _initialised = true;
                         SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: NVIDIA NVAPI library was initialised successfully");
                         SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Running UpdateActiveConfig to ensure there is a config to use later");

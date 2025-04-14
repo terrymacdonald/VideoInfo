@@ -2,53 +2,7 @@
   "profiles": {
     "VideoInfo save cfg1": {
       "commandName": "Project",
-      "commandLineArgs": "save test-config1.cfg",
-      "nativeDebugging": true
-    },
-    "VideoInfo save cfg2": {
-      "commandName": "Project",
-      "commandLineArgs": "save test-config2.cfg",
-      "nativeDebugging": true
-    },
-    "VideoInfo load cfg1": {
-      "commandName": "Project",
-      "commandLineArgs": "load test-config1.cfg",
-      "nativeDebugging": true
-    },
-    "VideoInfo load cfg2": {
-      "commandName": "Project",
-      "commandLineArgs": "load test-config2.cfg",
-      "nativeDebugging": true
-    },
-    "VideoInfo save cfg3": {
-      "commandName": "Project",
-      "commandLineArgs": "save test-config3.cfg",
-      "nativeDebugging": true
-    },
-    "VideoInfo load cfg3": {
-      "commandName": "Project",
-      "commandLineArgs": "load test-config3.cfg",
-      "nativeDebugging": true
-    },
-    "VideoInfo save cfg4": {
-      "commandName": "Project",
-      "commandLineArgs": "save test-config4.cfg",
-      "nativeDebugging": true
-    },
-    "VideoInfo load cfg4": {
-      "commandName": "Project",
-      "commandLineArgs": "load test-config4.cfg",
-      "nativeDebugging": true
-    },
-    "VideoInfo zip": {
-      "commandName": "Project",
-      "commandLineArgs": "zip",
-      "nativeDebugging": true
-    },
-    "equal cfg1 cfg1b": {
-      "commandName": "Project",
-      "commandLineArgs": "equal test-config1.cfg",
-      "nativeDebugging": true
+      "commandLineArgs": "save display-config1.cfg"
     }
   }
 }

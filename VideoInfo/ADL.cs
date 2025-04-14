@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Runtime.InteropServices;
 using FARPROC = System.IntPtr;
 using HMODULE = System.IntPtr;
@@ -345,7 +345,7 @@ namespace DisplayMagicianShared.AMD
         public bool PreferDisplaySet => (AdapterDisplayCapValue & 0x1) == 0x100;
         public bool BezelSet => (AdapterDisplayCapValue & 0x1) == 0x200;
 
-        /*        #define ADL_ADAPTER_DISPLAYCAP_MANNER_SUPPORTED_NOTACTIVE        0x00000001
+        *//*        #define ADL_ADAPTER_DISPLAYCAP_MANNER_SUPPORTED_NOTACTIVE        0x00000001
                 #define ADL_ADAPTER_DISPLAYCAP_MANNER_SUPPORTED_SINGLE            0x00000002
                 #define ADL_ADAPTER_DISPLAYCAP_MANNER_SUPPORTED_CLONE            0x00000004
                 #define ADL_ADAPTER_DISPLAYCAP_MANNER_SUPPORTED_NSTRETCH1GPU    0x00000008
@@ -357,7 +357,7 @@ namespace DisplayMagicianShared.AMD
                 #define ADL_ADAPTER_DISPLAYCAP_MANNER_SUPPORTED_EXTENDED        0x00000080
 
                 #define ADL_ADAPTER_DISPLAYCAP_PREFERDISPLAY_SUPPORTED            0x00000100
-                #define ADL_ADAPTER_DISPLAYCAP_BEZEL_SUPPORTED                    0x00000200*/
+                #define ADL_ADAPTER_DISPLAYCAP_BEZEL_SUPPORTED                    0x00000200*//*
 
         public override bool Equals(object obj) => obj is ADL_ADAPTER_DISPLAY_CAP other && this.Equals(other);
         public bool Equals(ADL_ADAPTER_DISPLAY_CAP other)
@@ -867,13 +867,13 @@ namespace DisplayMagicianShared.AMD
         public bool SupportsxvYCC601 => (DDCInfoFlag & 0x10) == 0x20;
         public bool SupportsxvYCC709 => (DDCInfoFlag & 0x10) == 0x40;
 
-        /*#define ADL_DISPLAYDDCINFOEX_FLAG_PROJECTORDEVICE       (1 << 0)
+        *//*#define ADL_DISPLAYDDCINFOEX_FLAG_PROJECTORDEVICE       (1 << 0)
         #define ADL_DISPLAYDDCINFOEX_FLAG_EDIDEXTENSION         (1 << 1)
         #define ADL_DISPLAYDDCINFOEX_FLAG_DIGITALDEVICE         (1 << 2)
         #define ADL_DISPLAYDDCINFOEX_FLAG_HDMIAUDIODEVICE       (1 << 3)
         #define ADL_DISPLAYDDCINFOEX_FLAG_SUPPORTS_AI           (1 << 4)
         #define ADL_DISPLAYDDCINFOEX_FLAG_SUPPORT_xvYCC601      (1 << 5)
-        #define ADL_DISPLAYDDCINFOEX_FLAG_SUPPORT_xvYCC709      (1 << 6)*/
+        #define ADL_DISPLAYDDCINFOEX_FLAG_SUPPORT_xvYCC709      (1 << 6)*//*
 
         // Panel Pixel Format settings
         public bool PixelFormatUnknown => (PanelPixelFormat & 0x1) == 0x1;
@@ -885,13 +885,13 @@ namespace DisplayMagicianShared.AMD
 
         // ADL_DISPLAY_ADJUSTMENT_PIXELFORMAT adjustment values
         // (bit-vector)
-        /*#define ADL_DISPLAY_PIXELFORMAT_UNKNOWN             0
+        *//*#define ADL_DISPLAY_PIXELFORMAT_UNKNOWN             0
         #define ADL_DISPLAY_PIXELFORMAT_RGB                       (1 << 0)
         #define ADL_DISPLAY_PIXELFORMAT_YCRCB444                  (1 << 1)    //Limited range
         #define ADL_DISPLAY_PIXELFORMAT_YCRCB422                 (1 << 2)    //Limited range
         #define ADL_DISPLAY_PIXELFORMAT_RGB_LIMITED_RANGE      (1 << 3)
         #define ADL_DISPLAY_PIXELFORMAT_RGB_FULL_RANGE    ADL_DISPLAY_PIXELFORMAT_RGB  //Full range
-        #define ADL_DISPLAY_PIXELFORMAT_YCRCB420              (1 << 4)*/
+        #define ADL_DISPLAY_PIXELFORMAT_YCRCB420              (1 << 4)*//*
 
         // Supported Transfer Function settings
         //public bool DisplayConnectedSupported => (SupportedTransferFunction & 0x1) == 0x1;
@@ -1222,7 +1222,7 @@ namespace DisplayMagicianShared.AMD
         public bool DisplayConnectorIsUSBTypeC => DisplayConnector == ADL_DISPLAY_CONNECTION_TYPE.USBTypeC;
 
 
-        /*#define ADL_DISPLAY_CONTYPE_UNKNOWN                 0
+        *//*#define ADL_DISPLAY_CONTYPE_UNKNOWN                 0
         #define ADL_DISPLAY_CONTYPE_VGA                     1
         #define ADL_DISPLAY_CONTYPE_DVI_D                   2
         #define ADL_DISPLAY_CONTYPE_DVI_I                   3
@@ -1239,7 +1239,7 @@ namespace DisplayMagicianShared.AMD
         #define ADL_DISPLAY_CONTYPE_DISPLAYPORT             15
         #define ADL_DISPLAY_CONTYPE_EDP                     16
         #define ADL_DISPLAY_CONTYPE_WIRELESSDISPLAY         17
-        #define ADL_DISPLAY_CONTYPE_USB_TYPE_C              18*/
+        #define ADL_DISPLAY_CONTYPE_USB_TYPE_C              18*//*
 
         // Display Connector
 
@@ -1258,7 +1258,7 @@ namespace DisplayMagicianShared.AMD
         public bool DisplayOutputTypeIsActiveDongle => DisplayOutputType == ADL_CONNECTION_TYPE.ActiveDongle;
         public bool DisplayOutputTypeIsVirtual => DisplayOutputType == ADL_CONNECTION_TYPE.Virtual;
 
-        /*#define ADL_CONNECTION_TYPE_VGA 0
+        *//*#define ADL_CONNECTION_TYPE_VGA 0
         #define ADL_CONNECTION_TYPE_DVI 1
         #define ADL_CONNECTION_TYPE_DVI_SL 2
         #define ADL_CONNECTION_TYPE_HDMI 3
@@ -1271,7 +1271,7 @@ namespace DisplayMagicianShared.AMD
         #define ADL_CONNECTION_TYPE_PASSIVE_DONGLE_DP_DVI 10
         #define ADL_CONNECTION_TYPE_MST 11
         #define ADL_CONNECTION_TYPE_ACTIVE_DONGLE          12
-        #define ADL_CONNECTION_TYPE_VIRTUAL    13*/
+        #define ADL_CONNECTION_TYPE_VIRTUAL    13*//*
 
 
         // Display Info Mask settings
@@ -1722,14 +1722,14 @@ namespace DisplayMagicianShared.AMD
         // ADL_DISPLAY_DISPLAYMAP_MANNER_ Definitions
         // for ADLDisplayMap.iDisplayMapMask and ADLDisplayMap.iDisplayMapValue
         // (bit-vector)
-        /*#define ADL_DISPLAY_DISPLAYMAP_MANNER_RESERVED            0x00000001
+        *//*#define ADL_DISPLAY_DISPLAYMAP_MANNER_RESERVED            0x00000001
         #define ADL_DISPLAY_DISPLAYMAP_MANNER_NOTACTIVE            0x00000002
         #define ADL_DISPLAY_DISPLAYMAP_MANNER_SINGLE            0x00000004
         #define ADL_DISPLAY_DISPLAYMAP_MANNER_CLONE                0x00000008
         #define ADL_DISPLAY_DISPLAYMAP_MANNER_RESERVED1            0x00000010  // Removed NSTRETCH
         #define ADL_DISPLAY_DISPLAYMAP_MANNER_HSTRETCH            0x00000020
         #define ADL_DISPLAY_DISPLAYMAP_MANNER_VSTRETCH            0x00000040
-        #define ADL_DISPLAY_DISPLAYMAP_MANNER_VLD                0x00000080*/
+        #define ADL_DISPLAY_DISPLAYMAP_MANNER_VLD                0x00000080*//*
 
         public override bool Equals(object obj) => obj is ADL_POSSIBLE_MAPPING other && this.Equals(other);
         public bool Equals(ADL_POSSIBLE_MAPPING other)
@@ -1790,9 +1790,9 @@ namespace DisplayMagicianShared.AMD
         // ADL_DISPLAY_POSSIBLEMAPRESULT_VALID Definitions
         // for ADLPossibleMapResult.iPossibleMapResultMask and ADLPossibleMapResult.iPossibleMapResultValue
         // (bit-vector)
-        /*#define ADL_DISPLAY_POSSIBLEMAPRESULT_VALID                0x00000001
+        *//*#define ADL_DISPLAY_POSSIBLEMAPRESULT_VALID                0x00000001
         #define ADL_DISPLAY_POSSIBLEMAPRESULT_BEZELSUPPORTED    0x00000002
-        #define ADL_DISPLAY_POSSIBLEMAPRESULT_OVERLAPSUPPORTED    0x00000004*/
+        #define ADL_DISPLAY_POSSIBLEMAPRESULT_OVERLAPSUPPORTED    0x00000004*//*
 
         public override bool Equals(object obj) => obj is ADL_POSSIBLE_MAP_RESULT other && this.Equals(other);
         public bool Equals(ADL_POSSIBLE_MAP_RESULT other)
@@ -1864,7 +1864,7 @@ namespace DisplayMagicianShared.AMD
         public bool SLSGridDisplayRotationSet => (SLSGridValue & 0x40) == 0x40;
         public bool SLSGridDesktopRotationSet => (SLSGridValue & 0x80) == 0x80;
 
-        /*#define ADL_DISPLAY_SLSGRID_CAP_OPTION_RELATIVETO_LANDSCAPE     0x00000001
+        *//*#define ADL_DISPLAY_SLSGRID_CAP_OPTION_RELATIVETO_LANDSCAPE     0x00000001
         #define ADL_DISPLAY_SLSGRID_CAP_OPTION_RELATIVETO_CURRENTANGLE     0x00000002
         #define ADL_DISPLAY_SLSGRID_PORTAIT_MODE                         0x00000004
         #define ADL_DISPLAY_SLSGRID_KEEPTARGETROTATION                  0x00000080
@@ -1872,7 +1872,7 @@ namespace DisplayMagicianShared.AMD
         #define ADL_DISPLAY_SLSGRID_SAMEMODESLS_SUPPORT        0x00000010
         #define ADL_DISPLAY_SLSGRID_MIXMODESLS_SUPPORT        0x00000020
         #define ADL_DISPLAY_SLSGRID_DISPLAYROTATION_SUPPORT    0x00000040
-        #define ADL_DISPLAY_SLSGRID_DESKTOPROTATION_SUPPORT    0x00000080*/
+        #define ADL_DISPLAY_SLSGRID_DESKTOPROTATION_SUPPORT    0x00000080*//*
 
         public override bool Equals(object obj) => obj is ADL_SLS_GRID other && this.Equals(other);
         public bool Equals(ADL_SLS_GRID other)
@@ -1962,10 +1962,10 @@ namespace DisplayMagicianShared.AMD
         public bool Orientation180 => (Orientation & 0x4) == 0x4;
         public bool Orientation270 => (Orientation & 0x8) == 0x8;
 
-        /*#define ADL_DISPLAY_SLSGRID_ORIENTATION_000        0x00000001
+        *//*#define ADL_DISPLAY_SLSGRID_ORIENTATION_000        0x00000001
         #define ADL_DISPLAY_SLSGRID_ORIENTATION_090        0x00000002
         #define ADL_DISPLAY_SLSGRID_ORIENTATION_180        0x00000004
-        #define ADL_DISPLAY_SLSGRID_ORIENTATION_270        0x00000008*/
+        #define ADL_DISPLAY_SLSGRID_ORIENTATION_270        0x00000008*//*
 
         // SLS Map Mask settings
         public bool SLSMapDisplayArrangedSupported => (SLSMapMask & 0x2) == 0x2;
@@ -1990,7 +1990,7 @@ namespace DisplayMagicianShared.AMD
         public bool SLSMapIsCloneVTSet => (SLSMapValue & 0x4000) == 0x4000;
 
 
-        /*#define ADL_DISPLAY_SLSMAP_DISPLAYARRANGED        0x0002
+        *//*#define ADL_DISPLAY_SLSMAP_DISPLAYARRANGED        0x0002
         #define ADL_DISPLAY_SLSMAP_CURRENTCONFIG        0x0004
         #define ADL_DISPLAY_SLSMAP_BEZELMODE            0x0010
         #define ADL_DISPLAY_SLSMAP_SLSLAYOUTMODE_FIT        0x0100
@@ -1999,7 +1999,7 @@ namespace DisplayMagicianShared.AMD
         #define ADL_DISPLAY_SLSMAP_IS_SLS        0x1000
         #define ADL_DISPLAY_SLSMAP_IS_SLSBUILDER 0x2000
         #define ADL_DISPLAY_SLSMAP_IS_CLONEVT     0x4000
-        */
+        *//*
 
         public override bool Equals(object obj) => obj is ADL_SLS_MAP other && this.Equals(other);
         public bool Equals(ADL_SLS_MAP other)
@@ -2418,8 +2418,8 @@ namespace DisplayMagicianShared.AMD
         public bool SLSBezelOffsetStepByStepSet => (BezelOffsetValue & 0x4) == 0x4;
         public bool SLSBezelOffsetCommitSet => (BezelOffsetValue & 0x8) == 0x8;
 
-        /*#define ADL_DISPLAY_BEZELOFFSET_STEPBYSTEPSET            0x00000004
-        #define ADL_DISPLAY_BEZELOFFSET_COMMIT                    0x00000008*/
+        *//*#define ADL_DISPLAY_BEZELOFFSET_STEPBYSTEPSET            0x00000004
+        #define ADL_DISPLAY_BEZELOFFSET_COMMIT                    0x00000008*//*
 
         public override bool Equals(object obj) => obj is ADL_SLS_OFFSET other && this.Equals(other);
         public bool Equals(ADL_SLS_OFFSET other)
@@ -2793,7 +2793,7 @@ namespace DisplayMagicianShared.AMD
 
         #region Internal Constant
         /// <summary> Atiadlxx_FileName </summary>
-        public const string ATI_ADL_DLL = "atiadlxx.dll";
+        public const string AMD_ADLX_BINDING_DLL = "ADLXBindings.dll";
         /// <summary> Kernel32_FileName </summary>
         public const string Kernel32_FileName = "kernel32.dll";
         #endregion Internal Constant
@@ -3078,4 +3078,4 @@ namespace DisplayMagicianShared.AMD
         }
 
     }
-}
+}*/
