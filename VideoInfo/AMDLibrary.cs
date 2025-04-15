@@ -19,47 +19,40 @@ using System.Runtime.InteropServices.JavaScript;
 namespace DisplayMagicianShared.AMD
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct AMD_ADAPTER_CONFIG : IEquatable<AMD_ADAPTER_CONFIG>
+    public struct AMD_DESKTOP : IEquatable<AMD_DESKTOP>
     {
-        public int AdapterDeviceNumber;
-        public int AdapterBusNumber;
-        public int AdapterIndex;
-        public bool IsPrimaryAdapter;
         public string DisplayName;
-        public int OSDisplayIndex;
+        public string DisplayType;
+        public string ConnectorType;
+        public long ManufacturerID;
+        public long UniqueID;
 
-        public override bool Equals(object obj) => obj is AMD_ADAPTER_CONFIG other && this.Equals(other);
-
-        public bool Equals(AMD_ADAPTER_CONFIG other)
+        public override bool Equals(object obj) => obj is AMD_DISPAMD_DESKTOPLAY other && this.Equals(other);
+        public bool Equals(AMD_DESKTOP other)
         {
-            if(AdapterIndex != other.AdapterIndex)
-            {
-                SharedLogger.logger.Trace($"AMD_ADAPTER_CONFIG/Equals: The AdapterIndex values don't equal each other");
-                return false;
-            }
-            if (AdapterBusNumber != other.AdapterBusNumber)
-            {
-                SharedLogger.logger.Trace($"AMD_ADAPTER_CONFIG/Equals: The AdapterBusNumber values don't equal each other");
-                return false;
-            }
-            if (AdapterDeviceNumber != other.AdapterDeviceNumber)
-            {
-                SharedLogger.logger.Trace($"AMD_ADAPTER_CONFIG/Equals: The AdapterDeviceNumber values don't equal each other");
-                return false;
-            }
-            if (IsPrimaryAdapter != other.IsPrimaryAdapter)
-            {
-                SharedLogger.logger.Trace($"AMD_ADAPTER_CONFIG/Equals: The IsPrimaryAdapter values don't equal each other");
-                return false;
-            }
             if (DisplayName != other.DisplayName)
             {
-                SharedLogger.logger.Trace($"AMD_ADAPTER_CONFIG/Equals: The DisplayName values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayName values don't equal each other");
                 return false;
             }
-            if (OSDisplayIndex != other.OSDisplayIndex)
+            if (DisplayType != other.DisplayType)
             {
-                SharedLogger.logger.Trace($"AMD_ADAPTER_CONFIG/Equals: The OSDisplayIndex values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayType values don't equal each other");
+                return false;
+            }
+            if (ConnectorType != other.ConnectorType)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ConnectorType values don't equal each other");
+                return false;
+            }
+            if (ManufacturerID != other.ManufacturerID)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ManufacturerID values don't equal each other");
+                return false;
+            }
+            if (UniqueID != other.UniqueID)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The UniqueID values don't equal each other");
                 return false;
             }
             return true;
@@ -67,106 +60,48 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (AdapterIndex, AdapterBusNumber, AdapterDeviceNumber, IsPrimaryAdapter, DisplayName, OSDisplayIndex).GetHashCode();
+            return (DisplayName, DisplayType, ConnectorType, ManufacturerID, UniqueID).GetHashCode();
         }
+        public static bool operator ==(AMD_DESKTOP lhs, AMD_DESKTOP rhs) => lhs.Equals(rhs);
 
-        public static bool operator ==(AMD_ADAPTER_CONFIG lhs, AMD_ADAPTER_CONFIG rhs) => lhs.Equals(rhs);
-
-        public static bool operator !=(AMD_ADAPTER_CONFIG lhs, AMD_ADAPTER_CONFIG rhs) => !(lhs == rhs);
+        public static bool operator !=(AMD_DESKTOP lhs, AMD_DESKTOP rhs) => !(lhs == rhs);
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct AMD_SLSMAP_CONFIG : IEquatable<AMD_SLSMAP_CONFIG>
+    public struct AMD_DISPLAY : IEquatable<AMD_DISPLAY>
     {
-        public ADL_SLS_MAP SLSMap;
-        public List<ADL_SLS_TARGET> SLSTargets;
-        public List<ADL_SLS_MODE> NativeModes;
-        public List<ADL_SLS_OFFSET> NativeModeOffsets;
-        public List<ADL_BEZEL_TRANSIENT_MODE> BezelModes;
-        public List<ADL_BEZEL_TRANSIENT_MODE> TransientModes;
-        public List<ADL_SLS_OFFSET> SLSOffsets;
-        public int BezelModePercent;
+        public string DisplayName;
+        public string DisplayType;
+        public string ConnectorType;
+        public long ManufacturerID;
+        public long UniqueID;
 
-        public override bool Equals(object obj) => obj is AMD_SLS_CONFIG other && this.Equals(other);
-
-        public bool Equals(AMD_SLSMAP_CONFIG other)
+        public override bool Equals(object obj) => obj is AMD_DISPLAY other && this.Equals(other);
+        public bool Equals(AMD_DISPLAY other)
         {
-            if(!SLSMap.Equals(other.SLSMap))
+            if(DisplayName != other.DisplayName)
             {
-                SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The SLSMap values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayName values don't equal each other");
                 return false;
             }
-            if(SLSTargets.SequenceEqual(other.SLSTargets))
+            if (DisplayType != other.DisplayType)
             {
-                SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The SLSTargets values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayType values don't equal each other");
                 return false;
             }
-            if (NativeModes.SequenceEqual(other.NativeModes))
+            if (ConnectorType != other.ConnectorType)
             {
-                SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The NativeModes values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ConnectorType values don't equal each other");
                 return false;
             }
-            if (NativeModeOffsets.SequenceEqual(other.NativeModeOffsets))
+            if (ManufacturerID != other.ManufacturerID)
             {
-                SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The NativeModeOffsets values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ManufacturerID values don't equal each other");
                 return false;
             }
-            if (BezelModes.SequenceEqual(other.BezelModes))
+            if (UniqueID != other.UniqueID)
             {
-                SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The BezelModes values don't equal each other");
-                return false;
-            }
-            if (TransientModes.SequenceEqual(other.TransientModes))
-            {
-                SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The TransientModes values don't equal each other");
-                return false;
-            }
-            if (SLSOffsets.SequenceEqual(other.SLSOffsets))
-            {
-                SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The SLSOffsets values don't equal each other");
-                return false;
-            }
-            if (BezelModePercent != other.BezelModePercent)
-            {
-                SharedLogger.logger.Trace($"AMD_SLSMAP_CONFIG/Equals: The BezelModePercent values don't equal each other");
-                return false;
-            }
-            return true;    
-        }
-
-        public override int GetHashCode()
-        {
-            return (SLSMap, SLSTargets, NativeModes, NativeModeOffsets, BezelModes, TransientModes, SLSOffsets, BezelModePercent).GetHashCode();
-        }
-        public static bool operator ==(AMD_SLSMAP_CONFIG lhs, AMD_SLSMAP_CONFIG rhs) => lhs.Equals(rhs);
-
-        public static bool operator !=(AMD_SLSMAP_CONFIG lhs, AMD_SLSMAP_CONFIG rhs) => !(lhs == rhs);
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct AMD_SLS_CONFIG : IEquatable<AMD_SLS_CONFIG>
-    {
-        public bool IsSlsEnabled;
-        public List<AMD_SLSMAP_CONFIG> SLSMapConfigs;
-        public List<ADL_MODE> SLSEnabledDisplayTargets;
-
-        public override bool Equals(object obj) => obj is AMD_SLS_CONFIG other && this.Equals(other);
-
-        public bool Equals(AMD_SLS_CONFIG other)
-        {
-            if (IsSlsEnabled != other.IsSlsEnabled)
-            {
-                SharedLogger.logger.Trace($"AMD_SLS_CONFIG/Equals: The IsSlsEnabled values don't equal each other");
-                return false;
-            }
-            if (SLSMapConfigs.SequenceEqual(other.SLSMapConfigs))
-            {
-                SharedLogger.logger.Trace($"AMD_SLS_CONFIG/Equals: The SLSMapConfigs values don't equal each other");
-                return false;
-            }
-            if (SLSEnabledDisplayTargets.SequenceEqual(other.SLSEnabledDisplayTargets))
-            {
-                SharedLogger.logger.Trace($"AMD_SLS_CONFIG/Equals: The SLSEnabledDisplayTargets values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The UniqueID values don't equal each other");
                 return false;
             }
             return true;
@@ -174,48 +109,11 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (IsSlsEnabled, SLSMapConfigs, SLSEnabledDisplayTargets).GetHashCode();
+            return (DisplayName, DisplayType, ConnectorType, ManufacturerID, UniqueID).GetHashCode();
         }
-        public static bool operator ==(AMD_SLS_CONFIG lhs, AMD_SLS_CONFIG rhs) => lhs.Equals(rhs);
+        public static bool operator ==(AMD_DISPLAY lhs, AMD_DISPLAY rhs) => lhs.Equals(rhs);
 
-        public static bool operator !=(AMD_SLS_CONFIG lhs, AMD_SLS_CONFIG rhs) => !(lhs == rhs);
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct AMD_HDR_CONFIG : IEquatable<AMD_HDR_CONFIG>
-    {
-        public int AdapterIndex;
-        public bool HDRSupported;
-        public bool HDREnabled;
-
-        public override bool Equals(object obj) => obj is AMD_HDR_CONFIG other && this.Equals(other);
-        public bool Equals(AMD_HDR_CONFIG other)
-        {
-            if(AdapterIndex != other.AdapterIndex)
-            {
-                SharedLogger.logger.Trace($"AMD_HDR_CONFIG/Equals: The AdapterIndex values don't equal each other");
-                return false;
-            }
-            if (HDRSupported != other.HDRSupported)
-            {
-                SharedLogger.logger.Trace($"AMD_HDR_CONFIG/Equals: The HDRSupported values don't equal each other");
-                return false;
-            }
-            if (HDREnabled != other.HDREnabled)
-            {
-                SharedLogger.logger.Trace($"AMD_HDR_CONFIG/Equals: The HDREnabled values don't equal each other");
-                return false;
-            }
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            return (AdapterIndex, HDRSupported, HDREnabled).GetHashCode();
-        }
-        public static bool operator ==(AMD_HDR_CONFIG lhs, AMD_HDR_CONFIG rhs) => lhs.Equals(rhs);
-
-        public static bool operator !=(AMD_HDR_CONFIG lhs, AMD_HDR_CONFIG rhs) => !(lhs == rhs);
+        public static bool operator !=(AMD_DISPLAY lhs, AMD_DISPLAY rhs) => !(lhs == rhs);
     }
 
 
@@ -223,11 +121,10 @@ namespace DisplayMagicianShared.AMD
     public struct AMD_DISPLAY_CONFIG : IEquatable<AMD_DISPLAY_CONFIG>
     {
         public bool IsInUse;
-        public List<AMD_ADAPTER_CONFIG> AdapterConfigs;
-        public AMD_SLS_CONFIG SlsConfig;
-        public List<ADL_DISPLAY_MAP> DisplayMaps;
-        public List<ADL_DISPLAY_TARGET> DisplayTargets;
-        public Dictionary<int, AMD_HDR_CONFIG> HdrConfigs;
+        public bool IsCloned;
+        public List<AMD_DESKTOP> Desktops;
+        public bool IsEyefinity;
+        public List<AMD_DISPLAY> Displays;
         public List<string> DisplayIdentifiers;
         public override bool Equals(object obj) => obj is AMD_DISPLAY_CONFIG other && this.Equals(other);
 
@@ -238,32 +135,26 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The IsInUse values don't equal each other");
                 return false;
             }
-            if (AdapterConfigs.SequenceEqual(other.AdapterConfigs))
+            if (IsCloned != other.IsCloned)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The AdapterConfigs values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The IsCloned values don't equal each other");
                 return false;
             }
-            if (!SlsConfig.Equals(other.SlsConfig))
+            if (Desktops.SequenceEqual(other.Desktops))
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The SlsConfig values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The Desktops values don't equal each other");
                 return false;
             }
-            if (DisplayMaps.SequenceEqual(other.DisplayMaps))
+            if (IsEyefinity != other.IsEyefinity)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The DisplayMaps values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The IsEyefinity values don't equal each other");
                 return false;
             }
-            if (DisplayTargets.SequenceEqual(other.DisplayTargets))
+            if (Displays.SequenceEqual(other.Displays))
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The DisplayTargets values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The Displays values don't equal each other");
                 return false;
-            }
-            if (HdrConfigs.SequenceEqual(other.HdrConfigs))
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The HdrConfigs values don't equal each other");
-                return false;
-            }
-            if (DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
+            }            if (DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The DisplayIdentifiers values don't equal each other");
                 return false;
@@ -273,7 +164,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (IsInUse, AdapterConfigs, SlsConfig, DisplayMaps, DisplayTargets, DisplayIdentifiers).GetHashCode();
+            return (IsInUse, IsCloned, Desktops, IsEyefinity, Displays, DisplayIdentifiers).GetHashCode();
         }
 
         public static bool operator ==(AMD_DISPLAY_CONFIG lhs, AMD_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
@@ -505,7 +396,7 @@ namespace DisplayMagicianShared.AMD
             // Fill in the minimal amount we need to avoid null references
             // so that we won't break json.net when we save a default config
 
-            myDefaultConfig.AdapterConfigs = new List<AMD_ADAPTER_CONFIG>();
+            myDefaultConfig.Desktops = new List<IADLXDesktop>();
             myDefaultConfig.SlsConfig.IsSlsEnabled = false;
             myDefaultConfig.SlsConfig.SLSMapConfigs = new List<AMD_SLSMAP_CONFIG>();
             myDefaultConfig.SlsConfig.SLSEnabledDisplayTargets = new List<ADL_MODE>();
