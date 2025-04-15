@@ -10,6 +10,10 @@ using DisplayMagicianShared.Windows;
 using System.Threading;
 using DisplayMagicianShared.NVIDIA;
 using static System.Net.Mime.MediaTypeNames;
+using EDIDParser;
+using Windows.Devices.PointOfService;
+using Windows.Graphics;
+using System.Security.Cryptography;
 
 namespace DisplayMagicianShared.AMD
 {
@@ -543,9 +547,99 @@ namespace DisplayMagicianShared.AMD
 
             if (_initialised)
             {
-                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;                
+                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;
+                // Get the desktop services
+                // This is how we get and iterate through the various desktops. 
+                // - A single desktop is associated with one display.
+                // - A duplicate desktop is associated with two or more displays.
+                // - An AMD Eyefinity desktop is associated with two or more displays.
+                IADLXDesktopServices desktopService;
+                IADLXDesktopList desktopList;               
+
+                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX desktop services");
+                SWIGTYPE_p_p_adlx__IADLXDesktopServices d = ADLX.new_desktopSerP_Ptr();
+                status = _adlxSystem.GetDesktopsServices(d);
+                desktopService = ADLX.desktopSerP_Ptr_value(d);
+                if (status != ADLX_RESULT.ADLX_OK)
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX desktop services. systemServices.GetDesktopsServices() returned error code {status}");
+                    return myDisplayConfig;
+                }
+                else
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the desktop services");
+                    // Get the display services
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX desktop list");
+                    // Get display list
+                    SWIGTYPE_p_p_adlx__IADLXDesktopList ppDesktopList = ADLX.new_desktopListP_Ptr();
+                    status = desktopService.GetDesktops(ppDesktopList);
+                    desktopList = ADLX.desktopListP_Ptr_value(ppDesktopList);
+
+                    if (status != ADLX_RESULT.ADLX_OK)
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                        return myDisplayConfig;
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Successfully got the desktop list");
+                        // Iterate through the desktop list
+                        uint it = desktopList.Begin();
+                        for (; it != desktopList.Size(); it++)
+                        {
+                            SWIGTYPE_p_p_adlx__IADLXDesktop ppDesktop = ADLX.new_desktopP_Ptr();
+                            status = desktopList.At(it, ppDesktop);
+                            IADLXDesktop desktop = ADLX.desktopP_Ptr_value(ppDesktop);
+
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                
+                                SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_uintP();
+                                desktop.GetNumberOfDisplays(pNumDisplays);
+                                long numDisplays = ADLX.uintP_value(pNumDisplays);
+
+                                SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_orientationP();
+                                desktop.Orientation(pOrientation);
+                                ADLX_ORIENTATION orientation = ADLX.orientationP_value(pOrientation);
+
+                                SWIGTYPE_p_int pWidth = ADLX.new_intP();
+                                SWIGTYPE_p_int pHeight = ADLX.new_intP();
+                                desktop.Size(pWidth, pHeight);
+                                int width = ADLX.intP_value(pWidth);
+                                int height = ADLX.intP_value(pHeight);
+
+                                ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
+                                desktop.TopLeft(pLocationTopLeft);
+                                ADLX_Point locationTopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
+
+                                SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_desktopTypeP();
+                                desktop.Type(pDesktopType);
+                                ADLX_DESKTOP_TYPE desktopType = ADLX.desktopTypeP_value(pDesktopType);
+                                
+                                Console.WriteLine(String.Format("\nThe desktop [{0}]:", it));
+                                Console.WriteLine(String.Format("\tNumber of displays: {0}", numDisplays));
+                                Console.WriteLine(String.Format("\tOerientation: {0}", orientation));
+                                Console.WriteLine(String.Format("\tWidth/Height:  w: {0}  h: {1}", width, height));
+                                Console.WriteLine(String.Format("\tTop Left: {0},{1}", locationTopLeft.x, locationTopLeft.y));
+                                Console.WriteLine(String.Format("\tDesktop Type: {0}", desktopType.ToString()));
+
+                                // Release desktop interface
+                                desktop.Release();
+                            }
+                        }
+                    }
+                    // Release desktop list interface
+                    desktopList.Release();
+                }
+
+
+                // Release desktop services interface
+                desktopService.Release();
+
+                // Get the display services
+                // This lets us interact witth the various displays
                 IADLXDisplayServices displayService;
-                IADLXDisplayList displayList;              
+                IADLXDisplayList displayList;
 
                 SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display services");
                 SWIGTYPE_p_p_adlx__IADLXDisplayServices s = ADLX.new_displaySerP_Ptr();
@@ -630,7 +724,7 @@ namespace DisplayMagicianShared.AMD
                                 Console.WriteLine(String.Format("\tType: {0}", disType));
                                 Console.WriteLine(String.Format("\tConnector type: {0}", connect));
                                 Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));
-                                Console.WriteLine(String.Format("\tEDID: {0}", edid));
+                                //Console.WriteLine(String.Format("\tEDID: {0}", edid));
                                 Console.WriteLine(String.Format("\tResolution:  h: {0}  v: {1}", h, v));
                                 Console.WriteLine(String.Format("\tRefresh rate: {0}", refRate));
                                 Console.WriteLine(String.Format("\tPixel clock: {0}", pixClock));
