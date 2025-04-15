@@ -27,7 +27,7 @@ namespace DisplayMagicianShared.AMD
         public long ManufacturerID;
         public long UniqueID;
 
-        public override bool Equals(object obj) => obj is AMD_DISPAMD_DESKTOPLAY other && this.Equals(other);
+        public override bool Equals(object obj) => obj is AMD_DESKTOP other && this.Equals(other);
         public bool Equals(AMD_DESKTOP other)
         {
             if (DisplayName != other.DisplayName)
@@ -397,16 +397,13 @@ namespace DisplayMagicianShared.AMD
             // Fill in the minimal amount we need to avoid null references
             // so that we won't break json.net when we save a default config
 
-            myDefaultConfig.Desktops = new List<IADLXDesktop>();
-            myDefaultConfig.SlsConfig.IsSlsEnabled = false;
-            myDefaultConfig.SlsConfig.SLSMapConfigs = new List<AMD_SLSMAP_CONFIG>();
-            myDefaultConfig.SlsConfig.SLSEnabledDisplayTargets = new List<ADL_MODE>();
-            myDefaultConfig.DisplayMaps = new List<ADL_DISPLAY_MAP>();
-            myDefaultConfig.DisplayTargets = new List<ADL_DISPLAY_TARGET>();
-            myDefaultConfig.HdrConfigs = new Dictionary<int, AMD_HDR_CONFIG>();
-            myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.IsInUse = false;
-
+            myDefaultConfig.IsCloned = false;
+            myDefaultConfig.IsEyefinity = false;
+            myDefaultConfig.Desktops = new List<AMD_DESKTOP>();
+            myDefaultConfig.Displays = new List<AMD_DISPLAY>();
+            myDefaultConfig.DisplayIdentifiers = new List<string>();
+            
             return myDefaultConfig;
         }
 
@@ -1901,7 +1898,7 @@ namespace DisplayMagicianShared.AMD
             // We want to check the AMD Eyefinity (SLS) config is valid
             SharedLogger.logger.Trace($"AMDLibrary/IsValidConfig: Testing whether the display configuration is valid");
             // 
-            if (displayConfig.SlsConfig.IsSlsEnabled)
+            if (displayConfig.IsInUse && displayConfig.IsEyefinity)
             {
                 // At the moment we just assume the config is true so we try to use it
                 return true;
