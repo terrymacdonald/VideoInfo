@@ -14,6 +14,7 @@ using EDIDParser;
 using Windows.Devices.PointOfService;
 using Windows.Graphics;
 using System.Security.Cryptography;
+using System.Runtime.InteropServices.JavaScript;
 
 namespace DisplayMagicianShared.AMD
 {
@@ -359,10 +360,10 @@ namespace DisplayMagicianShared.AMD
                         _adlxHelper = null;
                     }
 
-                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Display Configuration");
-                    _activeDisplayConfig = GetActiveConfig();
-                    //SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Connected Display Identifiers");
-                    //_allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
+                    /*SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Display Configuration");
+                    _activeDisplayConfig = GetActiveConfig();*/
+                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Connected Display Identifiers");
+                    _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
                 }
 
             }
@@ -523,7 +524,7 @@ namespace DisplayMagicianShared.AMD
             try
             {
                 _activeDisplayConfig = GetActiveConfig();
-                _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers();
+                _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
             }
             catch (Exception ex)
             {
@@ -739,13 +740,6 @@ namespace DisplayMagicianShared.AMD
                     // Release display list interface
                     displayList.Release();
                 }
-
-
-                
-                    
-
-                
-
 
                 // Release display services interface
                 displayService.Release();
@@ -2057,27 +2051,254 @@ namespace DisplayMagicianShared.AMD
             }
         }
 
-        public List<string> GetCurrentDisplayIdentifiers()
+        public List<string> GetCurrentDisplayIdentifiers(out bool failure)
         {
             SharedLogger.logger.Trace($"AMDLibrary/GetCurrentDisplayIdentifiers: Getting the current display identifiers for the displays in use now");
             bool allDisplays = false;
-            return GetSomeDisplayIdentifiers(allDisplays);
+            return GetSomeDisplayIdentifiers(out failure, allDisplays);
         }
 
-        public List<string> GetAllConnectedDisplayIdentifiers()
+        public List<string> GetAllConnectedDisplayIdentifiers(out bool failure)
         {
             SharedLogger.logger.Trace($"AMDLibrary/GetAllConnectedDisplayIdentifiers: Getting all the display identifiers that can possibly be used");
             bool allDisplays = true;
-            _allConnectedDisplayIdentifiers = GetSomeDisplayIdentifiers(allDisplays);
+            _allConnectedDisplayIdentifiers = GetSomeDisplayIdentifiers(out failure, allDisplays);
 
             return _allConnectedDisplayIdentifiers;
         }
 
-        private List<string> GetSomeDisplayIdentifiers(bool allDisplays = false)
+        private List<string> GetSomeDisplayIdentifiers(out bool failure, bool allDisplays = false)
         {
             SharedLogger.logger.Debug($"AMDLibrary/GetSomeDisplayIdentifiers: Generating unique Display Identifiers");
 
             List<string> displayIdentifiers = new List<string>();
+            failure = false;
+
+            if (_initialised)
+            {
+                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;                
+
+                // Get the display services
+                // This lets us interact witth the various displays
+                IADLXDisplayServices displayService;
+                IADLXDisplayList displayList;
+
+                SharedLogger.logger.Trace($"AMDLibrary/GetSomeDisplayIdentifiers: Attempting to get the ADLX display services");
+                SWIGTYPE_p_p_adlx__IADLXDisplayServices s = ADLX.new_displaySerP_Ptr();
+                status = _adlxSystem.GetDisplaysServices(s);
+                displayService = ADLX.displaySerP_Ptr_value(s);
+                if (status != ADLX_RESULT.ADLX_OK)
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/GetSomeDisplayIdentifiers: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
+                    failure = true;
+                }
+                else
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/GetSomeDisplayIdentifiers: Successfully got the display services");
+                    // Get the display services
+                    SharedLogger.logger.Trace($"AMDLibrary/GetSomeDisplayIdentifiers: Attempting to get the ADLX display list");
+                    // Get display list
+                    SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
+                    status = displayService.GetDisplays(ppDisplayList);
+                    displayList = ADLX.displayListP_Ptr_value(ppDisplayList);
+                    if (status != ADLX_RESULT.ADLX_OK)
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetSomeDisplayIdentifiers: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                        failure = true;
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetSomeDisplayIdentifiers: Successfully got the display list");
+                        // Iterate through the display list
+                        uint it = displayList.Begin();
+                        for (; it != displayList.Size(); it++)
+                        {
+                            SWIGTYPE_p_p_adlx__IADLXDisplay ppDisplay = ADLX.new_displayP_Ptr();
+                            status = displayList.At(it, ppDisplay);
+                            IADLXDisplay display = ADLX.displayP_Ptr_value(ppDisplay);
+
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                // Get the GPU related to this display
+                                SWIGTYPE_p_p_adlx__IADLXGPU ppGPU = ADLX.new_gpuP_Ptr();
+                                display.GetGPU(ppGPU);
+                                IADLXGPU gpu = ADLX.gpuP_Ptr_value(ppGPU);
+
+                                SWIGTYPE_p_p_char ppGpuName = ADLX.new_charP_Ptr();
+                                gpu.Name(ppGpuName);
+                                string gpuName = ADLX.charP_Ptr_value(ppGpuName);
+
+                                SWIGTYPE_p_int ppGpuUniqueId = ADLX.new_intP();
+                                gpu.UniqueId(ppGpuUniqueId);
+                                int gpuUniqueId = ADLX.intP_value(ppGpuUniqueId);
+
+                                SWIGTYPE_p_bool ppGpuIsExternal = ADLX.new_boolP();
+                                gpu.IsExternal(ppGpuIsExternal);
+                                bool gpuIsExternal = ADLX.boolP_value(ppGpuIsExternal);
+
+                                /*SWIGTYPE_p_p_char ppGpuVendorId = ADLX.new_charP_Ptr();
+                                gpu.VendorId(ppGpuVendorId);
+                                string gpuVendorId = ADLX.charP_Ptr_value(ppGpuVendorId);*/
+
+                                // Release the memory we allocated for the GPU
+                                gpu.Release();
+
+                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
+                                display.Name(ppName);
+                                String name = ADLX.charP_Ptr_value(ppName);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                display.DisplayType(pDisType);
+                                ADLX_DISPLAY_TYPE disType = ADLX.displayTypeP_value(pDisType);
+
+                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                display.ManufacturerID(pMID);
+                                long mid = ADLX.uintP_value(pMID);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                display.ConnectorType(pConnect);
+                                ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.disConnectTypeP_value(pConnect);
+
+                                /*SWIGTYPE_p_p_char ppEDIE = ADLX.new_charP_Ptr();
+                                display.EDID(ppEDIE);
+                                String edid = ADLX.charP_Ptr_value(ppEDIE);
+
+                                SWIGTYPE_p_int pH = ADLX.new_intP();
+                                SWIGTYPE_p_int pV = ADLX.new_intP();
+                                display.NativeResolution(pH, pV);
+                                int h = ADLX.intP_value(pH);
+                                int v = ADLX.intP_value(pV);
+
+                                SWIGTYPE_p_double pRefRate = ADLX.new_doubleP();
+                                display.RefreshRate(pRefRate);
+                                double refRate = ADLX.doubleP_value(pRefRate);
+
+                                SWIGTYPE_p_unsigned_int pPixClock = ADLX.new_uintP();
+                                display.PixelClock(pPixClock);
+                                long pixClock = ADLX.uintP_value(pPixClock);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
+                                display.ScanType(pScanType);
+                                ADLX_DISPLAY_SCAN_TYPE scanType = ADLX.disScanTypeP_value(pScanType);*/
+
+                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
+                                display.UniqueId(pID);
+                                uint uniqueId = ADLX.adlx_sizeP_value(pID);
+
+                                Console.WriteLine(String.Format("\nThe display [{0}]:", it));
+                                Console.WriteLine(String.Format("\tName: {0}", name));
+                                Console.WriteLine(String.Format("\tType: {0}", disType));
+                                Console.WriteLine(String.Format("\tConnector type: {0}", connect));
+                                Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));
+                                //Console.WriteLine(String.Format("\tEDID: {0}", edid));
+                                /*Console.WriteLine(String.Format("\tResolution:  h: {0}  v: {1}", h, v));
+                                Console.WriteLine(String.Format("\tRefresh rate: {0}", refRate));
+                                Console.WriteLine(String.Format("\tPixel clock: {0}", pixClock));
+                                Console.WriteLine(String.Format("\tScan type: {0}", scanType));
+                                Console.WriteLine(String.Format("\tUnique id: {0}", id));*/
+
+                                // Create an array of all the important display info we need to record
+                                List<string> displayInfo = new List<string>();
+                                displayInfo.Add("AMDADLX");
+                                try
+                                {
+                                    displayInfo.Add(gpuName);
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Warn(ex, $"AMDLibrary/GetSomeDisplayIdentifiers: Exception getting GPU Name from video card. Substituting with a # instead");
+                                    displayInfo.Add("#");
+                                }
+                                try
+                                {
+                                    displayInfo.Add(gpuUniqueId.ToString());
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Warn(ex, $"AMDLibrary/GetSomeDisplayIdentifiers: Exception getting GPU Unique ID from video card. Substituting with a # instead");
+                                    displayInfo.Add("#");
+                                }
+                                try
+                                {
+                                    displayInfo.Add(gpuIsExternal.ToString());
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Warn(ex, $"AMDLibrary/GetSomeDisplayIdentifiers: Exception getting GPU Is External from video card. Substituting with a # instead");
+                                    displayInfo.Add("#");
+                                }
+                                try
+                                {
+                                    displayInfo.Add(connect.ToString("G"));
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Warn(ex, $"AMDLibrary/GetSomeDisplayIdentifiers: Exception getting ADLX Connection Type for the display from video card. Substituting with a # instead");
+                                    displayInfo.Add("#");
+                                }
+                                try
+                                {
+                                    displayInfo.Add(name);
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Warn(ex, $"AMDLibrary/GetSomeDisplayIdentifiers: Exception getting ADLX Name for the display from video card. Substituting with a # instead");
+                                    displayInfo.Add("#");
+                                }
+                                try
+                                {
+                                    displayInfo.Add(disType.ToString("G"));
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Warn(ex, $"AMDLibrary/GetSomeDisplayIdentifiers: Exception getting ADLX Display Type for the display from video card. Substituting with a # instead");
+                                    displayInfo.Add("#");
+                                }
+                                try
+                                {
+                                    displayInfo.Add(mid.ToString());
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Warn(ex, $"AMDLibrary/GetSomeDisplayIdentifiers: Exception getting ADLX Manufacturer for the display from video card. Substituting with a # instead");
+                                    displayInfo.Add("#");
+                                }
+                                try
+                                {
+                                    displayInfo.Add(uniqueId.ToString());
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Warn(ex, $"AMDLibrary/GetSomeDisplayIdentifiers: Exception getting ADLX Display Unique ID for the display from video card. Substituting with a # instead");
+                                    displayInfo.Add("#");
+                                }
+                                // Create a display identifier out of it
+                                string displayIdentifier = String.Join("|", displayInfo);
+                                // Add it to the list of display identifiers so we can return it
+                                // but only add it if it doesn't already exist. Otherwise we get duplicates :/
+                                if (!displayIdentifiers.Contains(displayIdentifier))
+                                {
+                                    displayIdentifiers.Add(displayIdentifier);
+                                    SharedLogger.logger.Debug($"AMDLibrary/GetSomeDisplayIdentifiers: DisplayIdentifier detected: {displayIdentifier}");
+                                }
+                                // Release display interface
+                                display.Release();
+                            }
+                        }
+                    }
+                    // Release display list interface
+                    displayList.Release();
+                }
+
+                // Release display services interface
+                displayService.Release();
+
+            }
+            else
+            {
+                SharedLogger.logger.Error($"AMDLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the AMD ADLX library isn't initialised!");
+                throw new AMDLibraryException($"Tried to get Displays but the AMD ADLX library isn't initialised!");
+            }
 
             /*if (_initialised)
             {
@@ -2419,11 +2640,11 @@ namespace DisplayMagicianShared.AMD
             {
                 SharedLogger.logger.Error($"AMDLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to run GetSomeDisplayIdentifiers but the AMD ADL library isn't initialised!");
                 throw new AMDLibraryException($"Tried to run GetSomeDisplayIdentifiers but the AMD ADL library isn't initialised!");
-            }
+            }*/
 
 
             // Sort the display identifiers
-            displayIdentifiers.Sort();*/
+            displayIdentifiers.Sort();
 
             return displayIdentifiers;
         }
