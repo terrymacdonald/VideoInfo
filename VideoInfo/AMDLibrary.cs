@@ -15,6 +15,7 @@ using Windows.Devices.PointOfService;
 using Windows.Graphics;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices.JavaScript;
+using Microsoft.VisualBasic;
 
 namespace DisplayMagicianShared.AMD
 {
@@ -444,7 +445,8 @@ namespace DisplayMagicianShared.AMD
                 // - A duplicate desktop is associated with two or more displays.
                 // - An AMD Eyefinity desktop is associated with two or more displays.
                 IADLXDesktopServices desktopService;
-                IADLXDesktopList desktopList;               
+                IADLXDesktopList desktopList;
+                bool isEyefinityEnabled = false;
 
                 SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX desktop services");
                 SWIGTYPE_p_p_adlx__IADLXDesktopServices d = ADLX.new_desktopSerP_Ptr();
@@ -457,6 +459,9 @@ namespace DisplayMagicianShared.AMD
                 }
                 else
                 {
+
+                    // Get the list of Desktops we have (this is more for informational purposes)
+
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the desktop services");
                     // Get the display services
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX desktop list");
@@ -505,6 +510,12 @@ namespace DisplayMagicianShared.AMD
                                 SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_desktopTypeP();
                                 desktop.Type(pDesktopType);
                                 ADLX_DESKTOP_TYPE desktopType = ADLX.desktopTypeP_value(pDesktopType);
+
+                                // The the desktop is an eyefinity desktop then set the desktop
+                                if (desktopType == ADLX_DESKTOP_TYPE.DESKTOP_EYEFINITY)
+                                {
+                                    isEyefinityEnabled = true;
+                                }
                                 
                                 Console.WriteLine(String.Format("\nThe desktop [{0}]:", it));
                                 Console.WriteLine(String.Format("\tNumber of displays: {0}", numDisplays));
@@ -520,7 +531,77 @@ namespace DisplayMagicianShared.AMD
                     }
                     // Release desktop list interface
                     desktopList.Release();
+
+
+                    // If we have an EyeFinityDesktop, then get the EyefinityDesktop details for later
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX EyefinityDesktop object");
+                    // Get eyefinitydisplay list
+                    SWIGTYPE_p_p_adlx__IADLXSimpleEyefinity ppSimpleEyefinity = ADLX.new_simpleEyefinityP_Ptr();
+                    status = desktopService.GetSimpleEyefinity(ppSimpleEyefinity);
+                    IADLXSimpleEyefinity simpleEyefinity = ADLX.simpleEyefinityP_Ptr_value(ppSimpleEyefinity);
+
+                    if (status != ADLX_RESULT.ADLX_OK)
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX SimpleEyefinity object. systemServices.GetSimpleEyefinity() returned error code {status}");
+                        return myDisplayConfig;
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Successfully got the ADLX EyefinityDesktop object");
+
+                        simpleEyefinity.
+
+                        simpleEyefinity.
+
+                        // Iterate through the desktop list
+                        uint it = desktopList.Begin();
+                        for (; it != desktopList.Size(); it++)
+                        {
+                            SWIGTYPE_p_p_adlx__IADLXDesktop ppDesktop = ADLX.new_desktopP_Ptr();
+                            status = desktopList.At(it, ppDesktop);
+                            IADLXDesktop desktop = ADLX.desktopP_Ptr_value(ppDesktop);
+
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+
+                                SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_uintP();
+                                desktop.GetNumberOfDisplays(pNumDisplays);
+                                long numDisplays = ADLX.uintP_value(pNumDisplays);
+
+                                SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_orientationP();
+                                desktop.Orientation(pOrientation);
+                                ADLX_ORIENTATION orientation = ADLX.orientationP_value(pOrientation);
+
+                                SWIGTYPE_p_int pWidth = ADLX.new_intP();
+                                SWIGTYPE_p_int pHeight = ADLX.new_intP();
+                                desktop.Size(pWidth, pHeight);
+                                int width = ADLX.intP_value(pWidth);
+                                int height = ADLX.intP_value(pHeight);
+
+                                ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
+                                desktop.TopLeft(pLocationTopLeft);
+                                ADLX_Point locationTopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
+
+                                SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_desktopTypeP();
+                                desktop.Type(pDesktopType);
+                                ADLX_DESKTOP_TYPE desktopType = ADLX.desktopTypeP_value(pDesktopType);
+
+                                Console.WriteLine(String.Format("\nThe desktop [{0}]:", it));
+                                Console.WriteLine(String.Format("\tNumber of displays: {0}", numDisplays));
+                                Console.WriteLine(String.Format("\tOerientation: {0}", orientation));
+                                Console.WriteLine(String.Format("\tWidth/Height:  w: {0}  h: {1}", width, height));
+                                Console.WriteLine(String.Format("\tTop Left: {0},{1}", locationTopLeft.x, locationTopLeft.y));
+                                Console.WriteLine(String.Format("\tDesktop Type: {0}", desktopType.ToString()));
+
+                                // Release desktop interface
+                                desktop.Release();
+                            }
+                        }
+                    }
+                    // Release simpleEyefinity interface
+                    simpleEyefinity.Release();
                 }
+
 
 
                 // Release desktop services interface
@@ -1024,113 +1105,94 @@ namespace DisplayMagicianShared.AMD
         public bool SetActiveConfig(AMD_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
 
-            /*if (_initialised)
+            if (_initialised)
             {
-                // Set the initial state of the ADL_STATUS
-                ADL_STATUS ADLRet = 0;
+                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;
+                // Get the desktop services
+                // This is how we control the various desktops. 
+                // - A single desktop is associated with one display.
+                // - A duplicate desktop is associated with two or more displays.
+                // - An AMD Eyefinity desktop is associated with two or more displays.
+                IADLXDesktopServices desktopService;
+                IADLXDesktopList desktopList;
 
-                // set the display locations
-                if (displayConfig.SlsConfig.IsSlsEnabled)
+                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to get the ADLX desktop services");
+                SWIGTYPE_p_p_adlx__IADLXDesktopServices d = ADLX.new_desktopSerP_Ptr();
+                status = _adlxSystem.GetDesktopsServices(d);
+                desktopService = ADLX.desktopSerP_Ptr_value(d);
+                if (status != ADLX_RESULT.ADLX_OK)
                 {
-                    // We need to change to an Eyefinity (SLS) profile, so we need to apply the new SLS Topologies
-                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: SLS is enabled in the new display configuration, so we need to set it");
-
-                    foreach (AMD_SLSMAP_CONFIG slsMapConfig in displayConfig.SlsConfig.SLSMapConfigs)
-                    {
-                        // Attempt to turn on this SLS Map Config if it exists in the AMD Radeon driver config database
-                        ADLRet = ADLImport.ADL2_Display_SLSMapConfig_SetState(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap.SLSMapIndex, ADLImport.ADL_TRUE);
-                        if (ADLRet == ADL_STATUS.ADL_OK)
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_SetState successfully set the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                            Thread.Sleep(delayInMs * 3);
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_SetState returned ADL_STATUS {ADLRet} when trying to set the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-
-                            // If we get an error with just tturning it on, then we need to actually try to created a new Eyefinity map and then enable it
-                            // If we reach this stage, then the user has discarded the AMD Eyefinity mode in AMD due to a bad UI design, and we need to work around that slight issue.
-                            // (BTW that's FAR to easy to do in the AMD Radeon GUI)
-                            // NOTE: There is a slight issue with way of doing things. Although we create a much more robust way of working, we also will never ever actually use the Eyefinity config as saved.
-                            //       Instead, we will always drop through to creating an Eyefinity config each time, the only saving grace being that the AMD Driver is smart enough to notice this and it will reuse the same SLSMapIndex number.
-                            //       This at least means that we won't keep filling the AMD Driver up with additional EYefinity configs! It will instaed only add one more additional AMD Config if it works this way.
-
-                            int supportedSLSLayoutImageMode;
-                            int reasonForNotSupportSLS;
-                            ADLRet = ADLImport.ADL2_Display_SLSMapConfig_Valid(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap, slsMapConfig.SLSTargets.Count, slsMapConfig.SLSTargets.ToArray(), out supportedSLSLayoutImageMode, out reasonForNotSupportSLS, ADLImport.ADL_DISPLAY_SLSMAPCONFIG_CREATE_OPTION_RELATIVETO_CURRENTANGLE);
-                            if (ADLRet == ADL_STATUS.ADL_OK)
-                            {
-                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_Valid successfully validated a new SLSMAP config for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_Valid returned ADL_STATUS {ADLRet} when trying to create a new SLSMAP for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                                return false;
-                            }
-
-                            // Create and apply the new SLSMap
-                            int newSlsMapIndex;
-                            ADLRet = ADLImport.ADL2_Display_SLSMapConfig_Create(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap, slsMapConfig.SLSTargets.Count, slsMapConfig.SLSTargets.ToArray(), slsMapConfig.BezelModePercent, out newSlsMapIndex, ADLImport.ADL_DISPLAY_SLSMAPCONFIG_CREATE_OPTION_RELATIVETO_CURRENTANGLE);
-                            if (ADLRet == ADL_STATUS.ADL_OK)
-                            {
-                                if (newSlsMapIndex != -1)
-                                {
-                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_Create successfully created the new SLSMAP we just created with index {newSlsMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                                    Thread.Sleep(delayInMs * 3);
-                                    // At this point we have created a new AMD Eyefinity Config
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_Create returned ADL_STATUS {ADLRet} but the returned SLSMapIndex was -1, which indicates that the new SLSMAP failed to create for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                                }
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_Create returned ADL_STATUS {ADLRet} when trying to create a new SLSMAP for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                                return false;
-                            }
-
-                        }
-
-                    }
-
+                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error getting the ADLX desktop services. systemServices.GetDesktopsServices() returned error code {status}");
+                    return false;
                 }
                 else
                 {
-                    // We need to change to a plain, non-Eyefinity (SLS) profile, so we need to disable any SLS Topologies if they are being used
-                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: SLS is not used in the new display configuration, so we need to set it to disabled if it's configured currently");
+                    // Get the list of Desktops we have (this is more for informational purposes)
+                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully got the desktop services");
 
-                    if (ActiveDisplayConfig.SlsConfig.IsSlsEnabled)
+                    // If the display config needs an Eyefinity Desktop then lets create one.
+                    if (displayConfig.IsEyefinity)
                     {
-                        // We need to disable the current Eyefinity (SLS) profile to turn it off
-                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: SLS is enabled in the current display configuration, so we need to turn it off");
-
-                        foreach (AMD_SLSMAP_CONFIG slsMapConfig in ActiveDisplayConfig.SlsConfig.SLSMapConfigs)
+                        if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
                         {
-                            // Turn off this SLS Map Config
-                            ADLRet = ADLImport.ADL2_Display_SLSMapConfig_SetState(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap.SLSMapIndex, ADLImport.ADL_FALSE);
-                            if (ADLRet == ADL_STATUS.ADL_OK)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Eyefinity layout is exactly the same as the one we want, so skipping setting up the Eyefinity Desktop");
+                        }
+                        else
+                        {
+                            // Setup the EyefinityDesktop using the settings the driver stores internally
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to get the ADLX EyefinityDesktop object");
+                            // Get eyefinitydisplay list
+                            SWIGTYPE_p_p_adlx__IADLXSimpleEyefinity ppSimpleEyefinity = ADLX.new_simpleEyefinityP_Ptr();
+                            status = desktopService.GetSimpleEyefinity(ppSimpleEyefinity);
+                            IADLXSimpleEyefinity simpleEyefinity = ADLX.simpleEyefinityP_Ptr_value(ppSimpleEyefinity);
+
+                            if (status != ADLX_RESULT.ADLX_OK)
                             {
-                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_SetState successfully disabled the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                                Thread.Sleep(delayInMs * 3);
+                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error getting the ADLX SimpleEyefinity object. systemServices.GetSimpleEyefinity() returned error code {status}");
+                                return false;
                             }
                             else
                             {
-                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_SetState returned ADL_STATUS {ADLRet} when trying to set the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} to FALSE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                                return false;
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully got the ADLX SimpleEyefinity object");
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to create the ADLX Eyefinity Desktop");
+                                SWIGTYPE_p_p_adlx__IADLXEyefinityDesktop ppEyefinityDesktop = ADLX.new_eyefinityDesktopP_Ptr();
+                                status = simpleEyefinity.Create(ppEyefinityDesktop);
+                                IADLXEyefinityDesktop eyefinityDesktop = ADLX.eyefinityDesktopP_Ptr_value(ppEyefinityDesktop);
+
+                                if (status != ADLX_RESULT.ADLX_OK)
+                                {
+                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error creating the ADLX Eyefinity Desktop. systemServices.GetSimpleEyefinity() returned error code {status}");
+                                    return false;
+                                }
+                                else
+                                {
+                                    if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: This new Eyefinity layout is exactly the same as the one we want! Our job is done.");
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: This new Eyefinity layout is different from the one we originally saved with this desktop profile. If you have changed your Eyefinity Layout then you need to update this desktop profile!.");
+                                    }
+                                }
                             }
+                            // Release simpleEyefinity interface
+                            simpleEyefinity.Release();
 
                         }
                     }
-
+                    
                 }
+
+                // Release desktop services interface
+                desktopService.Release();
 
             }
             else
             {
-                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the AMD ADL library isn't initialised!");
-                throw new AMDLibraryException($"Tried to run SetActiveConfig but the AMD ADL library isn't initialised!");
-            }*/
+                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
+                throw new AMDLibraryException($"Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
+            }
 
             return true;
         }
@@ -1138,66 +1200,124 @@ namespace DisplayMagicianShared.AMD
 
         public bool SetActiveConfigOverride(AMD_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
-            /*if (_initialised)
+            if (_initialised)
             {
-                // Set the initial state of the ADL_STATUS
-                ADL_STATUS ADLRet = 0;
+                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;                
 
-                // We want to set the AMD HDR settings now
-                // We got through each of the attached displays and set the HDR
+                // Get the display services
+                // This lets us interact witth the various displays individually
+                IADLXDisplayServices displayService;
+                IADLXDisplayList displayList;
 
-                // Go through each of the HDR configs we have
-                foreach (var hdrConfig in displayConfig.HdrConfigs)
+                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Attempting to get the ADLX display services");
+                SWIGTYPE_p_p_adlx__IADLXDisplayServices s = ADLX.new_displaySerP_Ptr();
+                status = _adlxSystem.GetDisplaysServices(s);
+                displayService = ADLX.displaySerP_Ptr_value(s);
+                if (status != ADLX_RESULT.ADLX_OK)
                 {
-                    // Try and find the HDR config displays in the list of currently connected displays
-                    foreach (var displayInfoItem in ActiveDisplayConfig.DisplayTargets)
+                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
+                    return false;
+                }
+                else
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Successfully got the display services");
+                    // Get the display services
+                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Attempting to get the ADLX display list");
+                    // Get display list
+                    SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
+                    status = displayService.GetDisplays(ppDisplayList);
+                    displayList = ADLX.displayListP_Ptr_value(ppDisplayList);
+                    if (status != ADLX_RESULT.ADLX_OK)
                     {
-                        try
+                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                        return false;
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Successfully got the display list");
+                        // Iterate through the display list
+                        uint it = displayList.Begin();
+                        for (; it != displayList.Size(); it++)
                         {
-                            // If we find the HDR config display in the list of currently connected displays then try to set the HDR setting we recorded earlier
-                            if (hdrConfig.Key == displayInfoItem.DisplayID.DisplayLogicalIndex)
+                            SWIGTYPE_p_p_adlx__IADLXDisplay ppDisplay = ADLX.new_displayP_Ptr();
+                            status = displayList.At(it, ppDisplay);
+                            IADLXDisplay display = ADLX.displayP_Ptr_value(ppDisplay);
+
+                            if (status == ADLX_RESULT.ADLX_OK)
                             {
-                                if (hdrConfig.Value.HDREnabled)
-                                {
-                                    ADLRet = ADLImport.ADL2_Display_HDRState_Set(_adlContextHandle, hdrConfig.Value.AdapterIndex, displayInfoItem.DisplayID, 1);
-                                    if (ADLRet == ADL_STATUS.ADL_OK)
-                                    {
-                                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: ADL2_Display_HDRState_Set was able to turn on HDR for display {displayInfoItem.DisplayID.DisplayLogicalIndex}.");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Error($"AMDLibrary/SetActiveConfigOverride: ADL2_Display_HDRState_Set was NOT able to turn on HDR for display {displayInfoItem.DisplayID.DisplayLogicalIndex}.");
-                                    }
-                                }
-                                else
-                                {
-                                    ADLRet = ADLImport.ADL2_Display_HDRState_Set(_adlContextHandle, hdrConfig.Value.AdapterIndex, displayInfoItem.DisplayID, 0);
-                                    if (ADLRet == ADL_STATUS.ADL_OK)
-                                    {
-                                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: ADL2_Display_HDRState_Set was able to turn off HDR for display {displayInfoItem.DisplayID.DisplayLogicalIndex}.");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Error($"AMDLibrary/SetActiveConfigOverride: ADL2_Display_HDRState_Set was NOT able to turn off HDR for display {displayInfoItem.DisplayID.DisplayLogicalIndex}.");
-                                    }
-                                }
-                                break;
+                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
+                                display.Name(ppName);
+                                String name = ADLX.charP_Ptr_value(ppName);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                display.DisplayType(pDisType);
+                                ADLX_DISPLAY_TYPE disType = ADLX.displayTypeP_value(pDisType);
+
+                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                display.ManufacturerID(pMID);
+                                long mid = ADLX.uintP_value(pMID);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                display.ConnectorType(pConnect);
+                                ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.disConnectTypeP_value(pConnect);
+
+                                SWIGTYPE_p_p_char ppEDIE = ADLX.new_charP_Ptr();
+                                display.EDID(ppEDIE);
+                                String edid = ADLX.charP_Ptr_value(ppEDIE);
+
+                                SWIGTYPE_p_int pH = ADLX.new_intP();
+                                SWIGTYPE_p_int pV = ADLX.new_intP();
+                                display.NativeResolution(pH, pV);
+                                int h = ADLX.intP_value(pH);
+                                int v = ADLX.intP_value(pV);
+
+                                SWIGTYPE_p_double pRefRate = ADLX.new_doubleP();
+                                display.RefreshRate(pRefRate);
+                                double refRate = ADLX.doubleP_value(pRefRate);
+
+                                SWIGTYPE_p_unsigned_int pPixClock = ADLX.new_uintP();
+                                display.PixelClock(pPixClock);
+                                long pixClock = ADLX.uintP_value(pPixClock);
+
+                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
+                                display.ScanType(pScanType);
+                                ADLX_DISPLAY_SCAN_TYPE scanType = ADLX.disScanTypeP_value(pScanType);
+
+                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
+                                display.UniqueId(pID);
+                                uint id = ADLX.adlx_sizeP_value(pID);
+
+                                Console.WriteLine(String.Format("\nThe display [{0}]:", it));
+                                Console.WriteLine(String.Format("\tName: {0}", name));
+                                Console.WriteLine(String.Format("\tType: {0}", disType));
+                                Console.WriteLine(String.Format("\tConnector type: {0}", connect));
+                                Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));
+                                //Console.WriteLine(String.Format("\tEDID: {0}", edid));
+                                Console.WriteLine(String.Format("\tResolution:  h: {0}  v: {1}", h, v));
+                                Console.WriteLine(String.Format("\tRefresh rate: {0}", refRate));
+                                Console.WriteLine(String.Format("\tPixel clock: {0}", pixClock));
+                                Console.WriteLine(String.Format("\tScan type: {0}", scanType));
+                                Console.WriteLine(String.Format("\tUnique id: {0}", id));
+
+                                // Release display interface
+                                display.Release();
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception! ADL2_Display_HDRState_Set was NOT able to change HDR for display {displayInfoItem.DisplayID.DisplayLogicalIndex}.");
-                            continue;
-                        }
                     }
-
+                    // Release display list interface
+                    displayList.Release();
                 }
+
+                // Release display services interface
+                displayService.Release();
+
             }
             else
             {
-                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfigOverride but the AMD ADL library isn't initialised!");
-                throw new AMDLibraryException($"Tried to run SetActiveConfigOverride but the AMD ADL library isn't initialised!");
-            }*/
+                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfigOverride: ERROR - Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
+                throw new AMDLibraryException($"Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
+            }
+
             return true;
         }
 
