@@ -459,7 +459,8 @@ namespace DisplayMagicianShared.AMD
             myDefaultConfig.Desktops = new List<AMD_DESKTOP>();
             myDefaultConfig.Displays = new List<AMD_DISPLAY>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
-            
+            myDefaultConfig.EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
+
             return myDefaultConfig;
         }
 
