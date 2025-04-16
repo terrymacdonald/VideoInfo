@@ -338,6 +338,14 @@ namespace DisplayMagicianShared.Windows
         public UInt32 Current;
         public UInt32 Recommended;
 
+        public DPIScalingInfo()
+        {
+            Minimum = 100;
+            Maximum = 100;
+            Current = 100;
+            Recommended = 100;
+        }
+
         public override bool Equals(object obj) => obj is DPIScalingInfo other && this.Equals(other);
         public bool Equals(DPIScalingInfo other)
         {
@@ -425,6 +433,14 @@ namespace DisplayMagicianShared.Windows
         public LUID AdapterId;
         public uint Id;
 
+        public DISPLAYCONFIG_DEVICE_INFO_HEADER()
+        {
+            Type = DISPLAYCONFIG_DEVICE_INFO_TYPE.Zero;
+            Size = (uint)Marshal.SizeOf(typeof(DISPLAYCONFIG_DEVICE_INFO_HEADER));
+            AdapterId = new LUID();
+            Id = 0;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_DEVICE_INFO_HEADER other && this.Equals(other);
 
         public bool Equals(DISPLAYCONFIG_DEVICE_INFO_HEADER other)
@@ -472,6 +488,14 @@ namespace DisplayMagicianShared.Windows
         public bool WideColorEnforced => (Value & 0x4) == 0x4;
         public bool AdvancedColorForceDisabled => (Value & 0x8) == 0x8;
 
+        public DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            Value = 0;
+            ColorEncoding = DISPLAYCONFIG_COLOR_ENCODING.DISPLAYCONFIG_COLOR_ENCODING_RGB;
+            BitsPerColorChannel = 0;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO other && this.Equals(other);
 
         public bool Equals(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO other)
@@ -516,6 +540,12 @@ namespace DisplayMagicianShared.Windows
         public int X;
         public int Y;
 
+        public POINTL()
+        {
+            X = 0;
+            Y = 0;
+        }
+
         public override bool Equals(object obj) => obj is POINTL other && this.Equals(other);
         public bool Equals(POINTL other)
         {
@@ -549,6 +579,12 @@ namespace DisplayMagicianShared.Windows
         public uint HighPart;
 
         public ulong Value => ((ulong)HighPart << 32) | LowPart;
+
+        public LUID()
+        {
+            LowPart = 0;
+            HighPart = 0;
+        }
 
         public override bool Equals(object obj) => obj is LUID other && this.Equals(other);
         public bool Equals(LUID other)
@@ -585,6 +621,15 @@ namespace DisplayMagicianShared.Windows
         public uint Height;
         public DISPLAYCONFIG_PIXELFORMAT PixelFormat;
         public POINTL Position;
+
+        public DISPLAYCONFIG_SOURCE_MODE()
+        {
+            Width = 0;
+            Height = 0;
+            PixelFormat = DISPLAYCONFIG_PIXELFORMAT.DISPLAYCONFIG_PIXELFORMAT_32BPP;
+            Position = new POINTL();
+        }
+
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SOURCE_MODE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SOURCE_MODE other)
@@ -628,6 +673,12 @@ namespace DisplayMagicianShared.Windows
         public uint Numerator;
         public uint Denominator;
 
+        public DISPLAYCONFIG_RATIONAL()
+        {
+            Numerator = 0;
+            Denominator = 0;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_RATIONAL other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_RATIONAL other)
         {
@@ -661,6 +712,12 @@ namespace DisplayMagicianShared.Windows
         public uint Cx;
         public uint Cy;
 
+        public DISPLAYCONFIG_2DREGION()
+        {
+            Cx = 0;
+            Cy = 0;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_2DREGION other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_2DREGION other)
         {
@@ -692,6 +749,13 @@ namespace DisplayMagicianShared.Windows
         public POINTL PathSourceSize;
         public RECTL DesktopImageRegion;
         public RECTL DesktopImageClip;
+
+        public DISPLAYCONFIG_DESKTOP_IMAGE_INFO()
+        {
+            PathSourceSize = new POINTL();
+            DesktopImageRegion = new RECTL();
+            DesktopImageClip = new RECTL();
+        }
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_DESKTOP_IMAGE_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_DESKTOP_IMAGE_INFO other)
@@ -734,6 +798,17 @@ namespace DisplayMagicianShared.Windows
         public DISPLAYCONFIG_2DREGION TotalSize;
         public D3D_VIDEO_SIGNAL_STANDARD VideoStandard;
         public DISPLAYCONFIG_SCANLINE_ORDERING ScanLineOrdering;
+
+        public DISPLAYCONFIG_VIDEO_SIGNAL_INFO()
+        {
+            PixelRate = 0;
+            HSyncFreq = new DISPLAYCONFIG_RATIONAL();
+            VSyncFreq = new DISPLAYCONFIG_RATIONAL();
+            ActiveSize = new DISPLAYCONFIG_2DREGION();
+            TotalSize = new DISPLAYCONFIG_2DREGION();
+            VideoStandard = D3D_VIDEO_SIGNAL_STANDARD.Uninitialized;
+            ScanLineOrdering = DISPLAYCONFIG_SCANLINE_ORDERING.DISPLAYCONFIG_SCANLINE_ORDERING_UNSPECIFIED;
+        }
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_VIDEO_SIGNAL_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_VIDEO_SIGNAL_INFO other)
@@ -791,6 +866,11 @@ namespace DisplayMagicianShared.Windows
     {
         public DISPLAYCONFIG_VIDEO_SIGNAL_INFO TargetVideoSignalInfo;
 
+        public DISPLAYCONFIG_TARGET_MODE()
+        {
+            TargetVideoSignalInfo = new DISPLAYCONFIG_VIDEO_SIGNAL_INFO();
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_MODE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_MODE other)
         {
@@ -827,6 +907,16 @@ namespace DisplayMagicianShared.Windows
         public ushort sourceModeInfoIdx;
         [FieldOffset(16)]
         public DISPLAYCONFIG_SOURCE_FLAGS StatusFlags;
+
+        public DISPLAYCONFIG_PATH_SOURCE_INFO()
+        {
+            AdapterId = new LUID();
+            Id = 0;
+            ModeInfoIdx = 0;
+            cloneGroupId = 0;
+            sourceModeInfoIdx = 0;
+            StatusFlags = DISPLAYCONFIG_SOURCE_FLAGS.Zero;
+        }
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_PATH_SOURCE_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_PATH_SOURCE_INFO other)
@@ -878,6 +968,19 @@ namespace DisplayMagicianShared.Windows
         public bool ForcedAvailabilitySystem => (StatusFlags & 0x10) == 0x10;
         public bool IsHMD => (StatusFlags & 0x20) == 0x20;
 
+        public DISPLAYCONFIG_PATH_TARGET_INFO()
+        {
+            AdapterId = new LUID();
+            Id = 0;
+            ModeInfoIdx = 0;
+            OutputTechnology = DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HD15;
+            Rotation = DISPLAYCONFIG_ROTATION.DISPLAYCONFIG_ROTATION_IDENTITY;
+            Scaling = DISPLAYCONFIG_SCALING.DISPLAYCONFIG_SCALING_STRETCHED;
+            RefreshRate = new DISPLAYCONFIG_RATIONAL();
+            ScanLineOrdering = DISPLAYCONFIG_SCANLINE_ORDERING.DISPLAYCONFIG_SCANLINE_ORDERING_UNSPECIFIED;
+            TargetAvailable = false;
+            StatusFlags = 0;
+        }
 
         /* DISPLAYCONFIG_TARGET_IN_USE = 0x00000001,
         DISPLAYCONFIG_TARGET_FORCIBLE = 0x00000002,
@@ -951,6 +1054,13 @@ namespace DisplayMagicianShared.Windows
         public DISPLAYCONFIG_PATH_TARGET_INFO TargetInfo;
         public DISPLAYCONFIG_PATH_FLAGS Flags;
 
+        public DISPLAYCONFIG_PATH_INFO()
+        {
+            SourceInfo = new DISPLAYCONFIG_PATH_SOURCE_INFO();
+            TargetInfo = new DISPLAYCONFIG_PATH_TARGET_INFO();
+            Flags = DISPLAYCONFIG_PATH_FLAGS.Zero;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_PATH_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_PATH_INFO other)
         {
@@ -1003,6 +1113,16 @@ namespace DisplayMagicianShared.Windows
 
         [FieldOffset(16)]
         public DISPLAYCONFIG_DESKTOP_IMAGE_INFO DesktopImageInfo;
+
+        public DISPLAYCONFIG_MODE_INFO()
+        {
+            InfoType = DISPLAYCONFIG_MODE_INFO_TYPE.Zero;
+            Id = 0;
+            AdapterId = new LUID();
+            TargetMode = new DISPLAYCONFIG_TARGET_MODE();
+            SourceMode = new DISPLAYCONFIG_SOURCE_MODE();
+            DesktopImageInfo = new DISPLAYCONFIG_DESKTOP_IMAGE_INFO();
+        }
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_MODE_INFO other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_MODE_INFO other)
@@ -1074,6 +1194,12 @@ namespace DisplayMagicianShared.Windows
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string ViewGdiDeviceName;
 
+        public DISPLAYCONFIG_SOURCE_DEVICE_NAME()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            ViewGdiDeviceName = string.Empty;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SOURCE_DEVICE_NAME other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SOURCE_DEVICE_NAME other)
         {
@@ -1104,6 +1230,11 @@ namespace DisplayMagicianShared.Windows
     public struct DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS : IEquatable<DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS>
     {
         public uint Value;
+
+        public DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS()
+        {
+            Value = 0;
+        }
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS other)
@@ -1144,6 +1275,18 @@ namespace DisplayMagicianShared.Windows
         public string MonitorFriendlyDeviceName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
         public string MonitorDevicePath;
+
+        public DISPLAYCONFIG_TARGET_DEVICE_NAME()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            Flags = new DISPLAYCONFIG_TARGET_DEVICE_NAME_FLAGS();
+            OutputTechnology = DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HD15;
+            EdidManufactureId = 0;
+            EdidProductCodeId = 0;
+            ConnectorInstance = 0;
+            MonitorFriendlyDeviceName = string.Empty;
+            MonitorDevicePath = string.Empty;
+        }
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_DEVICE_NAME other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_DEVICE_NAME other)
@@ -1210,6 +1353,14 @@ namespace DisplayMagicianShared.Windows
         public uint Height;
         public DISPLAYCONFIG_TARGET_MODE TargetMode;
 
+        public DISPLAYCONFIG_TARGET_PREFERRED_MODE()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            Width = 0;
+            Height = 0;
+            TargetMode = new DISPLAYCONFIG_TARGET_MODE();
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_PREFERRED_MODE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_PREFERRED_MODE other)
         {
@@ -1253,6 +1404,12 @@ namespace DisplayMagicianShared.Windows
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
         public string AdapterDevicePath;
 
+        public DISPLAYCONFIG_ADAPTER_NAME()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            AdapterDevicePath = string.Empty;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_ADAPTER_NAME other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_ADAPTER_NAME other)
         {
@@ -1284,6 +1441,12 @@ namespace DisplayMagicianShared.Windows
     {
         public DISPLAYCONFIG_DEVICE_INFO_HEADER Header;
         public uint Value;
+
+        public DISPLAYCONFIG_SUPPORT_VIRTUAL_RESOLUTION()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            Value = 0;
+        }
 
         public bool IsMonitorVirtualResolutionDisabled
         {
@@ -1322,6 +1485,12 @@ namespace DisplayMagicianShared.Windows
     {
         public DISPLAYCONFIG_DEVICE_INFO_HEADER Header;
         public uint Value;
+
+        public DISPLAYCONFIG_SET_TARGET_PERSISTENCE()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            Value = 0;
+        }
 
         public bool IsBootPersistenceOn
         {
@@ -1362,6 +1531,12 @@ namespace DisplayMagicianShared.Windows
         //[MarshalAs(UnmanagedType.U4)]
         public DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY BaseOutputTechnology;
 
+        public DISPLAYCONFIG_TARGET_BASE_TYPE()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            BaseOutputTechnology = DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HD15;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_TARGET_BASE_TYPE other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_TARGET_BASE_TYPE other)
         {
@@ -1394,6 +1569,12 @@ namespace DisplayMagicianShared.Windows
     {
         public DISPLAYCONFIG_DEVICE_INFO_HEADER Header;
         public uint Value;
+
+        public DISPLAYCONFIG_SET_ADVANCED_COLOR_STATE()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            Value = 0;
+        }
 
         public bool EnableAdvancedColor
         {
@@ -1449,6 +1630,12 @@ namespace DisplayMagicianShared.Windows
         // where it actually returns a uint! So had to engineer in a bug :(
         public uint SDRWhiteLevel;
 
+        public DISPLAYCONFIG_SDR_WHITE_LEVEL()
+        {
+            Header = new DISPLAYCONFIG_DEVICE_INFO_HEADER();
+            SDRWhiteLevel = 0;
+        }
+
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_SDR_WHITE_LEVEL other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_SDR_WHITE_LEVEL other)
         {
@@ -1482,6 +1669,14 @@ namespace DisplayMagicianShared.Windows
         public int Top;
         public int Right;
         public int Bottom;
+
+        public RECTL()
+        {
+            Left = 0;
+            Top = 0;
+            Right = 0;
+            Bottom = 0;
+        }
 
         public RECTL(int left, int top, int right, int bottom)
         {

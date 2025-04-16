@@ -17,6 +17,7 @@ using System.Security.Cryptography;
 using System.Runtime.InteropServices.JavaScript;
 using Microsoft.VisualBasic;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace DisplayMagicianShared.AMD
 {
@@ -30,6 +31,13 @@ namespace DisplayMagicianShared.AMD
         public int SizeHeight;
         public ADLX_Point TopLeft;
         public ADLX_DESKTOP_TYPE Type;
+
+        public AMD_DESKTOP()
+        {
+            Displays = new List<AMD_DISPLAY>();
+            TopLeft = new ADLX_Point();
+            Type = ADLX_DESKTOP_TYPE.DESKTOP_SINGLE;
+        }
 
         public override bool Equals(object obj) => obj is AMD_DESKTOP other && this.Equals(other);
         public bool Equals(AMD_DESKTOP other)
@@ -97,6 +105,11 @@ namespace DisplayMagicianShared.AMD
         public ADLX_Point DisplayTopLeft;
         public long DisplayUniqueId;
 
+        public EYEFINITY_GRID_NODE()
+        {
+            DisplayTopLeft = new ADLX_Point();
+        }
+
         public override bool Equals(object obj) => obj is EYEFINITY_GRID_NODE other && this.Equals(other);
         public bool Equals(EYEFINITY_GRID_NODE other)
         {
@@ -159,32 +172,27 @@ namespace DisplayMagicianShared.AMD
         public long Columns;
         public EYEFINITY_GRID_NODE[][] Grid;
 
+        public AMD_EYEFINITY_DESKTOP()
+        {
+            Grid = Array.Empty<EYEFINITY_GRID_NODE[]>();
+        }
+
         public override bool Equals(object obj) => obj is AMD_EYEFINITY_DESKTOP other && this.Equals(other);
         public bool Equals(AMD_EYEFINITY_DESKTOP other)
         {
-            if (DisplayName != other.DisplayName)
+            if (Rows != other.Rows)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayName values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Rows: The Rows values don't equal each other");
                 return false;
             }
-            if (DisplayType != other.DisplayType)
+            if (Columns != other.Columns)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayType values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The Columns values don't equal each other");
                 return false;
             }
-            if (ConnectorType != other.ConnectorType)
+            if (Grid.SequenceEqual(other.Grid))
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ConnectorType values don't equal each other");
-                return false;
-            }
-            if (ManufacturerID != other.ManufacturerID)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ManufacturerID values don't equal each other");
-                return false;
-            }
-            if (UniqueID != other.UniqueID)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The UniqueID values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The Grid values don't equal each other");
                 return false;
             }
             return true;
@@ -192,7 +200,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (DisplayName, DisplayType, ConnectorType, ManufacturerID, UniqueID).GetHashCode();
+            return (Rows, Columns, Grid).GetHashCode();
         }
         public static bool operator ==(AMD_EYEFINITY_DESKTOP lhs, AMD_EYEFINITY_DESKTOP rhs) => lhs.Equals(rhs);
 
@@ -215,6 +223,16 @@ namespace DisplayMagicianShared.AMD
         public long UniqueID;
         public bool IsSupportedColorDepth;
         public ADLX_COLOR_DEPTH ColorDepth;
+
+        public AMD_DISPLAY_WITH_SETTINGS()
+        {
+            EDID = "";
+            Name = "";
+            ScanType = ADLX_DISPLAY_SCAN_TYPE.PROGRESSIVE;
+            ConnectorType = ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_UNKNOWN;
+            DisplayType = ADLX_DISPLAY_TYPE.DISPLAY_TYPE_UNKOWN;
+            ColorDepth = ADLX_COLOR_DEPTH.BPC_UNKNOWN;
+        }
 
         public override bool Equals(object obj) => obj is AMD_DISPLAY_WITH_SETTINGS other && this.Equals(other);
         public bool Equals(AMD_DISPLAY_WITH_SETTINGS other)
@@ -301,6 +319,15 @@ namespace DisplayMagicianShared.AMD
         public ADLX_DISPLAY_SCAN_TYPE ScanType;
         public long UniqueID;
 
+        public AMD_DISPLAY()
+        {
+            EDID = "";
+            Name = "";
+            ScanType = ADLX_DISPLAY_SCAN_TYPE.PROGRESSIVE;
+            ConnectorType = ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_UNKNOWN;
+            DisplayType = ADLX_DISPLAY_TYPE.DISPLAY_TYPE_UNKOWN;
+        }
+
         public override bool Equals(object obj) => obj is AMD_DISPLAY other && this.Equals(other);
         public bool Equals(AMD_DISPLAY other)
         {
@@ -382,8 +409,19 @@ namespace DisplayMagicianShared.AMD
         public AMD_EYEFINITY_DESKTOP EyefinityDesktop;
         public List<AMD_DISPLAY_WITH_SETTINGS> Displays;
         public List<string> DisplayIdentifiers;
-        public override bool Equals(object obj) => obj is AMD_DISPLAY_CONFIG other && this.Equals(other);
 
+        public AMD_DISPLAY_CONFIG()
+        {
+            IsInUse = false;
+            IsCloned = false;
+            IsEyefinity = false;
+            Desktops = new List<AMD_DESKTOP>();
+            EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
+            Displays = new List<AMD_DISPLAY_WITH_SETTINGS>();
+            DisplayIdentifiers = new List<string>();
+        }
+
+        public override bool Equals(object obj) => obj is AMD_DISPLAY_CONFIG other && this.Equals(other);
         public bool Equals(AMD_DISPLAY_CONFIG other)
         {
             if (IsInUse != other.IsInUse)
@@ -658,14 +696,15 @@ namespace DisplayMagicianShared.AMD
             // Fill in the minimal amount we need to avoid null references
             // so that we won't break json.net when we save a default config
 
-            myDefaultConfig.IsInUse = false;
+            // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
+            /*myDefaultConfig.IsInUse = false;
             myDefaultConfig.IsCloned = false;
             myDefaultConfig.IsEyefinity = false;
             myDefaultConfig.Desktops = new List<AMD_DESKTOP>();
             myDefaultConfig.Displays = new List<AMD_DISPLAY_WITH_SETTINGS>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
-            myDefaultConfig.EyefinityDesktop.ConnectorType = ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_UNKNOWN;
+            myDefaultConfig.EyefinityDesktop.Grid = Array.Empty<EYEFINITY_GRID_NODE[]>();*/
 
             return myDefaultConfig;
         }
@@ -1033,6 +1072,10 @@ namespace DisplayMagicianShared.AMD
 
                 // Now we have everything we need, so we can build the display config!
                 myDisplayConfig.IsInUse = true;
+
+                // Get the display identifiers                
+                myDisplayConfig.DisplayIdentifiers = GetCurrentDisplayIdentifiers(out bool failure);
+
             }
             else
             {

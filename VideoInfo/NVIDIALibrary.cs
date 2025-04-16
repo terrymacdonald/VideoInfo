@@ -29,6 +29,17 @@ namespace DisplayMagicianShared.NVIDIA
         public GridTopologyV2[] MosaicGridTopos;
         public UInt32 MosaicGridCount;
 
+        public NVIDIA_MOSAIC_CONFIG()
+        {
+            IsMosaicEnabled = false;
+            MosaicTopologyBrief = new TopologyBrief();
+            MosaicDisplaySettings = new DisplaySettingsV2();
+            OverlapX = 0;
+            OverlapY = 0;
+            MosaicGridTopos = new GridTopologyV2[NvConstants.NVAPI_MAX_MOSAIC_TOPOS];
+            MosaicGridCount = 0;
+        }
+
         public override bool Equals(object obj) => obj is NVIDIA_MOSAIC_CONFIG other && this.Equals(other);
 
         public bool Equals(NVIDIA_MOSAIC_CONFIG other)
@@ -96,6 +107,18 @@ namespace DisplayMagicianShared.NVIDIA
         public bool HasCustomDisplay;
         public List<CustomDisplay> CustomDisplays;
 
+        public NVIDIA_PER_DISPLAY_CONFIG()
+        {
+            HasNvHdrEnabled = false;
+            HdrCapabilities = new HDRCapabilitiesV3();
+            HdrColorData = new HDRColorDataV2();
+            HasAdaptiveSync = false;
+            AdaptiveSyncConfig = new SetAdaptiveSyncData();
+            HasColorData = false;
+            ColorData = new ColorDataV5();
+            HasCustomDisplay = false;
+            CustomDisplays = new List<CustomDisplay>();
+        }
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_DISPLAY_CONFIG other && this.Equals(other);
 
@@ -210,6 +233,14 @@ namespace DisplayMagicianShared.NVIDIA
         public DRSProfileV1 ProfileInfo;
         public List<DRSSettingV1> DriverSettings;
 
+        public NVIDIA_DRS_CONFIG()
+        {
+            //HasDRSSettings = false;
+            IsBaseProfile = false;
+            ProfileInfo = new DRSProfileV1();
+            DriverSettings = new List<DRSSettingV1>();
+        }
+
         public override bool Equals(object obj) => obj is NVIDIA_DRS_CONFIG other && this.Equals(other);
         public bool Equals(NVIDIA_DRS_CONFIG other)
         {
@@ -267,6 +298,20 @@ namespace DisplayMagicianShared.NVIDIA
         public Int32 BusSlotId;
         public UInt32 DisplayCount;
         public Dictionary<UInt32, NVIDIA_PER_DISPLAY_CONFIG> Displays;
+
+        public NVIDIA_PER_ADAPTER_CONFIG()
+        {
+            IsQuadro = false;
+            HasLogicalGPU = false;
+            SystemType = SystemType.Unknown;
+            AdapterName = string.Empty;
+            GPUType = GPUType.Unknown;
+            BusType = GPUBusType.Undefined;
+            BusId = -1;
+            BusSlotId = -1;
+            DisplayCount = 0;
+            Displays = new Dictionary<UInt32, NVIDIA_PER_DISPLAY_CONFIG>();
+        }
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_ADAPTER_CONFIG other && this.Equals(other);
         public bool Equals(NVIDIA_PER_ADAPTER_CONFIG other)
@@ -367,6 +412,18 @@ namespace DisplayMagicianShared.NVIDIA
         // generating the profile icon.
         public Dictionary<string, string> DisplayNames;
         public List<string> DisplayIdentifiers;
+
+        public NVIDIA_DISPLAY_CONFIG()
+        {
+            IsInUse = false;
+            IsCloned = false;
+            MosaicConfig = new NVIDIA_MOSAIC_CONFIG();
+            PhysicalAdapters = new Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG>();
+            DisplayConfigs = new List<PathInfoV2>();
+            DRSSettings = new List<NVIDIA_DRS_CONFIG>();
+            DisplayNames = new Dictionary<string, string>();
+            DisplayIdentifiers = new List<string>();
+        }
 
         public override bool Equals(object obj) => obj is NVIDIA_DISPLAY_CONFIG other && this.Equals(other);
 
@@ -607,7 +664,8 @@ namespace DisplayMagicianShared.NVIDIA
             // Fill in the minimal amount we need to avoid null references
             // so that we won't break json.net when we save a default config
 
-            myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;
+            // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
+            /*myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;
             myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[] { };
             myDefaultConfig.MosaicConfig.MosaicGridCount = 0;
             //myDefaultConfig.MosaicConfig.MosaicViewports = new List<ViewPortF[]>();
@@ -618,7 +676,7 @@ namespace DisplayMagicianShared.NVIDIA
             myDefaultConfig.DisplayNames = new Dictionary<string, string>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.IsCloned = false;
-            myDefaultConfig.IsInUse = false;
+            myDefaultConfig.IsInUse = false;*/
 
             return myDefaultConfig;
         }
@@ -1425,11 +1483,7 @@ namespace DisplayMagicianShared.NVIDIA
                             SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the Windows DisplayName to DisplayID mappings for Display ID {displayName}.");
                         }
                         
-                    }
-
-                    // Get the display identifiers                
-                    myDisplayConfig.DisplayIdentifiers = GetCurrentDisplayIdentifiers(out bool failure);
-
+                    }                 
 
 
                     // Get the DRS Settings
@@ -1519,6 +1573,10 @@ namespace DisplayMagicianShared.NVIDIA
 
                     // At this stage we should set the IsInUse flag to report that the NVIDIA config is in Use
                     myDisplayConfig.IsInUse = true;
+
+                    // Get the display identifiers                
+                    myDisplayConfig.DisplayIdentifiers = GetCurrentDisplayIdentifiers(out bool failure);
+
 
                 }
                 catch (Exception ex)

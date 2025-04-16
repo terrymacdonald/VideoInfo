@@ -370,6 +370,32 @@ namespace DisplayMagicianShared.Windows
         [FieldOffset(120)]
         public UInt32 DisplayFrequency;
 
+        public DEVICE_MODE()
+        {
+            this.DisplayFrequency = 0;
+            this.DisplayFlags = DISPLAY_FLAGS.None;
+            this.PixelsHeight = 0;
+            this.PixelsWidth = 0;
+            this.BitsPerPixel = 0;
+            this.LogicalInchPixels = 0;
+            this.FormName = string.Empty;
+            this.Collate = 0;
+            this.TrueTypeOption = 0;
+            this.YResolution = 0;
+            this.Duplex = 0;
+            this.Color = 0;
+            this.DisplayFixedOutput = DISPLAY_FIXED_OUTPUT.Default;
+            this.DisplayOrientation = DISPLAY_ORIENTATION.Rotate0Degree;
+            this.Position = new POINTL();
+            this.Fields = DEVICE_MODE_FIELDS.None;
+            this.DriverExtra = 0;
+            this.Size = 0;
+            this.DriverVersion = 0;
+            this.SpecificationVersion = 0;
+            this.DeviceName = string.Empty;
+            
+        }
+
         public override bool Equals(object obj) => obj is DEVICE_MODE other && this.Equals(other);
 
         public bool Equals(DEVICE_MODE other)
@@ -457,6 +483,17 @@ namespace DisplayMagicianShared.Windows
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
         public string DeviceKey;
 
+        public DISPLAY_DEVICE()
+        { 
+            Size = 0;
+            DeviceName = string.Empty;
+            DeviceString = string.Empty;
+            StateFlags = DISPLAY_DEVICE_STATE_FLAGS.AttachedToDesktop;
+            DeviceId = string.Empty;
+            DeviceKey = string.Empty;               
+        }
+
+
         public override bool Equals(object obj) => obj is DISPLAY_DEVICE other && this.Equals(other);
 
         public bool Equals(DISPLAY_DEVICE other)
@@ -503,6 +540,13 @@ namespace DisplayMagicianShared.Windows
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = DataPoints)]
         public UInt16[] Blue;
 
+        public GAMMA_RAMP()
+        {
+            Red = new UInt16[DataPoints];
+            Green = new UInt16[DataPoints];
+            Blue = new UInt16[DataPoints];
+        }
+
         public override bool Equals(object obj) => obj is GAMMA_RAMP other && this.Equals(other);
 
         public bool Equals(GAMMA_RAMP other)
@@ -543,6 +587,15 @@ namespace DisplayMagicianShared.Windows
         public RECTL Bounds;
         public RECTL WorkingArea;
         public MONITOR_INFO_FLAGS Flags;
+
+        public MONITOR_INFO()
+        {
+            Size = 0;
+            Bounds = new RECTL();
+            WorkingArea = new RECTL();
+            Flags = MONITOR_INFO_FLAGS.None;
+            DisplayName = string.Empty;
+        }
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string DisplayName;
@@ -595,6 +648,14 @@ namespace DisplayMagicianShared.Windows
         public bool IsPrimary;
         public DISPLAY_DEVICE Device;
         public DEVICE_MODE DeviceMode;
+
+        public GDI_DISPLAY_SETTING()
+        {
+            IsEnabled = false;
+            IsPrimary = false;
+            Device = new DISPLAY_DEVICE();
+            DeviceMode = new DEVICE_MODE();
+        }
 
         public override bool Equals(object obj) => obj is GDI_DISPLAY_SETTING other && this.Equals(other);
 

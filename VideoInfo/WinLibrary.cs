@@ -29,6 +29,14 @@ namespace DisplayMagicianShared.Windows
         public DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO AdvancedColorInfo;
         public DISPLAYCONFIG_SDR_WHITE_LEVEL SDRWhiteLevel;
 
+        public ADVANCED_HDR_INFO_PER_PATH()
+        {
+            AdapterId = new LUID();
+            Id = 0;
+            AdvancedColorInfo = new DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO();
+            SDRWhiteLevel = new DISPLAYCONFIG_SDR_WHITE_LEVEL();
+        }
+
         public override bool Equals(object obj) => obj is ADVANCED_HDR_INFO_PER_PATH other && this.Equals(other);
         public bool Equals(ADVANCED_HDR_INFO_PER_PATH other)
         {
@@ -65,6 +73,15 @@ namespace DisplayMagicianShared.Windows
         public UInt32 TargetId;
         public string DevicePath;
         public DPIScalingInfo SourceDPIScalingInfo;
+
+        public DISPLAY_SOURCE()
+        {
+            AdapterId = new LUID();
+            SourceId = 0;
+            TargetId = 0;
+            DevicePath = string.Empty;
+            SourceDPIScalingInfo = new DPIScalingInfo();
+        }
 
         public override bool Equals(object obj) => obj is DISPLAY_SOURCE other && this.Equals(other);
         public bool Equals(DISPLAY_SOURCE other)
@@ -111,6 +128,19 @@ namespace DisplayMagicianShared.Windows
         // generating the profile icon.
         public Dictionary<string, List<DISPLAY_SOURCE>> DisplaySources;
         public List<string> DisplayIdentifiers;
+
+        public WINDOWS_DISPLAY_CONFIG()
+        {
+            DisplayAdapters = new Dictionary<ulong, string>();
+            DisplayConfigPaths = Array.Empty<DISPLAYCONFIG_PATH_INFO>();
+            DisplayConfigModes = Array.Empty<DISPLAYCONFIG_MODE_INFO>();
+            DisplayHDRStates = new List<ADVANCED_HDR_INFO_PER_PATH>();
+            GdiDisplaySettings = new Dictionary<string, GDI_DISPLAY_SETTING>();
+            TaskbarPositions = new Dictionary<Rect, TaskbarPosition>();
+            IsCloned = false;
+            DisplaySources = new Dictionary<string, List<DISPLAY_SOURCE>>();
+            DisplayIdentifiers = new List<string>();
+        }
 
         public override bool Equals(object obj) => obj is WINDOWS_DISPLAY_CONFIG other && this.Equals(other);
         public bool Equals(WINDOWS_DISPLAY_CONFIG other)
@@ -282,14 +312,15 @@ namespace DisplayMagicianShared.Windows
             // Fill in the minimal amount we need to avoid null references
             // so that we won't break json.net when we save a default config
 
-            myDefaultConfig.DisplayAdapters = new Dictionary<ulong, string>();
+            // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
+            /*myDefaultConfig.DisplayAdapters = new Dictionary<ulong, string>();
             myDefaultConfig.DisplayConfigModes = new DISPLAYCONFIG_MODE_INFO[0];
             myDefaultConfig.DisplayConfigPaths = new DISPLAYCONFIG_PATH_INFO[0];
             myDefaultConfig.DisplayHDRStates = new List<ADVANCED_HDR_INFO_PER_PATH>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.DisplaySources = new Dictionary<string, List<DISPLAY_SOURCE>>();
             myDefaultConfig.GdiDisplaySettings = new Dictionary<string, GDI_DISPLAY_SETTING>();
-            myDefaultConfig.IsCloned = false;
+            myDefaultConfig.IsCloned = false;*/
 
             return myDefaultConfig;
         }
