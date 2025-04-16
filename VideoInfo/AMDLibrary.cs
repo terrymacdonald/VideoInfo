@@ -16,44 +16,62 @@ using Windows.Graphics;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices.JavaScript;
 using Microsoft.VisualBasic;
+using System.Xml;
 
 namespace DisplayMagicianShared.AMD
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DESKTOP : IEquatable<AMD_DESKTOP>
     {
-        public string DisplayName;
-        public string DisplayType;
-        public string ConnectorType;
-        public long ManufacturerID;
-        public long UniqueID;
+        public long NumberOfDisplays;
+        public List<AMD_DISPLAY> Displays;
+        public ADLX_ORIENTATION Orientation;
+        public int SizeWidth;
+        public int SizeHeight;
+        public ADLX_Point TopLeft;
+        public ADLX_DESKTOP_TYPE Type;
 
         public override bool Equals(object obj) => obj is AMD_DESKTOP other && this.Equals(other);
         public bool Equals(AMD_DESKTOP other)
         {
-            if (DisplayName != other.DisplayName)
+            if (NumberOfDisplays != other.NumberOfDisplays)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayName values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The NumberOfDisplays values don't equal each other");
                 return false;
             }
-            if (DisplayType != other.DisplayType)
+            if (Displays.SequenceEqual(other.Displays))
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayType values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The SequenceEqual values don't equal each other");
                 return false;
             }
-            if (ConnectorType != other.ConnectorType)
+            if (Orientation != other.Orientation)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ConnectorType values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The Orientation values don't equal each other");
                 return false;
             }
-            if (ManufacturerID != other.ManufacturerID)
+            if (SizeWidth != other.SizeWidth)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ManufacturerID values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The SizeWidth values don't equal each other");
                 return false;
             }
-            if (UniqueID != other.UniqueID)
+            if (SizeHeight != other.SizeHeight)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The UniqueID values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The SizeHeight values don't equal each other");
+                return false;
+            }
+            if (TopLeft.x != other.TopLeft.x)
+            {
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The TopLeft.x values don't equal each other");
+                return false;
+            }
+            if (TopLeft.y != other.TopLeft.y)
+            {
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The TopLeft.y values don't equal each other");
+                return false;
+            }
+            if (Type != other.Type)
+            {
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The Type values don't equal each other");
                 return false;
             }
             return true;
@@ -61,7 +79,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (DisplayName, DisplayType, ConnectorType, ManufacturerID, UniqueID).GetHashCode();
+            return (NumberOfDisplays, Displays, Orientation, SizeWidth, SizeHeight, TopLeft, Type).GetHashCode();
         }
         public static bool operator ==(AMD_DESKTOP lhs, AMD_DESKTOP rhs) => lhs.Equals(rhs);
 
@@ -69,13 +87,77 @@ namespace DisplayMagicianShared.AMD
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    public struct EYEFINITY_GRID_NODE : IEquatable<EYEFINITY_GRID_NODE>
+    {
+        public long Row;
+        public long Column;
+        public ADLX_ORIENTATION DisplayOrientation;
+        public int DisplayWidth;
+        public int DisplayHeight;
+        public ADLX_Point DisplayTopLeft;
+        public long DisplayUniqueId;
+
+        public override bool Equals(object obj) => obj is EYEFINITY_GRID_NODE other && this.Equals(other);
+        public bool Equals(EYEFINITY_GRID_NODE other)
+        {
+            if (Row != other.Row)
+            {
+                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The Row values don't equal each other");
+                return false;
+            }
+            if (Column != other.Column)
+            {
+                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The Column values don't equal each other");
+                return false;
+            }
+            if (DisplayOrientation != other.DisplayOrientation)
+            {
+                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayOrientation values don't equal each other");
+                return false;
+            }
+            if (DisplayWidth != other.DisplayWidth)
+            {
+                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayWidth values don't equal each other");
+                return false;
+            }
+            if (DisplayHeight != other.DisplayHeight)
+            {
+                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayHeight values don't equal each other");
+                return false;
+            }
+            if(DisplayTopLeft.x != other.DisplayTopLeft.x)
+            {
+                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayTopLeft.x values don't equal each other");
+                return false;
+            }
+            if (DisplayTopLeft.y != other.DisplayTopLeft.y)
+            {
+                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayTopLeft.y values don't equal each other");
+                return false;
+            }
+            if (DisplayUniqueId != other.DisplayUniqueId)
+            {
+                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayUniqueId values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return (Row, Column, DisplayOrientation, DisplayWidth, DisplayHeight, DisplayTopLeft, DisplayUniqueId).GetHashCode();
+        }
+        public static bool operator ==(EYEFINITY_GRID_NODE lhs, EYEFINITY_GRID_NODE rhs) => lhs.Equals(rhs);
+
+        public static bool operator !=(EYEFINITY_GRID_NODE lhs, EYEFINITY_GRID_NODE rhs) => !(lhs == rhs);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     public struct AMD_EYEFINITY_DESKTOP : IEquatable<AMD_EYEFINITY_DESKTOP>
     {
-        public string DisplayName;
-        public string DisplayType;
-        public string ConnectorType;
-        public long ManufacturerID;
-        public long UniqueID;
+        public long Rows;
+        public long Columns;
+        public EYEFINITY_GRID_NODE[][] Grid;
 
         public override bool Equals(object obj) => obj is AMD_EYEFINITY_DESKTOP other && this.Equals(other);
         public bool Equals(AMD_EYEFINITY_DESKTOP other)
@@ -118,20 +200,113 @@ namespace DisplayMagicianShared.AMD
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    public struct AMD_DISPLAY_WITH_SETTINGS : IEquatable<AMD_DISPLAY_WITH_SETTINGS>
+    {
+        public ADLX_DISPLAY_CONNECTOR_TYPE ConnectorType;
+        public ADLX_DISPLAY_TYPE DisplayType;
+        public string EDID;
+        public long ManufacturerID;
+        public string Name;
+        public int MaxHResolution;
+        public int MaxVResolution;
+        public long PixelClock;
+        public double RefreshRate;
+        public ADLX_DISPLAY_SCAN_TYPE ScanType;
+        public long UniqueID;
+        public bool IsSupportedColorDepth;
+        public ADLX_COLOR_DEPTH ColorDepth;
+
+        public override bool Equals(object obj) => obj is AMD_DISPLAY_WITH_SETTINGS other && this.Equals(other);
+        public bool Equals(AMD_DISPLAY_WITH_SETTINGS other)
+        {
+            if (ConnectorType != other.ConnectorType)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ConnectorType values don't equal each other");
+                return false;
+            }
+            if (DisplayType != other.DisplayType)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The DisplayType values don't equal each other");
+                return false;
+            }
+            if (EDID != other.EDID)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The EDID values don't equal each other");
+                return false;
+            }
+            if (ManufacturerID != other.ManufacturerID)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ManufacturerID values don't equal each other");
+                return false;
+            }
+            if (Name != other.Name)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The Name values don't equal each other");
+                return false;
+            }
+            if (MaxHResolution != other.MaxHResolution)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The MaxHResolution values don't equal each other");
+                return false;
+            }
+            if (MaxVResolution != other.MaxVResolution)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The MaxVResolution values don't equal each other");
+                return false;
+            }
+            if (PixelClock != other.PixelClock)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The PixelClock values don't equal each other");
+                return false;
+            }
+            if (RefreshRate != other.RefreshRate)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The RefreshRate values don't equal each other");
+                return false;
+            }
+            if (ScanType != other.ScanType)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ScanType values don't equal each other");
+                return false;
+            }
+            if (UniqueID != other.UniqueID)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The UniqueID values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, MaxHResolution, MaxVResolution, PixelClock, RefreshRate, ScanType, UniqueID).GetHashCode();
+        }
+        public static bool operator ==(AMD_DISPLAY_WITH_SETTINGS lhs, AMD_DISPLAY_WITH_SETTINGS rhs) => lhs.Equals(rhs);
+
+        public static bool operator !=(AMD_DISPLAY_WITH_SETTINGS lhs, AMD_DISPLAY_WITH_SETTINGS rhs) => !(lhs == rhs);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DISPLAY : IEquatable<AMD_DISPLAY>
     {
-        public string DisplayName;
-        public string DisplayType;
-        public string ConnectorType;
+        public ADLX_DISPLAY_CONNECTOR_TYPE ConnectorType;
+        public ADLX_DISPLAY_TYPE DisplayType;
+        public string EDID;       
         public long ManufacturerID;
+        public string Name;
+        public int MaxHResolution;
+        public int MaxVResolution;
+        public long PixelClock;
+        public double RefreshRate;
+        public ADLX_DISPLAY_SCAN_TYPE ScanType;
         public long UniqueID;
 
         public override bool Equals(object obj) => obj is AMD_DISPLAY other && this.Equals(other);
         public bool Equals(AMD_DISPLAY other)
         {
-            if(DisplayName != other.DisplayName)
+            if (ConnectorType != other.ConnectorType)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayName values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ConnectorType values don't equal each other");
                 return false;
             }
             if (DisplayType != other.DisplayType)
@@ -139,14 +314,44 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayType values don't equal each other");
                 return false;
             }
-            if (ConnectorType != other.ConnectorType)
+            if (EDID != other.EDID)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ConnectorType values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The EDID values don't equal each other");
                 return false;
             }
             if (ManufacturerID != other.ManufacturerID)
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ManufacturerID values don't equal each other");
+                return false;
+            }
+            if (Name != other.Name)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The Name values don't equal each other");
+                return false;
+            }
+            if (MaxHResolution != other.MaxHResolution)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The MaxHResolution values don't equal each other");
+                return false;
+            }
+            if (MaxVResolution != other.MaxVResolution)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The MaxVResolution values don't equal each other");
+                return false;
+            }
+            if (PixelClock != other.PixelClock)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The PixelClock values don't equal each other");
+                return false;
+            }
+            if (RefreshRate != other.RefreshRate)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The RefreshRate values don't equal each other");
+                return false;
+            }
+            if (ScanType != other.ScanType)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ScanType values don't equal each other");
                 return false;
             }
             if (UniqueID != other.UniqueID)
@@ -159,7 +364,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (DisplayName, DisplayType, ConnectorType, ManufacturerID, UniqueID).GetHashCode();
+            return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, MaxHResolution, MaxVResolution, PixelClock, RefreshRate, ScanType, UniqueID).GetHashCode();
         }
         public static bool operator ==(AMD_DISPLAY lhs, AMD_DISPLAY rhs) => lhs.Equals(rhs);
 
@@ -175,7 +380,7 @@ namespace DisplayMagicianShared.AMD
         public List<AMD_DESKTOP> Desktops;
         public bool IsEyefinity;
         public AMD_EYEFINITY_DESKTOP EyefinityDesktop;
-        public List<AMD_DISPLAY> Displays;
+        public List<AMD_DISPLAY_WITH_SETTINGS> Displays;
         public List<string> DisplayIdentifiers;
         public override bool Equals(object obj) => obj is AMD_DISPLAY_CONFIG other && this.Equals(other);
 
@@ -457,9 +662,10 @@ namespace DisplayMagicianShared.AMD
             myDefaultConfig.IsCloned = false;
             myDefaultConfig.IsEyefinity = false;
             myDefaultConfig.Desktops = new List<AMD_DESKTOP>();
-            myDefaultConfig.Displays = new List<AMD_DISPLAY>();
+            myDefaultConfig.Displays = new List<AMD_DISPLAY_WITH_SETTINGS>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
+            myDefaultConfig.EyefinityDesktop.ConnectorType = ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_UNKNOWN;
 
             return myDefaultConfig;
         }
@@ -490,6 +696,7 @@ namespace DisplayMagicianShared.AMD
 
         private AMD_DISPLAY_CONFIG GetAMDDisplayConfig(bool allDisplays = false)
         {
+            // Creat empty config struct so we know there are no nulls in there to break the json serializer
             AMD_DISPLAY_CONFIG myDisplayConfig = CreateDefaultConfig();
 
             if (_initialised)
@@ -506,7 +713,7 @@ namespace DisplayMagicianShared.AMD
                 bool isEyefinityEnabled = false;
                 bool isCloned = false;
                 List<AMD_DESKTOP> desktopsToStore = new List<AMD_DESKTOP>();
-                List<AMD_DISPLAY> displaysToStore = new List<AMD_DISPLAY>();
+                List<AMD_DISPLAY_WITH_SETTINGS> displaysToStore = new List<AMD_DISPLAY_WITH_SETTINGS>();
                 AMD_EYEFINITY_DESKTOP eyefinityDesktopToStore = new AMD_EYEFINITY_DESKTOP();
 
                 SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX desktop services");
@@ -516,7 +723,7 @@ namespace DisplayMagicianShared.AMD
                 if (status != ADLX_RESULT.ADLX_OK)
                 {
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX desktop services. systemServices.GetDesktopsServices() returned error code {status}");
-                    return myDisplayConfig;
+                    return CreateDefaultConfig(); ;
                 }
                 else
                 {
@@ -534,7 +741,7 @@ namespace DisplayMagicianShared.AMD
                     if (status != ADLX_RESULT.ADLX_OK)
                     {
                         SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
-                        return myDisplayConfig;
+                        return CreateDefaultConfig(); ;
                     }
                     else
                     {
@@ -549,32 +756,125 @@ namespace DisplayMagicianShared.AMD
 
                             if (status == ADLX_RESULT.ADLX_OK)
                             {
-                                
+                                AMD_DESKTOP newDesktop = new AMD_DESKTOP();
+                                newDesktop.Displays = new List<AMD_DISPLAY>();
+
                                 SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_uintP();
                                 desktop.GetNumberOfDisplays(pNumDisplays);
-                                long numDisplays = ADLX.uintP_value(pNumDisplays);
+                                newDesktop.NumberOfDisplays = ADLX.uintP_value(pNumDisplays);
+                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is {newDesktop.NumberOfDisplays}");
+
+                                if (newDesktop.NumberOfDisplays > 0)
+                                {
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is > 0, so getting list of displays");
+                                    // Get the list of displays that are part of this desktop
+                                    SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
+                                    status = desktop.GetDisplays(ppDisplayList);
+                                    IADLXDisplayList desktopDisplayList = ADLX.displayListP_Ptr_value(ppDisplayList);
+                                    if (status != ADLX_RESULT.ADLX_OK)
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                                        return CreateDefaultConfig(); ;
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Successfully got the display list");
+                                        // Iterate through the display list
+                                        uint itDisplay = desktopDisplayList.Begin();
+                                        for (; itDisplay != desktopDisplayList.Size(); itDisplay++)
+                                        {
+                                            SWIGTYPE_p_p_adlx__IADLXDisplay ppDisplay = ADLX.new_displayP_Ptr();
+                                            status = desktopDisplayList.At(itDisplay, ppDisplay);
+                                            IADLXDisplay display = ADLX.displayP_Ptr_value(ppDisplay);
+                                            if (status == ADLX_RESULT.ADLX_OK)
+                                            {
+                                                // Create a new AMD_DISPLAY to store things in
+                                                AMD_DISPLAY newDisplay = new AMD_DISPLAY();
+
+                                                // Get the display connection type
+                                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                                display.ConnectorType(pConnect);
+                                                newDisplay.ConnectorType = ADLX.disConnectTypeP_value(pConnect);
+
+                                                // Get the display type
+                                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                                display.DisplayType(pDisType);
+                                                newDisplay.DisplayType = ADLX.displayTypeP_value(pDisType);
+
+                                                // Get the EDID
+                                                SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
+                                                display.EDID(ppEDID);
+                                                String edid = ADLX.charP_Ptr_value(ppEDID);
+
+                                                // Get the manufacturer ID
+                                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                                display.ManufacturerID(pMID);
+                                                newDisplay.ManufacturerID = ADLX.uintP_value(pMID);
+
+                                                // Get the display name
+                                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
+                                                display.Name(ppName);
+                                                String name = ADLX.charP_Ptr_value(ppName);
+                                                newDisplay.Name = name;
+
+                                                // Get the native resolution
+                                                SWIGTYPE_p_int pMaxHRes = ADLX.new_intP();
+                                                SWIGTYPE_p_int pMaxVRes = ADLX.new_intP();
+                                                display.NativeResolution(pMaxHRes, pMaxVRes);
+                                                newDisplay.MaxHResolution = ADLX.intP_value(pMaxHRes);
+                                                newDisplay.MaxVResolution = ADLX.intP_value(pMaxVRes);
+
+                                                // Get the PixelClock
+                                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_uintP();
+                                                display.PixelClock(pPixelClock);
+                                                newDisplay.PixelClock = ADLX.uintP_value(pPixelClock);
+                                                // Get the refresh rate
+                                                SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
+                                                display.RefreshRate(pRefreshRate);
+                                                newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
+
+                                                // Get the scan type
+                                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
+                                                display.ScanType(pScanType);
+                                                newDisplay.ScanType = ADLX.disScanTypeP_value(pScanType);
+
+                                                // Get the Unique ID
+                                                SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
+                                                display.UniqueId(pUID);
+                                                newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
+
+                                                // Save the Display to the list for this desktop
+                                                newDesktop.Displays.Add(newDisplay);
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is 0, so not getting list of displays. Skipping.");
+                                }
 
                                 SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_orientationP();
                                 desktop.Orientation(pOrientation);
-                                ADLX_ORIENTATION orientation = ADLX.orientationP_value(pOrientation);
+                                newDesktop.Orientation = ADLX.orientationP_value(pOrientation);
 
                                 SWIGTYPE_p_int pWidth = ADLX.new_intP();
                                 SWIGTYPE_p_int pHeight = ADLX.new_intP();
                                 desktop.Size(pWidth, pHeight);
-                                int width = ADLX.intP_value(pWidth);
-                                int height = ADLX.intP_value(pHeight);
+                                newDesktop.SizeWidth = ADLX.intP_value(pWidth);
+                                newDesktop.SizeHeight = ADLX.intP_value(pHeight);
 
                                 ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
                                 desktop.TopLeft(pLocationTopLeft);
-                                ADLX_Point locationTopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
+                                newDesktop.TopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
 
                                 SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_desktopTypeP();
                                 desktop.Type(pDesktopType);
-                                ADLX_DESKTOP_TYPE desktopType = ADLX.desktopTypeP_value(pDesktopType);
+                                newDesktop.Type = ADLX.desktopTypeP_value(pDesktopType);
 
                                 // The the desktop is an eyefinity desktop then set the eyefinity enabled flag
                                 // and also process the EyefinityDesktop layout
-                                if (desktopType == ADLX_DESKTOP_TYPE.DESKTOP_EYEFINITY)
+                                if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_EYEFINITY)
                                 {
                                     isEyefinityEnabled = true;
                                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Eyefinity desktop detected");
@@ -587,7 +887,7 @@ namespace DisplayMagicianShared.AMD
                                     status = desktop.QueryInterface(IADLXEyefinityDesktop.IID(), IADLXEyefinityDesktop.getCPtr(IADLXDesktop.getCPtr(desktop)));
                                     IADLXEyefinityDesktop eyefinityDesktop = ADLX.eyefinityDesktopP_Ptr_value(ppEyefinityDesktop);*/
                                 }
-                                else if (desktopType == ADLX_DESKTOP_TYPE.DESKTOP_DUPLCATE)
+                                else if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_DUPLCATE)
                                 {
                                     isCloned = true;
                                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Cloned desktop detected");
@@ -599,6 +899,9 @@ namespace DisplayMagicianShared.AMD
 
                                 // Release desktop interface
                                 desktop.Release();
+
+                                // Save the Desktop to the main list
+                                myDisplayConfig.Desktops.Add(newDesktop);
                             }
                         }
                     }
@@ -607,10 +910,10 @@ namespace DisplayMagicianShared.AMD
                                       
                 }
 
-
-
                 // Release desktop services interface
                 desktopService.Release();
+
+                //-----------------------------------------------------------------------
 
                 // Get the display services
                 // This lets us interact witth the various displays
@@ -624,7 +927,7 @@ namespace DisplayMagicianShared.AMD
                 if (status != ADLX_RESULT.ADLX_OK)
                 {
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
-                    return myDisplayConfig;
+                    return CreateDefaultConfig(); ;
                 }
                 else
                 {
@@ -638,7 +941,7 @@ namespace DisplayMagicianShared.AMD
                     if (status != ADLX_RESULT.ADLX_OK)
                     {
                         SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
-                        return myDisplayConfig;
+                        return CreateDefaultConfig();
                     }
                     else
                     {
@@ -653,50 +956,70 @@ namespace DisplayMagicianShared.AMD
 
                             if (status == ADLX_RESULT.ADLX_OK)
                             {
+                                // Create a new AMD_DISPLAY_WITH_SETTINGS to store things in
+                                AMD_DISPLAY_WITH_SETTINGS newDisplay = new AMD_DISPLAY_WITH_SETTINGS();
+
+                                // Get the display connection type
+                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                display.ConnectorType(pConnect);
+                                newDisplay.ConnectorType = ADLX.disConnectTypeP_value(pConnect);
+
+                                // Get the display type
+                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                display.DisplayType(pDisType);
+                                newDisplay.DisplayType = ADLX.displayTypeP_value(pDisType);
+
+                                // Get the EDID
+                                SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
+                                display.EDID(ppEDID);
+                                String edid = ADLX.charP_Ptr_value(ppEDID);
+
+                                // Get the manufacturer ID
+                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                display.ManufacturerID(pMID);
+                                newDisplay.ManufacturerID = ADLX.uintP_value(pMID);
+
+                                // Get the display name
                                 SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
                                 display.Name(ppName);
                                 String name = ADLX.charP_Ptr_value(ppName);
+                                newDisplay.Name = name;
 
-                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
-                                display.DisplayType(pDisType);
-                                ADLX_DISPLAY_TYPE disType = ADLX.displayTypeP_value(pDisType);
+                                // Get the native resolution
+                                SWIGTYPE_p_int pMaxHRes = ADLX.new_intP();
+                                SWIGTYPE_p_int pMaxVRes = ADLX.new_intP();
+                                display.NativeResolution(pMaxHRes, pMaxVRes);
+                                newDisplay.MaxHResolution = ADLX.intP_value(pMaxHRes);
+                                newDisplay.MaxVResolution = ADLX.intP_value(pMaxVRes);
 
-                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
-                                display.ManufacturerID(pMID);
-                                long mid = ADLX.uintP_value(pMID);
+                                // Get the PixelClock
+                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_uintP();
+                                display.PixelClock(pPixelClock);
+                                newDisplay.PixelClock = ADLX.uintP_value(pPixelClock);
+                                // Get the refresh rate
+                                SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
+                                display.RefreshRate(pRefreshRate);
+                                newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
 
-                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
-                                display.ConnectorType(pConnect);
-                                ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.disConnectTypeP_value(pConnect);
-
-                                SWIGTYPE_p_p_char ppEDIE = ADLX.new_charP_Ptr();
-                                display.EDID(ppEDIE);
-                                String edid = ADLX.charP_Ptr_value(ppEDIE);
-
-                                SWIGTYPE_p_int pH = ADLX.new_intP();
-                                SWIGTYPE_p_int pV = ADLX.new_intP();
-                                display.NativeResolution(pH, pV);
-                                int h = ADLX.intP_value(pH);
-                                int v = ADLX.intP_value(pV);
-
-                                SWIGTYPE_p_double pRefRate = ADLX.new_doubleP();
-                                display.RefreshRate(pRefRate);
-                                double refRate = ADLX.doubleP_value(pRefRate);
-
-                                SWIGTYPE_p_unsigned_int pPixClock = ADLX.new_uintP();
-                                display.PixelClock(pPixClock);
-                                long pixClock = ADLX.uintP_value(pPixClock);
-
+                                // Get the scan type
                                 SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
                                 display.ScanType(pScanType);
-                                ADLX_DISPLAY_SCAN_TYPE scanType = ADLX.disScanTypeP_value(pScanType);
+                                newDisplay.ScanType = ADLX.disScanTypeP_value(pScanType);
 
-                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
-                                display.UniqueId(pID);
-                                uint id = ADLX.adlx_sizeP_value(pID);
+                                // Get the Unique ID
+                                SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
+                                display.UniqueId(pUID);
+                                newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
 
-                                // Release display interface
-                                display.Release();
+                                // Ok now start getting the various settings for this display
+                                // Get the Display Color Depth
+
+                                /*SWIGTYPE_p_p_adlx__IADLXDisplayColorDepth pColorDepth = ADLX.;
+                                display.ColorDepth(pColorDepth);
+                                newDisplay.ColorDepth = ADLX.disColorDepthP_value(pColorDepth);*/
+
+                                // Save the Display to the main list of displays
+                                myDisplayConfig.Displays.Add(newDisplay);
                             }
                         }
                     }
@@ -710,16 +1033,11 @@ namespace DisplayMagicianShared.AMD
 
                 // Now we have everything we need, so we can build the display config!
                 myDisplayConfig.IsInUse = true;
-                myDisplayConfig.IsCloned = isCloned;
-                myDisplayConfig.IsEyefinity = isEyefinityEnabled;
-                myDisplayConfig.Desktops = desktopsToStore;
-                myDisplayConfig.Displays = displaysToStore;
-                myDisplayConfig.EyefinityDesktop = eyefinityDesktopToStore;
             }
             else
             {
                 SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: ERROR - Tried to run GetAMDDisplayConfig but the AMD ADL library isn't initialised!");
-                throw new AMDLibraryException($"Tried to run GetAMDDisplayConfig but the AMD ADL library isn't initialised!");
+                return CreateDefaultConfig();
             }
             
             // Return the configuration
