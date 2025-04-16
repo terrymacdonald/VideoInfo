@@ -3,6 +3,10 @@
     "VideoInfo save cfg1": {
       "commandName": "Project",
       "commandLineArgs": "save display-config1.cfg"
+    },
+    "VideoInfo load cfg1": {
+      "commandName": "Project",
+      "commandLineArgs": "load display-config1.cfg"
     }
   }
 }
