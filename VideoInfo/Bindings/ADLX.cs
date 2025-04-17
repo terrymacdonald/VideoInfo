@@ -20,20 +20,18 @@ public class ADLX {
     return ret;
   }
 
-  public static SWIGTYPE_p_void adlx_load_library(SWIGTYPE_p_wchar_t filename) {
-    global::System.IntPtr cPtr = ADLXPINVOKE.adlx_load_library(SWIGTYPE_p_wchar_t.getCPtr(filename));
-    SWIGTYPE_p_void ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
+  public static global::System.IntPtr adlx_load_library(SWIGTYPE_p_wchar_t filename) {
+    global::System.IntPtr ret = ADLXPINVOKE.adlx_load_library(SWIGTYPE_p_wchar_t.getCPtr(filename));
     return ret;
   }
 
-  public static int adlx_free_library(SWIGTYPE_p_void module) {
-    int ret = ADLXPINVOKE.adlx_free_library(SWIGTYPE_p_void.getCPtr(module));
+  public static int adlx_free_library(global::System.IntPtr module) {
+    int ret = ADLXPINVOKE.adlx_free_library(module);
     return ret;
   }
 
-  public static SWIGTYPE_p_void adlx_get_proc_address(SWIGTYPE_p_void module, string procName) {
-    global::System.IntPtr cPtr = ADLXPINVOKE.adlx_get_proc_address(SWIGTYPE_p_void.getCPtr(module), procName);
-    SWIGTYPE_p_void ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
+  public static global::System.IntPtr adlx_get_proc_address(global::System.IntPtr module, string procName) {
+    global::System.IntPtr ret = ADLXPINVOKE.adlx_get_proc_address(module, procName);
     return ret;
   }
 
@@ -377,30 +375,30 @@ public class ADLX {
     return ret;
   }
 
-  public static ADLX_Point new_adlx_pointP() {
-    global::System.IntPtr cPtr = ADLXPINVOKE.new_adlx_pointP();
+  public static ADLX_Point new_pointP() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_pointP();
     ADLX_Point ret = (cPtr == global::System.IntPtr.Zero) ? null : new ADLX_Point(cPtr, false);
     return ret;
   }
 
-  public static ADLX_Point copy_adlx_pointP(ADLX_Point value) {
-    global::System.IntPtr cPtr = ADLXPINVOKE.copy_adlx_pointP(ADLX_Point.getCPtr(value));
+  public static ADLX_Point copy_pointP(ADLX_Point value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_pointP(ADLX_Point.getCPtr(value));
     ADLX_Point ret = (cPtr == global::System.IntPtr.Zero) ? null : new ADLX_Point(cPtr, false);
     if (ADLXPINVOKE.SWIGPendingException.Pending) throw ADLXPINVOKE.SWIGPendingException.Retrieve();
     return ret;
   }
 
-  public static void delete_adlx_pointP(ADLX_Point obj) {
-    ADLXPINVOKE.delete_adlx_pointP(ADLX_Point.getCPtr(obj));
+  public static void delete_pointP(ADLX_Point obj) {
+    ADLXPINVOKE.delete_pointP(ADLX_Point.getCPtr(obj));
   }
 
-  public static void adlx_pointP_assign(ADLX_Point obj, ADLX_Point value) {
-    ADLXPINVOKE.adlx_pointP_assign(ADLX_Point.getCPtr(obj), ADLX_Point.getCPtr(value));
+  public static void pointP_assign(ADLX_Point obj, ADLX_Point value) {
+    ADLXPINVOKE.pointP_assign(ADLX_Point.getCPtr(obj), ADLX_Point.getCPtr(value));
     if (ADLXPINVOKE.SWIGPendingException.Pending) throw ADLXPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ADLX_Point adlx_pointP_value(ADLX_Point obj) {
-    ADLX_Point ret = new ADLX_Point(ADLXPINVOKE.adlx_pointP_value(ADLX_Point.getCPtr(obj)), true);
+  public static ADLX_Point pointP_value(ADLX_Point obj) {
+    ADLX_Point ret = new ADLX_Point(ADLXPINVOKE.pointP_value(ADLX_Point.getCPtr(obj)), true);
     return ret;
   }
 
@@ -712,6 +710,58 @@ public class ADLX {
   public static IADLXGPU gpuP_Ptr_value(SWIGTYPE_p_p_adlx__IADLXGPU obj) {
     global::System.IntPtr cPtr = ADLXPINVOKE.gpuP_Ptr_value(SWIGTYPE_p_p_adlx__IADLXGPU.getCPtr(obj));
     IADLXGPU ret = (cPtr == global::System.IntPtr.Zero) ? null : new IADLXGPU(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXGPU1 new_gpu1P_Ptr() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_gpu1P_Ptr();
+    SWIGTYPE_p_p_adlx__IADLXGPU1 ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXGPU1(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXGPU1 copy_gpu1P_Ptr(IADLXGPU1 value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_gpu1P_Ptr(IADLXGPU1.getCPtr(value));
+    SWIGTYPE_p_p_adlx__IADLXGPU1 ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXGPU1(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_gpu1P_Ptr(SWIGTYPE_p_p_adlx__IADLXGPU1 obj) {
+    ADLXPINVOKE.delete_gpu1P_Ptr(SWIGTYPE_p_p_adlx__IADLXGPU1.getCPtr(obj));
+  }
+
+  public static void gpu1P_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXGPU1 obj, IADLXGPU1 value) {
+    ADLXPINVOKE.gpu1P_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXGPU1.getCPtr(obj), IADLXGPU1.getCPtr(value));
+  }
+
+  public static IADLXGPU1 gpu1P_Ptr_value(SWIGTYPE_p_p_adlx__IADLXGPU1 obj) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.gpu1P_Ptr_value(SWIGTYPE_p_p_adlx__IADLXGPU1.getCPtr(obj));
+    IADLXGPU1 ret = (cPtr == global::System.IntPtr.Zero) ? null : new IADLXGPU1(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXGPU2 new_gpu2P_Ptr() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_gpu2P_Ptr();
+    SWIGTYPE_p_p_adlx__IADLXGPU2 ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXGPU2(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXGPU2 copy_gpu2P_Ptr(IADLXGPU2 value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_gpu2P_Ptr(IADLXGPU2.getCPtr(value));
+    SWIGTYPE_p_p_adlx__IADLXGPU2 ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXGPU2(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_gpu2P_Ptr(SWIGTYPE_p_p_adlx__IADLXGPU2 obj) {
+    ADLXPINVOKE.delete_gpu2P_Ptr(SWIGTYPE_p_p_adlx__IADLXGPU2.getCPtr(obj));
+  }
+
+  public static void gpu2P_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXGPU2 obj, IADLXGPU2 value) {
+    ADLXPINVOKE.gpu2P_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXGPU2.getCPtr(obj), IADLXGPU2.getCPtr(value));
+  }
+
+  public static IADLXGPU2 gpu2P_Ptr_value(SWIGTYPE_p_p_adlx__IADLXGPU2 obj) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.gpu2P_Ptr_value(SWIGTYPE_p_p_adlx__IADLXGPU2.getCPtr(obj));
+    IADLXGPU2 ret = (cPtr == global::System.IntPtr.Zero) ? null : new IADLXGPU2(cPtr, false);
     return ret;
   }
 
@@ -1101,6 +1151,31 @@ public class ADLX {
 
   public static string charP_Ptr_value(SWIGTYPE_p_p_char obj) {
     string ret = ADLXPINVOKE.charP_Ptr_value(SWIGTYPE_p_p_char.getCPtr(obj));
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_void new_voidP_Ptr() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_voidP_Ptr();
+    SWIGTYPE_p_p_void ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_void(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_void copy_voidP_Ptr(global::System.IntPtr value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_voidP_Ptr(value);
+    SWIGTYPE_p_p_void ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_void(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_voidP_Ptr(SWIGTYPE_p_p_void obj) {
+    ADLXPINVOKE.delete_voidP_Ptr(SWIGTYPE_p_p_void.getCPtr(obj));
+  }
+
+  public static void voidP_Ptr_assign(SWIGTYPE_p_p_void obj, global::System.IntPtr value) {
+    ADLXPINVOKE.voidP_Ptr_assign(SWIGTYPE_p_p_void.getCPtr(obj), value);
+  }
+
+  public static global::System.IntPtr voidP_Ptr_value(SWIGTYPE_p_p_void obj) {
+    global::System.IntPtr ret = ADLXPINVOKE.voidP_Ptr_value(SWIGTYPE_p_p_void.getCPtr(obj));
     return ret;
   }
 

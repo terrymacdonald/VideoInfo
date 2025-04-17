@@ -903,9 +903,9 @@ namespace DisplayMagicianShared.AMD
                                 newDesktop.SizeWidth = ADLX.intP_value(pWidth);
                                 newDesktop.SizeHeight = ADLX.intP_value(pHeight);
 
-                                ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
+                                ADLX_Point pLocationTopLeft = ADLX.new_pointP();
                                 desktop.TopLeft(pLocationTopLeft);
-                                newDesktop.TopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
+                                newDesktop.TopLeft = ADLX.pointP_value(pLocationTopLeft);
 
                                 SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_desktopTypeP();
                                 desktop.Type(pDesktopType);
@@ -918,13 +918,46 @@ namespace DisplayMagicianShared.AMD
                                     isEyefinityEnabled = true;
                                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Eyefinity desktop detected");
                                     // TODO - Get the eyefinity desktop
-                                    
-                                    /*// If you need to work with `IADLXEyefinityDesktop`, you can query the interface from the `IADLXDesktop` object.
-                                    SWIGTYPE_p_p_adlx__IADLXEyefinityDesktop ppEyefinityDesktop = ADLX.new_eyefinityDesktopP_Ptr();
-                                    SWIGTYPE_p_p_void ppInterface = ADLX.();
-                                    desktop.QueryInterface(IADLXEyefinityDesktop.IID(), ppInterface);
-                                    status = desktop.QueryInterface(IADLXEyefinityDesktop.IID(), IADLXEyefinityDesktop.getCPtr(IADLXDesktop.getCPtr(desktop)));
-                                    IADLXEyefinityDesktop eyefinityDesktop = ADLX.eyefinityDesktopP_Ptr_value(ppEyefinityDesktop);*/
+
+                                    // 1. Allocate a void** via SWIG
+                                    SWIGTYPE_p_p_void ppVoid = ADLX.new_voidP_Ptr();
+
+                                    // 2. Call QueryInterface with the IID for IADLXEyefinityDesktop
+                                    status = desktop.QueryInterface(
+                                        IADLXEyefinityDesktop.IID(),
+                                        ppVoid
+                                    );
+
+                                    // 3. Check HRESULT
+                                    if (status != ADLX_RESULT.ADLX_OK)
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                                        return CreateDefaultConfig(); ;
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Successfully got the display list");
+
+                                        // 4. Extract the raw IntPtr from the void**
+                                        IntPtr rawPtr = ADLX.voidP_Ptr_value(ppVoid);
+
+                                        // 5. Wrap it in the managed proxy
+                                        //    (Constructor args may vary based on SWIG config)
+                                        IADLXEyefinityDesktop eyefinityDesktop = new IADLXEyefinityDesktop(rawPtr, true);
+
+                                        // 6. Use the interface...
+                                        SWIGTYPE_p_unsigned_int pRow = ADLX.new_uintP();
+                                        ADLX.uintP_assign(pRow, 0);
+                                        SWIGTYPE_p_unsigned_int pCol = ADLX.new_uintP();
+                                        ADLX.uintP_assign(pCol, 0);
+                                        SWIGTYPE_p_p_adlx__IADLXEyefinityDesktop ppEDesktop = ADLX.new_eyefinityDesktopP_Ptr();
+                                        eyefinityDesktop.GridSize(pRow, pCol);
+
+
+                                        // 7. Release when done
+                                        eyefinityDesktop.Release();
+                                        ADLX.delete_voidP_Ptr(ppVoid);
+                                    }
                                 }
                                 else if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_DUPLCATE)
                                 {

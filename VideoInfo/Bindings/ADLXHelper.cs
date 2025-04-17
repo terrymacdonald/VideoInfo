@@ -59,8 +59,8 @@ public class ADLXHelper : global::System.IDisposable {
   public ADLXHelper() : this(ADLXPINVOKE.new_ADLXHelper(), true) {
   }
 
-  public ADLX_RESULT InitializeWithCallerAdl(SWIGTYPE_p_void adlContext, SWIGTYPE_p_f_p_p_void__void adlMainMemoryFree) {
-    ADLX_RESULT ret = (ADLX_RESULT)ADLXPINVOKE.ADLXHelper_InitializeWithCallerAdl(swigCPtr, SWIGTYPE_p_void.getCPtr(adlContext), SWIGTYPE_p_f_p_p_void__void.getCPtr(adlMainMemoryFree));
+  public ADLX_RESULT InitializeWithCallerAdl(global::System.IntPtr adlContext, SWIGTYPE_p_f_p_p_void__void adlMainMemoryFree) {
+    ADLX_RESULT ret = (ADLX_RESULT)ADLXPINVOKE.ADLXHelper_InitializeWithCallerAdl(swigCPtr, adlContext, SWIGTYPE_p_f_p_p_void__void.getCPtr(adlMainMemoryFree));
     return ret;
   }
 
