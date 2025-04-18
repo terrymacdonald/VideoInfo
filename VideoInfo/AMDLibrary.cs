@@ -1730,38 +1730,46 @@ namespace DisplayMagicianShared.AMD
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Eyefinity layout is NOT required, so we need to destroy the Eyefinity Desktop");
-
-                        // Setup the EyefinityDesktop using the settings the driver stores internally
-                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to get the ADLX EyefinityDesktop object");
-                        // Get eyefinitydisplay list
-                        SWIGTYPE_p_p_adlx__IADLXSimpleEyefinity ppSimpleEyefinity = ADLX.new_simpleEyefinityP_Ptr();
-                        status = desktopService.GetSimpleEyefinity(ppSimpleEyefinity);
-                        IADLXSimpleEyefinity simpleEyefinity = ADLX.simpleEyefinityP_Ptr_value(ppSimpleEyefinity);
-
-                        if (status != ADLX_RESULT.ADLX_OK)
+                        if (ActiveDisplayConfig.IsEyefinity)
                         {
-                            SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error getting the ADLX SimpleEyefinity object. systemServices.GetSimpleEyefinity() returned error code {status}");
-                            return false;
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully got the ADLX SimpleEyefinity object");
-                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to destroy all the ADLX Eyefinity Desktops");
-                            SWIGTYPE_p_p_adlx__IADLXEyefinityDesktop ppEyefinityDesktop = ADLX.new_eyefinityDesktopP_Ptr();
-                            status = simpleEyefinity.DestroyAll();
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Eyefinity layout is currently in use but is NOT required, so we need to destroy the Eyefinity Desktop");
+
+                            // Setup the EyefinityDesktop using the settings the driver stores internally
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to get the ADLX EyefinityDesktop object");
+                            // Get eyefinitydisplay list
+                            SWIGTYPE_p_p_adlx__IADLXSimpleEyefinity ppSimpleEyefinity = ADLX.new_simpleEyefinityP_Ptr();
+                            status = desktopService.GetSimpleEyefinity(ppSimpleEyefinity);
+                            IADLXSimpleEyefinity simpleEyefinity = ADLX.simpleEyefinityP_Ptr_value(ppSimpleEyefinity);
+
                             if (status != ADLX_RESULT.ADLX_OK)
                             {
-                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error destroying all existing ADLX Eyefinity Desktops. systemServices.GetSimpleEyefinity() returned error code {status}");
+                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error getting the ADLX SimpleEyefinity object. systemServices.GetSimpleEyefinity() returned error code {status}");
                                 return false;
                             }
                             else
                             {
-                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Successfully destroyed all existing ADLX Eyefinity Desktops. ");
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully got the ADLX SimpleEyefinity object");
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to destroy all the ADLX Eyefinity Desktops");
+                                SWIGTYPE_p_p_adlx__IADLXEyefinityDesktop ppEyefinityDesktop = ADLX.new_eyefinityDesktopP_Ptr();
+                                status = simpleEyefinity.DestroyAll();
+                                if (status != ADLX_RESULT.ADLX_OK)
+                                {
+                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error destroying all existing ADLX Eyefinity Desktops. systemServices.GetSimpleEyefinity() returned error code {status}");
+                                    return false;
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Successfully destroyed all existing ADLX Eyefinity Desktops. ");
+                                }
                             }
+                            // Release simpleEyefinity interface
+                            simpleEyefinity.Release();
+
                         }
-                        // Release simpleEyefinity interface
-                        simpleEyefinity.Release();
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Eyefinity layout is not currently in use and is NOT required, so leaving things as they are.");
+                        }
                     }                    
                 }
 
