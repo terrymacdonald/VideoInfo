@@ -1056,9 +1056,9 @@ namespace DisplayMagicianShared.NVIDIA
         ///     parameters should be reported (false).
         /// </param>
         /// <returns>HDR capabilities of the display</returns>
-        public static HDRCapabilitiesV1 GetHDRCapabilities(uint displayId, bool driverExpandDefaultHDRParameters)
+        public static HDRCapabilitiesV3 GetHDRCapabilities(uint displayId, bool driverExpandDefaultHDRParameters)
         {
-            var hdrCapabilities = new HDRCapabilitiesV1(driverExpandDefaultHDRParameters);
+            var hdrCapabilities = new HDRCapabilitiesV3(driverExpandDefaultHDRParameters);
 
             using (var hdrCapabilitiesReference = ValueTypeReference.FromValueType(hdrCapabilities))
             {
@@ -1072,7 +1072,7 @@ namespace DisplayMagicianShared.NVIDIA
                     throw new NVIDIAApiException(status);
                 }
 
-                return hdrCapabilitiesReference.ToValueType<HDRCapabilitiesV1>().GetValueOrDefault();
+                return hdrCapabilitiesReference.ToValueType<HDRCapabilitiesV3>().GetValueOrDefault();
             }
         }
 

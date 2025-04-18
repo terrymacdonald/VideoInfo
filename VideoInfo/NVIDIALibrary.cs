@@ -1240,27 +1240,12 @@ namespace DisplayMagicianShared.NVIDIA
                                 }
                                 catch (Exception ex)
                                 {
-                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the standard  color data from the display.");
-                                    ColorDataV4 colorData4 = new ColorDataV4(ColorDataCommand.Get);
-                                    try
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the standard  color data from the display.");
-                                        NVAPI.ColorControl(displayIds[displayIndex].DisplayId, ref colorData4);
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the standard  color data from the display.");
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Your monitor {displayIds[displayIndex].DisplayId} has the following color settings set. BPC = {colorData4.DesktopColorDepth.ToString()}. Color Format = {colorData4.ColorFormat.ToString("G")}. Colorimetry = {colorData4.Colorimetry.ToString("G")}. Color Selection Policy = {colorData4.SelectionPolicy.ToString()}. Color Depth = {colorData4.ColorDepth.ToString()}. Dynamic Range = {colorData4.DynamicRange.ToString()}.");
-                                        myDisplay.ColorData = colorData4;
-                                        myDisplay.HasColorData = true;
-
-                                    }
-                                    catch (Exception nex)
-                                    {
-                                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the standard  color data from the display.");
-                                    }
+                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the standard color data from the display.");
                                 }
 
                                 // Now we get the HDR capabilities of the display
                                 // TODO: CHange to HDRCapabilitiesV3 once the v3 struct is completed and tested
-                                IHDRCapabilities hdrCapabilities;
+                                HDRCapabilitiesV3 hdrCapabilities;
                                 try
                                 {
                                     hdrCapabilities = NVAPI.GetHDRCapabilities(displayIds[displayIndex].DisplayId, false);
@@ -1326,7 +1311,7 @@ namespace DisplayMagicianShared.NVIDIA
                             
  
                                 // Now we get the HDR colour settings of the display
-                                IHDRColorData hdrColorData;
+                                HDRColorDataV2 hdrColorData;
                                 try
                                 {
                                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the HDR Color Mode for Display ID# {displayIds[displayIndex].DisplayId}.");
