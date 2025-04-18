@@ -254,6 +254,8 @@ namespace DisplayMagicianShared.AMD
         public long UniqueID;
         public bool IsSupportedColorDepth;
         public ADLX_COLOR_DEPTH ColorDepth;
+        public bool IsSupportedCustomColorBrightness;
+        public int CustomColorBrightness;
 
         public AMD_DISPLAY_WITH_SETTINGS()
         {
@@ -438,7 +440,7 @@ namespace DisplayMagicianShared.AMD
         public bool IsEyefinity;
         public List<AMD_DESKTOP> Desktops;
         public AMD_EYEFINITY_DESKTOP EyefinityDesktop;
-        public List<AMD_DISPLAY_WITH_SETTINGS> Displays;
+        public Dictionary<long,AMD_DISPLAY_WITH_SETTINGS> Displays;
         public List<string> DisplayIdentifiers;
 
         public AMD_DISPLAY_CONFIG()
@@ -448,7 +450,7 @@ namespace DisplayMagicianShared.AMD
             IsEyefinity = false;
             Desktops = new List<AMD_DESKTOP>();
             EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
-            Displays = new List<AMD_DISPLAY_WITH_SETTINGS>();
+            Displays = new Dictionary<long,AMD_DISPLAY_WITH_SETTINGS>();
             DisplayIdentifiers = new List<string>();
         }
 
@@ -829,9 +831,9 @@ namespace DisplayMagicianShared.AMD
                                 AMD_DESKTOP newDesktop = new AMD_DESKTOP();
                                 newDesktop.Displays = new List<AMD_DISPLAY>();
 
-                                SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_uintP();
+                                SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_adlx_uintP();
                                 desktop.GetNumberOfDisplays(pNumDisplays);
-                                newDesktop.NumberOfDisplays = ADLX.uintP_value(pNumDisplays);
+                                newDesktop.NumberOfDisplays = ADLX.adlx_uintP_value(pNumDisplays);
                                 SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is {newDesktop.NumberOfDisplays}");
 
                                 if (newDesktop.NumberOfDisplays > 0)
@@ -862,14 +864,14 @@ namespace DisplayMagicianShared.AMD
                                                 AMD_DISPLAY newDisplay = new AMD_DISPLAY();
 
                                                 // Get the display connection type
-                                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
                                                 display.ConnectorType(pConnect);
-                                                newDisplay.ConnectorType = ADLX.disConnectTypeP_value(pConnect);
+                                                newDisplay.ConnectorType = ADLX.adlx_displayConnectTypeP_value(pConnect);
 
                                                 // Get the display type
-                                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
                                                 display.DisplayType(pDisType);
-                                                newDisplay.DisplayType = ADLX.displayTypeP_value(pDisType);
+                                                newDisplay.DisplayType = ADLX.adlx_displayTypeP_value(pDisType);
 
                                                 // Get the EDID
                                                 SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
@@ -877,9 +879,9 @@ namespace DisplayMagicianShared.AMD
                                                 String edid = ADLX.charP_Ptr_value(ppEDID);
 
                                                 // Get the manufacturer ID
-                                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
                                                 display.ManufacturerID(pMID);
-                                                newDisplay.ManufacturerID = ADLX.uintP_value(pMID);
+                                                newDisplay.ManufacturerID = ADLX.adlx_uintP_value(pMID);
 
                                                 // Get the display name
                                                 SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
@@ -888,32 +890,36 @@ namespace DisplayMagicianShared.AMD
                                                 newDisplay.Name = name;
 
                                                 // Get the native resolution
-                                                SWIGTYPE_p_int pMaxHRes = ADLX.new_intP();
-                                                SWIGTYPE_p_int pMaxVRes = ADLX.new_intP();
+                                                SWIGTYPE_p_int pMaxHRes = ADLX.new_adlx_intP();
+                                                SWIGTYPE_p_int pMaxVRes = ADLX.new_adlx_intP();
                                                 display.NativeResolution(pMaxHRes, pMaxVRes);
-                                                newDisplay.MaxHResolution = ADLX.intP_value(pMaxHRes);
-                                                newDisplay.MaxVResolution = ADLX.intP_value(pMaxVRes);
+                                                newDisplay.MaxHResolution = ADLX.adlx_intP_value(pMaxHRes);
+                                                newDisplay.MaxVResolution = ADLX.adlx_intP_value(pMaxVRes);
 
                                                 // Get the PixelClock
-                                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_uintP();
+                                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_adlx_uintP();
                                                 display.PixelClock(pPixelClock);
-                                                newDisplay.PixelClock = ADLX.uintP_value(pPixelClock);
+                                                newDisplay.PixelClock = ADLX.adlx_uintP_value(pPixelClock);
                                                 // Get the refresh rate
                                                 SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
                                                 display.RefreshRate(pRefreshRate);
                                                 newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
 
                                                 // Get the scan type
-                                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
+                                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_adlx_displayScanTypeP();
                                                 display.ScanType(pScanType);
-                                                newDisplay.ScanType = ADLX.disScanTypeP_value(pScanType);
+                                                newDisplay.ScanType = ADLX.adlx_displayScanTypeP_value(pScanType);
 
                                                 // Get the Unique ID
                                                 SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
                                                 display.UniqueId(pUID);
                                                 newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
 
-                                                // Save the Display to the list for this desktop
+                                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
+                                                display.UniqueId(pID);
+                                                uint id = ADLX.adlx_sizeP_value(pID);
+
+                                                // Add the new display to the list of displays for this desktop
                                                 newDesktop.Displays.Add(newDisplay);
                                             }
                                         }
@@ -924,23 +930,23 @@ namespace DisplayMagicianShared.AMD
                                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is 0, so not getting list of displays. Skipping.");
                                 }
 
-                                SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_orientationP();
+                                SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_adlx_orientationP();
                                 desktop.Orientation(pOrientation);
-                                newDesktop.Orientation = ADLX.orientationP_value(pOrientation);
+                                newDesktop.Orientation = ADLX.adlx_orientationP_value(pOrientation);
 
-                                SWIGTYPE_p_int pWidth = ADLX.new_intP();
-                                SWIGTYPE_p_int pHeight = ADLX.new_intP();
+                                SWIGTYPE_p_int pWidth = ADLX.new_adlx_intP();
+                                SWIGTYPE_p_int pHeight = ADLX.new_adlx_intP();
                                 desktop.Size(pWidth, pHeight);
-                                newDesktop.SizeWidth = ADLX.intP_value(pWidth);
-                                newDesktop.SizeHeight = ADLX.intP_value(pHeight);
+                                newDesktop.SizeWidth = ADLX.adlx_intP_value(pWidth);
+                                newDesktop.SizeHeight = ADLX.adlx_intP_value(pHeight);
 
-                                ADLX_Point pLocationTopLeft = ADLX.new_pointP();
+                                ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
                                 desktop.TopLeft(pLocationTopLeft);
-                                newDesktop.TopLeft = ADLX.pointP_value(pLocationTopLeft);
+                                newDesktop.TopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
 
-                                SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_desktopTypeP();
+                                SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_adlx_desktopTypeP();
                                 desktop.Type(pDesktopType);
-                                newDesktop.Type = ADLX.desktopTypeP_value(pDesktopType);
+                                newDesktop.Type = ADLX.adlx_desktopTypeP_value(pDesktopType);
 
                                 // The the desktop is an eyefinity desktop then set the eyefinity enabled flag
                                 // and also process the EyefinityDesktop layout
@@ -978,13 +984,13 @@ namespace DisplayMagicianShared.AMD
 
                                         // Use the EyefinityDesktop object to get the Eyefinity layout
                                         SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Getting the rows and columns of the diaplay grid for the Eyefinity desktop");
-                                        SWIGTYPE_p_unsigned_int pRow = ADLX.new_uintP();
-                                        ADLX.uintP_assign(pRow, 0);
-                                        SWIGTYPE_p_unsigned_int pCol = ADLX.new_uintP();
-                                        ADLX.uintP_assign(pCol, 0);
+                                        SWIGTYPE_p_unsigned_int pRow = ADLX.new_adlx_uintP();
+                                        ADLX.adlx_uintP_assign(pRow, 0);
+                                        SWIGTYPE_p_unsigned_int pCol = ADLX.new_adlx_uintP();
+                                        ADLX.adlx_uintP_assign(pCol, 0);
                                         eyefinityDesktop.GridSize(pRow, pCol);
-                                        myDisplayConfig.EyefinityDesktop.Rows = ADLX.uintP_value(pRow);
-                                        myDisplayConfig.EyefinityDesktop.Columns = ADLX.uintP_value(pCol);
+                                        myDisplayConfig.EyefinityDesktop.Rows = ADLX.adlx_uintP_value(pRow);
+                                        myDisplayConfig.EyefinityDesktop.Columns = ADLX.adlx_uintP_value(pCol);
 
                                         /*for (uint row=1; row<gridRows; row++)
                                         {
@@ -1094,14 +1100,14 @@ namespace DisplayMagicianShared.AMD
                                 AMD_DISPLAY_WITH_SETTINGS newDisplay = new AMD_DISPLAY_WITH_SETTINGS();
 
                                 // Get the display connection type
-                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
                                 display.ConnectorType(pConnect);
-                                newDisplay.ConnectorType = ADLX.disConnectTypeP_value(pConnect);
+                                newDisplay.ConnectorType = ADLX.adlx_displayConnectTypeP_value(pConnect);
 
                                 // Get the display type
-                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
                                 display.DisplayType(pDisType);
-                                newDisplay.DisplayType = ADLX.displayTypeP_value(pDisType);
+                                newDisplay.DisplayType = ADLX.adlx_displayTypeP_value(pDisType);
 
                                 // Get the EDID
                                 SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
@@ -1109,9 +1115,9 @@ namespace DisplayMagicianShared.AMD
                                 String edid = ADLX.charP_Ptr_value(ppEDID);
 
                                 // Get the manufacturer ID
-                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
                                 display.ManufacturerID(pMID);
-                                newDisplay.ManufacturerID = ADLX.uintP_value(pMID);
+                                newDisplay.ManufacturerID = ADLX.adlx_uintP_value(pMID);
 
                                 // Get the display name
                                 SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
@@ -1120,25 +1126,25 @@ namespace DisplayMagicianShared.AMD
                                 newDisplay.Name = name;
 
                                 // Get the native resolution
-                                SWIGTYPE_p_int pMaxHRes = ADLX.new_intP();
-                                SWIGTYPE_p_int pMaxVRes = ADLX.new_intP();
+                                SWIGTYPE_p_int pMaxHRes = ADLX.new_adlx_intP();
+                                SWIGTYPE_p_int pMaxVRes = ADLX.new_adlx_intP();
                                 display.NativeResolution(pMaxHRes, pMaxVRes);
-                                newDisplay.MaxHResolution = ADLX.intP_value(pMaxHRes);
-                                newDisplay.MaxVResolution = ADLX.intP_value(pMaxVRes);
+                                newDisplay.MaxHResolution = ADLX.adlx_intP_value(pMaxHRes);
+                                newDisplay.MaxVResolution = ADLX.adlx_intP_value(pMaxVRes);
 
                                 // Get the PixelClock
-                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_uintP();
+                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_adlx_uintP();
                                 display.PixelClock(pPixelClock);
-                                newDisplay.PixelClock = ADLX.uintP_value(pPixelClock);
+                                newDisplay.PixelClock = ADLX.adlx_uintP_value(pPixelClock);
                                 // Get the refresh rate
                                 SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
                                 display.RefreshRate(pRefreshRate);
                                 newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
 
                                 // Get the scan type
-                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
+                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_adlx_displayScanTypeP();
                                 display.ScanType(pScanType);
-                                newDisplay.ScanType = ADLX.disScanTypeP_value(pScanType);
+                                newDisplay.ScanType = ADLX.adlx_displayScanTypeP_value(pScanType);
 
                                 // Get the Unique ID
                                 SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
@@ -1146,14 +1152,98 @@ namespace DisplayMagicianShared.AMD
                                 newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
 
                                 // Ok now start getting the various settings for this display
-                                // Get the Display Color Depth
 
-                                /*SWIGTYPE_p_p_adlx__IADLXDisplayColorDepth pColorDepth = ADLX.;
-                                display.ColorDepth(pColorDepth);
-                                newDisplay.ColorDepth = ADLX.disColorDepthP_value(pColorDepth);*/
+                                //------------------------------------
+                                // GET THE COLOR DEPTH IF WE CAN
+                                //------------------------------------
+                                // Get the current color depth for this display
+                                SWIGTYPE_p_p_adlx__IADLXDisplayColorDepth ppColorDepth = ADLX.new_displayColorDepthP_Ptr();
+                                status = displayService.GetColorDepth(display, ppColorDepth);
+                                if (status != ADLX_RESULT.ADLX_OK)
+                                {
+                                    SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display color depth object. systemServices.GetColorDepth() returned error code {status}");
+                                    //return false;
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display color depth object");
+                                    // Check if the color depth is the same as the one we stored
+                                    IADLXDisplayColorDepth colorDepth = ADLX.displayColorDepthP_Ptr_value(ppColorDepth);
+                                    // Check if the color depth is supported
+                                    SWIGTYPE_p_bool pIsSupported = ADLX.new_boolP();
+                                    status = colorDepth.IsSupported(pIsSupported);
+                                    if (status == ADLX_RESULT.ADLX_OK)
+                                    {
+                                        newDisplay.IsSupportedColorDepth = ADLX.boolP_value(pIsSupported);
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Color Depth can be set for this display");
+                                        
+                                        // Get the current color depth for this display
+                                        SWIGTYPE_p_ADLX_COLOR_DEPTH pColorDepth = ADLX.new_adlx_colorDepthP();
+                                        status = colorDepth.GetValue(pColorDepth);
 
-                                // Save the Display to the main list of displays
-                                myDisplayConfig.Displays.Add(newDisplay);
+                                        if (status != ADLX_RESULT.ADLX_OK)
+                                        {
+                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display color depth. systemServices.GetColorDepth() returned error code {status}");
+                                            //return false;
+                                        }
+                                        else
+                                        {
+                                            newDisplay.ColorDepth = ADLX.adlx_colorDepthP_value(pColorDepth);
+                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display color depth for this display: {newDisplay.ColorDepth}");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Color Depth is NOT supported for this display so skipping setting it");
+                                    }
+                                }
+
+                                //------------------------------------
+                                // GET THE DISPLAY CUSTOM COLOR IF POSSIBLE
+                                //------------------------------------
+                                // Get the current custom color object for this display
+                                SWIGTYPE_p_p_adlx__IADLXDisplayCustomColor ppCustomColor = ADLX.new_displayCustomColorP_Ptr();
+                                status = displayService.GetCustomColor(display, ppCustomColor);
+                                if (status != ADLX_RESULT.ADLX_OK)
+                                {
+                                    SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display custom color object. systemServices.GetCustomColor() returned error code {status}");
+                                    //return false;
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display custom color object");
+                                    IADLXDisplayCustomColor customColor = ADLX.displayCustomColorP_Ptr_value(ppCustomColor);
+                                    // Check if the custom color brightness is supported
+                                    SWIGTYPE_p_bool pIsBrightnessSupported = ADLX.new_boolP();
+                                    status = customColor.IsBrightnessSupported(pIsBrightnessSupported);
+                                    if (status == ADLX_RESULT.ADLX_OK)
+                                    {
+                                        newDisplay.IsSupportedCustomColorBrightness = ADLX.boolP_value(pIsBrightnessSupported);
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Brightness can be set for this display!");
+                                        // Get the current color brightness for this display
+                                        SWIGTYPE_p_int pCurrentBrightness = ADLX.new_adlx_intP();
+                                        status = customColor.GetBrightness(pCurrentBrightness);
+                                        if (status != ADLX_RESULT.ADLX_OK)
+                                        {
+                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display custom color brightness. systemServices.GetCustomColor() returned error code {status}");
+                                            //return false;
+                                        }
+                                        else
+                                        {
+                                            newDisplay.CustomColorBrightness = ADLX.adlx_intP_value(pCurrentBrightness);
+                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display custom color brightness for this display: {newDisplay.CustomColorBrightness}");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Brightness is NOT supported for this display.");
+                                    }
+                                }
+                                SharedLogger.logger.Warn($"AMDLibrary/GetAMDDisplayConfig: Found the display settings for this UniqueID but it has a different name");
+
+
+                                // Save the Display to the main dictionary of displays with the uniqueid as the key
+                                myDisplayConfig.Displays.Add(newDisplay.UniqueID, newDisplay);
                             }
                         }
                     }
@@ -1638,7 +1728,41 @@ namespace DisplayMagicianShared.AMD
 
                         }
                     }
-                    
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Eyefinity layout is NOT required, so we need to destroy the Eyefinity Desktop");
+
+                        // Setup the EyefinityDesktop using the settings the driver stores internally
+                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to get the ADLX EyefinityDesktop object");
+                        // Get eyefinitydisplay list
+                        SWIGTYPE_p_p_adlx__IADLXSimpleEyefinity ppSimpleEyefinity = ADLX.new_simpleEyefinityP_Ptr();
+                        status = desktopService.GetSimpleEyefinity(ppSimpleEyefinity);
+                        IADLXSimpleEyefinity simpleEyefinity = ADLX.simpleEyefinityP_Ptr_value(ppSimpleEyefinity);
+
+                        if (status != ADLX_RESULT.ADLX_OK)
+                        {
+                            SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error getting the ADLX SimpleEyefinity object. systemServices.GetSimpleEyefinity() returned error code {status}");
+                            return false;
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully got the ADLX SimpleEyefinity object");
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to destroy all the ADLX Eyefinity Desktops");
+                            SWIGTYPE_p_p_adlx__IADLXEyefinityDesktop ppEyefinityDesktop = ADLX.new_eyefinityDesktopP_Ptr();
+                            status = simpleEyefinity.DestroyAll();
+                            if (status != ADLX_RESULT.ADLX_OK)
+                            {
+                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Error destroying all existing ADLX Eyefinity Desktops. systemServices.GetSimpleEyefinity() returned error code {status}");
+                                return false;
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: Successfully destroyed all existing ADLX Eyefinity Desktops. ");
+                            }
+                        }
+                        // Release simpleEyefinity interface
+                        simpleEyefinity.Release();
+                    }                    
                 }
 
                 // Release desktop services interface
@@ -1692,7 +1816,7 @@ namespace DisplayMagicianShared.AMD
                     else
                     {
                         SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Successfully got the display list");
-                        // Iterate through the display list
+                        // Iterate through the display list and see if we need to change any settings
                         uint it = displayList.Begin();
                         for (; it != displayList.Size(); it++)
                         {
@@ -1702,63 +1826,142 @@ namespace DisplayMagicianShared.AMD
 
                             if (status == ADLX_RESULT.ADLX_OK)
                             {
-                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
-                                display.Name(ppName);
-                                String name = ADLX.charP_Ptr_value(ppName);
-
-                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
-                                display.DisplayType(pDisType);
-                                ADLX_DISPLAY_TYPE disType = ADLX.displayTypeP_value(pDisType);
-
-                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
-                                display.ManufacturerID(pMID);
-                                long mid = ADLX.uintP_value(pMID);
-
-                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
-                                display.ConnectorType(pConnect);
-                                ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.disConnectTypeP_value(pConnect);
-
-                                SWIGTYPE_p_p_char ppEDIE = ADLX.new_charP_Ptr();
-                                display.EDID(ppEDIE);
-                                String edid = ADLX.charP_Ptr_value(ppEDIE);
-
-                                SWIGTYPE_p_int pH = ADLX.new_intP();
-                                SWIGTYPE_p_int pV = ADLX.new_intP();
-                                display.NativeResolution(pH, pV);
-                                int h = ADLX.intP_value(pH);
-                                int v = ADLX.intP_value(pV);
-
-                                SWIGTYPE_p_double pRefRate = ADLX.new_doubleP();
-                                display.RefreshRate(pRefRate);
-                                double refRate = ADLX.doubleP_value(pRefRate);
-
-                                SWIGTYPE_p_unsigned_int pPixClock = ADLX.new_uintP();
-                                display.PixelClock(pPixClock);
-                                long pixClock = ADLX.uintP_value(pPixClock);
-
-                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
-                                display.ScanType(pScanType);
-                                ADLX_DISPLAY_SCAN_TYPE scanType = ADLX.disScanTypeP_value(pScanType);
-
                                 SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
                                 display.UniqueId(pID);
                                 uint id = ADLX.adlx_sizeP_value(pID);
 
-                                Console.WriteLine(String.Format("\nThe display [{0}]:", it));
-                                Console.WriteLine(String.Format("\tName: {0}", name));
-                                Console.WriteLine(String.Format("\tType: {0}", disType));
-                                Console.WriteLine(String.Format("\tConnector type: {0}", connect));
-                                Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));
-                                //Console.WriteLine(String.Format("\tEDID: {0}", edid));
-                                Console.WriteLine(String.Format("\tResolution:  h: {0}  v: {1}", h, v));
-                                Console.WriteLine(String.Format("\tRefresh rate: {0}", refRate));
-                                Console.WriteLine(String.Format("\tPixel clock: {0}", pixClock));
-                                Console.WriteLine(String.Format("\tScan type: {0}", scanType));
-                                Console.WriteLine(String.Format("\tUnique id: {0}", id));
+                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
+                                display.Name(ppName);
+                                string name = ADLX.charP_Ptr_value(ppName);
 
-                                // Release display interface
-                                display.Release();
+                                // find the display settings that match this display
+                                if (displayConfig.Displays.ContainsKey(id))
+                                {
+                                    // We have a match, so lets set the display settings
+                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Found a matching display with ID {id} in the display list");
+                                    // Get the display settings we stored
+                                    AMD_DISPLAY_WITH_SETTINGS displaySettingsWeStored = displayConfig.Displays[id];
+
+                                    //------------------------------------
+                                    // SET THE COLOR DEPTH IF NEEDED
+                                    //------------------------------------
+                                    // Get the current color depth for this display
+                                    SWIGTYPE_p_p_adlx__IADLXDisplayColorDepth ppColorDepth = ADLX.new_displayColorDepthP_Ptr();
+                                    status = displayService.GetColorDepth(display, ppColorDepth);
+                                    if (status != ADLX_RESULT.ADLX_OK)
+                                    {
+                                        SharedLogger.logger.Error($"AMDLibrary/SetActiveConfigOverride: Error getting the display color depth object. systemServices.GetColorDepth() returned error code {status}");
+                                        //return false;
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Successfully got the display color depth object");
+                                        // Check if the color depth is the same as the one we stored
+                                        IADLXDisplayColorDepth colorDepth = ADLX.displayColorDepthP_Ptr_value(ppColorDepth);
+                                        // Check if the color depth is supported
+                                        SWIGTYPE_p_bool pIsSupported = ADLX.new_boolP();
+                                        status = colorDepth.IsSupported(pIsSupported);
+                                        bool colorDepthIsSupported = ADLX.boolP_value(pIsSupported);
+                                        if (status == ADLX_RESULT.ADLX_OK && colorDepthIsSupported)
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Color Depth can be set for this display!");
+                                            // Get the current color depth for this display
+                                            SWIGTYPE_p_ADLX_COLOR_DEPTH pColorDepth = ADLX.new_adlx_colorDepthP();
+                                            status = colorDepth.GetValue(pColorDepth);
+                                            ADLX_COLOR_DEPTH colorDepthValue = ADLX.adlx_colorDepthP_value(pColorDepth);
+
+                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Checking if Color Depth needs to be changed for this display");
+                                            if (colorDepthValue != displaySettingsWeStored.ColorDepth)
+                                            {
+                                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Color Depth does need to be changed for this display so attempting to change it");
+                                                // Set the color depth to the one we stored before
+                                                status = colorDepth.SetValue(displaySettingsWeStored.ColorDepth);
+                                                if (status != ADLX_RESULT.ADLX_OK)
+                                                {
+                                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfigOverride: Error setting the display color depth. systemServices.SetColorDepth() returned error code {status}");
+                                                    //return false;
+                                                }
+                                                else
+                                                {
+                                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Successfully set the display color depth to {displaySettingsWeStored.ColorDepth.ToString("G")}");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Color Depth does NOT need to be changed for this display as it is already set to {displaySettingsWeStored.ColorDepth.ToString("G")}");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Color Depth is NOT supported for this display so skipping setting it");
+                                        }
+                                    }
+
+                                    //------------------------------------
+                                    // SET THE DISPLAY CUSTOM COLOR IF NEEDED
+                                    //------------------------------------
+                                    // Get the current custom color object for this display
+                                    SWIGTYPE_p_p_adlx__IADLXDisplayCustomColor ppCustomColor = ADLX.new_displayCustomColorP_Ptr();
+                                    status = displayService.GetCustomColor(display, ppCustomColor);
+                                    if (status != ADLX_RESULT.ADLX_OK)
+                                    {
+                                        SharedLogger.logger.Error($"AMDLibrary/SetActiveConfigOverride: Error getting the display custom color object. systemServices.GetCustomColor() returned error code {status}");
+                                        //return false;
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Successfully got the display custom color object");
+                                        // Check if the custom color is the same as the one we stored
+                                        IADLXDisplayCustomColor customColor = ADLX.displayCustomColorP_Ptr_value(ppCustomColor);
+                                        // Check if the custom color brightness is supported
+                                        SWIGTYPE_p_bool pIsBrightnessSupported = ADLX.new_boolP();
+                                        status = customColor.IsBrightnessSupported(pIsBrightnessSupported);
+                                        bool brightnessIsSupported = ADLX.boolP_value(pIsBrightnessSupported);
+                                        if (status == ADLX_RESULT.ADLX_OK && brightnessIsSupported)
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Custom Color Brightness can be set for this display!");
+                                            // Get the current color brightness for this display
+                                            SWIGTYPE_p_int pCurrentBrightness = ADLX.new_adlx_intP();
+                                            status = customColor.GetBrightness(pCurrentBrightness);
+                                            int currentBrightnessValue = ADLX.adlx_intP_value(pCurrentBrightness);
+
+                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Checking if Custom Color Brightness needs to be changed for this display");
+                                            if (currentBrightnessValue != displaySettingsWeStored.CustomColorBrightness)
+                                            {
+                                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Custom Color Brightness does need to be changed for this display so attempting to change it");
+                                                // Set the color depth to the one we stored before
+                                                status = customColor.SetBrightness(displaySettingsWeStored.CustomColorBrightness);
+                                                if (status != ADLX_RESULT.ADLX_OK)
+                                                {
+                                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfigOverride: Error setting the display Custom Color Brightness. systemServices.CustomColorBrightness() returned error code {status}");
+                                                    //return false;
+                                                }
+                                                else
+                                                {
+                                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Successfully set the display Custom Color Brightness to {displaySettingsWeStored.CustomColorBrightness.ToString("G")}");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Custom Color Brightness does NOT need to be changed for this display as it is already set to {displaySettingsWeStored.CustomColorBrightness.ToString("G")}");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Custom Color Brightness is NOT supported for this display.");
+                                        }
+                                    }
+                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Found the display settings for this UniqueID but it has a different name");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No display with UniqueID {id} found in the stored settings, so skipping.");
+                                }
+
                             }
+
+                            // Release display interface
+                            display.Release();
                         }
                     }
                     // Release display list interface
@@ -1902,9 +2105,9 @@ namespace DisplayMagicianShared.AMD
                             if (status == ADLX_RESULT.ADLX_OK)
                             {
 
-                                SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_uintP();
+                                SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_adlx_uintP();
                                 desktop.GetNumberOfDisplays(pNumDisplays);
-                                long numDisplays = ADLX.uintP_value(pNumDisplays);
+                                long numDisplays = ADLX.adlx_uintP_value(pNumDisplays);
 
                                 SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
                                 desktop.GetDisplays(ppDisplayList);
@@ -1942,9 +2145,9 @@ namespace DisplayMagicianShared.AMD
                                             gpu.Name(ppGpuName);
                                             string gpuName = ADLX.charP_Ptr_value(ppGpuName);
 
-                                            SWIGTYPE_p_int ppGpuUniqueId = ADLX.new_intP();
+                                            SWIGTYPE_p_int ppGpuUniqueId = ADLX.new_adlx_intP();
                                             gpu.UniqueId(ppGpuUniqueId);
-                                            int gpuUniqueId = ADLX.intP_value(ppGpuUniqueId);
+                                            int gpuUniqueId = ADLX.adlx_intP_value(ppGpuUniqueId);
 
                                             SWIGTYPE_p_bool ppGpuIsExternal = ADLX.new_boolP();
                                             gpu.IsExternal(ppGpuIsExternal);
@@ -1957,17 +2160,17 @@ namespace DisplayMagicianShared.AMD
                                             display.Name(ppName);
                                             String name = ADLX.charP_Ptr_value(ppName);
 
-                                            SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                            SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
                                             display.DisplayType(pDisType);
-                                            ADLX_DISPLAY_TYPE disType = ADLX.displayTypeP_value(pDisType);
+                                            ADLX_DISPLAY_TYPE disType = ADLX.adlx_displayTypeP_value(pDisType);
 
-                                            SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                            SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
                                             display.ManufacturerID(pMID);
-                                            long mid = ADLX.uintP_value(pMID);
+                                            long mid = ADLX.adlx_uintP_value(pMID);
 
-                                            SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                            SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
                                             display.ConnectorType(pConnect);
-                                            ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.disConnectTypeP_value(pConnect);
+                                            ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.adlx_displayConnectTypeP_value(pConnect);
 
                                             SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
                                             display.UniqueId(pID);
@@ -2151,9 +2354,9 @@ namespace DisplayMagicianShared.AMD
                                 gpu.Name(ppGpuName);
                                 string gpuName = ADLX.charP_Ptr_value(ppGpuName);
 
-                                SWIGTYPE_p_int ppGpuUniqueId = ADLX.new_intP();
+                                SWIGTYPE_p_int ppGpuUniqueId = ADLX.new_adlx_intP();
                                 gpu.UniqueId(ppGpuUniqueId);
-                                int gpuUniqueId = ADLX.intP_value(ppGpuUniqueId);
+                                int gpuUniqueId = ADLX.adlx_intP_value(ppGpuUniqueId);
 
                                 SWIGTYPE_p_bool ppGpuIsExternal = ADLX.new_boolP();
                                 gpu.IsExternal(ppGpuIsExternal);
@@ -2170,17 +2373,17 @@ namespace DisplayMagicianShared.AMD
                                 display.Name(ppName);
                                 String name = ADLX.charP_Ptr_value(ppName);
 
-                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_displayTypeP();
+                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
                                 display.DisplayType(pDisType);
-                                ADLX_DISPLAY_TYPE disType = ADLX.displayTypeP_value(pDisType);
+                                ADLX_DISPLAY_TYPE disType = ADLX.adlx_displayTypeP_value(pDisType);
 
-                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_uintP();
+                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
                                 display.ManufacturerID(pMID);
-                                long mid = ADLX.uintP_value(pMID);
+                                long mid = ADLX.adlx_uintP_value(pMID);
 
-                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_disConnectTypeP();
+                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
                                 display.ConnectorType(pConnect);
-                                ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.disConnectTypeP_value(pConnect);
+                                ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.adlx_displayConnectTypeP_value(pConnect);
 
                                 /*SWIGTYPE_p_p_char ppEDIE = ADLX.new_charP_Ptr();
                                 display.EDID(ppEDIE);
@@ -2208,11 +2411,11 @@ namespace DisplayMagicianShared.AMD
                                 display.UniqueId(pID);
                                 uint uniqueId = ADLX.adlx_sizeP_value(pID);
 
-                                Console.WriteLine(String.Format("\nThe display [{0}]:", it));
+/*                                Console.WriteLine(String.Format("\nThe display [{0}]:", it));
                                 Console.WriteLine(String.Format("\tName: {0}", name));
                                 Console.WriteLine(String.Format("\tType: {0}", disType));
                                 Console.WriteLine(String.Format("\tConnector type: {0}", connect));
-                                Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));
+                                Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));*/
                                 //Console.WriteLine(String.Format("\tEDID: {0}", edid));
                                 /*Console.WriteLine(String.Format("\tResolution:  h: {0}  v: {1}", h, v));
                                 Console.WriteLine(String.Format("\tRefresh rate: {0}", refRate));
