@@ -263,16 +263,18 @@ namespace VideoInfo
             Console.WriteLine($"You can run it without any command line parameters, and it will print all the information it can find from the \nNVIDIA driver and the Windows Display CCD and GDI interfaces.\n");
             Console.WriteLine($"You can also run it with 'VideoInfo save myfilename.cfg' and it will save the current display configuration into\nthe myfilename.cfg file.\n");
             Console.WriteLine($"This is most useful when you subsequently use the 'VideoInfo load myfilename.cfg' command, as it will load the\ndisplay configuration from the myfilename.cfg file and make it live. In this way, you can make yourself a library\nof different cfg files with different display layouts, then use the VideoInfo load command to swap between them.\n\n");
+            Console.WriteLine($"If you have problems with the display settings not applying correctly, or your screen going blank, you may have a very slow display. To fix this you can add a '--delay:800' option to the command line to delay 800ms (or use whatever ms number that works for you).\n\n");
             Console.WriteLine($"Valid commands:\n");
             Console.WriteLine($"\t'VideoInfo print' will print information about your current display setting.");
             Console.WriteLine($"\t'VideoInfo save myfilename.cfg' will save your current display setting to the myfilename.cfg file.");
             Console.WriteLine($"\t'VideoInfo load myfilename.cfg' will load and apply the display setting in the myfilename.cfg file.");
+            Console.WriteLine($"\t'VideoInfo load myfilename.cfg --delay:800' will load and apply the display setting in the myfilename.cfg file with a 800ms delay between steps.");
             Console.WriteLine($"\t'VideoInfo possible myfilename.cfg' will test the display setting in the myfilename.cfg file to see\n\t\tif it is possible to use that display profile now.");
             Console.WriteLine($"\t'VideoInfo equal myfilename.cfg' will test if the display setting in the myfilename.cfg is equal to\n\t\tthe one in use.");
             Console.WriteLine($"\t'VideoInfo equal myfilename.cfg myother.cfg' will test if the display setting in the myfilename.cfg\n\t\tis equal to the one in myother.cfg.");
             Console.WriteLine($"\t'VideoInfo currentids' will display the display identifiers for all active displays.");
             Console.WriteLine($"\t'VideoInfo allids' will display the display identifiers for all displays that are active or can be \n\t\tmade active.");
-            Console.WriteLine($"\nUse DisplayMagician to store display settings for each game you have. https://github.com/terrymacdonald/DisplayMagician\n");
+            Console.WriteLine($"\nUse DisplayMagician for free to store display settings for each game you have and run them with a single click. Learn more here: https://github.com/terrymacdonald/DisplayMagician\n");
         }
 
         static void createSupportZipFile(string currentLogFilename)
