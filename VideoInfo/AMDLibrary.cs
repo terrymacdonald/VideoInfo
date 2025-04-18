@@ -30,13 +30,13 @@ namespace DisplayMagicianShared.AMD
         public ADLX_ORIENTATION Orientation;
         public int SizeWidth;
         public int SizeHeight;
-        public ADLX_Point TopLeft;
+        public int TopLeftX;
+        public int TopLeftY;
         public ADLX_DESKTOP_TYPE Type;
 
         public AMD_DESKTOP()
         {
             Displays = new List<AMD_DISPLAY>();
-            TopLeft = new ADLX_Point();
             Type = ADLX_DESKTOP_TYPE.DESKTOP_SINGLE;
         }
 
@@ -48,7 +48,7 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The NumberOfDisplays values don't equal each other");
                 return false;
             }
-            if (Displays.SequenceEqual(other.Displays))
+            if (!Displays.SequenceEqual(other.Displays))
             {
                 SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The SequenceEqual values don't equal each other");
                 return false;
@@ -68,14 +68,14 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The SizeHeight values don't equal each other");
                 return false;
             }
-            if (TopLeft.x != other.TopLeft.x)
+            if (TopLeftX != other.TopLeftX)
             {
-                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The TopLeft.x values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The TopLeftX values don't equal each other");
                 return false;
             }
-            if (TopLeft.y != other.TopLeft.y)
+            if (TopLeftY != other.TopLeftY)
             {
-                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The TopLeft.y values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DESKTOP/Equals: The TopLeftY values don't equal each other");
                 return false;
             }
             if (Type != other.Type)
@@ -88,83 +88,84 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (NumberOfDisplays, Displays, Orientation, SizeWidth, SizeHeight, TopLeft, Type).GetHashCode();
+            return (NumberOfDisplays, Displays, Orientation, SizeWidth, SizeHeight, TopLeftX, TopLeftY, Type).GetHashCode();
         }
         public static bool operator ==(AMD_DESKTOP lhs, AMD_DESKTOP rhs) => lhs.Equals(rhs);
 
         public static bool operator !=(AMD_DESKTOP lhs, AMD_DESKTOP rhs) => !(lhs == rhs);
     }
 
-   /* [StructLayout(LayoutKind.Sequential)]
-    public struct EYEFINITY_GRID_NODE : IEquatable<EYEFINITY_GRID_NODE>
-    {
-        public long Row;
-        public long Column;
-        public ADLX_ORIENTATION DisplayOrientation;
-        public int DisplayWidth;
-        public int DisplayHeight;
-        public ADLX_Point DisplayTopLeft;
-        public long DisplayUniqueId;
+    /* [StructLayout(LayoutKind.Sequential)]
+     public struct EYEFINITY_GRID_NODE : IEquatable<EYEFINITY_GRID_NODE>
+     {
+         public long Row;
+         public long Column;
+         public ADLX_ORIENTATION DisplayOrientation;
+         public int DisplayWidth;
+         public int DisplayHeight;
+         public int DisplayTopLeftX;
+         public int DisplayTopLeftY;
+         public long DisplayUniqueId;
 
-        public EYEFINITY_GRID_NODE()
-        {
-            DisplayTopLeft = new ADLX_Point();
-        }
+         public EYEFINITY_GRID_NODE()
+         {
+             DisplayOrientation = ADLX_ORIENTATION.ORIENTATION_LANDSCAPE;
+         }
 
-        public override bool Equals(object obj) => obj is EYEFINITY_GRID_NODE other && this.Equals(other);
-        public bool Equals(EYEFINITY_GRID_NODE other)
-        {
-            if (Row != other.Row)
-            {
-                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The Row values don't equal each other");
-                return false;
-            }
-            if (Column != other.Column)
-            {
-                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The Column values don't equal each other");
-                return false;
-            }
-            if (DisplayOrientation != other.DisplayOrientation)
-            {
-                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayOrientation values don't equal each other");
-                return false;
-            }
-            if (DisplayWidth != other.DisplayWidth)
-            {
-                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayWidth values don't equal each other");
-                return false;
-            }
-            if (DisplayHeight != other.DisplayHeight)
-            {
-                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayHeight values don't equal each other");
-                return false;
-            }
-            if(DisplayTopLeft.x != other.DisplayTopLeft.x)
-            {
-                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayTopLeft.x values don't equal each other");
-                return false;
-            }
-            if (DisplayTopLeft.y != other.DisplayTopLeft.y)
-            {
-                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayTopLeft.y values don't equal each other");
-                return false;
-            }
-            if (DisplayUniqueId != other.DisplayUniqueId)
-            {
-                SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayUniqueId values don't equal each other");
-                return false;
-            }
-            return true;
-        }
+         public override bool Equals(object obj) => obj is EYEFINITY_GRID_NODE other && this.Equals(other);
+         public bool Equals(EYEFINITY_GRID_NODE other)
+         {
+             if (Row != other.Row)
+             {
+                 SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The Row values don't equal each other");
+                 return false;
+             }
+             if (Column != other.Column)
+             {
+                 SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The Column values don't equal each other");
+                 return false;
+             }
+             if (DisplayOrientation != other.DisplayOrientation)
+             {
+                 SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayOrientation values don't equal each other");
+                 return false;
+             }
+             if (DisplayWidth != other.DisplayWidth)
+             {
+                 SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayWidth values don't equal each other");
+                 return false;
+             }
+             if (DisplayHeight != other.DisplayHeight)
+             {
+                 SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayHeight values don't equal each other");
+                 return false;
+             }
+             if(DisplayTopLeftX != other.DisplayTopLeftX)
+             {
+                 SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayTopLeftX values don't equal each other");
+                 return false;
+             }
+             if (DisplayTopLeftY != other.DisplayTopLeftY)
+             {
+                 SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayTopLeftY values don't equal each other");
+                 return false;
+             }
+             if (DisplayUniqueId != other.DisplayUniqueId)
+             {
+                 SharedLogger.logger.Trace($"EYEFINITY_GRID_NODE/Equals: The DisplayUniqueId values don't equal each other");
+                 return false;
+             }
+             return true;
+         }
 
-        public override int GetHashCode()
-        {
-            return (Row, Column, DisplayOrientation, DisplayWidth, DisplayHeight, DisplayTopLeft, DisplayUniqueId).GetHashCode();
-        }
-        public static bool operator ==(EYEFINITY_GRID_NODE lhs, EYEFINITY_GRID_NODE rhs) => lhs.Equals(rhs);
+         public override int GetHashCode()
+         {
+             return (Row, Column, DisplayOrientation, DisplayWidth, DisplayHeight, DisplayTopLeftX, DisplayTopLeftY, DisplayUniqueId).GetHashCode();
+         }
+         public static bool operator ==(EYEFINITY_GRID_NODE lhs, EYEFINITY_GRID_NODE rhs) => lhs.Equals(rhs);
 
-        public static bool operator !=(EYEFINITY_GRID_NODE lhs, EYEFINITY_GRID_NODE rhs) => !(lhs == rhs);
-    }*/
+         public static bool operator !=(EYEFINITY_GRID_NODE lhs, EYEFINITY_GRID_NODE rhs) => !(lhs == rhs);
+     }*/
 
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_EYEFINITY_DESKTOP : IEquatable<AMD_EYEFINITY_DESKTOP>
@@ -174,13 +175,13 @@ namespace DisplayMagicianShared.AMD
         public ADLX_ORIENTATION Orientation;
         public int SizeWidth;
         public int SizeHeight;
-        public ADLX_Point TopLeft;
+        public int TopLeftX;
+        public int TopLeftY;
         //public EYEFINITY_GRID_NODE[][] Grid;
 
         public AMD_EYEFINITY_DESKTOP()
         {
             Orientation = ADLX_ORIENTATION.ORIENTATION_LANDSCAPE;
-            TopLeft = new ADLX_Point();
             //Grid = Array.Empty<EYEFINITY_GRID_NODE[]>();
         }
 
@@ -212,14 +213,14 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Equals: The SizeHeight values don't equal each other");
                 return false;
             }
-            if (TopLeft.x != other.TopLeft.x)
+            if (TopLeftX != other.TopLeftX)
             {
-                SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Equals: The TopLeft.x values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Equals: The TopLeftX values don't equal each other");
                 return false;
             }
-            if (TopLeft.y != other.TopLeft.y)
+            if (TopLeftY != other.TopLeftY)
             {
-                SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Equals: The TopLeft.y values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Equals: The TopLeftY values don't equal each other");
                 return false;
             }
             /*if (Grid.SequenceEqual(other.Grid))
@@ -232,7 +233,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (Rows, Columns, Orientation, SizeWidth, SizeHeight, TopLeft).GetHashCode();
+            return (Rows, Columns, Orientation, SizeWidth, SizeHeight, TopLeftX, TopLeftY).GetHashCode();
         }
         public static bool operator ==(AMD_EYEFINITY_DESKTOP lhs, AMD_EYEFINITY_DESKTOP rhs) => lhs.Equals(rhs);
 
@@ -468,7 +469,7 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The IsCloned values don't equal each other");
                 return false;
             }
-            if (Desktops.SequenceEqual(other.Desktops))
+            if (!Desktops.SequenceEqual(other.Desktops))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The Desktops values don't equal each other");
                 return false;
@@ -478,17 +479,17 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The IsEyefinity values don't equal each other");
                 return false;
             }
-            if (EyefinityDesktop.Equals(other.EyefinityDesktop))
+            if (!EyefinityDesktop.Equals(other.EyefinityDesktop))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The EyefinityDesktop values don't equal each other");
                 return false;
             }
-            if (Displays.SequenceEqual(other.Displays))
+            if (!Displays.SequenceEqual(other.Displays))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The Displays values don't equal each other");
                 return false;
             }            
-            if (DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
+            if (!DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The DisplayIdentifiers values don't equal each other");
                 return false;
@@ -943,7 +944,9 @@ namespace DisplayMagicianShared.AMD
 
                                 ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
                                 desktop.TopLeft(pLocationTopLeft);
-                                newDesktop.TopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
+                                ADLX_Point locationTopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
+                                newDesktop.TopLeftX = locationTopLeft.x;
+                                newDesktop.TopLeftY = locationTopLeft.y;
 
                                 SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_adlx_desktopTypeP();
                                 desktop.Type(pDesktopType);
@@ -1019,7 +1022,8 @@ namespace DisplayMagicianShared.AMD
 
                                         // Copy over the desktop level sizes so that we can match things easier in the future
                                         myDisplayConfig.EyefinityDesktop.Orientation = newDesktop.Orientation;
-                                        myDisplayConfig.EyefinityDesktop.TopLeft = newDesktop.TopLeft;
+                                        myDisplayConfig.EyefinityDesktop.TopLeftX = newDesktop.TopLeftX;
+                                        myDisplayConfig.EyefinityDesktop.TopLeftY = newDesktop.TopLeftY;
                                         myDisplayConfig.EyefinityDesktop.SizeWidth = newDesktop.SizeWidth;
                                         myDisplayConfig.EyefinityDesktop.SizeHeight = newDesktop.SizeHeight;
 

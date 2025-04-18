@@ -7,6 +7,22 @@
     "VideoInfo load cfg1": {
       "commandName": "Project",
       "commandLineArgs": "load display-config1.cfg"
+    },
+    "VideoInfo save cfg2": {
+      "commandName": "Project",
+      "commandLineArgs": "save display-config2.cfg"
+    },
+    "VideoInfo load cfg2": {
+      "commandName": "Project",
+      "commandLineArgs": "load display-config2.cfg"
+    },
+    "VideoInfo equal cfg1": {
+      "commandName": "Project",
+      "commandLineArgs": "equal display-config1.cfg"
+    },
+    "VideoInfo equal cfg2": {
+      "commandName": "Project",
+      "commandLineArgs": "equal display-config2.cfg"
     }
   }
 }
