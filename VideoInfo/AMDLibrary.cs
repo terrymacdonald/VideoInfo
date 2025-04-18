@@ -18,6 +18,7 @@ using System.Runtime.InteropServices.JavaScript;
 using Microsoft.VisualBasic;
 using System.Xml;
 using System.Xml.Linq;
+using System.Threading.Tasks;
 
 namespace DisplayMagicianShared.AMD
 {
@@ -1725,7 +1726,6 @@ namespace DisplayMagicianShared.AMD
                             }
                             // Release simpleEyefinity interface
                             simpleEyefinity.Release();
-
                         }
                     }
                     else
