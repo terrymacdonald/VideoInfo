@@ -98,12 +98,12 @@ namespace DisplayMagicianShared.NVIDIA
     public struct NVIDIA_PER_DISPLAY_CONFIG : IEquatable<NVIDIA_PER_DISPLAY_CONFIG>
     {
         public bool HasNvHdrEnabled;
-        public IHDRCapabilities HdrCapabilities;
-        public IHDRColorData HdrColorData;
+        public HDRCapabilitiesV3 HdrCapabilities;
+        public HDRColorDataV2 HdrColorData;
         public bool HasAdaptiveSync;
         public SetAdaptiveSyncData AdaptiveSyncConfig;
         public bool HasColorData;
-        public IColorData ColorData;
+        public ColorDataV5 ColorData;
         public bool HasCustomDisplay;
         public List<CustomDisplay> CustomDisplays;
 
