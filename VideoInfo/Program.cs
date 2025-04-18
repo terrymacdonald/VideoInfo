@@ -64,13 +64,13 @@ namespace VideoInfo
             NLog.LogManager.Configuration = config;
 
             // Start the Log file
-            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.8.12");
+            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.9.0");
             // Log the commandline options
             SharedLogger.logger.Info($"VideoInfo/Main: cmdline options: {string.Join(" ", args)}");
 
-            Console.WriteLine($"\nVideoInfo v1.8.12");
+            Console.WriteLine($"\nVideoInfo v1.9.0");
             Console.WriteLine($"=================");
-            Console.WriteLine($"(c) Terry MacDonald 2025\n");
+            Console.WriteLine($"(c) Terry MacDonald 2024-2025\n");
 
             // Update the configuration
             nvidiaLibrary = NVIDIALibrary.GetLibrary();
