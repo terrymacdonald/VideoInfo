@@ -12,20 +12,57 @@ namespace DisplayMagicianShared.NVIDIA
     public static class NVAPI
     {
 
-        private static bool available = true;
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr LoadLibrary(string dllToLoad);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool FreeLibrary(IntPtr hModule);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+
+        private static bool available = false;
 
         static NVAPI()
         {
             try
             {
-                Marshal.PrelinkAll(typeof(GeneralDelegates));
+                // Determine the appropriate NVAPI DLL based on the process architecture
+                string dllName = "nvapi64.dll";
+
+                // Attempt to load the NVAPI DLL
+                IntPtr hModule = LoadLibrary(dllName);
+                if (hModule != IntPtr.Zero)
+                {
+                    // Attempt to get the address of a non-existent function to verify the DLL is loaded
+                    IntPtr procAddress = GetProcAddress(hModule, "fakefunction");
+                    // If GetProcAddress returns IntPtr.Zero, the function doesn't exist, which is expected
+                    // The key point is that LoadLibrary succeeded, indicating the DLL is present
+                    available = true;
+
+                    // Free the loaded library
+                    FreeLibrary(hModule);
+
+                    // Then actually go through and prelink the delegates at this point as we know the DLL is working
+                    Marshal.PrelinkAll(typeof(GeneralDelegates));
+                }
+                else
+                {
+                    // LoadLibrary failed, DLL is not available
+                    available = false;
+                }
                 available = true;
             }
-            catch(Exception) { }
+            catch (Exception) 
+            {
+                available = false;
+            }
         }
 
         // TODO: Fix this is available so it actually tests if nvidia dll is available.
-        public static bool IsAvailable() { return available; }
+        public static bool IsAvailable() { 
+            return available; 
+        }
 
         /// <summary>
         ///     This function returns information about the system's chipset.
@@ -157,6 +194,7 @@ namespace DisplayMagicianShared.NVIDIA
 
             if (status != Status.Ok)
             {
+                available = false;
                 throw new NVIDIAApiException(status);
             }
             else

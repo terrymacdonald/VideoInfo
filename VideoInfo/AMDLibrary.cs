@@ -510,7 +510,13 @@ namespace DisplayMagicianShared.AMD
     class AMDLibrary : IDisposable
     {
         [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr LoadLibrary(string lpFileName);
+        public static extern IntPtr LoadLibrary(string dllToLoad);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool FreeLibrary(IntPtr hModule);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
 
         // Static members are 'eagerly initialized', that is, 
         // immediately when class is loaded for the first time.
@@ -548,19 +554,60 @@ namespace DisplayMagicianShared.AMD
             _activeDisplayConfig = CreateDefaultConfig();
             try
             {
-                SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX Binding DLL {AMD_ADLX_BINDING_DLL}");
-                // Attempt to prelink all of the ADLX functions
-                LoadLibrary(AMD_ADLX_BINDING_DLL);
-                //Marshal.PrelinkAll(typeof(ADLImport));
+                _initialised = false;
+                // Check if there is AMD hardware installed
+                SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Looking for AMD PCI hardware...");
+                if (WinLibrary.IsPCIVideoCardVendorInstalled(PCIVendorIDs))
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD hardware detected");
+                }
+                else
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: No AMD hardware detected");
+                    return;
+                }
 
-                SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Intialising AMD ADLX library interface");
+                SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX Binding DLL {AMD_ADLX_BINDING_DLL}");
+                //Marshal.PrelinkAll(typeof(ADLImport));
+                try
+                {
+                    // Attempt to load the NVAPI DLL
+                    IntPtr hModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
+                    if (hModule != IntPtr.Zero)
+                    {
+                        // Attempt to get the address of a non-existent function to verify the DLL is loaded
+                        IntPtr procAddress = GetProcAddress(hModule, "fakefunction");
+                        // If GetProcAddress returns IntPtr.Zero, the function doesn't exist, which is expected
+                        // The key point is that LoadLibrary succeeded, indicating the DLL is present
+                        
+                        // Free the loaded library
+                        //FreeLibrary(hModule);
+
+                        _initialised = true;
+                        SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Successfully loaded the AMD ADLX DLL.");
+                    }
+                    else
+                    {
+                        // LoadLibrary failed, DLL is not available
+                        _initialised = false;
+                        SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX DLL. You may need to install the AMD driver.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _initialised = false;
+                    SharedLogger.logger.Error(ex, "AMDLibrary/AMDLibrary: Exception whie trying to load the AMD ADLX DLL. You may need to install the AMD driver.");
+                }
+
                 // Second parameter is 1 so that we only the get connected adapters in use now
 
                 // We set the environment variable as a workaround so that ADL2_Display_SLSMapConfigX2_Get works :(
                 // This is a weird thing that AMD even set in their own code! WTF! Who programmed that as a feature?
                 Environment.SetEnvironmentVariable("ADL_4KWORKAROUND_CANCEL", "TRUE");
 
+
                 // Initialize ADLX with ADLXHelper
+                SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Intialising AMD ADLX library interface");
                 _adlxHelper = new ADLXHelper();
                 ADLX_RESULT status = _adlxHelper.Initialize();
                 if (status != ADLX_RESULT.ADLX_OK)
@@ -609,6 +656,10 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Info(ex, $"AMDLibrary/AMDLibrary: A general exception trying to load the AMD ADLX DLL {AMD_ADLX_BINDING_DLL}.");
                 return;
             }
+
+
+
+
         }
 
         ~AMDLibrary()
@@ -732,6 +783,7 @@ namespace DisplayMagicianShared.AMD
             // so that we won't break json.net when we save a default config
 
             // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
+            myDefaultConfig.IsInUse = false;
             /*myDefaultConfig.IsInUse = false;
             myDefaultConfig.IsCloned = false;
             myDefaultConfig.IsEyefinity = false;

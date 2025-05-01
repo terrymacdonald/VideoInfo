@@ -496,9 +496,7 @@ namespace DisplayMagicianShared.NVIDIA
 
     public class NVIDIALibrary : IDisposable
     {
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private static extern IntPtr LoadLibrary(string lpFileName);
+    
 
         // Static members are 'eagerly initialized', that is, 
         // immediately when class is loaded for the first time.
@@ -506,6 +504,7 @@ namespace DisplayMagicianShared.NVIDIA
         private static NVIDIALibrary _instance = new NVIDIALibrary();
 
         private bool _initialised = false;
+        private bool _inUse = false;
         private NVIDIA_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<MonitorConnectionType> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
@@ -533,12 +532,25 @@ namespace DisplayMagicianShared.NVIDIA
             _activeDisplayConfig = CreateDefaultConfig();
             try
             {
+                _initialised = false;
+                SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Looking for NVIDIA PCI hardware...");
+                // Check if there is NVIDIA hardware installed
+                if (WinLibrary.IsPCIVideoCardVendorInstalled(PCIVendorIDs))
+                {
+                    SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: NVIDIA hardware detected");
+                }
+                else
+                {
+                    SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: No NVIDIA hardware detected");
+                    return;
+                }
+
+
                 SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Attempting to load the NVIDIA NVAPI DLL");
 
                 Status status = Status.Error;
                 SharedLogger.logger.Trace("NVIDIALibrary/NVIDIALibrary: Intialising NVIDIA NVAPI library interface");
-                // Step 1: Initialise the NVAPI
-                _initialised = false;
+                // Step 1: Initialise the NVAPI                
                 try
                 {
                     // The NVAPI.DLL is loaded by the NVAPI library when the NVAPI object is created, so just by calling this we are
@@ -548,24 +560,29 @@ namespace DisplayMagicianShared.NVIDIA
                     {
                         // If we get here then we definitely have the NVIDIA driver available.
                         _initialised = true;
+                        SharedLogger.logger.Trace("NVIDIALibrary/NVIDIALibrary: Successfully loaded the NVIDIA NVAPI DLL.");
                         SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: NVIDIA NVAPI library was initialised successfully");
                         SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Running UpdateActiveConfig to ensure there is a config to use later");
                         _activeDisplayConfig = GetActiveConfig();
                         _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
+                        return;
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Error intialising NVIDIA NVAPI library. NvAPI_Initialize() returned error code {status}");
+                        _initialised = false;
+                        SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Error intialising NVIDIA NVAPI library. NvAPI_Initialize() returned error code {status}. There is probably no NVIDIA hardware installed nor NVAPI64.DLL installed.");
                     }
 
                 }
                 catch (DllNotFoundException ex)
                 {
                     // If this fires, then the DLL isn't available, so we need don't try to do anything else
-                    SharedLogger.logger.Info(ex, $"NVIDIALibrary/NVIDIALibrary: Exception trying to load the NVIDIA NVAPI DLLs nvapi64.dll or nvapi.dll. This generally means you don't have the NVIDIA driver installed.");
+                    _initialised = false;
+                    SharedLogger.logger.Info(ex, $"NVIDIALibrary/NVIDIALibrary: Exception trying to load the NVIDIA NVAPI DLL nvapi64.dll . This generally means you don't have the NVIDIA driver installed.");
                 }
                 catch (Exception ex)
                 {
+                    _initialised = false;
                     SharedLogger.logger.Error(ex, $"NVIDIALibrary/NVIDIALibrary: Exception intialising NVIDIA NVAPI library. NvAPI_Initialize() caused an exception.");
                 }
 
@@ -649,7 +666,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public static void KeepVideoCardOn()
         {
-            LoadLibrary("NVIDIAExportsDLL.dll");
+            NVAPI.LoadLibrary("NVIDIAExportsDLL.dll");
         }
 
         public static NVIDIALibrary GetLibrary()
@@ -663,6 +680,8 @@ namespace DisplayMagicianShared.NVIDIA
 
             // Fill in the minimal amount we need to avoid null references
             // so that we won't break json.net when we save a default config
+
+            myDefaultConfig.IsInUse = false;
 
             // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
             /*myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;

@@ -2358,7 +2358,7 @@ namespace DisplayMagicianShared.Windows
             return displayIdentifiers;
         }
 
-        public List<string> GetAllPCIVideoCardVendors()
+        public static List<string> GetAllPCIVideoCardVendors()
         {
             SharedLogger.logger.Trace($"WinLibrary/GetCurrentPCIVideoCardVendors: Getting the current PCI vendor ids for the videocards reported to Windows");
             List<string> videoCardVendorIds = new List<string>();
@@ -2507,6 +2507,21 @@ namespace DisplayMagicianShared.Windows
 
             return videoCardVendorIds;
 
+        }
+
+        // Takes a list of PCI Vendor IDs and checks if any of them are installed
+        public static bool IsPCIVideoCardVendorInstalled(List<string> vendorPciIds)
+        {
+            List<string> currentPCIVideoCardVendors = GetAllPCIVideoCardVendors();
+            foreach (string vendorPciId in vendorPciIds)
+            {
+                if (currentPCIVideoCardVendors.Contains(vendorPciId))
+                {
+                    SharedLogger.logger.Trace($"WinLibrary/IsPCIVideoCardVendorInstalled: Found PCI Vendor ID {vendorPciId} installed!");
+                    return true;
+                }
+            }
+            return false;
         }
 
         /*public List<DisplayMonitorInfo> GetAllConnectedMonitors()
