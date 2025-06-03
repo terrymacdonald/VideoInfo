@@ -36,7 +36,7 @@ namespace DisplayMagicianShared.NVIDIA
             MosaicDisplaySettings = new DisplaySettingsV2();
             OverlapX = 0;
             OverlapY = 0;
-            MosaicGridTopos = new GridTopologyV2[NvConstants.NVAPI_MAX_MOSAIC_TOPOS];
+            MosaicGridTopos = new GridTopologyV2[GridTopologyV2.MaxDisplays];
             MosaicGridCount = 0;
         }
 
@@ -49,31 +49,38 @@ namespace DisplayMagicianShared.NVIDIA
                 if (IsMosaicEnabled != other.IsMosaicEnabled)
                 {
                     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The IsMosaicEnabled fields don't match!");
+                    return false;
                 }
 
                 if (!MosaicTopologyBrief.Equals(other.MosaicTopologyBrief))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicTopologyBrief structs don't match!");
+                    return false;
                 }
                 if (!MosaicDisplaySettings.Equals(other.MosaicDisplaySettings))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicDisplaySettings structs don't match!");
+                    return false;
                 }
                 if (OverlapX != other.OverlapX)
                 {
                     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The OverlapX fields don't match!");
+                    return false;
                 }
                 if (OverlapY != other.OverlapY)
                 {
                     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The OverlapY fields don't match!");
+                    return false;
                 }
                 if (!MosaicGridTopos.SequenceEqual(other.MosaicGridTopos))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridTopos struct arrays don't match!");
+                    return false;
                 }
                 if (MosaicGridCount != other.MosaicGridCount)
                 {
                     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridCount fields don't match!");
+                    return false;
                 }
                 // If we make it here then the two configs are equal
                 return true;
@@ -684,18 +691,17 @@ namespace DisplayMagicianShared.NVIDIA
             myDefaultConfig.IsInUse = false;
 
             // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
-            /*myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;
-            myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[] { };
+            myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;
+            myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[GridTopologyV2.MaxDisplays];
             myDefaultConfig.MosaicConfig.MosaicGridCount = 0;
-            //myDefaultConfig.MosaicConfig.MosaicViewports = new List<ViewPortF[]>();
-            //myDefaultConfig.MosaicConfig.MosaicDisplaySettings = new DisplaySettingsV2();
+            myDefaultConfig.MosaicConfig.MosaicDisplaySettings = new DisplaySettingsV2();
             myDefaultConfig.PhysicalAdapters = new Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG>();
             myDefaultConfig.DisplayConfigs = new List<PathInfoV2>();
             myDefaultConfig.DRSSettings = new List<NVIDIA_DRS_CONFIG>();
             myDefaultConfig.DisplayNames = new Dictionary<string, string>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.IsCloned = false;
-            myDefaultConfig.IsInUse = false;*/
+            myDefaultConfig.IsInUse = false;
 
             return myDefaultConfig;
         }

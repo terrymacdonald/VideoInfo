@@ -19,11 +19,50 @@ namespace VideoInfo
     class Program
     {
 
-        public struct VIDEOINFO_DISPLAY_CONFIG
+        public struct VIDEOINFO_DISPLAY_CONFIG : IEquatable<VIDEOINFO_DISPLAY_CONFIG>
+
         {
             public NVIDIA_DISPLAY_CONFIG NVIDIAConfig;
             public AMD_DISPLAY_CONFIG AMDConfig;
             public WINDOWS_DISPLAY_CONFIG WindowsConfig;
+
+            public VIDEOINFO_DISPLAY_CONFIG()
+            {
+                NVIDIAConfig = new NVIDIA_DISPLAY_CONFIG();
+                AMDConfig = new AMD_DISPLAY_CONFIG();
+                WindowsConfig = new WINDOWS_DISPLAY_CONFIG();
+            }
+
+            public override bool Equals(object obj) => obj is VIDEOINFO_DISPLAY_CONFIG other && this.Equals(other);
+
+            public bool Equals(VIDEOINFO_DISPLAY_CONFIG other)
+            {
+                if (NVIDIAConfig != other.NVIDIAConfig)
+                {
+                    SharedLogger.logger.Trace($"VIDEOINFO_DISPLAY_CONFIG/Equals: The NVIDIAConfig values don't equal each other");
+                    return false;
+                }
+                if (AMDConfig != other.AMDConfig)
+                {
+                    SharedLogger.logger.Trace($"VIDEOINFO_DISPLAY_CONFIG/Equals: The AMDConfig values don't equal each other");
+                    return false;
+                }
+                if (WindowsConfig != other.WindowsConfig)
+                {
+                    SharedLogger.logger.Trace($"VIDEOINFO_DISPLAY_CONFIG/Equals: The WindowsConfig values don't equal each other");
+                    return false;
+                }
+
+                return true;
+            }
+
+            public override int GetHashCode()
+            {
+                return (NVIDIAConfig, AMDConfig, WindowsConfig).GetHashCode();
+            }
+            public static bool operator ==(VIDEOINFO_DISPLAY_CONFIG lhs, VIDEOINFO_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
+
+            public static bool operator !=(VIDEOINFO_DISPLAY_CONFIG lhs, VIDEOINFO_DISPLAY_CONFIG rhs) => !(lhs == rhs);
         }
 
         static VIDEOINFO_DISPLAY_CONFIG myDisplayConfig = new VIDEOINFO_DISPLAY_CONFIG();
@@ -884,6 +923,8 @@ namespace VideoInfo
                     SharedLogger.logger.Error(ex, $"VideoInfo/equalFromFile: Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
                     return;
                 }
+
+                
                 if (displayConfig.WindowsConfig.Equals(WinLibrary.GetLibrary().GetActiveConfig()) && 
                     displayConfig.NVIDIAConfig.Equals(NVIDIALibrary.GetLibrary().GetActiveConfig()) && 
                     displayConfig.AMDConfig.Equals(AMDLibrary.GetLibrary().GetActiveConfig()))

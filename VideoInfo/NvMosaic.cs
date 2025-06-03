@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Graphics;
 using static DisplayMagicianShared.NVIDIA.DisplayTopologyStatus;
 
 namespace DisplayMagicianShared.NVIDIA
@@ -957,6 +958,17 @@ namespace DisplayMagicianShared.NVIDIA
         internal uint _CloneGroup;
         internal PixelShiftType _PixelShiftType;
 
+        public GridTopologyDisplayV2()
+        {
+            _Version = new StructureVersion();
+            _DisplayId = 0;
+            _OverlapX = 0;
+            _OverlapY = 0;
+            _Rotation = Rotate.Degree0;
+            _CloneGroup = 0;
+            _PixelShiftType = PixelShiftType.NoPixelShift;
+        }
+
         /// <summary>
         ///     Creates a new GridTopologyDisplayV2
         /// </summary>
@@ -987,12 +999,37 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(GridTopologyDisplayV2 other)
         {
-            return _DisplayId == other._DisplayId &&
-                   _OverlapX == other._OverlapX &&
-                   _OverlapY == other._OverlapY &&
-                   _Rotation == other._Rotation &&
-                   _CloneGroup == other._CloneGroup &&
-                   _PixelShiftType == other._PixelShiftType;
+            if (_DisplayId != other._DisplayId)
+            {
+                SharedLogger.logger.Debug($"GridTopologyDisplayV2/Equals: The _DisplayId fields don't match!");
+                return false;
+            }
+            if (_OverlapX != other._OverlapX)
+            {
+                SharedLogger.logger.Debug($"GridTopologyDisplayV2/Equals: The _OverlapX fields don't match!");
+                return false;
+            }
+            if (_OverlapY != other._OverlapY)
+            {
+                SharedLogger.logger.Debug($"GridTopologyDisplayV2/Equals: The _OverlapY fields don't match!");
+                return false;
+            }
+            if (_Rotation != other._Rotation)
+            {
+                SharedLogger.logger.Debug($"GridTopologyDisplayV2/Equals: The _Rotation fields don't match!");
+                return false;
+            }
+            if (_CloneGroup != other._CloneGroup)
+            {
+                SharedLogger.logger.Debug($"GridTopologyDisplayV2/Equals: The _CloneGroup fields don't match!");
+                return false;
+            }
+            if( _PixelShiftType != other._PixelShiftType)
+            {
+                SharedLogger.logger.Debug($"GridTopologyDisplayV2/Equals: The _PixelShiftType fields don't match!");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
@@ -1338,6 +1375,16 @@ namespace DisplayMagicianShared.NVIDIA
 
         internal DisplaySettingsV1 _DisplaySettings;
 
+
+        public GridTopologyV2()
+        {
+            _Rows = 0;
+            _Columns = 0;
+            _DisplayCount = 0;
+            _Displays = new GridTopologyDisplayV2[MaxDisplays];
+            _DisplaySettings = new DisplaySettingsV1();
+        }
+
         /// <summary>
         ///     Creates a new GridTopologyV2
         /// </summary>
@@ -1412,12 +1459,37 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public bool Equals(GridTopologyV2 other)
         {
-            return _Rows == other._Rows &&
-                   _Columns == other._Columns &&
-                   _DisplayCount == other._DisplayCount &&
-                   _RawReserved == other._RawReserved &&
-                   _Displays.SequenceEqual(other._Displays) &&
-                   _DisplaySettings.Equals(other._DisplaySettings);
+            if (_Rows != other._Rows)
+            {
+                SharedLogger.logger.Debug($"GridTopologyV2/Equals: The _Rows fields don't match!");
+                return false;
+            }
+            if (_Columns != other._Columns)
+            {
+                SharedLogger.logger.Debug($"GridTopologyV2/Equals: The _Columns fields don't match!");
+                return false;
+            }
+            if (_DisplayCount != other._DisplayCount)
+            {
+                SharedLogger.logger.Debug($"GridTopologyV2/Equals: The _DisplayCount fields don't match!");
+                return false;
+            }
+            if (_RawReserved != other._RawReserved)
+            {
+                SharedLogger.logger.Debug($"GridTopologyV2/Equals: The _RawReserved fields don't match!");
+                return false;
+            }
+            if (!Displays.SequenceEqual(other.Displays))
+            {
+                SharedLogger.logger.Debug($"GridTopologyV2/Equals: The Displays fields don't match!");
+                return false;
+            }
+            if (!DisplaySettings.Equals(other.DisplaySettings))
+            {
+                SharedLogger.logger.Debug($"GridTopologyV2/Equals: The _DisplaySettings fields don't match!");
+                return false;
+            }
+            return true;
         }
 
         /// <inheritdoc />
