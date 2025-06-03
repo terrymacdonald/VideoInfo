@@ -682,6 +682,7 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADL DLL {ADLImport.ATI_ADL_DLL} to use for setting AMD Eyefinity (it seems more relaible)");
                 try
                 {
+                    _initialisedADL2 = false;
                     Marshal.PrelinkAll(typeof(ADLImport));
                     SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Successfully loaded the AMD ADL DLL.");
                     try
@@ -717,30 +718,45 @@ namespace DisplayMagicianShared.AMD
 
 
                 // Initialize ADLX with ADLXHelper
-                SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Intialising AMD ADLX library interface");
                 _adlxHelper = new ADLXHelper();
+                SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Intialising AMD ADLX Helper interface"); 
                 ADLX_RESULT status = _adlxHelper.Initialize();
                 if (status != ADLX_RESULT.ADLX_OK)
                 {
-                    SharedLogger.logger.Equals($"AMDLibrary/AMDLibrary: Error intialising AMD ADLX library. ADLXHelper.Initialize() returned error code {status}");
+                    SharedLogger.logger.Error($"AMDLibrary/AMDLibrary: Error intialising AMD ADLX library. ADLXHelper.Initialize() returned error code {status.ToString("G")}");
+                    _initialised = false;
+                    return; 
                 }
                 else
                 {                   
                     try
                     {
                         // Get system services
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to get the ADLX system services");
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Successfully intialised AMD ADLX Helper.");
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attemping to access AMD ADLX System Services.");
                         _adlxSystem = _adlxHelper.GetSystemServices();
-                        _initialised = true;
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADLX library was initialised successfully");
+                        if (_adlxSystem != null)
+                        {
+                            _initialised = true;
+                            SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Successfully got AMD ADLX System Services.");
+                            SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADLX library was initialised successfully");
+                        }
+                        else
+                        {
+                            _initialised = false;
+                            SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Failed to get AMD ADLX System Services. Disabling AMD support in this config.");
+                            return;
+                        }
                     }
                     catch (Exception ex)
                     {
-                        SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Exception getting the ADLX system services");
+                        SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Exception getting the ADLX System Services");
                         SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Terminating the ADLXHelper to avoid memory leaks");
                         _adlxHelper.Terminate();
                         SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Setting ADLXHelper to null");
                         _adlxHelper = null;
+                        _initialised = false;
+                        return;
                     }
 
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Display Configuration");
@@ -753,17 +769,20 @@ namespace DisplayMagicianShared.AMD
             catch (TypeInitializationException ex)
             {
                 SharedLogger.logger.Info(ex, $"AMDLibrary/AMDLibrary: TypeInitializationException trying to load the AMD ADLX DLL {AMD_ADLX_BINDING_DLL}. This generally means you don't have the AMD ADLX driver installed.");
+                _initialised = false;
                 return;
             }
             catch (DllNotFoundException ex)
             {
                 // If we get here then the AMD ADL DLL wasn't found. We can't continue to use it, so we log the error and exit
                 SharedLogger.logger.Info(ex, $"AMDLibrary/AMDLibrary: DllNotFoundException trying to load the AMD ADLX DLL {AMD_ADLX_BINDING_DLL}. This generally means you don't have the AMD ADLX driver installed.");
+                _initialised = false; 
                 return;
             }
             catch (Exception ex)
             {
                 SharedLogger.logger.Info(ex, $"AMDLibrary/AMDLibrary: A general exception trying to load the AMD ADLX DLL {AMD_ADLX_BINDING_DLL}.");
+                _initialised = false; 
                 return;
             }
         }
