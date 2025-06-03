@@ -121,7 +121,6 @@ namespace DisplayMagicianShared.Windows
         public DISPLAYCONFIG_MODE_INFO[] DisplayConfigModes;
         public List<ADVANCED_HDR_INFO_PER_PATH> DisplayHDRStates;
         public Dictionary<string, GDI_DISPLAY_SETTING> GdiDisplaySettings;
-        public Dictionary<Rect, TaskbarPosition> TaskbarPositions;
         public bool IsCloned;
         // Note: We purposely have left out the DisplaySources from the Equals as it's order keeps changing after each reboot and after each profile swap
         // and it is informational only and doesn't contribute to the configuration (it's used for generating the Screens structure, and therefore for
@@ -136,7 +135,6 @@ namespace DisplayMagicianShared.Windows
             DisplayConfigModes = Array.Empty<DISPLAYCONFIG_MODE_INFO>();
             DisplayHDRStates = new List<ADVANCED_HDR_INFO_PER_PATH>();
             GdiDisplaySettings = new Dictionary<string, GDI_DISPLAY_SETTING>();
-            TaskbarPositions = new Dictionary<Rect, TaskbarPosition>();
             IsCloned = false;
             DisplaySources = new Dictionary<string, List<DISPLAY_SOURCE>>();
             DisplayIdentifiers = new List<string>();
@@ -1079,10 +1077,6 @@ namespace DisplayMagicianShared.Windows
                 }
                 windowsDisplayConfig.DisplaySources[key] = dsList.ToList();
             }
-
-            // Record the taskbar locations for each display
-            SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Recording the taskbar locations for each display");
-            windowsDisplayConfig.TaskbarPositions = TaskbarHelper.GetTaskbarPositions();
 
             // Store the active paths and modes in our display config object
             windowsDisplayConfig.DisplayConfigPaths = paths;

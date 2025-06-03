@@ -1485,7 +1485,17 @@ namespace DisplayMagicianShared.NVIDIA
         /// <inheritdoc />
         public List<GridTopologyDisplayV2> Displays
         {
-            get => _Displays.Take((int)_DisplayCount).ToList();
+            get
+            {
+                if (_DisplayCount == 0)
+                {
+                    return new List<GridTopologyDisplayV2>();
+                }
+                else
+                {
+                    return _Displays.Take((int)_DisplayCount).ToList();
+                }
+            }
             set
             {
                 _DisplayCount = (uint)value.Count;

@@ -17,6 +17,9 @@
     <OutputPath>bin\x64\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="TaskbarHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="EDIDParser">
       <Version>1.2.5.4</Version>
     </PackageReference>
