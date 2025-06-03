@@ -39,12 +39,12 @@ namespace DisplayMagicianShared.AMD
         public AMD_SLSMAP_CONFIG()
         {
             SLSMap = new ADL_SLS_MAP();
-            SLSTargets = new List<ADL_SLS_TARGET>();
-            NativeModes = new List<ADL_SLS_MODE>();
-            NativeModeOffsets = new List<ADL_SLS_OFFSET>();
-            BezelModes = new List<ADL_BEZEL_TRANSIENT_MODE>();
-            TransientModes = new List<ADL_BEZEL_TRANSIENT_MODE>();
-            new List<ADL_SLS_OFFSET>();
+            SLSTargets = new List<ADL_SLS_TARGET>() { };
+            NativeModes = new List<ADL_SLS_MODE>() { };
+            NativeModeOffsets = new List<ADL_SLS_OFFSET>() { };
+            BezelModes = new List<ADL_BEZEL_TRANSIENT_MODE>() { };
+            TransientModes = new List<ADL_BEZEL_TRANSIENT_MODE>() { };
+            SLSOffsets = new List<ADL_SLS_OFFSET>() { };
             BezelModePercent= 0;
         }
 
@@ -912,14 +912,10 @@ namespace DisplayMagicianShared.AMD
 
             // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
             myDefaultConfig.IsInUse = false;
-            /*myDefaultConfig.IsInUse = false;
-            myDefaultConfig.IsCloned = false;
-            myDefaultConfig.IsEyefinity = false;
-            myDefaultConfig.Desktops = new List<AMD_DESKTOP>();
-            myDefaultConfig.Displays = new List<AMD_DISPLAY_WITH_SETTINGS>();
-            myDefaultConfig.DisplayIdentifiers = new List<string>();
-            myDefaultConfig.EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
-            myDefaultConfig.EyefinityDesktop.Grid = Array.Empty<EYEFINITY_GRID_NODE[]>();*/
+            //myDefaultConfig.Desktops = new List<AMD_DESKTOP>();
+            //myDefaultConfig.EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
+            //myDefaultConfig.Displays = new Dictionary<long, AMD_DISPLAY_WITH_SETTINGS>();   
+            //myDefaultConfig.Adl2SlsConfig = new AMD_SLS_CONFIG();
 
             return myDefaultConfig;
         }

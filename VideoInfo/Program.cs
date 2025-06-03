@@ -325,14 +325,8 @@ namespace VideoInfo
 
             SharedLogger.logger.Trace($"VideoInfo/saveToFile: Getting the current Active Config");
             // Get the current configuration
-            if (nvidiaLibrary.IsInstalled)
-            {
-                myDisplayConfig.NVIDIAConfig = nvidiaLibrary.ActiveDisplayConfig;
-            }            
-            if (amdLibrary.IsInstalled)
-            {
-                myDisplayConfig.AMDConfig = amdLibrary.ActiveDisplayConfig;
-            }            
+            myDisplayConfig.NVIDIAConfig = nvidiaLibrary.ActiveDisplayConfig;
+            myDisplayConfig.AMDConfig = amdLibrary.ActiveDisplayConfig;
             myDisplayConfig.WindowsConfig = winLibrary.ActiveDisplayConfig;
 
             SharedLogger.logger.Trace($"VideoInfo/saveToFile: Attempting to convert the current Active Config objects to JSON format");
