@@ -2421,22 +2421,82 @@ namespace DisplayMagicianShared.AMD
                     {
                         // Check if we are using the new ADLX or older ADL API to create the Eyefinity Desktop
                         if (useADLEyefinity)
-                        {
+                        {                          
+                            // If set then we are using the older ADL API to create the Eyefinity Desktop
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Using the older ADL API to create the Eyefinity Desktop.");
+                            // Set the initial state of the ADL_STATUS
+                            ADL_STATUS ADLRet = 0;
+                            
+                            foreach (AMD_SLSMAP_CONFIG slsMapConfig in displayConfig.Adl2SlsConfig.SLSMapConfigs)
+                            {
+                                // Attempt to turn on this SLS Map Config if it exists in the AMD Radeon driver config database
+                                ADLRet = ADLImport.ADL2_Display_SLSMapConfig_SetState(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap.SLSMapIndex, ADLImport.ADL_TRUE);
+                                if (ADLRet == ADL_STATUS.ADL_OK)
+                                {
+                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_SetState successfully set the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_SetState returned ADL_STATUS {ADLRet} when trying to set the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
 
+                                    // If we get an error with just tturning it on, then we need to actually try to created a new Eyefinity map and then enable it
+                                    // If we reach this stage, then the user has discarded the AMD Eyefinity mode in AMD due to a bad UI design, and we need to work around that slight issue.
+                                    // (BTW that's FAR to easy to do in the AMD Radeon GUI)
+                                    // NOTE: There is a slight issue with way of doing things. Although we create a much more robust way of working, we also will never ever actually use the Eyefinity config as saved.
+                                    //       Instead, we will always drop through to creating an Eyefinity config each time, the only saving grace being that the AMD Driver is smart enough to notice this and it will reuse the same SLSMapIndex number.
+                                    //       This at least means that we won't keep filling the AMD Driver up with additional EYefinity configs! It will instaed only add one more additional AMD Config if it works this way.
+
+                                    int supportedSLSLayoutImageMode;
+                                    int reasonForNotSupportSLS;
+                                    ADLRet = ADLImport.ADL2_Display_SLSMapConfig_Valid(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap, slsMapConfig.SLSTargets.Count, slsMapConfig.SLSTargets.ToArray(), out supportedSLSLayoutImageMode, out reasonForNotSupportSLS, ADLImport.ADL_DISPLAY_SLSMAPCONFIG_CREATE_OPTION_RELATIVETO_CURRENTANGLE);
+                                    if (ADLRet == ADL_STATUS.ADL_OK)
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_Valid successfully validated a new SLSMAP config for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_Valid returned ADL_STATUS {ADLRet} when trying to create a new SLSMAP for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                        return false;
+                                    }
+
+                                    // Create and apply the new SLSMap
+                                    int newSlsMapIndex;
+                                    ADLRet = ADLImport.ADL2_Display_SLSMapConfig_Create(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap, slsMapConfig.SLSTargets.Count, slsMapConfig.SLSTargets.ToArray(), slsMapConfig.BezelModePercent, out newSlsMapIndex, ADLImport.ADL_DISPLAY_SLSMAPCONFIG_CREATE_OPTION_RELATIVETO_CURRENTANGLE);
+                                    if (ADLRet == ADL_STATUS.ADL_OK)
+                                    {
+                                        if (newSlsMapIndex != -1)
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_Create successfully created the new SLSMAP we just created with index {newSlsMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+
+                                            // At this point we have created a new AMD Eyefinity Config
+                                        }
+                                        else
+                                        {
+                                            SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_Create returned ADL_STATUS {ADLRet} but the returned SLSMapIndex was -1, which indicates that the new SLSMAP failed to create for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_Create returned ADL_STATUS {ADLRet} when trying to create a new SLSMAP for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                        return false;
+                                    }
+
+                                }
+
+                            }
                         }
                         else
                         {
-                            // Otherwise we are using the ADL API to create the Eyefinity Desktop
+                            // Otherwise we are using the newer ADLX API to create the Eyefinity Desktop
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Using the newer ADLX API to create the Eyefinity Desktop.");
                             if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
                             {
-                                // If set then we are using the older ADL API to create the Eyefinity Desktop
-
+                                // If the Eyefinity Desktop is already set then we don't need to do anything
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Eyefinity layout is exactly the same as the one we want, so skipping setting up the Eyefinity Desktop");
                             }
                             else
                             {
-                                // Otherwise we are using the new ADLX API to create the Eyefinity Desktop
-
+                                // Otherwise we need to use the new ADLX API to create the Eyefinity Desktop
                                 // Setup the EyefinityDesktop using the settings the driver stores internally
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to get the ADLX EyefinityDesktop object");
                                 // Get eyefinitydisplay list
@@ -2489,11 +2549,33 @@ namespace DisplayMagicianShared.AMD
                             if (useADLEyefinity)
                             {
                                 // If set then we are using the older ADL API to destroy the Eyefinity Desktop
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Using the older ADL API to destroy the Eyefinity Desktop.");
 
+                                // We need to disable the current Eyefinity (SLS) profile to turn it off
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: SLS is enabled in the current display configuration, so we need to turn it off");
+                                // Set the initial state of the ADL_STATUS
+                                ADL_STATUS ADLRet = 0;
+
+                                foreach (AMD_SLSMAP_CONFIG slsMapConfig in ActiveDisplayConfig.Adl2SlsConfig.SLSMapConfigs)
+                                {
+                                    // Turn off this SLS Map Config
+                                    ADLRet = ADLImport.ADL2_Display_SLSMapConfig_SetState(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap.SLSMapIndex, ADLImport.ADL_FALSE);
+                                    if (ADLRet == ADL_STATUS.ADL_OK)
+                                    {
+                                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_SetState successfully disabled the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_SetState returned ADL_STATUS {ADLRet} when trying to set the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} to FALSE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                        return false;
+                                    }
+
+                                }
                             }
                             else
                             {
                                 // Otherwise we are using the new ADLX API to destroy the Eyefinity Desktop
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Using the newer ADLX API to destroy the Eyefinity Desktop.");
 
                                 // Setup the EyefinityDesktop using the settings the driver stores internally
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Attempting to get the ADLX EyefinityDesktop object");
