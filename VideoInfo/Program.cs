@@ -138,50 +138,68 @@ namespace VideoInfo
                 }
                 else if (args[0] == "load")
                 {
-                    int delayInMs = 0;
+                    // set the defaults
+                    bool useADLEyefinity = false;
+                    int delayInMs = 500;
+                    string fileToLoad = string.Empty;
                     SharedLogger.logger.Debug($"VideoInfo/Main: The load command was provided");
-                    if (args.Length == 3)
+
+                    // Check for any additional parameters
+                    if (args.Length >= 1)
                     {
-                        try
+                        for (int i = 1; i < args.Length; i++)
                         {
-                            delayInMs = int.Parse(args[2]);
-                            if (delayInMs < 0)
+                            if (args[i].StartsWith("--delay:", StringComparison.OrdinalIgnoreCase))
                             {
-                                delayInMs = 500;
+                                SharedLogger.logger.Debug($"VideoInfo/Main: The delay command was provided with value {args[i]}");
+                                try
+                                {
+                                    delayInMs = int.Parse(args[i].Substring(8));
+                                    if (delayInMs < 0)
+                                    {
+                                        delayInMs = 500;
+                                    }
+                                    else if (delayInMs > 10000)
+                                    {
+                                        delayInMs = 10000;
+                                    }
+                                }
+                                catch (FormatException ex)
+                                {
+                                    SharedLogger.logger.Error(ex,$"VideoInfo/Main: ERROR - The delay value provided is not a valid integer.");
+                                    Environment.Exit(1);
+                                    // Make the default delay 500ms if user provides junk
+                                    delayInMs = 500;
+                                }
                             }
-                            else if (delayInMs > 10000)
+                            else if (args[i].StartsWith("--oldEyefinity", StringComparison.OrdinalIgnoreCase))
                             {
-                                delayInMs = 10000;
+                                SharedLogger.logger.Debug($"VideoInfo/Main: The oldEyefinity command was provided, so we will use ADL Eyefinity to apply the display settings rather than ADLX.");
+                                useADLEyefinity = true;
+                            }
+                            else
+                            {
+                                if (File.Exists(args[i]))
+                                {
+                                    fileToLoad = args[i];
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"ERROR - The filename {args[i]} does not exist. Skipping.");
+                                    SharedLogger.logger.Error($"VideoInfo/Main: ERROR - The filename {args[i]} does not exist. Skipping.");
+                                }
                             }
                         }
-                        catch (FormatException ex)
-                        {
-                            SharedLogger.logger.Error(ex,$"VideoInfo/Main: ERROR - The delay value provided is not a valid integer.");
-                            Environment.Exit(1);
-                            // Make the default delay 500ms if user provides junk
-                            delayInMs = 500;
-                        }
-                    }
-                    else
-                    {
-                        // Make the default delay 500ms if not provided by user
-                        delayInMs = 500;
                     }
 
-                    if (args.Length != 2)
+                    if (fileToLoad == string.Empty)
                     {
                         Console.WriteLine($"ERROR - You need to provide a filename from which to load display settings");
                         SharedLogger.logger.Error($"VideoInfo/Main: ERROR - You need to provide a filename from which to load display settings");
                         Environment.Exit(1);
                     }
-                    SharedLogger.logger.Debug($"VideoInfo/Main: Attempting to use the display settings in {args[1]} as load command was provided");
-                    if (!File.Exists(args[1]))
-                    {
-                        Console.WriteLine($"ERROR - Couldn't find the file {args[1]} to load settings from it");
-                        SharedLogger.logger.Error($"VideoInfo/Main: ERROR - Couldn't find the file {args[1]} to load settings from it");
-                        Environment.Exit(1);
-                    }
-                    loadFromFile(args[1], delayInMs);
+                    SharedLogger.logger.Debug($"VideoInfo/Main: Attempting to use the display settings in {fileToLoad} as load command was provided");
+                    loadFromFile(fileToLoad, useADLEyefinity, delayInMs);
                 }
                 else if (args[0] == "possible")
                 {
@@ -404,7 +422,7 @@ namespace VideoInfo
             }
         }
 
-        static void loadFromFile(string filename, int delayInMs)
+        static void loadFromFile(string filename, bool useADLEyefinity, int delayInMs)
         {
             string json = "";
             try
@@ -554,7 +572,7 @@ namespace VideoInfo
                     if (applyAMDSettings)
                     {
                         Console.Write($"Attempting to apply AMD display config from {filename}...");
-                        itWorkedforAMD = amdLibrary.SetActiveConfig(myDisplayConfig.AMDConfig, delayInMs);
+                        itWorkedforAMD = amdLibrary.SetActiveConfig(myDisplayConfig.AMDConfig, useADLEyefinity, delayInMs);
                         Thread.Sleep(delayInMs); // Give it a second to wake up the displays
                         if (itWorkedforAMD)
                         {
