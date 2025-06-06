@@ -103,11 +103,11 @@ namespace VideoInfo
             NLog.LogManager.Configuration = config;
 
             // Start the Log file
-            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.9.1");
+            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.9.2");
             // Log the commandline options
             SharedLogger.logger.Info($"VideoInfo/Main: cmdline options: {string.Join(" ", args)}");
 
-            Console.WriteLine($"\nVideoInfo v1.9.1");
+            Console.WriteLine($"\nVideoInfo v1.9.2");
             Console.WriteLine($"=================");
             Console.WriteLine($"(c) Terry MacDonald 2024-2025\n");
 
