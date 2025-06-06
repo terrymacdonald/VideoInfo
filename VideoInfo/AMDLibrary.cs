@@ -617,6 +617,7 @@ namespace DisplayMagicianShared.AMD
         public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
         public const string AMD_ADLX_BINDING_DLL = "ADLXCSharpBind.dll";
+        public const string AMD_ADLX_DLL = "amdadlx64.dll";
 
         static AMDLibrary() { }
         public AMDLibrary()
@@ -651,26 +652,43 @@ namespace DisplayMagicianShared.AMD
                 //Marshal.PrelinkAll(typeof(ADLImport));
                 try
                 {
-                    // Attempt to load the NVAPI DLL
-                    IntPtr hModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
-                    if (hModule != IntPtr.Zero)
+                    // If we reach here, the DLL was loaded successfully, so the next step is to check that the ADLX library DLL is available
+                    // Attempt to load the AMD ADLX 64-bit DLL
+                    IntPtr hADLXModule = LoadLibrary(AMD_ADLX_DLL);
+                    if (hADLXModule != IntPtr.Zero)
                     {
-                        // Attempt to get the address of a non-existent function to verify the DLL is loaded
-                        IntPtr procAddress = GetProcAddress(hModule, "fakefunction");
-                        // If GetProcAddress returns IntPtr.Zero, the function doesn't exist, which is expected
-                        // The key point is that LoadLibrary succeeded, indicating the DLL is present
-                        
-                        // Free the loaded library
-                        //FreeLibrary(hModule);
-
-                        _initialised = true;
-                        SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Successfully loaded the AMD ADLX DLL.");
+                        // Successfully loaded the ADLX DLL, which means it's installed!
+                        SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: We successfully loaded the AMD ADLX DLL which means the AMD Adrenalin driver software is installed.");
                     }
                     else
                     {
                         // LoadLibrary failed, DLL is not available
                         _initialised = false;
-                        SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX DLL. You may need to install the AMD driver.");
+                        SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX DLL. You need to download and install the AMD Adrenalin software from the AMD support website in order to fully support AMD hardware.");
+                        return;
+                    }
+
+                    // Attempt to load the Custom ADLX Binding DLL
+                    IntPtr hBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
+                    if (hBindingModule != IntPtr.Zero)
+                    {
+                        // Attempt to get the address of a non-existent function to verify the DLL is loaded
+                        // IntPtr procAddress = GetProcAddress(hModule, "fakefunction");
+                        // If GetProcAddress returns IntPtr.Zero, the function doesn't exist, which is expected
+                        // The key point is that LoadLibrary succeeded, indicating the DLL is present
+                        // Free the loaded library if we're exiting now, to avoid memory leaks
+                        //FreeLibrary(hModule);
+
+                        // Successfully loaded our custom ADLX Binding DLL, which means it's installed!
+                        _initialised = false;
+                        SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: We successfully loaded our custom AMD ADLX Binding DLL!.");
+                    }
+                    else
+                    {
+                        // LoadLibrary failed, DLL is not available
+                        _initialised = false;
+                        SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX Binding DLL. You may need to install the AMD driver.");
+                        return;
                     }
                 }
                 catch (Exception ex)
@@ -725,6 +743,11 @@ namespace DisplayMagicianShared.AMD
                 {
                     SharedLogger.logger.Error($"AMDLibrary/AMDLibrary: Error intialising AMD ADLX library. ADLXHelper.Initialize() returned error code {status.ToString("G")}");
                     _initialised = false;
+
+                    if (status == ADLX_RESULT.ADLX_FAIL)
+                    {
+                        SharedLogger.logger.Error($"AMDLibrary/AMDLibrary: Please update your AMD Driver to the latest version. THis software requires AMD Adrenalin v25.6.0 or later to work!");
+                    }
                     return; 
                 }
                 else
