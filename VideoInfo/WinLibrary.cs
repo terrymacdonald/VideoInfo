@@ -2424,7 +2424,7 @@ namespace DisplayMagicianShared.Windows
                 err = CCDImport.DisplayConfigGetDeviceInfo(ref adapterInfo);
                 if (err == WIN32STATUS.ERROR_SUCCESS)
                 {
-                    SharedLogger.logger.Trace($"WinLibrary/GetCurrentPCIVideoCardVendors: Successfully got the display name info from {path.TargetInfo.Id}.");
+                    //SharedLogger.logger.Trace($"WinLibrary/GetCurrentPCIVideoCardVendors: Successfully got the display name info from {path.TargetInfo.Id}.");
                 }
                 else
                 {
@@ -2446,7 +2446,7 @@ namespace DisplayMagicianShared.Windows
                     {
                         string pciType = match.Groups[1].Value;
                         string vendorId = match.Groups[2].Value;
-                        SharedLogger.logger.Trace($"WinLibrary/GetCurrentPCIVideoCardVendors: The matched PCI Vendor ID is :{vendorId} and the PCI device is a {pciType} device.");
+                       // SharedLogger.logger.Trace($"WinLibrary/GetCurrentPCIVideoCardVendors: The matched PCI Vendor ID is :{vendorId} and the PCI device is a {pciType} device.");
                         if (!videoCardVendorIds.Contains(vendorId))
                         {
                             videoCardVendorIds.Add(vendorId);
