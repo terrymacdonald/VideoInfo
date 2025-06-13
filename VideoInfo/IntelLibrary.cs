@@ -129,22 +129,16 @@ namespace DisplayMagicianShared.Intel
     {
         public bool IsInUse;
         public bool IsCloned;
-        public bool IsEyefinity;
-        public List<AMD_DESKTOP> Desktops;
-        public AMD_EYEFINITY_DESKTOP EyefinityDesktop;
+        public bool IsCombinedDisplay;
         public Dictionary<long,INTEL_DISPLAY_WITH_SETTINGS> Displays;
-        public AMD_SLS_CONFIG Adl2SlsConfig;
         public List<string> DisplayIdentifiers;
 
         public INTEL_DISPLAY_CONFIG()
         {
             IsInUse = false;
             IsCloned = false;
-            IsEyefinity = false;
-            Desktops = new List<AMD_DESKTOP>();
-            EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
+            IsCombinedDisplay = false;
             Displays = new Dictionary<long,INTEL_DISPLAY_WITH_SETTINGS>();
-            Adl2SlsConfig = new AMD_SLS_CONFIG();
             DisplayIdentifiers = new List<string>();
         }
 
@@ -161,19 +155,9 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsCloned values don't equal each other");
                 return false;
             }
-            if (!Desktops.SequenceEqual(other.Desktops))
+            if (IsCombinedDisplay != other.IsCombinedDisplay)
             {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The Desktops values don't equal each other");
-                return false;
-            }
-            if (IsEyefinity != other.IsEyefinity)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsEyefinity values don't equal each other");
-                return false;
-            }
-            if (!EyefinityDesktop.Equals(other.EyefinityDesktop))
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The EyefinityDesktop values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsCombinedDisplay values don't equal each other");
                 return false;
             }
             if (!Displays.SequenceEqual(other.Displays))
@@ -191,7 +175,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCloned, Desktops, IsEyefinity, EyefinityDesktop, Displays, DisplayIdentifiers).GetHashCode();
+            return (IsInUse, IsCloned, IsCombinedDisplay, Displays, DisplayIdentifiers).GetHashCode();
         }
 
         public static bool operator ==(INTEL_DISPLAY_CONFIG lhs, INTEL_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
@@ -246,7 +230,7 @@ namespace DisplayMagicianShared.Intel
                     return;
                 }
 
-                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initiliase the Intel IGCL API");
+                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initialise the Intel IGCL API");
                 try
                 {
                     bool result = IGCLImport.Initialize();
@@ -260,7 +244,7 @@ namespace DisplayMagicianShared.Intel
                     {
                         // IGCL API failed to initialise
                         _initialised = false;
-                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API. You need to download and install the INtel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
+                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
                         return;
                     }
 
@@ -409,10 +393,10 @@ namespace DisplayMagicianShared.Intel
         {
             SharedLogger.logger.Trace($"IntelLibrary/GetActiveConfig: Getting the currently active config");
             bool allDisplays = true;
-            return GetAMDDisplayConfig(allDisplays);
+            return GetIntelDisplayConfig(allDisplays);
         }
 
-        private INTEL_DISPLAY_CONFIG GetAMDDisplayConfig(bool allDisplays = false)
+        private INTEL_DISPLAY_CONFIG GetIntelDisplayConfig(bool allDisplays = false)
         {
             // Creat empty config struct so we know there are no nulls in there to break the json serializer
             INTEL_DISPLAY_CONFIG myDisplayConfig = CreateDefaultConfig();
@@ -432,327 +416,325 @@ namespace DisplayMagicianShared.Intel
 
                 if (adapters == null || adapters.Count == 0)
                 {
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: No Intel devices found, returning empty config");
+                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: No Intel devices found, returning empty config");
                     return myDisplayConfig;
                 }
 
-                SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Found {adapters.Count} Intel devices, proceeding to get display configuration");
+                SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Found {adapters.Count} Intel devices, proceeding to get display configuration");
 
                 foreach (var adapter in adapters)
                 {
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Found Intel device {adapter.name}");
-                    myDisplayConfig.DisplayIdentifiers.Add(adapter.id);
+                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Found Intel device {adapter.name}");
+                    //myDisplayConfig.DisplayIdentifiers.Add(adapter.pDeviceID);
                 }
-                IADLXDesktopServices desktopService;
-                IADLXDesktopList desktopList;
+                /*                IADLXDesktopServices desktopService;
+                                IADLXDesktopList desktopList;
 
-                bool isEyefinityEnabled = false;
-                bool isCloned = false;
-                List<AMD_DESKTOP> desktopsToStore = new List<AMD_DESKTOP>();
-                List<INTEL_DISPLAY_WITH_SETTINGS> displaysToStore = new List<INTEL_DISPLAY_WITH_SETTINGS>();
-                AMD_EYEFINITY_DESKTOP eyefinityDesktopToStore = new AMD_EYEFINITY_DESKTOP();
+                                bool isEyefinityEnabled = false;
+                                bool isCloned = false;
+                                List<INTEL_DISPLAY_WITH_SETTINGS> displaysToStore = new List<INTEL_DISPLAY_WITH_SETTINGS>();
 
-                SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Attempting to get the ADLX desktop services");
-                SWIGTYPE_p_p_adlx__IADLXDesktopServices d = ADLX.new_desktopSerP_Ptr();
-                status = _adlxSystem.GetDesktopsServices(d);
-                desktopService = ADLX.desktopSerP_Ptr_value(d);
-                if (status != ADLX_RESULT.ADLX_OK)
-                {
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Error getting the ADLX desktop services. systemServices.GetDesktopsServices() returned error code {status}");
-                    return myDisplayConfig; ;
-                }
-                else
-                {
-
-                    // Get the list of Desktops we have (this is more for informational purposes)
-
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Successfully got the desktop services");
-                    // Get the display services
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Attempting to get the ADLX desktop list");
-                    // Get display list
-                    SWIGTYPE_p_p_adlx__IADLXDesktopList ppDesktopList = ADLX.new_desktopListP_Ptr();
-                    status = desktopService.GetDesktops(ppDesktopList);
-                    desktopList = ADLX.desktopListP_Ptr_value(ppDesktopList);
-
-                    if (status != ADLX_RESULT.ADLX_OK)
-                    {
-                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
-                        return CreateDefaultConfig(); ;
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: Successfully got the desktop list");
-                        // Iterate through the desktop list
-                        uint it = desktopList.Begin();
-                        for (; it != desktopList.Size(); it++)
-                        {
-                            SWIGTYPE_p_p_adlx__IADLXDesktop ppDesktop = ADLX.new_desktopP_Ptr();
-                            status = desktopList.At(it, ppDesktop);
-                            IADLXDesktop desktop = ADLX.desktopP_Ptr_value(ppDesktop);
-
-                            if (status == ADLX_RESULT.ADLX_OK)
-                            {
-                                AMD_DESKTOP newDesktop = new AMD_DESKTOP();
-                                newDesktop.Displays = new List<AMD_DISPLAY>();
-
-                                SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_adlx_uintP();
-                                desktop.GetNumberOfDisplays(pNumDisplays);
-                                newDesktop.NumberOfDisplays = ADLX.adlx_uintP_value(pNumDisplays);
-                                SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is {newDesktop.NumberOfDisplays}");
-
-                                if (newDesktop.NumberOfDisplays > 0)
+                                SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Attempting to get the ADLX desktop services");
+                                SWIGTYPE_p_p_adlx__IADLXDesktopServices d = ADLX.new_desktopSerP_Ptr();
+                                status = _adlxSystem.GetDesktopsServices(d);
+                                desktopService = ADLX.desktopSerP_Ptr_value(d);
+                                if (status != ADLX_RESULT.ADLX_OK)
                                 {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is > 0, so getting list of displays");
-                                    // Get the list of displays that are part of this desktop
-                                    SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
-                                    status = desktop.GetDisplays(ppDisplayList);
-                                    IADLXDisplayList desktopDisplayList = ADLX.displayListP_Ptr_value(ppDisplayList);
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Error getting the ADLX desktop services. systemServices.GetDesktopsServices() returned error code {status}");
+                                    return myDisplayConfig; ;
+                                }
+                                else
+                                {
+
+                                    // Get the list of Desktops we have (this is more for informational purposes)
+
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Successfully got the desktop services");
+                                    // Get the display services
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Attempting to get the ADLX desktop list");
+                                    // Get display list
+                                    SWIGTYPE_p_p_adlx__IADLXDesktopList ppDesktopList = ADLX.new_desktopListP_Ptr();
+                                    status = desktopService.GetDesktops(ppDesktopList);
+                                    desktopList = ADLX.desktopListP_Ptr_value(ppDesktopList);
+
                                     if (status != ADLX_RESULT.ADLX_OK)
                                     {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
                                         return CreateDefaultConfig(); ;
                                     }
                                     else
                                     {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: Successfully got the display list");
-                                        // Iterate through the display list
-                                        uint itDisplay = desktopDisplayList.Begin();
-                                        for (; itDisplay != desktopDisplayList.Size(); itDisplay++)
+                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: Successfully got the desktop list");
+                                        // Iterate through the desktop list
+                                        uint it = desktopList.Begin();
+                                        for (; it != desktopList.Size(); it++)
                                         {
-                                            SWIGTYPE_p_p_adlx__IADLXDisplay ppDisplay = ADLX.new_displayP_Ptr();
-                                            status = desktopDisplayList.At(itDisplay, ppDisplay);
-                                            IADLXDisplay display = ADLX.displayP_Ptr_value(ppDisplay);
+                                            SWIGTYPE_p_p_adlx__IADLXDesktop ppDesktop = ADLX.new_desktopP_Ptr();
+                                            status = desktopList.At(it, ppDesktop);
+                                            IADLXDesktop desktop = ADLX.desktopP_Ptr_value(ppDesktop);
+
                                             if (status == ADLX_RESULT.ADLX_OK)
                                             {
-                                                // Create a new AMD_DISPLAY to store things in
-                                                AMD_DISPLAY newDisplay = new AMD_DISPLAY();
+                                                AMD_DESKTOP newDesktop = new AMD_DESKTOP();
+                                                newDesktop.Displays = new List<AMD_DISPLAY>();
 
-                                                // Get the display connection type
-                                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
-                                                display.ConnectorType(pConnect);
-                                                newDisplay.ConnectorType = ADLX.adlx_displayConnectTypeP_value(pConnect);
+                                                SWIGTYPE_p_unsigned_int pNumDisplays = ADLX.new_adlx_uintP();
+                                                desktop.GetNumberOfDisplays(pNumDisplays);
+                                                newDesktop.NumberOfDisplays = ADLX.adlx_uintP_value(pNumDisplays);
+                                                SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is {newDesktop.NumberOfDisplays}");
 
-                                                // Get the display type
-                                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
-                                                display.DisplayType(pDisType);
-                                                newDisplay.DisplayType = ADLX.adlx_displayTypeP_value(pDisType);
+                                                if (newDesktop.NumberOfDisplays > 0)
+                                                {
+                                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is > 0, so getting list of displays");
+                                                    // Get the list of displays that are part of this desktop
+                                                    SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
+                                                    status = desktop.GetDisplays(ppDisplayList);
+                                                    IADLXDisplayList desktopDisplayList = ADLX.displayListP_Ptr_value(ppDisplayList);
+                                                    if (status != ADLX_RESULT.ADLX_OK)
+                                                    {
+                                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                                                        return CreateDefaultConfig(); ;
+                                                    }
+                                                    else
+                                                    {
+                                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: Successfully got the display list");
+                                                        // Iterate through the display list
+                                                        uint itDisplay = desktopDisplayList.Begin();
+                                                        for (; itDisplay != desktopDisplayList.Size(); itDisplay++)
+                                                        {
+                                                            SWIGTYPE_p_p_adlx__IADLXDisplay ppDisplay = ADLX.new_displayP_Ptr();
+                                                            status = desktopDisplayList.At(itDisplay, ppDisplay);
+                                                            IADLXDisplay display = ADLX.displayP_Ptr_value(ppDisplay);
+                                                            if (status == ADLX_RESULT.ADLX_OK)
+                                                            {
+                                                                // Create a new AMD_DISPLAY to store things in
+                                                                AMD_DISPLAY newDisplay = new AMD_DISPLAY();
 
-                                                // Get the EDID
-                                                SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
-                                                display.EDID(ppEDID);
-                                                String edid = ADLX.charP_Ptr_value(ppEDID);
+                                                                // Get the display connection type
+                                                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
+                                                                display.ConnectorType(pConnect);
+                                                                newDisplay.ConnectorType = ADLX.adlx_displayConnectTypeP_value(pConnect);
 
-                                                // Get the manufacturer ID
-                                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
-                                                display.ManufacturerID(pMID);
-                                                newDisplay.ManufacturerID = ADLX.adlx_uintP_value(pMID);
+                                                                // Get the display type
+                                                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
+                                                                display.DisplayType(pDisType);
+                                                                newDisplay.DisplayType = ADLX.adlx_displayTypeP_value(pDisType);
 
-                                                // Get the display name
-                                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
-                                                display.Name(ppName);
-                                                String name = ADLX.charP_Ptr_value(ppName);
-                                                newDisplay.Name = name;
+                                                                // Get the EDID
+                                                                SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
+                                                                display.EDID(ppEDID);
+                                                                String edid = ADLX.charP_Ptr_value(ppEDID);
 
-                                                // Get the native resolution
-                                                SWIGTYPE_p_int pMaxHRes = ADLX.new_adlx_intP();
-                                                SWIGTYPE_p_int pMaxVRes = ADLX.new_adlx_intP();
-                                                display.NativeResolution(pMaxHRes, pMaxVRes);
-                                                newDisplay.MaxHResolution = ADLX.adlx_intP_value(pMaxHRes);
-                                                newDisplay.MaxVResolution = ADLX.adlx_intP_value(pMaxVRes);
+                                                                // Get the manufacturer ID
+                                                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
+                                                                display.ManufacturerID(pMID);
+                                                                newDisplay.ManufacturerID = ADLX.adlx_uintP_value(pMID);
 
-                                                // Get the PixelClock
-                                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_adlx_uintP();
-                                                display.PixelClock(pPixelClock);
-                                                newDisplay.PixelClock = ADLX.adlx_uintP_value(pPixelClock);
-                                                // Get the refresh rate
-                                                SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
-                                                display.RefreshRate(pRefreshRate);
-                                                newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
+                                                                // Get the display name
+                                                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
+                                                                display.Name(ppName);
+                                                                String name = ADLX.charP_Ptr_value(ppName);
+                                                                newDisplay.Name = name;
 
-                                                // Get the scan type
-                                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_adlx_displayScanTypeP();
-                                                display.ScanType(pScanType);
-                                                newDisplay.ScanType = ADLX.adlx_displayScanTypeP_value(pScanType);
+                                                                // Get the native resolution
+                                                                SWIGTYPE_p_int pMaxHRes = ADLX.new_adlx_intP();
+                                                                SWIGTYPE_p_int pMaxVRes = ADLX.new_adlx_intP();
+                                                                display.NativeResolution(pMaxHRes, pMaxVRes);
+                                                                newDisplay.MaxHResolution = ADLX.adlx_intP_value(pMaxHRes);
+                                                                newDisplay.MaxVResolution = ADLX.adlx_intP_value(pMaxVRes);
 
-                                                // Get the Unique ID
-                                                SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
-                                                display.UniqueId(pUID);
-                                                newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
+                                                                // Get the PixelClock
+                                                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_adlx_uintP();
+                                                                display.PixelClock(pPixelClock);
+                                                                newDisplay.PixelClock = ADLX.adlx_uintP_value(pPixelClock);
+                                                                // Get the refresh rate
+                                                                SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
+                                                                display.RefreshRate(pRefreshRate);
+                                                                newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
 
-                                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
-                                                display.UniqueId(pID);
-                                                uint id = ADLX.adlx_sizeP_value(pID);
+                                                                // Get the scan type
+                                                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_adlx_displayScanTypeP();
+                                                                display.ScanType(pScanType);
+                                                                newDisplay.ScanType = ADLX.adlx_displayScanTypeP_value(pScanType);
 
-                                                // Add the new display to the list of displays for this desktop
-                                                newDesktop.Displays.Add(newDisplay);
+                                                                // Get the Unique ID
+                                                                SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
+                                                                display.UniqueId(pUID);
+                                                                newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
+
+                                                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
+                                                                display.UniqueId(pID);
+                                                                uint id = ADLX.adlx_sizeP_value(pID);
+
+                                                                // Add the new display to the list of displays for this desktop
+                                                                newDesktop.Displays.Add(newDisplay);
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is 0, so not getting list of displays. Skipping.");
+                                                }
+
+                                                SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_adlx_orientationP();
+                                                desktop.Orientation(pOrientation);
+                                                newDesktop.Orientation = ADLX.adlx_orientationP_value(pOrientation);
+
+                                                SWIGTYPE_p_int pWidth = ADLX.new_adlx_intP();
+                                                SWIGTYPE_p_int pHeight = ADLX.new_adlx_intP();
+                                                desktop.Size(pWidth, pHeight);
+                                                newDesktop.SizeWidth = ADLX.adlx_intP_value(pWidth);
+                                                newDesktop.SizeHeight = ADLX.adlx_intP_value(pHeight);
+
+                                                ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
+                                                desktop.TopLeft(pLocationTopLeft);
+                                                ADLX_Point locationTopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
+                                                newDesktop.TopLeftX = locationTopLeft.x;
+                                                newDesktop.TopLeftY = locationTopLeft.y;
+
+                                                SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_adlx_desktopTypeP();
+                                                desktop.Type(pDesktopType);
+                                                newDesktop.Type = ADLX.adlx_desktopTypeP_value(pDesktopType);
+
+                                                // The the desktop is an eyefinity desktop then set the eyefinity enabled flag
+                                                // and also process the EyefinityDesktop layout
+                                                if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_EYEFINITY)
+                                                {
+                                                    isEyefinityEnabled = true;
+                                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Eyefinity desktop detected");
+                                                    // Get the eyefinity desktop
+
+                                                    // 1. Allocate a void** via SWIG
+                                                    SWIGTYPE_p_p_void ppVoid = ADLX.new_voidP_Ptr();
+
+                                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Getting a pointer to the Eyefinity desktop object");
+                                                    // 2. Call QueryInterface with the IID for IADLXEyefinityDesktop to get the interface
+                                                    status = desktop.QueryInterface(
+                                                        IADLXEyefinityDesktop.IID(),
+                                                        ppVoid
+                                                    );
+
+                                                    if (status != ADLX_RESULT.ADLX_OK)
+                                                    {
+                                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                                                        return CreateDefaultConfig(); ;
+                                                    }
+                                                    else
+                                                    {
+                                                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Converting pointer to the Eyefinity desktop object to an IntPtr");
+
+                                                        // Extract the raw IntPtr from the void** for the IADLXEyefinityDesktop
+                                                        IntPtr rawPtr = ADLX.voidP_Ptr_value(ppVoid);
+
+                                                        // Wrap it in the managed proxy
+                                                        //    (Constructor args may vary based on SWIG config)
+                                                        IADLXEyefinityDesktop eyefinityDesktop = new IADLXEyefinityDesktop(rawPtr, true);
+
+                                                        // Use the EyefinityDesktop object to get the Eyefinity layout
+                                                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Getting the rows and columns of the diaplay grid for the Eyefinity desktop");
+                                                        SWIGTYPE_p_unsigned_int pRow = ADLX.new_adlx_uintP();
+                                                        ADLX.adlx_uintP_assign(pRow, 0);
+                                                        SWIGTYPE_p_unsigned_int pCol = ADLX.new_adlx_uintP();
+                                                        ADLX.adlx_uintP_assign(pCol, 0);
+                                                        eyefinityDesktop.GridSize(pRow, pCol);
+                                                        myDisplayConfig.EyefinityDesktop.Rows = ADLX.adlx_uintP_value(pRow);
+                                                        myDisplayConfig.EyefinityDesktop.Columns = ADLX.adlx_uintP_value(pCol);
+
+                                                        *//*for (uint row=1; row<gridRows; row++)
+                                                        {
+                                                            for (uint col = 1; col < gridCols; col++)
+                                                            {
+                                                                // Get the eyefinity desktop orientation
+                                                                SWIGTYPE_p_ADLX_ORIENTATION pEyefinityDisplayOrientation = ADLX.new_orientationP();
+                                                                eyefinityDesktop.DisplayOrientation(row, col, pEyefinityDisplayOrientation);
+                                                                ADLX_ORIENTATION eyefinityOrientation = ADLX.orientationP_value(pEyefinityDisplayOrientation);
+
+                                                                // Get the display size
+                                                                SWIGTYPE_p_int pEyefinityDisplayWidth= ADLX.new_intP();
+                                                                SWIGTYPE_p_int pEyefinityDisplayHeight = ADLX.new_intP();
+                                                                eyefinityDesktop.DisplaySize(row,col, pEyefinityDisplayWidth, pEyefinityDisplayHeight);
+                                                                int eyefinityDisplayWidth = ADLX.intP_value(pEyefinityDisplayWidth);
+                                                                int eyefinityDisplayHeight = ADLX.intP_value(pEyefinityDisplayHeight);
+
+                                                                // Get the display location
+                                                                ADLX_Point pLocation = ADLX.new_pointP();
+                                                                eyefinityDesktop.DisplayTopLeft(row, col, pLocation);
+                                                                ADLX_Point location = ADLX.pointP_value(pLocation);
+
+                                                            }
+                                                        }*//*
+
+                                                        // Copy over the desktop level sizes so that we can match things easier in the future
+                                                        myDisplayConfig.EyefinityDesktop.Orientation = newDesktop.Orientation;
+                                                        myDisplayConfig.EyefinityDesktop.TopLeftX = newDesktop.TopLeftX;
+                                                        myDisplayConfig.EyefinityDesktop.TopLeftY = newDesktop.TopLeftY;
+                                                        myDisplayConfig.EyefinityDesktop.SizeWidth = newDesktop.SizeWidth;
+                                                        myDisplayConfig.EyefinityDesktop.SizeHeight = newDesktop.SizeHeight;
+
+                                                        // 7. Release when done
+                                                        eyefinityDesktop.Release();
+                                                        ADLX.delete_voidP_Ptr(ppVoid);
+                                                    }
+                                                }
+                                                else if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_DUPLCATE)
+                                                {
+                                                    isCloned = true;
+                                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Cloned desktop detected");
+                                                }
+                                                else
+                                                {
+                                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Single desktop detected");
+                                                }
+
+                                                // Release desktop interface
+                                                desktop.Release();
+
+                                                // Save the Desktop to the main list
+                                                myDisplayConfig.Desktops.Add(newDesktop);
                                             }
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is 0, so not getting list of displays. Skipping.");
-                                }
+                                    // Release desktop list interface
+                                    desktopList.Release();
 
-                                SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_adlx_orientationP();
-                                desktop.Orientation(pOrientation);
-                                newDesktop.Orientation = ADLX.adlx_orientationP_value(pOrientation);
-
-                                SWIGTYPE_p_int pWidth = ADLX.new_adlx_intP();
-                                SWIGTYPE_p_int pHeight = ADLX.new_adlx_intP();
-                                desktop.Size(pWidth, pHeight);
-                                newDesktop.SizeWidth = ADLX.adlx_intP_value(pWidth);
-                                newDesktop.SizeHeight = ADLX.adlx_intP_value(pHeight);
-
-                                ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
-                                desktop.TopLeft(pLocationTopLeft);
-                                ADLX_Point locationTopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
-                                newDesktop.TopLeftX = locationTopLeft.x;
-                                newDesktop.TopLeftY = locationTopLeft.y;
-
-                                SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_adlx_desktopTypeP();
-                                desktop.Type(pDesktopType);
-                                newDesktop.Type = ADLX.adlx_desktopTypeP_value(pDesktopType);
-
-                                // The the desktop is an eyefinity desktop then set the eyefinity enabled flag
-                                // and also process the EyefinityDesktop layout
-                                if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_EYEFINITY)
-                                {
-                                    isEyefinityEnabled = true;
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Eyefinity desktop detected");
-                                    // Get the eyefinity desktop
-
-                                    // 1. Allocate a void** via SWIG
-                                    SWIGTYPE_p_p_void ppVoid = ADLX.new_voidP_Ptr();
-
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Getting a pointer to the Eyefinity desktop object");
-                                    // 2. Call QueryInterface with the IID for IADLXEyefinityDesktop to get the interface
-                                    status = desktop.QueryInterface(
-                                        IADLXEyefinityDesktop.IID(),
-                                        ppVoid
-                                    );
-
-                                    if (status != ADLX_RESULT.ADLX_OK)
-                                    {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDesktopConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
-                                        return CreateDefaultConfig(); ;
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Converting pointer to the Eyefinity desktop object to an IntPtr");
-
-                                        // Extract the raw IntPtr from the void** for the IADLXEyefinityDesktop
-                                        IntPtr rawPtr = ADLX.voidP_Ptr_value(ppVoid);
-
-                                        // Wrap it in the managed proxy
-                                        //    (Constructor args may vary based on SWIG config)
-                                        IADLXEyefinityDesktop eyefinityDesktop = new IADLXEyefinityDesktop(rawPtr, true);
-
-                                        // Use the EyefinityDesktop object to get the Eyefinity layout
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Getting the rows and columns of the diaplay grid for the Eyefinity desktop");
-                                        SWIGTYPE_p_unsigned_int pRow = ADLX.new_adlx_uintP();
-                                        ADLX.adlx_uintP_assign(pRow, 0);
-                                        SWIGTYPE_p_unsigned_int pCol = ADLX.new_adlx_uintP();
-                                        ADLX.adlx_uintP_assign(pCol, 0);
-                                        eyefinityDesktop.GridSize(pRow, pCol);
-                                        myDisplayConfig.EyefinityDesktop.Rows = ADLX.adlx_uintP_value(pRow);
-                                        myDisplayConfig.EyefinityDesktop.Columns = ADLX.adlx_uintP_value(pCol);
-
-                                        /*for (uint row=1; row<gridRows; row++)
-                                        {
-                                            for (uint col = 1; col < gridCols; col++)
-                                            {
-                                                // Get the eyefinity desktop orientation
-                                                SWIGTYPE_p_ADLX_ORIENTATION pEyefinityDisplayOrientation = ADLX.new_orientationP();
-                                                eyefinityDesktop.DisplayOrientation(row, col, pEyefinityDisplayOrientation);
-                                                ADLX_ORIENTATION eyefinityOrientation = ADLX.orientationP_value(pEyefinityDisplayOrientation);
-
-                                                // Get the display size
-                                                SWIGTYPE_p_int pEyefinityDisplayWidth= ADLX.new_intP();
-                                                SWIGTYPE_p_int pEyefinityDisplayHeight = ADLX.new_intP();
-                                                eyefinityDesktop.DisplaySize(row,col, pEyefinityDisplayWidth, pEyefinityDisplayHeight);
-                                                int eyefinityDisplayWidth = ADLX.intP_value(pEyefinityDisplayWidth);
-                                                int eyefinityDisplayHeight = ADLX.intP_value(pEyefinityDisplayHeight);
-
-                                                // Get the display location
-                                                ADLX_Point pLocation = ADLX.new_pointP();
-                                                eyefinityDesktop.DisplayTopLeft(row, col, pLocation);
-                                                ADLX_Point location = ADLX.pointP_value(pLocation);
-
-                                            }
-                                        }*/
-
-                                        // Copy over the desktop level sizes so that we can match things easier in the future
-                                        myDisplayConfig.EyefinityDesktop.Orientation = newDesktop.Orientation;
-                                        myDisplayConfig.EyefinityDesktop.TopLeftX = newDesktop.TopLeftX;
-                                        myDisplayConfig.EyefinityDesktop.TopLeftY = newDesktop.TopLeftY;
-                                        myDisplayConfig.EyefinityDesktop.SizeWidth = newDesktop.SizeWidth;
-                                        myDisplayConfig.EyefinityDesktop.SizeHeight = newDesktop.SizeHeight;
-
-                                        // 7. Release when done
-                                        eyefinityDesktop.Release();
-                                        ADLX.delete_voidP_Ptr(ppVoid);
-                                    }
-                                }
-                                else if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_DUPLCATE)
-                                {
-                                    isCloned = true;
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Cloned desktop detected");
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Single desktop detected");
                                 }
 
-                                // Release desktop interface
-                                desktop.Release();
-
-                                // Save the Desktop to the main list
-                                myDisplayConfig.Desktops.Add(newDesktop);
-                            }
-                        }
-                    }
-                    // Release desktop list interface
-                    desktopList.Release();
-                                      
-                }
-
-                // Release desktop services interface
-                desktopService.Release();
+                                // Release desktop services interface
+                                desktopService.Release();*/
 
                 //-----------------------------------------------------------------------
 
                 // Get the display services
                 // This lets us interact witth the various displays
-                IADLXDisplayServices displayService;
+                /*IADLXDisplayServices displayService;
                 IADLXDisplayList displayList;
 
-                SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display services");
+                SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Attempting to get the ADLX display services");
                 SWIGTYPE_p_p_adlx__IADLXDisplayServices s = ADLX.new_displaySerP_Ptr();
                 status = _adlxSystem.GetDisplaysServices(s);
                 displayService = ADLX.displaySerP_Ptr_value(s);
                 if (status != ADLX_RESULT.ADLX_OK)
                 {
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
+                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
                     return CreateDefaultConfig(); ;
                 }
                 else
                 {
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Successfully got the display services");
+                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Successfully got the display services");
                     // Get the display services
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display list");
+                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Attempting to get the ADLX display list");
                     // Get display list
                     SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
                     status = displayService.GetDisplays(ppDisplayList);
                     displayList = ADLX.displayListP_Ptr_value(ppDisplayList);
                     if (status != ADLX_RESULT.ADLX_OK)
                     {
-                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
+                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
                         return CreateDefaultConfig();
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Successfully got the display list");
+                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Successfully got the display list");
                         // Iterate through the display list
                         uint it = displayList.Begin();
                         for (; it != displayList.Size(); it++)
@@ -828,12 +810,12 @@ namespace DisplayMagicianShared.Intel
                                 status = displayService.GetColorDepth(display, ppColorDepth);
                                 if (status != ADLX_RESULT.ADLX_OK)
                                 {
-                                    SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: Error getting the display color depth object. systemServices.GetColorDepth() returned error code {status}");
+                                    SharedLogger.logger.Error($"IntelLibrary/GetntelDisplayConfig: Error getting the display color depth object. systemServices.GetColorDepth() returned error code {status}");
                                     //return false;
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Successfully got the display color depth object");
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Successfully got the display color depth object");
                                     // Check if the color depth is the same as the one we stored
                                     IADLXDisplayColorDepth colorDepth = ADLX.displayColorDepthP_Ptr_value(ppColorDepth);
                                     // Check if the color depth is supported
@@ -842,7 +824,7 @@ namespace DisplayMagicianShared.Intel
                                     if (status == ADLX_RESULT.ADLX_OK)
                                     {
                                         newDisplay.IsSupportedColorDepth = ADLX.boolP_value(pIsSupported);
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Color Depth can be set for this display");
+                                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Color Depth can be set for this display");
                                         
                                         // Get the current color depth for this display
                                         SWIGTYPE_p_ADLX_COLOR_DEPTH pColorDepth = ADLX.new_adlx_colorDepthP();
@@ -850,18 +832,18 @@ namespace DisplayMagicianShared.Intel
 
                                         if (status != ADLX_RESULT.ADLX_OK)
                                         {
-                                            SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: Error getting the display color depth. systemServices.GetColorDepth() returned error code {status}");
+                                            SharedLogger.logger.Error($"IntelLibrary/GetntelDisplayConfig: Error getting the display color depth. systemServices.GetColorDepth() returned error code {status}");
                                             //return false;
                                         }
                                         else
                                         {
                                             newDisplay.ColorDepth = ADLX.adlx_colorDepthP_value(pColorDepth);
-                                            SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Successfully got the display color depth for this display: {newDisplay.ColorDepth}");
+                                            SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Successfully got the display color depth for this display: {newDisplay.ColorDepth}");
                                         }
                                     }
                                     else
                                     {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Color Depth is NOT supported for this display so skipping setting it");
+                                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Color Depth is NOT supported for this display so skipping setting it");
                                     }
                                 }
 
@@ -873,12 +855,12 @@ namespace DisplayMagicianShared.Intel
                                 status = displayService.GetCustomColor(display, ppCustomColor);
                                 if (status != ADLX_RESULT.ADLX_OK)
                                 {
-                                    SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: Error getting the display custom color object. systemServices.GetCustomColor() returned error code {status}");
+                                    SharedLogger.logger.Error($"IntelLibrary/GetntelDisplayConfig: Error getting the display custom color object. systemServices.GetCustomColor() returned error code {status}");
                                     //return false;
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Successfully got the display custom color object");
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Successfully got the display custom color object");
                                     IADLXDisplayCustomColor customColor = ADLX.displayCustomColorP_Ptr_value(ppCustomColor);
                                     // Check if the custom color brightness is supported
                                     SWIGTYPE_p_bool pIsBrightnessSupported = ADLX.new_boolP();
@@ -886,27 +868,27 @@ namespace DisplayMagicianShared.Intel
                                     if (status == ADLX_RESULT.ADLX_OK)
                                     {
                                         newDisplay.IsSupportedCustomColorBrightness = ADLX.boolP_value(pIsBrightnessSupported);
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Custom Color Brightness can be set for this display!");
+                                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Custom Color Brightness can be set for this display!");
                                         // Get the current color brightness for this display
                                         SWIGTYPE_p_int pCurrentBrightness = ADLX.new_adlx_intP();
                                         status = customColor.GetBrightness(pCurrentBrightness);
                                         if (status != ADLX_RESULT.ADLX_OK)
                                         {
-                                            SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: Error getting the display custom color brightness. systemServices.GetCustomColor() returned error code {status}");
+                                            SharedLogger.logger.Error($"IntelLibrary/GetntelDisplayConfig: Error getting the display custom color brightness. systemServices.GetCustomColor() returned error code {status}");
                                             //return false;
                                         }
                                         else
                                         {
                                             newDisplay.CustomColorBrightness = ADLX.adlx_intP_value(pCurrentBrightness);
-                                            SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Successfully got the display custom color brightness for this display: {newDisplay.CustomColorBrightness}");
+                                            SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Successfully got the display custom color brightness for this display: {newDisplay.CustomColorBrightness}");
                                         }
                                     }
                                     else
                                     {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Custom Color Brightness is NOT supported for this display.");
+                                        SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Custom Color Brightness is NOT supported for this display.");
                                     }
                                 }
-                                SharedLogger.logger.Warn($"IntelLibrary/GetAMDDisplayConfig: Found the display settings for this UniqueID but it has a different name");
+                                SharedLogger.logger.Warn($"IntelLibrary/GetntelDisplayConfig: Found the display settings for this UniqueID but it has a different name");
 
 
                                 // Save the Display to the main dictionary of displays with the uniqueid as the key
@@ -919,7 +901,7 @@ namespace DisplayMagicianShared.Intel
                 }
 
                 // Release display services interface
-                displayService.Release();
+                displayService.Release();*/
 
 
                 // Now we have everything we need, so we can build the display config!
@@ -927,527 +909,10 @@ namespace DisplayMagicianShared.Intel
 
                 // Get the display identifiers                
                 myDisplayConfig.DisplayIdentifiers = GetCurrentDisplayIdentifiers(out bool failure);
-
-                // Now try to get the AMD Eyefinity layout using ADL2 (the older standard) as it is more configurable
-                if (_initialisedADL2)
-                {
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Attempting to get the AMD Eyefinity layout using the ADL2 API");
-
-                    // Get the Adapter info for ALL adapter and put it in the AdapterBuffer
-                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: Running ADL2_Adapter_AdapterInfoX4_Get to get the information about all AMD Adapters.");
-                    int numAdaptersInfo = 0;
-                    IntPtr adapterInfoBuffer = IntPtr.Zero;
-                    ADL_STATUS ADLRet = IGCLImport.ADL2_Adapter_AdapterInfoX4_Get(_adlContextHandle, -1, out numAdaptersInfo, out adapterInfoBuffer);
-                    if (ADLRet == ADL_STATUS.ADL_OK)
-                    {
-
-                        ADL_ADAPTER_INFOX2[] adapterArray = new ADL_ADAPTER_INFOX2[numAdaptersInfo];
-                        if (numAdaptersInfo > 0)
-                        {
-                            IntPtr currentAdaptersInfoBuffer = adapterInfoBuffer;
-                            for (int i = 0; i < numAdaptersInfo; i++)
-                            {
-                                // build a structure in the array slot
-                                adapterArray[i] = new ADL_ADAPTER_INFOX2();
-                                // fill the array slot structure with the data from the buffer
-                                adapterArray[i] = (ADL_ADAPTER_INFOX2)Marshal.PtrToStructure(currentAdaptersInfoBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                // destroy the bit of memory we no longer need
-                                //Marshal.DestroyStructure(currentAdaptersInfoBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                // advance the buffer forwards to the next object
-                                currentAdaptersInfoBuffer = (IntPtr)((long)currentAdaptersInfoBuffer + Marshal.SizeOf(adapterArray[i]));
-                            }
-                            // Free the memory used by the buffer                        
-                            Marshal.FreeCoTaskMem(adapterInfoBuffer);
-
-                            SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: ADL2_Adapter_AdapterInfoX4_Get returned information about all AMD Adapters.");
-                            // Now go through each adapter and get the information we need from it
-                            for (int adapterIndex = 0; adapterIndex < numAdaptersInfo; adapterIndex++)
-                            {
-                                // Skip this adapter if it isn't active
-                                ADL_ADAPTER_INFOX2 oneAdapter = adapterArray[adapterIndex]; // There is always just one as we asked for a specific one!
-                                if (oneAdapter.Exist != IGCLImport.ADL_TRUE)
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: AMD Adapter #{oneAdapter.AdapterIndex.ToString()} doesn't exist at present so skipping detection for this adapter.");
-                                    continue;
-                                }
-
-                                // Only skip non-present displays if we want all displays information
-                                if (oneAdapter.Present != IGCLImport.ADL_TRUE)
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: AMD Adapter #{oneAdapter.AdapterIndex.ToString()} isn't enabled at present so skipping detection for this adapter.");
-                                    continue;
-                                }
-
-                                // Check if the adapter is active
-                                // Skip this adapter if it isn't active
-                                int adapterActiveStatus = IGCLImport.ADL_FALSE;
-                                ADLRet = IGCLImport.ADL2_Adapter_Active_Get(_adlContextHandle, adapterIndex, out adapterActiveStatus);
-                                if (ADLRet == ADL_STATUS.ADL_OK)
-                                {
-                                    if (adapterActiveStatus == IGCLImport.ADL_TRUE)
-                                    {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetSomeDisplayIdentifiers: ADL2_Adapter_Active_Get returned ADL_TRUE - AMD Adapter #{adapterIndex} is active! We can continue.");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetSomeDisplayIdentifiers: ADL2_Adapter_Active_Get returned ADL_FALSE - AMD Adapter #{adapterIndex} is NOT active, so skipping.");
-                                        continue;
-                                    }
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Warn($"IntelLibrary/GetSomeDisplayIdentifiers: WARNING - ADL2_Adapter_Active_Get returned ADL_STATUS {ADLRet} when trying to see if AMD Adapter #{adapterIndex} is active. Trying to skip this adapter so something at least works.");
-                                    continue;
-                                }
-
-                                // Go grab the DisplayMaps and DisplayTargets as that is useful infor for creating screens
-                                int numDisplayTargets = 0;
-                                int numDisplayMaps = 0;
-                                IntPtr displayTargetBuffer = IntPtr.Zero;
-                                IntPtr displayMapBuffer = IntPtr.Zero;
-                                ADLRet = IGCLImport.ADL2_Display_DisplayMapConfig_Get(_adlContextHandle, adapterIndex, out numDisplayMaps, out displayMapBuffer, out numDisplayTargets, out displayTargetBuffer, IGCLImport.ADL_DISPLAY_DISPLAYMAP_OPTION_GPUINFO);
-                                if (ADLRet == ADL_STATUS.ADL_OK)
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: ADL2_Display_DisplayMapConfig_Get returned information about all displaytargets connected to AMD adapter {adapterIndex}.");
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: ERROR - ADL2_Display_DisplayMapConfig_Get returned ADL_STATUS {ADLRet} when trying to get the display target info from AMD adapter {adapterIndex} in the computer.");
-                                    throw new AMDLibraryException($"ADL2_Display_DisplayMapConfig_Get returned ADL_STATUS {ADLRet} when trying to get the display target info from AMD adapter {adapterIndex} in the computer");
-                                }
-
-                                ADL_DISPLAY_TARGET[] displayTargetArray = { };
-                                if (numDisplayTargets > 0)
-                                {
-                                    // At this point we know there is at least one screen connected to an adapter
-                                    myDisplayConfig.IsInUse = true;
-
-                                    IntPtr currentDisplayTargetBuffer = displayTargetBuffer;
-                                    //displayTargetArray = new ADL_DISPLAY_TARGET[numDisplayTargets];
-                                    displayTargetArray = new ADL_DISPLAY_TARGET[numDisplayTargets];
-                                    for (int i = 0; i < numDisplayTargets; i++)
-                                    {
-                                        // build a structure in the array slot
-                                        displayTargetArray[i] = new ADL_DISPLAY_TARGET();
-                                        //displayTargetArray[i] = new ADL_DISPLAY_TARGET();
-                                        // fill the array slot structure with the data from the buffer
-                                        displayTargetArray[i] = (ADL_DISPLAY_TARGET)Marshal.PtrToStructure(currentDisplayTargetBuffer, typeof(ADL_DISPLAY_TARGET));
-                                        //displayTargetArray[i] = (ADL_DISPLAY_TARGET)Marshal.PtrToStructure(currentDisplayTargetBuffer, typeof(ADL_DISPLAY_TARGET));
-                                        // destroy the bit of memory we no longer need
-                                        Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_DISPLAY_TARGET));
-                                        // advance the buffer forwards to the next object
-                                        currentDisplayTargetBuffer = (IntPtr)((long)currentDisplayTargetBuffer + Marshal.SizeOf(displayTargetArray[i]));
-                                        //currentDisplayTargetBuffer = (IntPtr)((long)currentDisplayTargetBuffer + Marshal.SizeOf(displayTargetArray[i]));
-
-                                    }
-                                    // Free the memory used by the buffer                        
-                                    Marshal.FreeCoTaskMem(displayTargetBuffer);
-                                    // Save the item                            
-                                    //savedAdapterConfig.DisplayTargets = new ADL_DISPLAY_TARGET[numDisplayTargets];
-                                    //myDisplayConfig.DisplayTargets = displayTargetArray.ToList<ADL_DISPLAY_TARGET>();
-                                }
-                                else
-                                {
-                                    // Free the memory used by the buffer                        
-                                    Marshal.FreeCoTaskMem(displayTargetBuffer);
-                                    // Return the default config as there are no display targets to get info from
-                                    return myDisplayConfig;
-                                }
-
-
-                                // If there are more than 1 display targets then eyefinity is possible
-                                if (numDisplayTargets > 1)
-                                {
-                                    // Check if SLS is enabled for this adapter!
-                                    int matchingSLSMapIndex = -1;
-                                    ADLRet = IGCLImport.ADL2_Display_SLSMapIndex_Get(_adlContextHandle, oneAdapter.AdapterIndex, numDisplayTargets, displayTargetArray, out matchingSLSMapIndex);
-                                    if (ADLRet == ADL_STATUS.ADL_OK && matchingSLSMapIndex != -1)
-                                    {
-                                        // We have a matching SLS index!
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: AMD Adapter #{oneAdapter.AdapterIndex.ToString()} has one or more SLS Maps that could be used with this display configuration! Eyefinity (SLS) could be enabled.");
-
-                                        AMD_SLSMAP_CONFIG mySLSMapConfig = new AMD_SLSMAP_CONFIG();
-
-                                        // We want to get the SLSMapConfig for this matching SLS Map to see if it is actually in use
-                                        int numSLSTargets = 0;
-                                        IntPtr slsTargetBuffer = IntPtr.Zero;
-                                        int numNativeMode = 0;
-                                        IntPtr nativeModeBuffer = IntPtr.Zero;
-                                        int numNativeModeOffsets = 0;
-                                        IntPtr nativeModeOffsetsBuffer = IntPtr.Zero;
-                                        int numBezelMode = 0;
-                                        IntPtr bezelModeBuffer = IntPtr.Zero;
-                                        int numTransientMode = 0;
-                                        IntPtr transientModeBuffer = IntPtr.Zero;
-                                        int numSLSOffset = 0;
-                                        IntPtr slsOffsetBuffer = IntPtr.Zero;
-                                        ADL_SLS_MAP slsMap = new ADL_SLS_MAP();
-                                        ADLRet = IGCLImport.ADL2_Display_SLSMapConfigX2_Get(
-                                                                                        _adlContextHandle,
-                                                                                            oneAdapter.AdapterIndex,
-                                                                                            matchingSLSMapIndex,
-                                                                                            ref slsMap,
-                                                                                            out numSLSTargets,
-                                                                                            out slsTargetBuffer,
-                                                                                            out numNativeMode,
-                                                                                            out nativeModeBuffer,
-                                                                                            out numNativeModeOffsets,
-                                                                                            out nativeModeOffsetsBuffer,
-                                                                                            out numBezelMode,
-                                                                                            out bezelModeBuffer,
-                                                                                            out numTransientMode,
-                                                                                            out transientModeBuffer,
-                                                                                            out numSLSOffset,
-                                                                                            out slsOffsetBuffer,
-                                                                                            IGCLImport.ADL_DISPLAY_SLSGRID_CAP_OPTION_RELATIVETO_CURRENTANGLE);
-                                        if (ADLRet == ADL_STATUS.ADL_OK)
-                                        {
-                                            SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: ADL2_Display_SLSMapConfigX2_Get returned information about the SLS Info connected to AMD adapter {adapterIndex}.");
-                                        }
-                                        else
-                                        {
-                                            SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: ERROR - ADL2_Display_SLSMapConfigX2_Get returned ADL_STATUS {ADLRet} when trying to get the SLS Info from AMD adapter {adapterIndex} in the computer.");
-                                            continue;
-                                        }
-
-                                        // First check that the number of grid entries is equal to the number
-                                        // of display targets associated with this adapter & SLS surface.
-                                        if (numDisplayTargets != (slsMap.Grid.SLSGridColumn * slsMap.Grid.SLSGridRow))
-                                        {
-                                            //Number of display targets returned is not equal to the SLS grid size, so SLS can't be enabled fo this display
-                                            //myDisplayConfig.SlsConfig.IsSlsEnabled = false; // This is already set to false at the start!
-                                            break;
-                                        }
-
-                                        // Add the slsMap to the config we want to store
-                                        mySLSMapConfig.SLSMap = slsMap;
-
-                                        // Process the slsTargetBuffer
-                                        ADL_SLS_TARGET[] slsTargetArray = new ADL_SLS_TARGET[numSLSTargets];
-                                        if (numSLSTargets > 0)
-                                        {
-                                            IntPtr currentSLSTargetBuffer = slsTargetBuffer;
-                                            for (int i = 0; i < numSLSTargets; i++)
-                                            {
-                                                // build a structure in the array slot
-                                                slsTargetArray[i] = new ADL_SLS_TARGET();
-                                                // fill the array slot structure with the data from the buffer
-                                                slsTargetArray[i] = (ADL_SLS_TARGET)Marshal.PtrToStructure(currentSLSTargetBuffer, typeof(ADL_SLS_TARGET));
-                                                // destroy the bit of memory we no longer need
-                                                //Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                                // advance the buffer forwards to the next object
-                                                currentSLSTargetBuffer = (IntPtr)((long)currentSLSTargetBuffer + Marshal.SizeOf(slsTargetArray[i]));
-                                            }
-                                            // Free the memory used by the buffer                        
-                                            Marshal.FreeCoTaskMem(slsTargetBuffer);
-
-                                            // Add the slsTarget to the config we want to store
-                                            mySLSMapConfig.SLSTargets = slsTargetArray.ToList();
-
-                                        }
-                                        else
-                                        {
-                                            // Add the slsTarget to the config we want to store
-                                            mySLSMapConfig.SLSTargets = new List<ADL_SLS_TARGET>();
-                                        }
-
-                                        // Process the nativeModeBuffer
-                                        ADL_SLS_MODE[] nativeModeArray = new ADL_SLS_MODE[numNativeMode];
-                                        if (numNativeMode > 0)
-                                        {
-                                            IntPtr currentNativeModeBuffer = nativeModeBuffer;
-                                            for (int i = 0; i < numNativeMode; i++)
-                                            {
-                                                // build a structure in the array slot
-                                                nativeModeArray[i] = new ADL_SLS_MODE();
-                                                // fill the array slot structure with the data from the buffer
-                                                nativeModeArray[i] = (ADL_SLS_MODE)Marshal.PtrToStructure(currentNativeModeBuffer, typeof(ADL_SLS_MODE));
-                                                // destroy the bit of memory we no longer need
-                                                //Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                                // advance the buffer forwards to the next object
-                                                currentNativeModeBuffer = (IntPtr)((long)currentNativeModeBuffer + Marshal.SizeOf(nativeModeArray[i]));
-                                            }
-                                            // Free the memory used by the buffer                        
-                                            Marshal.FreeCoTaskMem(nativeModeBuffer);
-
-                                            // Add the nativeMode to the config we want to store
-                                            mySLSMapConfig.NativeModes = nativeModeArray.ToList();
-
-                                        }
-                                        else
-                                        {
-                                            // Add the slsTarget to the config we want to store
-                                            mySLSMapConfig.NativeModes = new List<ADL_SLS_MODE>();
-                                        }
-
-                                        // Process the nativeModeOffsetsBuffer
-                                        ADL_SLS_OFFSET[] nativeModeOffsetArray = new ADL_SLS_OFFSET[numNativeModeOffsets];
-                                        if (numNativeModeOffsets > 0)
-                                        {
-                                            IntPtr currentNativeModeOffsetsBuffer = nativeModeOffsetsBuffer;
-                                            for (int i = 0; i < numNativeModeOffsets; i++)
-                                            {
-                                                // build a structure in the array slot
-                                                nativeModeOffsetArray[i] = new ADL_SLS_OFFSET();
-                                                // fill the array slot structure with the data from the buffer
-                                                nativeModeOffsetArray[i] = (ADL_SLS_OFFSET)Marshal.PtrToStructure(currentNativeModeOffsetsBuffer, typeof(ADL_SLS_OFFSET));
-                                                // destroy the bit of memory we no longer need
-                                                //Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                                // advance the buffer forwards to the next object
-                                                currentNativeModeOffsetsBuffer = (IntPtr)((long)currentNativeModeOffsetsBuffer + Marshal.SizeOf(nativeModeOffsetArray[i]));
-                                            }
-                                            // Free the memory used by the buffer                        
-                                            Marshal.FreeCoTaskMem(nativeModeOffsetsBuffer);
-
-                                            // Add the nativeModeOffsets to the config we want to store
-                                            mySLSMapConfig.NativeModeOffsets = nativeModeOffsetArray.ToList();
-
-                                        }
-                                        else
-                                        {
-                                            // Add the empty list to the config we want to store
-                                            mySLSMapConfig.NativeModeOffsets = new List<ADL_SLS_OFFSET>();
-                                        }
-
-                                        // Process the bezelModeBuffer
-                                        ADL_BEZEL_TRANSIENT_MODE[] bezelModeArray = new ADL_BEZEL_TRANSIENT_MODE[numBezelMode];
-                                        if (numBezelMode > 0)
-                                        {
-                                            IntPtr currentBezelModeBuffer = bezelModeBuffer;
-                                            for (int i = 0; i < numBezelMode; i++)
-                                            {
-                                                // build a structure in the array slot
-                                                bezelModeArray[i] = new ADL_BEZEL_TRANSIENT_MODE();
-                                                // fill the array slot structure with the data from the buffer
-                                                bezelModeArray[i] = (ADL_BEZEL_TRANSIENT_MODE)Marshal.PtrToStructure(currentBezelModeBuffer, typeof(ADL_BEZEL_TRANSIENT_MODE));
-                                                // destroy the bit of memory we no longer need
-                                                //Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                                // advance the buffer forwards to the next object
-                                                currentBezelModeBuffer = (IntPtr)((long)currentBezelModeBuffer + Marshal.SizeOf(bezelModeArray[i]));
-                                            }
-                                            // Free the memory used by the buffer                        
-                                            Marshal.FreeCoTaskMem(bezelModeBuffer);
-
-                                            // Add the bezelModes to the config we want to store
-                                            mySLSMapConfig.BezelModes = bezelModeArray.ToList();
-
-                                        }
-                                        else
-                                        {
-                                            // Add the slsTarget to the config we want to store
-                                            mySLSMapConfig.BezelModes = new List<ADL_BEZEL_TRANSIENT_MODE>();
-                                        }
-
-                                        // Process the transientModeBuffer
-                                        ADL_BEZEL_TRANSIENT_MODE[] transientModeArray = new ADL_BEZEL_TRANSIENT_MODE[numTransientMode];
-                                        if (numTransientMode > 0)
-                                        {
-                                            IntPtr currentTransientModeBuffer = transientModeBuffer;
-                                            for (int i = 0; i < numTransientMode; i++)
-                                            {
-                                                // build a structure in the array slot
-                                                transientModeArray[i] = new ADL_BEZEL_TRANSIENT_MODE();
-                                                // fill the array slot structure with the data from the buffer
-                                                transientModeArray[i] = (ADL_BEZEL_TRANSIENT_MODE)Marshal.PtrToStructure(currentTransientModeBuffer, typeof(ADL_BEZEL_TRANSIENT_MODE));
-                                                // destroy the bit of memory we no longer need
-                                                //Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                                // advance the buffer forwards to the next object
-                                                currentTransientModeBuffer = (IntPtr)((long)currentTransientModeBuffer + Marshal.SizeOf(transientModeArray[i]));
-                                            }
-                                            // Free the memory used by the buffer                        
-                                            Marshal.FreeCoTaskMem(transientModeBuffer);
-
-                                            // Add the transientModes to the config we want to store
-                                            mySLSMapConfig.TransientModes = transientModeArray.ToList();
-                                        }
-                                        else
-                                        {
-                                            // Add the slsTarget to the config we want to store
-                                            mySLSMapConfig.TransientModes = new List<ADL_BEZEL_TRANSIENT_MODE>();
-                                        }
-
-                                        // Process the slsOffsetBuffer
-                                        ADL_SLS_OFFSET[] slsOffsetArray = new ADL_SLS_OFFSET[numSLSOffset];
-                                        if (numSLSOffset > 0)
-                                        {
-                                            IntPtr currentSLSOffsetBuffer = slsOffsetBuffer;
-                                            for (int i = 0; i < numSLSOffset; i++)
-                                            {
-                                                // build a structure in the array slot
-                                                slsOffsetArray[i] = new ADL_SLS_OFFSET();
-                                                // fill the array slot structure with the data from the buffer
-                                                slsOffsetArray[i] = (ADL_SLS_OFFSET)Marshal.PtrToStructure(currentSLSOffsetBuffer, typeof(ADL_SLS_OFFSET));
-                                                // destroy the bit of memory we no longer need
-                                                //Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                                // advance the buffer forwards to the next object
-                                                currentSLSOffsetBuffer = (IntPtr)((long)currentSLSOffsetBuffer + Marshal.SizeOf(slsOffsetArray[i]));
-                                            }
-                                            // Free the memory used by the buffer                        
-                                            Marshal.FreeCoTaskMem(slsOffsetBuffer);
-
-                                            // Add the slsOffsets to the config we want to store
-                                            mySLSMapConfig.SLSOffsets = slsOffsetArray.ToList();
-
-                                        }
-                                        else
-                                        {
-                                            // Add the slsTarget to the config we want to store
-                                            mySLSMapConfig.SLSOffsets = new List<ADL_SLS_OFFSET>();
-                                        }
-
-                                        // Now we try to calculate whether SLS is enabled
-                                        // NFI why they don't just add a ADL2_Display_SLSMapConfig_GetState function to make this easy for ppl :(
-                                        // NVIDIA make it easy, why can't you AMD?
-
-                                        // Logic cribbed from https://github.com/elitak/amd-adl-sdk/blob/master/Sample/Eyefinity/ati_eyefinity.c
-                                        // Go through each display Target
-                                        foreach (var displayTarget in displayTargetArray)
-                                        {
-                                            // Get the current Display Modes for this adapter/display combination
-                                            int numDisplayModes;
-                                            IntPtr displayModeBuffer;
-                                            ADLRet = IGCLImport.ADL2_Display_Modes_Get(
-                                                                                        _adlContextHandle,
-                                                                                            oneAdapter.AdapterIndex,
-                                                                                            displayTarget.DisplayID.DisplayLogicalIndex,
-                                                                                            out numDisplayModes,
-                                                                                            out displayModeBuffer);
-                                            if (ADLRet == ADL_STATUS.ADL_OK)
-                                            {
-                                                SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: ADL2_Display_Modes_Get returned information about the display modes used by display #{displayTarget.DisplayID.DisplayLogicalAdapterIndex} connected to AMD adapter {adapterIndex}.");
-                                            }
-                                            else
-                                            {
-                                                SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: ERROR - ADL2_Display_Modes_Get returned ADL_STATUS {ADLRet} when trying to get the display modes from AMD adapter {adapterIndex} in the computer.");
-                                                continue;
-                                            }
-
-                                            ADL_MODE[] displayModeArray = new ADL_MODE[numDisplayModes];
-                                            if (numDisplayModes > 0)
-                                            {
-                                                IntPtr currentDisplayModeBuffer = displayModeBuffer;
-                                                for (int i = 0; i < numDisplayModes; i++)
-                                                {
-                                                    // build a structure in the array slot
-                                                    displayModeArray[i] = new ADL_MODE();
-                                                    // fill the array slot structure with the data from the buffer
-                                                    displayModeArray[i] = (ADL_MODE)Marshal.PtrToStructure(currentDisplayModeBuffer, typeof(ADL_MODE));
-                                                    // destroy the bit of memory we no longer need
-                                                    //Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                                                    // advance the buffer forwards to the next object
-                                                    currentDisplayModeBuffer = (IntPtr)((long)currentDisplayModeBuffer + Marshal.SizeOf(displayModeArray[i]));
-                                                }
-                                                // Free the memory used by the buffer                        
-                                                Marshal.FreeCoTaskMem(displayModeBuffer);
-
-                                                // Add the slsOffsets to the config we want to store
-                                                //mySLSMapConfig.SLSOffsets = displayModeArray.ToList();
-
-                                            }
-
-                                            // If Eyefinity is enabled for this adapter, then the display mode of an
-                                            // attached display target will match one of the SLS display modes reported by
-                                            // ADL_Display_SLSMapConfig_Get(). The match will either be with "native" SLS 
-                                            // modes (which are not bezel-compensated), or with "bezel" SLS modes which are.
-                                            // 
-                                            // So, simply compare current display mode against all the ones listed for the
-                                            // SLS native or bezel-compensated modes: if there is a match, then the mode
-                                            // currently used by this adapter is an Eyefinity/SLS mode, and Eyefinity is enabled.
-                                            // First check the native SLS mode list
-                                            // Process the slsOffsetBuffer
-                                            bool isSlsEnabled = false;
-                                            bool isBezelCompensatedDisplay = false;
-                                            foreach (var displayMode in displayModeArray)
-                                            {
-                                                foreach (var nativeMode in nativeModeArray)
-                                                {
-                                                    if (nativeMode.DisplayMode.XRes == displayMode.XRes && nativeMode.DisplayMode.YRes == displayMode.YRes)
-                                                    {
-                                                        isSlsEnabled = true;
-                                                        break;
-                                                    }
-
-                                                }
-
-                                                // If no match was found, check the bezel-compensated SLS mode list
-                                                if (!isSlsEnabled)
-                                                {
-                                                    foreach (var bezelMode in bezelModeArray)
-                                                    {
-                                                        if (bezelMode.DisplayMode.XRes == displayMode.XRes && bezelMode.DisplayMode.YRes == displayMode.YRes)
-                                                        {
-                                                            isSlsEnabled = true;
-                                                            isBezelCompensatedDisplay = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-
-                                                // Now we check which slot we need to put this display into
-                                                if (isSlsEnabled)
-                                                {
-                                                    // SLS is enabled for this display
-                                                    if (!myDisplayConfig.Adl2SlsConfig.SLSEnabledDisplayTargets.Contains(displayMode))
-                                                    {
-                                                        myDisplayConfig.Adl2SlsConfig.SLSEnabledDisplayTargets.Add(displayMode);
-                                                    }
-                                                    // we also update the main IsSLSEnabled so that it is indicated at the top level too
-
-                                                    myDisplayConfig.Adl2SlsConfig.IsSlsEnabled = true;
-                                                    SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: AMD Adapter #{oneAdapter.AdapterIndex.ToString()} has a matching SLS grid set! Eyefinity (SLS) is enabled. Setting IsSlsEnabled to true");
-
-                                                }
-                                            }
-
-                                        }
-
-                                        // Only Add the mySLSMapConfig to the displayConfig if SLS is enabled
-                                        if (myDisplayConfig.Adl2SlsConfig.IsSlsEnabled)
-                                        {
-                                            myDisplayConfig.Adl2SlsConfig.SLSMapConfigs.Add(mySLSMapConfig);
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        // If we get here then there there was no active SLSGrid, meaning Eyefinity is disabled!
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetAMDDisplayConfig: AMD Adapter #{oneAdapter.AdapterIndex.ToString()} has no active SLS grids set! Eyefinity (SLS) hasn't even been setup yet. Keeping the default IsSlsEnabled value of false.");
-                                    }
-                                }
-                                else
-                                {
-                                    // If we get here then there are less than two displays connected. Eyefinity cannot be enabled in this case!
-                                    SharedLogger.logger.Info($"IntelLibrary/GetAMDDisplayConfig: There are less than two displays connected to this adapter so Eyefinity cannot be enabled.");
-                                }
-
-                            }
-
-                        }
-                        else
-                        {
-                            // Free the memory used by the buffer                        
-                            Marshal.FreeCoTaskMem(adapterInfoBuffer);
-                            // Return the default config as there are no adapters to get info from
-                        }
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: ERROR - ADL2_Adapter_AdapterInfoX4_Get returned ADL_STATUS {ADLRet} when trying to get the adapter info about all AMD Adapters. Trying to skip this adapter so something at least works.");
-                    }
-
-
-
-                }
-                else
-                {
-                    SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: ERROR - Tried to get the AMD Eyefinity layout using the older ADL2 AP but the AMD ADL2 library isn't initialised!");
-                    myDisplayConfig.Adl2SlsConfig = new AMD_SLS_CONFIG();
-                }
-
             }
             else
             {
-                SharedLogger.logger.Error($"IntelLibrary/GetAMDDisplayConfig: ERROR - Tried to run GetAMDDisplayConfig but the AMD ADL library isn't initialised!");
+                SharedLogger.logger.Error($"IntelLibrary/GetntelDisplayConfig: ERROR - Tried to run GetntelDisplayConfig but the AMD ADL library isn't initialised!");
                 return CreateDefaultConfig();
             }
             
@@ -1463,7 +928,7 @@ namespace DisplayMagicianShared.Intel
             // Get the current config
             INTEL_DISPLAY_CONFIG displayConfig = ActiveDisplayConfig;
 
-            stringToReturn += $"****** AMD VIDEO CARDS *******\n";
+            stringToReturn += $"****** INTEL VIDEO CARDS *******\n";
 
 
             /*if (_initialised)
@@ -1832,7 +1297,7 @@ namespace DisplayMagicianShared.Intel
             return stringToReturn;
         }
 
-        public bool SetActiveConfig(INTEL_DISPLAY_CONFIG displayConfig, bool useADLEyefinity, int delayInMs)
+        public bool SetActiveConfig(INTEL_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
 
             if (_initialised)
@@ -1843,7 +1308,7 @@ namespace DisplayMagicianShared.Intel
                 // - A single desktop is associated with one display.
                 // - A duplicate desktop is associated with two or more displays.
                 // - An AMD Eyefinity desktop is associated with two or more displays.
-                IADLXDesktopServices desktopService;
+                /*IADLXDesktopServices desktopService;
                 IADLXDesktopList desktopList;
 
                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Attempting to get the ADLX desktop services");
@@ -2064,12 +1529,12 @@ namespace DisplayMagicianShared.Intel
 
                 // Release desktop services interface
                 desktopService.Release();
-
+                */
             }
             else
             {
-                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
-                throw new AMDLibraryException($"Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
+                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
+                throw new IntelLibraryException($"Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
             }
 
             return true;
@@ -2084,7 +1549,7 @@ namespace DisplayMagicianShared.Intel
 
                 // Get the display services
                 // This lets us interact witth the various displays individually
-                IADLXDisplayServices displayService;
+                /*IADLXDisplayServices displayService;
                 IADLXDisplayList displayList;
 
                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Attempting to get the ADLX display services");
@@ -2267,12 +1732,12 @@ namespace DisplayMagicianShared.Intel
 
                 // Release display services interface
                 displayService.Release();
-
+                */
             }
             else
             {
                 SharedLogger.logger.Error($"IntelLibrary/SetActiveConfigOverride: ERROR - Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
-                throw new AMDLibraryException($"Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
+                throw new IntelLibraryException($"Tried to run SetActiveConfig but the AMD ADLX library isn't initialised!");
             }
 
             return true;
@@ -2303,7 +1768,7 @@ namespace DisplayMagicianShared.Intel
             // We want to check the AMD Eyefinity (SLS) config is valid
             SharedLogger.logger.Trace($"IntelLibrary/IsValidConfig: Testing whether the display configuration is valid");
             // 
-            if (displayConfig.IsInUse && displayConfig.IsEyefinity)
+            if (displayConfig.IsInUse && displayConfig.IsCombinedDisplay)
             {
                 // At the moment we just assume the config is true so we try to use it
                 return true;
@@ -2318,7 +1783,7 @@ namespace DisplayMagicianShared.Intel
         public bool IsPossibleConfig(INTEL_DISPLAY_CONFIG displayConfig)
         {
             // We want to check the AMD profile can be used now
-            SharedLogger.logger.Trace($"IntelLibrary/IsPossibleConfig: Testing whether the AMD display configuration is possible to be used now");
+            SharedLogger.logger.Trace($"IntelLibrary/IsPossibleConfig: Testing whether the Intel display configuration is possible to be used now");
 
             // If both display identifiers are 0 then no displays were connected via AMD and we should just return true.
             if (displayConfig.DisplayIdentifiers.Count == 0 && _allConnectedDisplayIdentifiers.Count == 0)
@@ -2335,12 +1800,12 @@ namespace DisplayMagicianShared.Intel
             // Check that we have all the displayConfig DisplayIdentifiers we need available now            
             if (displayConfig.DisplayIdentifiers.All(value => _allConnectedDisplayIdentifiers.Contains(value)))
             {
-                SharedLogger.logger.Trace($"IntelLibrary/IsPossibleConfig: Success! The AMD display configuration is possible to be used now");
+                SharedLogger.logger.Trace($"IntelLibrary/IsPossibleConfig: Success! The Intel display configuration is possible to be used now");
                 return true;
             }
             else
             {
-                SharedLogger.logger.Trace($"IntelLibrary/IsPossibleConfig: Uh oh! The AMDdisplay configuration is possible cannot be used now");
+                SharedLogger.logger.Trace($"IntelLibrary/IsPossibleConfig: Uh oh! The Intel display configuration is possible cannot be used now");
                 return false;
             }
         }
@@ -2361,7 +1826,7 @@ namespace DisplayMagicianShared.Intel
                 // - A single desktop is associated with one display.
                 // - A duplicate desktop is associated with two or more displays.
                 // - An AMD Eyefinity desktop is associated with two or more displays.
-                IADLXDesktopServices desktopService;
+                /*IADLXDesktopServices desktopService;
                 IADLXDesktopList desktopList;
 
                 SharedLogger.logger.Trace($"IntelLibrary/GetCurrentDisplayIdentifiers: Attempting to get the ADLX desktop services");
@@ -2575,13 +2040,13 @@ namespace DisplayMagicianShared.Intel
 
 
                 // Release desktop services interface
-                desktopService.Release();
+                desktopService.Release();*/
 
             }
             else
             {
-                SharedLogger.logger.Error($"IntelLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the AMD ADLX library isn't initialised!");
-                throw new AMDLibraryException($"Tried to get Displays but the AMD ADLX library isn't initialised!");
+                SharedLogger.logger.Error($"IntelLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the Intel IGCL library isn't initialised!");
+                throw new IntelLibraryException($"Tried to get Displays but the Intel IGCL library isn't initialised!");
             }
 
             // Sort the display identifiers
@@ -2603,7 +2068,7 @@ namespace DisplayMagicianShared.Intel
 
                 // Get the display services
                 // This lets us interact witth the various displays
-                IADLXDisplayServices displayService;
+                /*IADLXDisplayServices displayService;
                 IADLXDisplayList displayList;
 
                 SharedLogger.logger.Trace($"IntelLibrary/GetAllConnectedDisplayIdentifiers: Attempting to get the ADLX display services");
@@ -2659,9 +2124,9 @@ namespace DisplayMagicianShared.Intel
                                 gpu.IsExternal(ppGpuIsExternal);
                                 bool gpuIsExternal = ADLX.boolP_value(ppGpuIsExternal);
 
-                                /*SWIGTYPE_p_p_char ppGpuVendorId = ADLX.new_charP_Ptr();
+                                *//*SWIGTYPE_p_p_char ppGpuVendorId = ADLX.new_charP_Ptr();
                                 gpu.VendorId(ppGpuVendorId);
-                                string gpuVendorId = ADLX.charP_Ptr_value(ppGpuVendorId);*/
+                                string gpuVendorId = ADLX.charP_Ptr_value(ppGpuVendorId);*//*
 
                                 // Release the memory we allocated for the GPU
                                 gpu.Release();
@@ -2682,7 +2147,7 @@ namespace DisplayMagicianShared.Intel
                                 display.ConnectorType(pConnect);
                                 ADLX_DISPLAY_CONNECTOR_TYPE connect = ADLX.adlx_displayConnectTypeP_value(pConnect);
 
-                                /*SWIGTYPE_p_p_char ppEDIE = ADLX.new_charP_Ptr();
+                                *//*SWIGTYPE_p_p_char ppEDIE = ADLX.new_charP_Ptr();
                                 display.EDID(ppEDIE);
                                 String edid = ADLX.charP_Ptr_value(ppEDIE);
 
@@ -2702,23 +2167,23 @@ namespace DisplayMagicianShared.Intel
 
                                 SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_disScanTypeP();
                                 display.ScanType(pScanType);
-                                ADLX_DISPLAY_SCAN_TYPE scanType = ADLX.disScanTypeP_value(pScanType);*/
+                                ADLX_DISPLAY_SCAN_TYPE scanType = ADLX.disScanTypeP_value(pScanType);*//*
 
                                 SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
                                 display.UniqueId(pID);
                                 uint uniqueId = ADLX.adlx_sizeP_value(pID);
 
-/*                                Console.WriteLine(String.Format("\nThe display [{0}]:", it));
+*//*                                Console.WriteLine(String.Format("\nThe display [{0}]:", it));
                                 Console.WriteLine(String.Format("\tName: {0}", name));
                                 Console.WriteLine(String.Format("\tType: {0}", disType));
                                 Console.WriteLine(String.Format("\tConnector type: {0}", connect));
-                                Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));*/
+                                Console.WriteLine(String.Format("\tManufacturer id: {0}", mid));*//*
                                 //Console.WriteLine(String.Format("\tEDID: {0}", edid));
-                                /*Console.WriteLine(String.Format("\tResolution:  h: {0}  v: {1}", h, v));
+                                *//*Console.WriteLine(String.Format("\tResolution:  h: {0}  v: {1}", h, v));
                                 Console.WriteLine(String.Format("\tRefresh rate: {0}", refRate));
                                 Console.WriteLine(String.Format("\tPixel clock: {0}", pixClock));
                                 Console.WriteLine(String.Format("\tScan type: {0}", scanType));
-                                Console.WriteLine(String.Format("\tUnique id: {0}", id));*/
+                                Console.WriteLine(String.Format("\tUnique id: {0}", id));*//*
 
                                 // Create an array of all the important display info we need to record
                                 List<string> displayInfo = new List<string>();
@@ -2814,13 +2279,13 @@ namespace DisplayMagicianShared.Intel
                 }
 
                 // Release display services interface
-                displayService.Release();
+                displayService.Release();*/
 
             }
             else
             {
-                SharedLogger.logger.Error($"IntelLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the AMD ADLX library isn't initialised!");
-                throw new AMDLibraryException($"Tried to get Displays but the AMD ADLX library isn't initialised!");
+                SharedLogger.logger.Error($"IntelLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the Intel IGCL library isn't initialised!");
+                throw new IntelLibraryException($"Tried to get Displays but the Intel IGCL library isn't initialised!");
             }
 
             // Sort the display identifiers
@@ -2833,10 +2298,10 @@ namespace DisplayMagicianShared.Intel
     }
 
     [global::System.Serializable]
-    public class AMDLibraryException : Exception
+    public class IntelLibraryException : Exception
     {
-        public AMDLibraryException() { }
-        public AMDLibraryException(string message) : base(message) { }
-        public AMDLibraryException(string message, Exception inner) : base(message, inner) { }
+        public IntelLibraryException() { }
+        public IntelLibraryException(string message) : base(message) { }
+        public IntelLibraryException(string message, Exception inner) : base(message, inner) { }
     }
 }
