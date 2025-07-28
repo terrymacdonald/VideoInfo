@@ -567,7 +567,12 @@ namespace DisplayMagicianShared.AMD
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The Displays values don't equal each other");
                 return false;
-            }            
+            }
+            if (!Adl2SlsConfig.Equals(other.Adl2SlsConfig))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The Adl2SlsConfig values don't equal each other");
+                return false;
+            }
             if (!DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The DisplayIdentifiers values don't equal each other");
@@ -578,7 +583,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCloned, Desktops, IsEyefinity, EyefinityDesktop, Displays, DisplayIdentifiers).GetHashCode();
+            return (IsInUse, IsCloned, Desktops, IsEyefinity, EyefinityDesktop, Displays, Adl2SlsConfig, DisplayIdentifiers).GetHashCode();
         }
 
         public static bool operator ==(AMD_DISPLAY_CONFIG lhs, AMD_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
