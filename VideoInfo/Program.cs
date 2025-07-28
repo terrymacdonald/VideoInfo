@@ -112,7 +112,7 @@ namespace VideoInfo
             NLog.LogManager.Configuration = config;
 
             // Start the Log file
-            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.9.2");
+            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.9.3");
             // Log the commandline options
             SharedLogger.logger.Info($"VideoInfo/Main: cmdline options: {string.Join(" ", args)}");
 
@@ -843,6 +843,10 @@ namespace VideoInfo
             bool amdAlreadyInUse = true;
             bool intelAlreadyInUse = true;
 
+            if ((intelLibrary.IsInstalled && !intelLibrary.IsActiveConfig(myDisplayConfig.IntelConfig)))
+            {
+                intelAlreadyInUse = false;
+            }
             if ((amdLibrary.IsInstalled && !amdLibrary.IsActiveConfig(myDisplayConfig.AMDConfig)))
             {
                 amdAlreadyInUse = false;

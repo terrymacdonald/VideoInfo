@@ -130,22 +130,16 @@ namespace DisplayMagicianShared.Intel
     {
         public bool IsInUse;
         public bool IsCloned;
-        public bool IsEyefinity;
-        //public List<Intel_DESKTOP> Desktops;
-        //public Intel_EYEFINITY_DESKTOP EyefinityDesktop;
-        //public Dictionary<long,INTEL_DISPLAY_WITH_SETTINGS> Displays;
-        //public Intel_SLS_CONFIG Adl2SlsConfig;
+        public bool IsCombinedDisplay;
+        public Dictionary<long,INTEL_DISPLAY_WITH_SETTINGS> Displays;
         public List<string> DisplayIdentifiers;
 
         public INTEL_DISPLAY_CONFIG()
         {
             IsInUse = false;
             IsCloned = false;
-            //IsEyefinity = false;
-            //Desktops = new List<Intel_DESKTOP>();
-            //EyefinityDesktop = new Intel_EYEFINITY_DESKTOP();
-            //Displays = new Dictionary<long,INTEL_DISPLAY_WITH_SETTINGS>();
-            //Adl2SlsConfig = new Intel_SLS_CONFIG();
+            IsCombinedDisplay = false;
+            Displays = new Dictionary<long,INTEL_DISPLAY_WITH_SETTINGS>();
             DisplayIdentifiers = new List<string>();
         }
 
@@ -162,19 +156,9 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsCloned values don't equal each other");
                 return false;
             }
-            /*if (!Desktops.SequenceEqual(other.Desktops))
+            if (IsCombinedDisplay != other.IsCombinedDisplay)
             {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The Desktops values don't equal each other");
-                return false;
-            }
-            if (IsEyefinity != other.IsEyefinity)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsEyefinity values don't equal each other");
-                return false;
-            }
-            if (!EyefinityDesktop.Equals(other.EyefinityDesktop))
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The EyefinityDesktop values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsCombinedDisplay values don't equal each other");
                 return false;
             }
             if (!Displays.SequenceEqual(other.Displays))
@@ -192,8 +176,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            //return (IsInUse, IsCloned, Desktops, IsEyefinity, EyefinityDesktop, Displays, DisplayIdentifiers).GetHashCode();
-            return (IsInUse, IsCloned, DisplayIdentifiers).GetHashCode();
+            return (IsInUse, IsCloned, IsCombinedDisplay, Displays, DisplayIdentifiers).GetHashCode();
         }
 
         public static bool operator ==(INTEL_DISPLAY_CONFIG lhs, INTEL_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
@@ -248,7 +231,7 @@ namespace DisplayMagicianShared.Intel
                     return;
                 }
 
-                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initiliase the Intel IGCL API");
+                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initialise the Intel IGCL API");
                 try
                 {
                     bool result = IGCLImport.Initialize();
@@ -262,7 +245,7 @@ namespace DisplayMagicianShared.Intel
                     {
                         // IGCL API failed to initialise
                         _initialised = false;
-                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API. You need to download and install the INtel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
+                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
                         return;
                     }
 
@@ -434,11 +417,11 @@ namespace DisplayMagicianShared.Intel
 
                 if (adapters == null || adapters.Count == 0)
                 {
-                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No Intel devices found, returning empty config");
+                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: No Intel devices found, returning empty config");
                     return myDisplayConfig;
                 }
 
-                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Found {adapters.Count} Intel devices, proceeding to get display configuration");
+                SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Found {adapters.Count} Intel devices, proceeding to get display configuration");
 
                 foreach (var adapter in adapters)
                 {
@@ -448,12 +431,26 @@ namespace DisplayMagicianShared.Intel
                 /*IADLXDesktopServices desktopService;
                 IADLXDesktopList desktopList;
 
+                                bool isEyefinityEnabled = false;
+                                bool isCloned = false;
+                                List<INTEL_DISPLAY_WITH_SETTINGS> displaysToStore = new List<INTEL_DISPLAY_WITH_SETTINGS>();
                 bool isEyefinityEnabled = false;
                 bool isCloned = false;
                 List<Intel_DESKTOP> desktopsToStore = new List<Intel_DESKTOP>();
                 List<INTEL_DISPLAY_WITH_SETTINGS> displaysToStore = new List<INTEL_DISPLAY_WITH_SETTINGS>();
                 Intel_EYEFINITY_DESKTOP eyefinityDesktopToStore = new Intel_EYEFINITY_DESKTOP();
 
+                                SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Attempting to get the ADLX desktop services");
+                                SWIGTYPE_p_p_adlx__IADLXDesktopServices d = ADLX.new_desktopSerP_Ptr();
+                                status = _adlxSystem.GetDesktopsServices(d);
+                                desktopService = ADLX.desktopSerP_Ptr_value(d);
+                                if (status != ADLX_RESULT.ADLX_OK)
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetntelDisplayConfig: Error getting the ADLX desktop services. systemServices.GetDesktopsServices() returned error code {status}");
+                                    return myDisplayConfig; ;
+                                }
+                                else
+                                {
                 SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Attempting to get the ADLX desktop services");
                 SWIGTYPE_p_p_adlx__IADLXDesktopServices d = ADLX.new_desktopSerP_Ptr();
                 status = _adlxSystem.GetDesktopsServices(d);
@@ -466,7 +463,7 @@ namespace DisplayMagicianShared.Intel
                 else
                 {
 
-                    // Get the list of Desktops we have (this is more for informational purposes)
+                                    // Get the list of Desktops we have (this is more for informational purposes)
 
                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got the desktop services");
                     // Get the display services
@@ -529,61 +526,61 @@ namespace DisplayMagicianShared.Intel
                                                 // Create a new Intel_DISPLAY to store things in
                                                 Intel_DISPLAY newDisplay = new Intel_DISPLAY();
 
-                                                // Get the display connection type
-                                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
-                                                display.ConnectorType(pConnect);
-                                                newDisplay.ConnectorType = ADLX.adlx_displayConnectTypeP_value(pConnect);
+                                                                // Get the display connection type
+                                                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
+                                                                display.ConnectorType(pConnect);
+                                                                newDisplay.ConnectorType = ADLX.adlx_displayConnectTypeP_value(pConnect);
 
-                                                // Get the display type
-                                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
-                                                display.DisplayType(pDisType);
-                                                newDisplay.DisplayType = ADLX.adlx_displayTypeP_value(pDisType);
+                                                                // Get the display type
+                                                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
+                                                                display.DisplayType(pDisType);
+                                                                newDisplay.DisplayType = ADLX.adlx_displayTypeP_value(pDisType);
 
-                                                // Get the EDID
-                                                SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
-                                                display.EDID(ppEDID);
-                                                String edid = ADLX.charP_Ptr_value(ppEDID);
+                                                                // Get the EDID
+                                                                SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
+                                                                display.EDID(ppEDID);
+                                                                String edid = ADLX.charP_Ptr_value(ppEDID);
 
-                                                // Get the manufacturer ID
-                                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
-                                                display.ManufacturerID(pMID);
-                                                newDisplay.ManufacturerID = ADLX.adlx_uintP_value(pMID);
+                                                                // Get the manufacturer ID
+                                                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
+                                                                display.ManufacturerID(pMID);
+                                                                newDisplay.ManufacturerID = ADLX.adlx_uintP_value(pMID);
 
-                                                // Get the display name
-                                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
-                                                display.Name(ppName);
-                                                String name = ADLX.charP_Ptr_value(ppName);
-                                                newDisplay.Name = name;
+                                                                // Get the display name
+                                                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
+                                                                display.Name(ppName);
+                                                                String name = ADLX.charP_Ptr_value(ppName);
+                                                                newDisplay.Name = name;
 
-                                                // Get the native resolution
-                                                SWIGTYPE_p_int pMaxHRes = ADLX.new_adlx_intP();
-                                                SWIGTYPE_p_int pMaxVRes = ADLX.new_adlx_intP();
-                                                display.NativeResolution(pMaxHRes, pMaxVRes);
-                                                newDisplay.MaxHResolution = ADLX.adlx_intP_value(pMaxHRes);
-                                                newDisplay.MaxVResolution = ADLX.adlx_intP_value(pMaxVRes);
+                                                                // Get the native resolution
+                                                                SWIGTYPE_p_int pMaxHRes = ADLX.new_adlx_intP();
+                                                                SWIGTYPE_p_int pMaxVRes = ADLX.new_adlx_intP();
+                                                                display.NativeResolution(pMaxHRes, pMaxVRes);
+                                                                newDisplay.MaxHResolution = ADLX.adlx_intP_value(pMaxHRes);
+                                                                newDisplay.MaxVResolution = ADLX.adlx_intP_value(pMaxVRes);
 
-                                                // Get the PixelClock
-                                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_adlx_uintP();
-                                                display.PixelClock(pPixelClock);
-                                                newDisplay.PixelClock = ADLX.adlx_uintP_value(pPixelClock);
-                                                // Get the refresh rate
-                                                SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
-                                                display.RefreshRate(pRefreshRate);
-                                                newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
+                                                                // Get the PixelClock
+                                                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_adlx_uintP();
+                                                                display.PixelClock(pPixelClock);
+                                                                newDisplay.PixelClock = ADLX.adlx_uintP_value(pPixelClock);
+                                                                // Get the refresh rate
+                                                                SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
+                                                                display.RefreshRate(pRefreshRate);
+                                                                newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
 
-                                                // Get the scan type
-                                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_adlx_displayScanTypeP();
-                                                display.ScanType(pScanType);
-                                                newDisplay.ScanType = ADLX.adlx_displayScanTypeP_value(pScanType);
+                                                                // Get the scan type
+                                                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_adlx_displayScanTypeP();
+                                                                display.ScanType(pScanType);
+                                                                newDisplay.ScanType = ADLX.adlx_displayScanTypeP_value(pScanType);
 
-                                                // Get the Unique ID
-                                                SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
-                                                display.UniqueId(pUID);
-                                                newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
+                                                                // Get the Unique ID
+                                                                SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
+                                                                display.UniqueId(pUID);
+                                                                newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
 
-                                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
-                                                display.UniqueId(pID);
-                                                uint id = ADLX.adlx_sizeP_value(pID);
+                                                                SWIGTYPE_p_size_t pID = ADLX.new_adlx_sizeP();
+                                                                display.UniqueId(pID);
+                                                                uint id = ADLX.adlx_sizeP_value(pID);
 
                                                 // Add the new display to the list of displays for this desktop
                                                 newDesktop.Displays.Add(newDisplay);
@@ -596,25 +593,25 @@ namespace DisplayMagicianShared.Intel
                                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDesktopConfig: The number of displays that are part of this desktop is 0, so not getting list of displays. Skipping.");
                                 }
 
-                                SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_adlx_orientationP();
-                                desktop.Orientation(pOrientation);
-                                newDesktop.Orientation = ADLX.adlx_orientationP_value(pOrientation);
+                                                SWIGTYPE_p_ADLX_ORIENTATION pOrientation = ADLX.new_adlx_orientationP();
+                                                desktop.Orientation(pOrientation);
+                                                newDesktop.Orientation = ADLX.adlx_orientationP_value(pOrientation);
 
-                                SWIGTYPE_p_int pWidth = ADLX.new_adlx_intP();
-                                SWIGTYPE_p_int pHeight = ADLX.new_adlx_intP();
-                                desktop.Size(pWidth, pHeight);
-                                newDesktop.SizeWidth = ADLX.adlx_intP_value(pWidth);
-                                newDesktop.SizeHeight = ADLX.adlx_intP_value(pHeight);
+                                                SWIGTYPE_p_int pWidth = ADLX.new_adlx_intP();
+                                                SWIGTYPE_p_int pHeight = ADLX.new_adlx_intP();
+                                                desktop.Size(pWidth, pHeight);
+                                                newDesktop.SizeWidth = ADLX.adlx_intP_value(pWidth);
+                                                newDesktop.SizeHeight = ADLX.adlx_intP_value(pHeight);
 
-                                ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
-                                desktop.TopLeft(pLocationTopLeft);
-                                ADLX_Point locationTopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
-                                newDesktop.TopLeftX = locationTopLeft.x;
-                                newDesktop.TopLeftY = locationTopLeft.y;
+                                                ADLX_Point pLocationTopLeft = ADLX.new_adlx_pointP();
+                                                desktop.TopLeft(pLocationTopLeft);
+                                                ADLX_Point locationTopLeft = ADLX.adlx_pointP_value(pLocationTopLeft);
+                                                newDesktop.TopLeftX = locationTopLeft.x;
+                                                newDesktop.TopLeftY = locationTopLeft.y;
 
-                                SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_adlx_desktopTypeP();
-                                desktop.Type(pDesktopType);
-                                newDesktop.Type = ADLX.adlx_desktopTypeP_value(pDesktopType);
+                                                SWIGTYPE_p_ADLX_DESKTOP_TYPE pDesktopType = ADLX.new_adlx_desktopTypeP();
+                                                desktop.Type(pDesktopType);
+                                                newDesktop.Type = ADLX.adlx_desktopTypeP_value(pDesktopType);
 
                                 // The the desktop is an eyefinity desktop then set the eyefinity enabled flag
                                 // and also process the EyefinityDesktop layout
@@ -624,8 +621,8 @@ namespace DisplayMagicianShared.Intel
                                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Eyefinity desktop detected");
                                     // Get the eyefinity desktop
 
-                                    // 1. Allocate a void** via SWIG
-                                    SWIGTYPE_p_p_void ppVoid = ADLX.new_voidP_Ptr();
+                                                    // 1. Allocate a void** via SWIG
+                                                    SWIGTYPE_p_p_void ppVoid = ADLX.new_voidP_Ptr();
 
                                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Getting a pointer to the Eyefinity desktop object");
                                     // 2. Call QueryInterface with the IID for IADLXEyefinityDesktop to get the interface
@@ -643,12 +640,12 @@ namespace DisplayMagicianShared.Intel
                                     {
                                         SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Converting pointer to the Eyefinity desktop object to an IntPtr");
 
-                                        // Extract the raw IntPtr from the void** for the IADLXEyefinityDesktop
-                                        IntPtr rawPtr = ADLX.voidP_Ptr_value(ppVoid);
+                                                        // Extract the raw IntPtr from the void** for the IADLXEyefinityDesktop
+                                                        IntPtr rawPtr = ADLX.voidP_Ptr_value(ppVoid);
 
-                                        // Wrap it in the managed proxy
-                                        //    (Constructor args may vary based on SWIG config)
-                                        IADLXEyefinityDesktop eyefinityDesktop = new IADLXEyefinityDesktop(rawPtr, true);
+                                                        // Wrap it in the managed proxy
+                                                        //    (Constructor args may vary based on SWIG config)
+                                                        IADLXEyefinityDesktop eyefinityDesktop = new IADLXEyefinityDesktop(rawPtr, true);
 
                                         // Use the EyefinityDesktop object to get the Eyefinity layout
                                         SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Getting the rows and columns of the diaplay grid for the Eyefinity desktop");
@@ -669,27 +666,27 @@ namespace DisplayMagicianShared.Intel
                                                 eyefinityDesktop.DisplayOrientation(row, col, pEyefinityDisplayOrientation);
                                                 ADLX_ORIENTATION eyefinityOrientation = ADLX.orientationP_value(pEyefinityDisplayOrientation);
 
-                                                // Get the display size
-                                                SWIGTYPE_p_int pEyefinityDisplayWidth= ADLX.new_intP();
-                                                SWIGTYPE_p_int pEyefinityDisplayHeight = ADLX.new_intP();
-                                                eyefinityDesktop.DisplaySize(row,col, pEyefinityDisplayWidth, pEyefinityDisplayHeight);
-                                                int eyefinityDisplayWidth = ADLX.intP_value(pEyefinityDisplayWidth);
-                                                int eyefinityDisplayHeight = ADLX.intP_value(pEyefinityDisplayHeight);
+                                                                // Get the display size
+                                                                SWIGTYPE_p_int pEyefinityDisplayWidth= ADLX.new_intP();
+                                                                SWIGTYPE_p_int pEyefinityDisplayHeight = ADLX.new_intP();
+                                                                eyefinityDesktop.DisplaySize(row,col, pEyefinityDisplayWidth, pEyefinityDisplayHeight);
+                                                                int eyefinityDisplayWidth = ADLX.intP_value(pEyefinityDisplayWidth);
+                                                                int eyefinityDisplayHeight = ADLX.intP_value(pEyefinityDisplayHeight);
 
-                                                // Get the display location
-                                                ADLX_Point pLocation = ADLX.new_pointP();
-                                                eyefinityDesktop.DisplayTopLeft(row, col, pLocation);
-                                                ADLX_Point location = ADLX.pointP_value(pLocation);
+                                                                // Get the display location
+                                                                ADLX_Point pLocation = ADLX.new_pointP();
+                                                                eyefinityDesktop.DisplayTopLeft(row, col, pLocation);
+                                                                ADLX_Point location = ADLX.pointP_value(pLocation);
 
                                             }
                                         }*//*
 
-                                        // Copy over the desktop level sizes so that we can match things easier in the future
-                                        myDisplayConfig.EyefinityDesktop.Orientation = newDesktop.Orientation;
-                                        myDisplayConfig.EyefinityDesktop.TopLeftX = newDesktop.TopLeftX;
-                                        myDisplayConfig.EyefinityDesktop.TopLeftY = newDesktop.TopLeftY;
-                                        myDisplayConfig.EyefinityDesktop.SizeWidth = newDesktop.SizeWidth;
-                                        myDisplayConfig.EyefinityDesktop.SizeHeight = newDesktop.SizeHeight;
+                                                        // Copy over the desktop level sizes so that we can match things easier in the future
+                                                        myDisplayConfig.EyefinityDesktop.Orientation = newDesktop.Orientation;
+                                                        myDisplayConfig.EyefinityDesktop.TopLeftX = newDesktop.TopLeftX;
+                                                        myDisplayConfig.EyefinityDesktop.TopLeftY = newDesktop.TopLeftY;
+                                                        myDisplayConfig.EyefinityDesktop.SizeWidth = newDesktop.SizeWidth;
+                                                        myDisplayConfig.EyefinityDesktop.SizeHeight = newDesktop.SizeHeight;
 
                                         // 7. Release when done
                                         eyefinityDesktop.Release();
@@ -706,18 +703,18 @@ namespace DisplayMagicianShared.Intel
                                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Single desktop detected");
                                 }
 
-                                // Release desktop interface
-                                desktop.Release();
+                                                // Release desktop interface
+                                                desktop.Release();
 
-                                // Save the Desktop to the main list
-                                myDisplayConfig.Desktops.Add(newDesktop);
-                            }
-                        }
-                    }
-                    // Release desktop list interface
-                    desktopList.Release();
-                                      
-                }
+                                                // Save the Desktop to the main list
+                                                myDisplayConfig.Desktops.Add(newDesktop);
+                                            }
+                                        }
+                                    }
+                                    // Release desktop list interface
+                                    desktopList.Release();
+
+                                }
 
                 // Release desktop services interface
                 desktopService.Release();*/
@@ -1569,7 +1566,7 @@ namespace DisplayMagicianShared.Intel
                 /*
                 // Get the display services
                 // This lets us interact witth the various displays individually
-                IADLXDisplayServices displayService;
+                /*IADLXDisplayServices displayService;
                 IADLXDisplayList displayList;
 
                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Attempting to get the ADLX display services");
@@ -1788,7 +1785,7 @@ namespace DisplayMagicianShared.Intel
             // We want to check the Intel Eyefinity (SLS) config is valid
             SharedLogger.logger.Trace($"IntelLibrary/IsValidConfig: Testing whether the display configuration is valid");
             // 
-            if (displayConfig.IsInUse && displayConfig.IsEyefinity)
+            if (displayConfig.IsInUse && displayConfig.IsCombinedDisplay)
             {
                 // At the moment we just assume the config is true so we try to use it
                 return true;
@@ -2088,7 +2085,7 @@ namespace DisplayMagicianShared.Intel
 
                 /*// Get the display services
                 // This lets us interact witth the various displays
-                IADLXDisplayServices displayService;
+                /*IADLXDisplayServices displayService;
                 IADLXDisplayList displayList;
 
                 SharedLogger.logger.Trace($"IntelLibrary/GetAllConnectedDisplayIdentifiers: Attempting to get the ADLX display services");
