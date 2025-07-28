@@ -165,7 +165,7 @@ namespace DisplayMagicianShared.Intel
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The Displays values don't equal each other");
                 return false;
-            }*/            
+            }            
             if (!DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The DisplayIdentifiers values don't equal each other");
