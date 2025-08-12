@@ -616,6 +616,8 @@ namespace DisplayMagicianShared.AMD
         private AMD_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
+        public IntPtr hADLXBindingModule = IntPtr.Zero;
+        public IntPtr hADLModule = IntPtr.Zero;
         public const string AMD_ADLX_BINDING_DLL = "ADLXCSharpBind.dll";
         public const string AMD_ADLX_DLL = "amdadlx64.dll";
 
@@ -652,7 +654,7 @@ namespace DisplayMagicianShared.AMD
                 {
                     // Attempt to load the AMD ADLX 64-bit DLL
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX DLL {AMD_ADLX_DLL} to confirm it's available for use by our ADLX Csharp Binding DLL");
-                    IntPtr hADLXModule = LoadLibrary(AMD_ADLX_DLL);
+                    hADLXModule = LoadLibrary(AMD_ADLX_DLL);
                     if (hADLXModule != IntPtr.Zero)
                     {
                         // Successfully loaded the ADLX DLL, which means it's installed!
@@ -669,7 +671,7 @@ namespace DisplayMagicianShared.AMD
                     // Attempt to load the Custom ADLX Binding DLL
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX CSharp Binding DLL {AMD_ADLX_BINDING_DLL} so we can access the AMD ADLX DLL from C#");
 
-                    IntPtr hBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
+                    hBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
                     if (hBindingModule != IntPtr.Zero)
                     {
                         // Attempt to get the address of a non-existent function to verify the DLL is loaded
@@ -883,6 +885,21 @@ namespace DisplayMagicianShared.AMD
                     }
 
                 }
+            }
+
+
+            if (hADLXBindingModule != IntPtr.Zero)
+            {
+                SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX Binding DLL");
+                FreeLibrary(hADLXBindingModule);
+                hADLXBindingModule = IntPtr.Zero;
+            }
+
+            if (hADLXModule != IntPtr.Zero)
+            {
+                SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX DLL");
+                FreeLibrary(hADLXModule);
+                hADLXModule = IntPtr.Zero;
             }
 
             _disposed = true;
