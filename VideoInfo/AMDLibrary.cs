@@ -617,7 +617,7 @@ namespace DisplayMagicianShared.AMD
         public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
         public IntPtr hADLXBindingModule = IntPtr.Zero;
-        public IntPtr hADLModule = IntPtr.Zero;
+        public IntPtr hADLXModule = IntPtr.Zero;
         public const string AMD_ADLX_BINDING_DLL = "ADLXCSharpBind.dll";
         public const string AMD_ADLX_DLL = "amdadlx64.dll";
 
@@ -671,8 +671,8 @@ namespace DisplayMagicianShared.AMD
                     // Attempt to load the Custom ADLX Binding DLL
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX CSharp Binding DLL {AMD_ADLX_BINDING_DLL} so we can access the AMD ADLX DLL from C#");
 
-                    hBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
-                    if (hBindingModule != IntPtr.Zero)
+                    hADLXBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
+                    if (hADLXBindingModule != IntPtr.Zero)
                     {
                         // Attempt to get the address of a non-existent function to verify the DLL is loaded
                         // IntPtr procAddress = GetProcAddress(hModule, "fakefunction");

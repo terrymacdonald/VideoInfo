@@ -36,7 +36,7 @@ namespace DisplayMagicianShared.NVIDIA
             MosaicDisplaySettings = new DisplaySettingsV2();
             OverlapX = 0;
             OverlapY = 0;
-            MosaicGridTopos = new GridTopologyV2[GridTopologyV2.MaxDisplays];
+            MosaicGridTopos = new GridTopologyV2[] { };
             MosaicGridCount = 0;
         }
 
@@ -692,7 +692,8 @@ namespace DisplayMagicianShared.NVIDIA
 
             // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
             myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;
-            myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[GridTopologyV2.MaxDisplays];
+            //myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[GridTopologyV2.MaxDisplays];
+            myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[] { };
             myDefaultConfig.MosaicConfig.MosaicGridCount = 0;
             myDefaultConfig.MosaicConfig.MosaicDisplaySettings = new DisplaySettingsV2();
             myDefaultConfig.PhysicalAdapters = new Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG>();
