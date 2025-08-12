@@ -322,7 +322,8 @@ namespace DisplayMagicianShared.Intel
 
     public class IGCLImport
     {
-        private const string dllIGCLName = "IGCL_Wrapper.dll";
+        private const string dllIGCLName = "ControlLib.dll";
+        private const string dllIGCLWrapper = "IGCL_Wrapper.dll";
         private const string dllKernelName = "kernel32.dll";
 
         [DllImport(dllKernelName, CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = false)]
@@ -460,6 +461,11 @@ namespace DisplayMagicianShared.Intel
             }
 
             return false;
+        }
+
+        public static IGCLStatus GetStatus()
+        {
+            return status;
         }
 
         public static void Terminate()

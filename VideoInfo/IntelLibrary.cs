@@ -209,8 +209,10 @@ namespace DisplayMagicianShared.Intel
         private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
         private INTEL_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<string> _allConnectedDisplayIdentifiers;
-        public const string Intel_ADLX_BINDING_DLL = "ADLXCSharpBind.dll";
-        public const string Intel_ADLX_DLL = "Inteladlx64.dll";
+        public IntPtr hIGCLBindingModule = IntPtr.Zero;
+        public IntPtr hIGCLModule = IntPtr.Zero;
+        public const string Intel_IGCL_BINDING_DLL = "CtlLibraryBindings.dll";
+        public const string Intel_IGCL_DLL = "ControlLib.dll";
 
         static IntelLibrary() { }
         public IntelLibrary()
@@ -231,11 +233,49 @@ namespace DisplayMagicianShared.Intel
                     return;
                 }
 
+                // Attempt to load the Intel IGCL 64-bit DLL
+                IntPtr hIGCLModule = LoadLibrary(Intel_IGCL_DLL);
+                if (hIGCLModule != IntPtr.Zero)
+                {
+                    // Successfully loaded the ADLX DLL, which means it's installed!
+                    SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: We successfully loaded the AMD ADLX DLL which means the AMD Adrenalin driver software is installed.");
+                }
+                else
+                {
+                    // LoadLibrary failed, DLL is not available
+                    _initialised = false;
+                    SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX DLL. You need to download and install the AMD Adrenalin software from the AMD support website in order to fully support AMD hardware.");
+                    return;
+                }
+
+                // Attempt to load the Custom ADLX Binding DLL
+                IntPtr hBindingModule = LoadLibrary(Intel_IGCL_BINDING_DLL);
+                if (hBindingModule != IntPtr.Zero)
+                {
+                    // Attempt to get the address of a non-existent function to verify the DLL is loaded
+                    // IntPtr procAddress = GetProcAddress(hModule, "fakefunction");
+                    // If GetProcAddress returns IntPtr.Zero, the function doesn't exist, which is expected
+                    // The key point is that LoadLibrary succeeded, indicating the DLL is present
+                    // Free the loaded library if we're exiting now, to avoid memory leaks
+                    //FreeLibrary(hModule);
+
+                    // Successfully loaded our custom ADLX Binding DLL, which means it's installed!
+                    _initialised = false;
+                    SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: We successfully loaded our custom AMD ADLX Binding DLL!.");
+                }
+                else
+                {
+                    // LoadLibrary failed, DLL is not available
+                    _initialised = false;
+                    SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX Binding DLL. You may need to install the AMD driver.");
+                    return;
+                }
+
                 SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initialise the Intel IGCL API");
                 try
                 {
                     bool result = IGCLImport.Initialize();
-                    if ( result)
+                    if (result)
                     {
                         // IGCL API Initialised correctly
                         _initialised = false;
@@ -245,7 +285,23 @@ namespace DisplayMagicianShared.Intel
                     {
                         // IGCL API failed to initialise
                         _initialised = false;
-                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
+                        IGCLStatus status = IGCLImport.GetStatus();
+                        if (status == IGCLStatus.DLL_NOT_FOUND)
+                        {
+                            SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API as the DLL is not found. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
+                        }
+                        else if (status == IGCLStatus.DLL_INCORRECT_VERSION)
+                        {
+                            SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API as the DLL is the incorrect version. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
+                        }
+                        else if (status == IGCLStatus.DLL_INITIALIZE_ERROR)
+                        {
+                            SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API as the DLL failed to initialise. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
+                        }
                         return;
                     }
 
@@ -256,6 +312,7 @@ namespace DisplayMagicianShared.Intel
                     SharedLogger.logger.Error(ex, "IntelLibrary/IntelLibrary: Exception whie trying to load the Intel ADLX DLL. You may need to install the Intel driver.");
                 }
 
+
                 SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Display Configuration");
                 _activeDisplayConfig = GetActiveConfig();
                 SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Connected Display Identifiers");
@@ -264,7 +321,7 @@ namespace DisplayMagicianShared.Intel
             }
             catch (Exception ex)
             {
-                SharedLogger.logger.Info(ex, $"IntelLibrary/IntelLibrary: A general exception trying to load the Intel ADLX DLL {Intel_ADLX_BINDING_DLL}.");
+                SharedLogger.logger.Info(ex, $"IntelLibrary/IntelLibrary: A general exception trying to load the Intel IGCL DLL {Intel_IGCL_BINDING_DLL}.");
                 _initialised = false; 
                 return;
             }
@@ -297,6 +354,20 @@ namespace DisplayMagicianShared.Intel
             {
                 // Terminate the IGCL API to avoid memory leaks
                 IGCLImport.Terminate();
+            }
+
+            if (hIGCLBindingModule != IntPtr.Zero)
+            {
+                SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX Binding DLL");
+                FreeLibrary(hIGCLBindingModule);
+                hIGCLBindingModule = IntPtr.Zero;
+            }
+
+            if (hIGCLModule != IntPtr.Zero)
+            {
+                SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX DLL");
+                FreeLibrary(hIGCLModule);
+                hIGCLModule = IntPtr.Zero;
             }
 
             _disposed = true;
