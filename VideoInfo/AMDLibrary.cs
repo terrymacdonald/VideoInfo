@@ -616,6 +616,8 @@ namespace DisplayMagicianShared.AMD
         private AMD_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
+        public IntPtr hADLXBindingModule = IntPtr.Zero;
+        public IntPtr hADLXModule = IntPtr.Zero;
         public const string AMD_ADLX_BINDING_DLL = "ADLXCSharpBind.dll";
         public const string AMD_ADLX_DLL = "amdadlx64.dll";
 
@@ -648,13 +650,11 @@ namespace DisplayMagicianShared.AMD
                     return;
                 }
 
-                SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX Binding DLL {AMD_ADLX_BINDING_DLL}");
-                //Marshal.PrelinkAll(typeof(ADLImport));
                 try
                 {
-                    // If we reach here, the DLL was loaded successfully, so the next step is to check that the ADLX library DLL is available
                     // Attempt to load the AMD ADLX 64-bit DLL
-                    IntPtr hADLXModule = LoadLibrary(AMD_ADLX_DLL);
+                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX DLL {AMD_ADLX_DLL} to confirm it's available for use by our ADLX Csharp Binding DLL");
+                    hADLXModule = LoadLibrary(AMD_ADLX_DLL);
                     if (hADLXModule != IntPtr.Zero)
                     {
                         // Successfully loaded the ADLX DLL, which means it's installed!
@@ -669,8 +669,10 @@ namespace DisplayMagicianShared.AMD
                     }
 
                     // Attempt to load the Custom ADLX Binding DLL
-                    IntPtr hBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
-                    if (hBindingModule != IntPtr.Zero)
+                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX CSharp Binding DLL {AMD_ADLX_BINDING_DLL} so we can access the AMD ADLX DLL from C#");
+
+                    hADLXBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
+                    if (hADLXBindingModule != IntPtr.Zero)
                     {
                         // Attempt to get the address of a non-existent function to verify the DLL is loaded
                         // IntPtr procAddress = GetProcAddress(hModule, "fakefunction");
@@ -681,28 +683,28 @@ namespace DisplayMagicianShared.AMD
 
                         // Successfully loaded our custom ADLX Binding DLL, which means it's installed!
                         _initialised = false;
-                        SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: We successfully loaded our custom AMD ADLX Binding DLL!.");
+                        SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: We successfully loaded our custom AMD ADLX Binding DLL! We can use the AMD ADLX API");
                     }
                     else
                     {
                         // LoadLibrary failed, DLL is not available
                         _initialised = false;
-                        SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX Binding DLL. You may need to install the AMD driver.");
+                        SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX Binding DLL.");
                         return;
                     }
                 }
                 catch (Exception ex)
                 {
                     _initialised = false;
-                    SharedLogger.logger.Error(ex, "AMDLibrary/AMDLibrary: Exception whie trying to load the AMD ADLX DLL. You may need to install the AMD driver.");
+                    SharedLogger.logger.Error(ex, "AMDLibrary/AMDLibrary: Exception while trying to load the AMD ADLX DLL or our AMD ADLX CSharp Binding DLL. You may need to install the AMD driver.");
                 }
 
-                SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADL DLL {ADLImport.ATI_ADL_DLL} to use for setting AMD Eyefinity (it seems more relaible)");
+                SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADL2 DLL {ADLImport.ATI_ADL_DLL} to use for setting AMD Eyefinity (it seems more reliable)");
                 try
                 {
                     _initialisedADL2 = false;
                     Marshal.PrelinkAll(typeof(ADLImport));
-                    SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Successfully loaded the AMD ADL DLL.");
+                    SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Successfully loaded the AMD ADL2 DLL.");
                     try
                     {
                         ADL_STATUS ADLRet;
@@ -883,6 +885,21 @@ namespace DisplayMagicianShared.AMD
                     }
 
                 }
+            }
+
+
+            if (hADLXBindingModule != IntPtr.Zero)
+            {
+                SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX Binding DLL");
+                FreeLibrary(hADLXBindingModule);
+                hADLXBindingModule = IntPtr.Zero;
+            }
+
+            if (hADLXModule != IntPtr.Zero)
+            {
+                SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX DLL");
+                FreeLibrary(hADLXModule);
+                hADLXModule = IntPtr.Zero;
             }
 
             _disposed = true;
