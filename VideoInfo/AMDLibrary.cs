@@ -1482,6 +1482,7 @@ namespace DisplayMagicianShared.AMD
                                 SharedLogger.logger.Warn($"AMDLibrary/GetAMDDisplayConfig: Found the display settings for this UniqueID but it has a different name");
 
 
+
                                 // Save the Display to the main dictionary of displays with the uniqueid as the key
                                 myDisplayConfig.Displays.Add(newDisplay.UniqueID, newDisplay);
                             }
