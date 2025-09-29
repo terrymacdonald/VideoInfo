@@ -1279,7 +1279,7 @@ namespace DisplayMagicianShared.AMD
                 //-----------------------------------------------------------------------
 
                 // Get the display services
-                // This lets us interact witth the various displays
+                // This lets us interact with the various displays to get the settings from them
                 IADLXDisplayServices displayService;
                 IADLXDisplayList displayList;
 
