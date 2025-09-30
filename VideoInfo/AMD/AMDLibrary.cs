@@ -1970,7 +1970,6 @@ namespace DisplayMagicianShared.AMD
                                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: FreeSync object could not be obtained for this display.");
                                 }
 
-
                                 //------------------------------------
                                 // GET THE Display Gamut Settings IF WE CAN
                                 //------------------------------------
@@ -2267,6 +2266,15 @@ namespace DisplayMagicianShared.AMD
                                     // Release VSR interface
                                     vsr.Release();
                                 }
+
+                                // TODO: Need to create sections as above, for these settings to get them all
+                                // NOTE: It may not be worth grabbing them all as some are less useful than others for gaming
+                                displayService.Get3DLUT(display, pp3DLUT);
+                                displayService.GetCustomResolution(display, ppCustomRes);
+                                displayService.GetHDCP(display, ppHDCP);
+                                displayService.GetIntegerScaling(display, ppIntScaling);
+                                displayService.GetType(display, ppDisplayType);
+                                displayService.GetVariBright(display, ppVariBright);
 
                                 // Save the Display to the main dictionary of displays with the uniqueid as the key
                                 myDisplayConfig.Displays.Add(newDisplay.UniqueID, newDisplay);
