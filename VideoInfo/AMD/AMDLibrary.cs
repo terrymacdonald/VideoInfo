@@ -346,6 +346,7 @@ namespace DisplayMagicianShared.AMD
         public int CustomColorContrast;
         public bool IsSupportedCustomColorTemperature;
         public int CustomColorTemperature;
+        public bool IsSupportedGamma = false; // Force this to be false until we can add the functionality
         public int GammaCoefficientGamma;
         public int GammaCoefficientA0;
         public int GammaCoefficientA1;
@@ -508,6 +509,11 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomColorTemperature values don't equal each other");
                 return false;
             }
+            if (IsSupportedGamma != other.IsSupportedGamma)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedGamma values don't equal each other");
+                return false;
+            }
             if (GammaCoefficientGamma != other.GammaCoefficientGamma)
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaCoefficientGamma values don't equal each other");
@@ -658,7 +664,7 @@ namespace DisplayMagicianShared.AMD
             return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, MaxHResolution, MaxVResolution, PixelClock, RefreshRate, ScanType, UniqueID,
                 IsSupportedColorDepth, ColorDepth, IsSupportedCustomColorBrightness, CustomColorBrightness, IsSupportedCustomColorHue, CustomColorHue,
                 IsSupportedCustomColorSaturation, CustomColorSaturation, IsSupportedCustomColorContrast, CustomColorContrast, IsSupportedCustomColorTemperature,
-                CustomColorTemperature, GammaCoefficientGamma, GammaCoefficientA0, GammaCoefficientA1, GammaCoefficientA2, GammaCoefficientA3,
+                CustomColorTemperature, IsSupportedGamma, GammaCoefficientGamma, GammaCoefficientA0, GammaCoefficientA1, GammaCoefficientA2, GammaCoefficientA3,
                 GammaRampRed, GammaRampGreen, GammaRampBlue, IsSupportedFreeSync, IsEnabledFreeSync, GamutColorSpaceRedX, GamutColorSpaceRedY, GamutColorSpaceGreenX, GamutColorSpaceGreenY,
                 GamutColorSpaceBlueX, GamutColorSpaceBlueY, GamutWhitePointX, GamutWhitePointY, IsSupportedGPUScaling, IsEnabledGPUScaling,
                 IsSupportedIntegerScaling, IsEnabledIntegerScaling, IsSupportedPixelFormat, CurrentPixelFormat, IsSupportedScalingMode, CurrentScalingMode,
@@ -1866,6 +1872,7 @@ namespace DisplayMagicianShared.AMD
                                 // TODO: Fix getting and setting the gamma ramp as that is the bit that is breaking thi section
                                 //       but for now we just disable this section.
                                 // Now grab the display gamma settings if we can
+                                newDisplay.IsSupportedGamma = false;
                                 /*SWIGTYPE_p_p_adlx__IADLXDisplayGamma ppGamma = ADLX.new_displayGammaP_Ptr();
                                 status = displayService.GetGamma(display, ppGamma);
                                 if (status == ADLX_RESULT.ADLX_OK)
