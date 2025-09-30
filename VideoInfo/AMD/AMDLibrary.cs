@@ -1863,8 +1863,10 @@ namespace DisplayMagicianShared.AMD
 
                                 }
 
+                                // TODO: Fix getting and setting the gamma ramp as that is the bit that is breaking thi section
+                                //       but for now we just disable this section.
                                 // Now grab the display gamma settings if we can
-                                SWIGTYPE_p_p_adlx__IADLXDisplayGamma ppGamma = ADLX.new_displayGammaP_Ptr();
+                                /*SWIGTYPE_p_p_adlx__IADLXDisplayGamma ppGamma = ADLX.new_displayGammaP_Ptr();
                                 status = displayService.GetGamma(display, ppGamma);
                                 if (status == ADLX_RESULT.ADLX_OK)
                                 {
@@ -1909,7 +1911,7 @@ namespace DisplayMagicianShared.AMD
                                 else
                                 {
                                     SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display gamma object. displayService.GetGamma() returned error code {status}");
-                                }
+                                }*/
 
                                 //------------------------------------
                                 // GET THE FreeSync Settings IF WE CAN
