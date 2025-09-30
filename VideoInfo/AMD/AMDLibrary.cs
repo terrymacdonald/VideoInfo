@@ -341,9 +341,9 @@ namespace DisplayMagicianShared.AMD
         public bool IsSupportedCustomColorHue;
         public int CustomColorHue;
         public bool IsSupportedCustomColorSaturation;
-        public int CustomColorSaturation; 
+        public int CustomColorSaturation;
         public bool IsSupportedCustomColorContrast;
-        public int CustomColorContrast;        
+        public int CustomColorContrast;
         public bool IsSupportedCustomColorTemperature;
         public int CustomColorTemperature;
         public int GammaCoefficientGamma;
@@ -351,7 +351,9 @@ namespace DisplayMagicianShared.AMD
         public int GammaCoefficientA1;
         public int GammaCoefficientA2;
         public int GammaCoefficientA3;
-        public SerializableGammaRamp GammaRamp; // done for testing
+        public List<double> GammaRampRed; // done for testing
+        public List<double> GammaRampGreen; // done for testing
+        public List<double> GammaRampBlue; // done for testing
         public bool IsSupportedFreeSync;
         public bool IsEnabledFreeSync;
         public int GamutColorSpaceRedX;
@@ -383,6 +385,9 @@ namespace DisplayMagicianShared.AMD
             ColorDepth = ADLX_COLOR_DEPTH.BPC_UNKNOWN;
             CurrentPixelFormat = ADLX_PIXEL_FORMAT.FORMAT_UNKNOWN;
             CurrentScalingMode = ADLX_SCALE_MODE.PRESERVE_ASPECT_RATIO;
+            GammaRampRed = new List<double>();
+            GammaRampGreen = new List<double>();
+            GammaRampBlue = new List<double>();
         }
 
         public override bool Equals(object obj) => obj is AMD_DISPLAY_WITH_SETTINGS other && this.Equals(other);
@@ -528,9 +533,19 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaCoefficientA3 values don't equal each other");
                 return false;
             }
-            if (GammaRamp != other.GammaRamp)
+            if (!GammaRampRed.SequenceEqual(other.GammaRampRed))
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaRamp values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaRampRed values don't equal each other");
+                return false;
+            }
+            if (!GammaRampGreen.SequenceEqual(other.GammaRampGreen))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaRampGreen values don't equal each other");
+                return false;
+            }
+            if (!GammaRampBlue.SequenceEqual(other.GammaRampBlue))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaRampBlue values don't equal each other");
                 return false;
             }
             if (IsSupportedFreeSync != other.IsSupportedFreeSync)
@@ -644,7 +659,7 @@ namespace DisplayMagicianShared.AMD
                 IsSupportedColorDepth, ColorDepth, IsSupportedCustomColorBrightness, CustomColorBrightness, IsSupportedCustomColorHue, CustomColorHue,
                 IsSupportedCustomColorSaturation, CustomColorSaturation, IsSupportedCustomColorContrast, CustomColorContrast, IsSupportedCustomColorTemperature,
                 CustomColorTemperature, GammaCoefficientGamma, GammaCoefficientA0, GammaCoefficientA1, GammaCoefficientA2, GammaCoefficientA3,
-                GammaRamp, IsSupportedFreeSync, IsEnabledFreeSync, GamutColorSpaceRedX, GamutColorSpaceRedY, GamutColorSpaceGreenX, GamutColorSpaceGreenY,
+                GammaRampRed, GammaRampGreen, GammaRampBlue, IsSupportedFreeSync, IsEnabledFreeSync, GamutColorSpaceRedX, GamutColorSpaceRedY, GamutColorSpaceGreenX, GamutColorSpaceGreenY,
                 GamutColorSpaceBlueX, GamutColorSpaceBlueY, GamutWhitePointX, GamutWhitePointY, IsSupportedGPUScaling, IsEnabledGPUScaling,
                 IsSupportedIntegerScaling, IsEnabledIntegerScaling, IsSupportedPixelFormat, CurrentPixelFormat, IsSupportedScalingMode, CurrentScalingMode,
                 IsSupportedVSR, IsEnabledVSR
