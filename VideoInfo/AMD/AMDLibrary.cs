@@ -2284,13 +2284,15 @@ namespace DisplayMagicianShared.AMD
                                         SWIGTYPE_p_bool pHDCPStatus = ADLX.new_boolP();
                                         if (hdcp.IsEnabled(pHDCPStatus) == ADLX_RESULT.ADLX_OK)
                                         {
-                                            newDisplay.IsEnabledHDCP = true;
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported and enabled");
-                                        }
-                                        else
-                                        {
-                                            newDisplay.IsEnabledHDCP = false;
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported but NOT enabled");
+                                            newDisplay.IsEnabledHDCP = ADLX.boolP_value(pHDCPStatus);
+                                            if (newDisplay.IsEnabledHDCP)
+                                            {
+                                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported and enabled");
+                                            }
+                                            else
+                                            {
+                                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported but NOT enabled");
+                                            }
                                         }
                                     }
                                     else
@@ -2302,12 +2304,44 @@ namespace DisplayMagicianShared.AMD
                                     hdcp.Release();
                                 }
 
+                                // Get VariBright settings
+                                SWIGTYPE_p_p_adlx__IADLXDisplayVariBright ppVariBright = ADLX.new_displayVariBrightP_Ptr();
+                                status = displayService.GetVariBright(display, ppVariBright);
+                                if (status == ADLX_RESULT.ADLX_OK)
+                                {
+                                    IADLXDisplayVariBright vb = ADLX.displayVariBrightP_Ptr_value(ppVariBright);
+                                    SWIGTYPE_p_bool pIsVBSupported = ADLX.new_boolP();
+                                    if (vb.IsSupported(pIsVBSupported) == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsVBSupported))
+                                    {
+                                        newDisplay.IsSupportedVariBright = true;
+                                        SWIGTYPE_p_bool pVBEnabled = ADLX.new_boolP();
+                                        if (vb.IsEnabled(pVBEnabled) == ADLX_RESULT.ADLX_OK)
+                                        {
+                                            newDisplay.IsEnabledVariBright = ADLX.boolP_value(pVBEnabled);
+                                            if (newDisplay.IsEnabledHDCP)
+                                            {
+                                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is supported and enabled");
+                                            }
+                                            else
+                                            {
+                                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is supported but NOT enabled");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        newDisplay.IsSupportedVariBright = false;
+                                        newDisplay.IsEnabledVariBright = false;
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is NOT supported");
+                                    }
+                                    vb.Release();
+                                }
+
                                 // TODO: Need to create sections as above, for these settings to get them all
                                 // NOTE: It may not be worth grabbing them all as some are less useful than others for gaming
                                 displayService.Get3DLUT(display, pp3DLUT);
                                 displayService.GetCustomResolution(display, ppCustomRes);
                                 displayService.GetType(display, ppDisplayType);
-                                displayService.GetVariBright(display, ppVariBright);
 
                                 // Save the Display to the main dictionary of displays with the uniqueid as the key
                                 myDisplayConfig.Displays.Add(newDisplay.UniqueID, newDisplay);
