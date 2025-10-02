@@ -375,6 +375,10 @@ namespace DisplayMagicianShared.AMD
         public ADLX_SCALE_MODE CurrentScalingMode = ADLX_SCALE_MODE.PRESERVE_ASPECT_RATIO;
         public bool IsSupportedVSR = false;
         public bool IsEnabledVSR = false;
+        public bool IsSupportedHDCP = false;
+        public bool IsEnabledHDCP = false;
+        public bool IsSupportedVariBright = false;
+        public bool IsEnabledVariBright = false;
 
         public AMD_DISPLAY_WITH_SETTINGS()
         {
@@ -2267,12 +2271,41 @@ namespace DisplayMagicianShared.AMD
                                     vsr.Release();
                                 }
 
+                                // Get the HDCP settings if we can
+                                SWIGTYPE_p_p_adlx__IADLXDisplayHDCP ppHDCP = ADLX.new_displayHDCPP_Ptr();
+                                status = displayService.GetHDCP(display, ppHDCP);
+                                if (status == ADLX_RESULT.ADLX_OK)
+                                {
+                                    IADLXDisplayHDCP hdcp = ADLX.displayHDCPP_Ptr_value(ppHDCP);
+                                    SWIGTYPE_p_bool pIsHDCPSupported = ADLX.new_boolP();
+                                    if (hdcp.IsSupported(pIsHDCPSupported) == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsHDCPSupported))
+                                    {
+                                        newDisplay.IsSupportedHDCP = true;
+                                        SWIGTYPE_p_bool pHDCPStatus = ADLX.new_boolP();
+                                        if (hdcp.IsEnabled(pHDCPStatus) == ADLX_RESULT.ADLX_OK)
+                                        {
+                                            newDisplay.IsEnabledHDCP = true;
+                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported and enabled");
+                                        }
+                                        else
+                                        {
+                                            newDisplay.IsEnabledHDCP = false;
+                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported but NOT enabled");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        newDisplay.IsSupportedHDCP = false;
+                                        newDisplay.IsEnabledHDCP = false;
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is NOT supported");
+                                    }
+                                    hdcp.Release();
+                                }
+
                                 // TODO: Need to create sections as above, for these settings to get them all
                                 // NOTE: It may not be worth grabbing them all as some are less useful than others for gaming
                                 displayService.Get3DLUT(display, pp3DLUT);
                                 displayService.GetCustomResolution(display, ppCustomRes);
-                                displayService.GetHDCP(display, ppHDCP);
-                                displayService.GetIntegerScaling(display, ppIntScaling);
                                 displayService.GetType(display, ppDisplayType);
                                 displayService.GetVariBright(display, ppVariBright);
 
