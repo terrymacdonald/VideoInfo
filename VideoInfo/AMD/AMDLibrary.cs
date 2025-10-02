@@ -320,6 +320,61 @@ namespace DisplayMagicianShared.AMD
         public static bool operator !=(AMD_EYEFINITY_DESKTOP lhs, AMD_EYEFINITY_DESKTOP rhs) => !(lhs == rhs);
     }
 
+    public struct Display3DLUTSettings
+    {
+        public bool IsSupportedSCE { get; set; }
+        public bool IsSupportedSCEVividGaming { get; set; }
+        public bool IsSupportedSCEDynamicContrast { get; set; }
+        public bool IsSupportedUser3DLUT { get; set; }
+
+        public bool IsCurrentSCEDisabled { get; set; }
+        public bool IsCurrentSCEVividGaming { get; set; }
+        public bool IsCurrentSCEDynamicContrast { get; set; }
+        public bool IsUser3DLUTApplied { get; set; }
+
+        // If using Dynamic Contrast mode:
+        public int CurrentDynamicContrastValue { get; set; }
+        public IntRange DynamicContrastRange { get; set; }  // min, max, step
+
+        // Full LUT data (optional, can be a large array).
+        // Can store as flattened list or nested arrays: e.g. [R][G][B] => value
+        public List<ushort> UserLUTData { get; set; } = new List<ushort>();
+        public int UserLUTNumPoints { get; set; }
+        public LutMode UserLUTMode { get; set; } = 0;
+
+        public Display3DLUTSettings()
+        {
+            CurrentDynamicContrastValue = 0;
+            UserLUTData = new List<ushort>();
+        }
+    }
+
+    /// Range helper
+    public struct IntRange
+    {
+        public int Min { get; set; }
+        public int Max { get; set; }
+        public int Step { get; set; }
+    }
+
+    public enum LutMode
+    {
+        None = 0,
+        SDR = 1,
+        HDR = 2,
+        All = 3
+    }
+
+    public class CustomDisplayResolutionInfo
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public int RefreshRate { get; set; }
+        public int TimingStandard { get; set; }
+
+        // (Optional) you might want fields like “isActive” or “isDefault” etc.
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DISPLAY_WITH_SETTINGS : IEquatable<AMD_DISPLAY_WITH_SETTINGS>
     {
@@ -379,6 +434,20 @@ namespace DisplayMagicianShared.AMD
         public bool IsEnabledHDCP = false;
         public bool IsSupportedVariBright = false;
         public bool IsEnabledVariBright = false;
+        public bool IsSupported3DLUT = false;
+        public Display3DLUTSettings ThreeDLUTSettings { get; set; } = new Display3DLUTSettings();
+        // Custom resolution support / status
+        public bool IsSupportedCustomResolution { get; set; }
+        public bool IsCustomResolutionApplied { get; set; }
+
+        // The details of the currently applied custom resolution (if any)
+        public int CustomResWidth { get; set; }
+        public int CustomResHeight { get; set; }
+        public int CustomResRefreshRate { get; set; }
+        public int CustomResTimingStandard { get; set; }
+
+        // (Optional) store the list of all defined custom resolutions for that display
+        public List<CustomDisplayResolutionInfo> CustomResolutions { get; set; } = new List<CustomDisplayResolutionInfo>();
 
         public AMD_DISPLAY_WITH_SETTINGS()
         {
@@ -393,6 +462,7 @@ namespace DisplayMagicianShared.AMD
             GammaRampRed = new List<double>();
             GammaRampGreen = new List<double>();
             GammaRampBlue = new List<double>();
+            CustomResolutions = new List<CustomDisplayResolutionInfo>();
         }
 
         public override bool Equals(object obj) => obj is AMD_DISPLAY_WITH_SETTINGS other && this.Equals(other);
@@ -2337,11 +2407,184 @@ namespace DisplayMagicianShared.AMD
                                     vb.Release();
                                 }
 
-                                // TODO: Need to create sections as above, for these settings to get them all
-                                // NOTE: It may not be worth grabbing them all as some are less useful than others for gaming
-                                displayService.Get3DLUT(display, pp3DLUT);
-                                displayService.GetCustomResolution(display, ppCustomRes);
-                                displayService.GetType(display, ppDisplayType);
+                                // Get 3DLUT settings if we can
+                                // NOTE: This section is commented out as it needs more work to properly capture and store the 3DLUT data
+                                //       The basic structure is in place, but the actual 3DLUT map data retrieval and storage needs to be finalized
+                                /*SWIGTYPE_p_p_adlx__IADLXDisplay3DLUT pp3DLUT = ADLX.new_display3DLUTP_Ptr();
+                                status = displayService.Get3DLUT(display, pp3DLUT);
+                                if (status == ADLX_RESULT.ADLX_OK)
+                                {
+                                    IADLXDisplay3DLUT lut = ADLX.display3DLUTP_Ptr_value(pp3DLUT);
+
+                                    // Support checks
+                                    SWIGTYPE_p_bool p = ADLX.new_boolP();
+                                    Display3DLUTSettings ThreeDLUT = new Display3DLUTSettings();
+                                    if (lut.IsSupportedSCE(p) == ADLX_RESULT.ADLX_OK)
+                                        ThreeDLUT.IsSupportedSCE = ADLX.boolP_value(p);
+
+                                    if (lut.IsSupportedSCEVividGaming(p) == ADLX_RESULT.ADLX_OK)
+                                        ThreeDLUT.IsSupportedSCEVividGaming = ADLX.boolP_value(p);
+
+                                    if (lut.IsSupportedSCEDynamicContrast(p) == ADLX_RESULT.ADLX_OK)
+                                        ThreeDLUT.IsSupportedSCEDynamicContrast = ADLX.boolP_value(p);
+
+                                    if (lut.IsSupportedUser3DLUT(p) == ADLX_RESULT.ADLX_OK)
+                                        ThreeDLUT.IsSupportedUser3DLUT = ADLX.boolP_value(p);
+
+                                    // Current applied mode
+                                    SWIGTYPE_p_bool pb = ADLX.new_boolP();
+                                    if (lut.IsCurrentSCEDisabled(pb) == ADLX_RESULT.ADLX_OK)
+                                        ThreeDLUT.IsCurrentSCEDisabled = ADLX.boolP_value(pb);
+
+                                    if (lut.IsCurrentSCEVividGaming(pb) == ADLX_RESULT.ADLX_OK)
+                                        ThreeDLUT.IsCurrentSCEVividGaming = ADLX.boolP_value(pb);
+
+                                    if (lut.IsCurrentSCEDynamicContrast(pb) == ADLX_RESULT.ADLX_OK)
+                                        ThreeDLUT.IsCurrentSCEDynamicContrast = ADLX.boolP_value(pb);
+
+                                    // If dynamic contrast is current, get contrast and range
+                                    if (ThreeDLUT.IsCurrentSCEDynamicContrast)
+                                    {
+                                        ADLX_IntRange range = new ADLX_IntRange();
+                                        if (lut.GetSCEDynamicContrastRange(range) == ADLX_RESULT.ADLX_OK)
+                                        {
+                                            ThreeDLUT.DynamicContrastRange = new IntRange
+                                            {
+                                                Min = range.minValue,
+                                                Max = range.maxValue,
+                                                Step = range.step
+                                            };
+                                        }
+                                        SWIGTYPE_p_int pContrast = ADLX.new_adlx_intP();
+                                        if (lut.GetSCEDynamicContrast(pContrast) == ADLX_RESULT.ADLX_OK)
+                                        {
+                                            ThreeDLUT.CurrentDynamicContrastValue = ADLX.adlx_intP_value(pContrast);
+                                        }
+                                    }
+
+                                    // If user LUT is supported and you'd like to capture it:
+                                    if (ThreeDLUT.IsSupportedUser3DLUT)
+                                    {
+                                        // Suppose the API has GetAllUser3DLUT or GetSDRUser3DLUT / GetHDRUser3DLUT
+                                        // Example:
+                                        ADLX_3DLUT_TRANSFER_FUNCTION tf;
+                                        ADLX_3DLUT_COLORSPACE cs;
+                                        int numPoints = 0;
+                                        ADLX_UINT16_RGB rgbData;
+                                        LutMode mode = LutMode.None;
+
+                                        // TODO: FIX THIS SECTION TO RECORD THE USER 3DLUT
+                                        SWIGTYPE_p_ADLX_3DLUT_TRANSFER_FUNCTION pADLX_3DLUT_TRANSFER_FUNCTION = ADLX.new_adlx_3dlutTransferFunctionP();
+                                        SWIGTYPE_p_ADLX_3DLUT_COLORSPACE pADLX_3DLUT_COLOR_SPACE = ADLX.new_adlx_3dlutColorSpaceP();
+                                        SWIGTYPE_p_int pNumPoints = ADLX.new_adlx_intP();
+                                        ADLX_3DLUT_Data pData = ADLX.new_adlx_3dlutP();
+                                        status = lut.GetAllUser3DLUT(pADLX_3DLUT_TRANSFER_FUNCTION, pADLX_3DLUT_COLOR_SPACE, pNumPoints, pData);
+                                        if (status == ADLX_RESULT.ADLX_OK)
+                                        {
+                                            tf = ADLX.adlx_3dlutTransferFunctionP_value(pADLX_3DLUT_TRANSFER_FUNCTION);                                           
+                                            cs = ADLX.adlx_3dlutColorSpaceP_value(pADLX_3DLUT_COLOR_SPACE);
+                                            numPoints = ADLX.adlx_intP_value(pNumPoints);
+                                            rgbData = pData.data;
+                                            
+                                            if (numPoints > 0)
+                                            {
+                                                ThreeDLUT.UserLUTMode = mode;
+                                                ThreeDLUT.UserLUTNumPoints = numPoints;
+
+                                                // Suppose each point is a struct of three ushort values, or single value, flatten accordingly
+                                                int totalEntries = numPoints * numPoints * numPoints;
+                                                var arr = new ushort[totalEntries * 3];  // or *1, depending on format
+
+                                                // Copy from unmanaged memory into the array
+                                                Marshal.Copy(dataPtr, (short[])(object)arr, 0, arr.Length);
+                                                ThreeDLUT.UserLUTData = arr;
+                                            }
+                                        } 
+                                    }
+                                    newDisplay.ThreeDLUTSettings = ThreeDLUT;
+                                    lut.Release();
+                                }*/
+
+                                // Get the Custom Resolution settings if we can
+                                // TODO: This section needs updating in the SWIG bindings to work properly. The ADLXWrapper project
+                                //       needs to be updated and rebuilt to include the necessary methods for getting custom resolutions.
+                                /*
+                                SWIGTYPE_p_p_adlx__IADLXDisplayCustomResolution ppCustomRes = ADLX.new_displayCustomResolutionP_Ptr();
+                                status = displayService.GetCustomResolution(display, ppCustomRes);
+                                if (status == ADLX_RESULT.ADLX_OK)
+                                {
+                                    IADLXDisplayCustomResolution customRes = ADLX.displayCustomResolutionP_Ptr_value(ppCustomRes);
+
+                                    SWIGTYPE_p_bool pIsCustomResSupported = ADLX.new_boolP();
+                                    if (customRes.IsSupported(pIsCustomResSupported) == ADLX_RESULT.ADLX_OK &&
+                                        ADLX.boolP_value(pIsCustomResSupported))
+                                    {
+                                        // Mark support
+                                        newDisplay.IsSupportedCustomResolution = true;
+
+                                        // Try to get current applied
+                                        SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppRes = ADLX.new_displayResolutionP_Ptr();
+                                        if (customRes.GetCurrentAppliedResolution(ppRes) == ADLX_RESULT.ADLX_OK)
+                                        {
+                                            IADLXDisplayResolution res = ADLX.displayResolutionP_Ptr_value(ppRes);
+
+                                            SWIGTYPE_p_ADLX_DISPLAY_RESOLUTION pResValue = ADLX.new_adlx_displayResolutionP();
+                                            if (res.GetValue(pResValue) == ADLX_RESULT.ADLX_OK)
+                                            {
+                                                newDisplay.CustomResWidth = pResValue.width;
+                                                newDisplay.CustomResHeight = pResValue.height;
+                                                newDisplay.CustomResRefreshRate = pResValue.refreshRate;
+                                                newDisplay.CustomResTimingStandard = pResValue.timingStandard;
+
+                                                newDisplay.IsCustomResolutionApplied = true;
+                                            }
+                                            else
+                                            {
+                                                newDisplay.IsCustomResolutionApplied = false;
+                                            }
+                                            res.Release();
+                                        }
+                                        else
+                                        {
+                                            newDisplay.IsCustomResolutionApplied = false;
+                                        }
+
+                                        // (Optional) enumerate all defined custom resolutions
+                                        SWIGTYPE_p_p_adlx__IADLXDisplayResolutionList ppList = ADLX.new_displayResolutionListP_Ptr();
+                                        if (customRes.GetResolutionList(ppList) == ADLX_RESULT.ADLX_OK)
+                                        {
+                                            IADLXDisplayResolutionList list = ADLX.displayResolutionListP_Ptr_value(ppList);
+                                            uint idx = list.Begin();
+                                            for (; idx != list.Size(); idx++)
+                                            {
+                                                SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppEntry = ADLX.new_displayResolutionP_Ptr();
+                                                if (list.At(idx, ppEntry) == ADLX_RESULT.ADLX_OK)
+                                                {
+                                                    IADLXDisplayResolution entry = ADLX.displayResolutionP_Ptr_value(ppEntry);
+                                                    SWIGTYPE_p_ADLX_DISPLAY_RESOLUTION pEntryVal = ADLX.new_adlx_displayResolutionP();
+                                                    if (entry.GetValue(pEntryVal) == ADLX_RESULT.ADLX_OK)
+                                                    {
+                                                        newDisplay.CustomResolutions.Add(new DisplayResolutionInfo
+                                                        {
+                                                            Width = pEntryVal.width,
+                                                            Height = pEntryVal.height,
+                                                            RefreshRate = pEntryVal.refreshRate,
+                                                            TimingStandard = pEntryVal.timingStandard
+                                                        });
+                                                    }
+                                                    entry.Release();
+                                                }
+                                            }
+                                            list.Release();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        newDisplay.IsSupportedCustomResolution = false;
+                                    }
+
+                                    customRes.Release();
+                                }*/
 
                                 // Save the Display to the main dictionary of displays with the uniqueid as the key
                                 myDisplayConfig.Displays.Add(newDisplay.UniqueID, newDisplay);
