@@ -3623,8 +3623,6 @@ namespace DisplayMagicianShared.AMD
                         }
                         else
                         {
-                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Eyefinity layout is currently in use but is NOT required, so we need to destroy the Eyefinity Desktop");
-
                             // Otherwise we are using the newer ADLX API to create the Eyefinity Desktop
                             SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Using the newer ADLX API to create the Eyefinity Desktop.");
                             if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
@@ -3662,9 +3660,10 @@ namespace DisplayMagicianShared.AMD
                                     }
                                     else
                                     {
+                                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully created the ADLX Eyefinity Desktop");
                                         if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
                                         {
-                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: This new Eyefinity layout is exactly the same as the one we want! Our job is done.");
+                                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: This new Eyefinity layout matches the desired configuraton");
                                         }
                                         else
                                         {
