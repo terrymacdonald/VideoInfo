@@ -1,4 +1,5 @@
 ﻿using DisplayMagicianShared;
+using DisplayMagicianShared.Intel;
 using DisplayMagicianShared.NVIDIA;
 using DisplayMagicianShared.Windows;
 using EDIDParser;
@@ -54,7 +55,7 @@ namespace DisplayMagicianShared.Intel
             ColorDepth = ADLX_COLOR_DEPTH.BPC_UNKNOWN;
         }
 
-        public override bool Equals(object obj) => obj is INTEL_DISPLAY_WITH_SETTINGS other && this.Equals(other);
+        public override bool Equals(object obj) => obj is INTEL_DISPLAY_WITH_SETTINGS other && Equals(other);
         public bool Equals(INTEL_DISPLAY_WITH_SETTINGS other)
         {
             if (ConnectorType != other.ConnectorType)
@@ -143,7 +144,7 @@ namespace DisplayMagicianShared.Intel
             DisplayIdentifiers = new List<string>();
         }
 
-        public override bool Equals(object obj) => obj is INTEL_DISPLAY_CONFIG other && this.Equals(other);
+        public override bool Equals(object obj) => obj is INTEL_DISPLAY_CONFIG other && Equals(other);
         public bool Equals(INTEL_DISPLAY_CONFIG other)
         {
             if (IsInUse != other.IsInUse)
@@ -187,13 +188,13 @@ namespace DisplayMagicianShared.Intel
     class IntelLibrary : IDisposable
     {
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr LoadLibrary(string dllToLoad);
+        public static extern nint LoadLibrary(string dllToLoad);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool FreeLibrary(IntPtr hModule);
+        public static extern bool FreeLibrary(nint hModule);
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+        public static extern nint GetProcAddress(nint hModule, string procedureName);
 
         // Static members are 'eagerly initialized', that is, 
         // immediately when class is loaded for the first time.
@@ -206,11 +207,11 @@ namespace DisplayMagicianShared.Intel
         private bool _disposed = false;
 
         // Instantiate a SafeHandle instance.
-        private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
+        private SafeHandle _safeHandle = new SafeFileHandle(nint.Zero, true);
         private INTEL_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<string> _allConnectedDisplayIdentifiers;
-        public IntPtr hIGCLBindingModule = IntPtr.Zero;
-        public IntPtr hIGCLModule = IntPtr.Zero;
+        public nint hIGCLBindingModule = nint.Zero;
+        public nint hIGCLModule = nint.Zero;
         public const string Intel_IGCL_BINDING_DLL = "CtlLibraryBindings.dll";
         public const string Intel_IGCL_DLL = "ControlLib.dll";
 
@@ -234,8 +235,8 @@ namespace DisplayMagicianShared.Intel
                 }
 
                 // Attempt to load the Intel IGCL 64-bit DLL
-                IntPtr hIGCLModule = LoadLibrary(Intel_IGCL_DLL);
-                if (hIGCLModule != IntPtr.Zero)
+                nint hIGCLModule = LoadLibrary(Intel_IGCL_DLL);
+                if (hIGCLModule != nint.Zero)
                 {
                     // Successfully loaded the ADLX DLL, which means it's installed!
                     SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: We successfully loaded the AMD ADLX DLL which means the AMD Adrenalin driver software is installed.");
@@ -249,8 +250,8 @@ namespace DisplayMagicianShared.Intel
                 }
 
                 // Attempt to load the Custom ADLX Binding DLL
-                IntPtr hBindingModule = LoadLibrary(Intel_IGCL_BINDING_DLL);
-                if (hBindingModule != IntPtr.Zero)
+                nint hBindingModule = LoadLibrary(Intel_IGCL_BINDING_DLL);
+                if (hBindingModule != nint.Zero)
                 {
                     // Attempt to get the address of a non-existent function to verify the DLL is loaded
                     // IntPtr procAddress = GetProcAddress(hModule, "fakefunction");
@@ -274,7 +275,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initialise the Intel IGCL API");
                 try
                 {
-                    bool result = IGCLImport.Initialize();
+                    bool result = Initialize();
                     if (result)
                     {
                         // IGCL API Initialised correctly
@@ -285,7 +286,7 @@ namespace DisplayMagicianShared.Intel
                     {
                         // IGCL API failed to initialise
                         _initialised = false;
-                        IGCLStatus status = IGCLImport.GetStatus();
+                        IGCLStatus status = GetStatus();
                         if (status == IGCLStatus.DLL_NOT_FOUND)
                         {
                             SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to access the Intel IGCL API as the DLL is not found. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
@@ -353,21 +354,21 @@ namespace DisplayMagicianShared.Intel
             if (_initialised)
             {
                 // Terminate the IGCL API to avoid memory leaks
-                IGCLImport.Terminate();
+                Terminate();
             }
 
-            if (hIGCLBindingModule != IntPtr.Zero)
+            if (hIGCLBindingModule != nint.Zero)
             {
                 SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX Binding DLL");
                 FreeLibrary(hIGCLBindingModule);
-                hIGCLBindingModule = IntPtr.Zero;
+                hIGCLBindingModule = nint.Zero;
             }
 
-            if (hIGCLModule != IntPtr.Zero)
+            if (hIGCLModule != nint.Zero)
             {
                 SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX DLL");
                 FreeLibrary(hIGCLModule);
-                hIGCLModule = IntPtr.Zero;
+                hIGCLModule = nint.Zero;
             }
 
             _disposed = true;
@@ -484,7 +485,7 @@ namespace DisplayMagicianShared.Intel
 
                 // Iterate through the desktops and displays to get the display information
                 List<ctl_device_adapter_properties_t> adapters;
-                IGCLImport.GetDevices(out adapters);
+                GetDevices(out adapters);
 
                 if (adapters == null || adapters.Count == 0)
                 {
@@ -2385,7 +2386,7 @@ namespace DisplayMagicianShared.Intel
 
     }
 
-    [global::System.Serializable]
+    [Serializable]
     public class IntelLibraryException : Exception
     {
         public IntelLibraryException() { }
