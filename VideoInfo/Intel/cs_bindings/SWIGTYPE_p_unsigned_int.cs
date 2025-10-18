@@ -10,6 +10,11 @@
 
 namespace IGCLWrapper {
 
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
 public class SWIGTYPE_p_unsigned_int {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 

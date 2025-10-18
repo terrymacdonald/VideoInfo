@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_property_int_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_property_int_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -56,6 +61,8 @@ public class ctl_property_int_t : global::System.IDisposable {
       }
     }
   }
+
+#nullable enable
 
   public bool Enable {
     set {

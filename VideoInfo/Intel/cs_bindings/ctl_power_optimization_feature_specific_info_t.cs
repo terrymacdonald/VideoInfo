@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_power_optimization_feature_specific_info_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_power_optimization_feature_specific_info_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,35 +62,37 @@ public class ctl_power_optimization_feature_specific_info_t : global::System.IDi
     }
   }
 
-  public ctl_power_optimization_lrr_t LRRInfo {
+#nullable enable
+
+  public ctl_power_optimization_lrr_t? LRRInfo {
     set {
       IGCLPINVOKE.ctl_power_optimization_feature_specific_info_t_LRRInfo_set(swigCPtr, ctl_power_optimization_lrr_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_optimization_feature_specific_info_t_LRRInfo_get(swigCPtr);
-      ctl_power_optimization_lrr_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_optimization_lrr_t(cPtr, false);
+      ctl_power_optimization_lrr_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_optimization_lrr_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_power_optimization_psr_t PSRInfo {
+  public ctl_power_optimization_psr_t? PSRInfo {
     set {
       IGCLPINVOKE.ctl_power_optimization_feature_specific_info_t_PSRInfo_set(swigCPtr, ctl_power_optimization_psr_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_optimization_feature_specific_info_t_PSRInfo_get(swigCPtr);
-      ctl_power_optimization_psr_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_optimization_psr_t(cPtr, false);
+      ctl_power_optimization_psr_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_optimization_psr_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_power_optimization_dpst_t DPSTInfo {
+  public ctl_power_optimization_dpst_t? DPSTInfo {
     set {
       IGCLPINVOKE.ctl_power_optimization_feature_specific_info_t_DPSTInfo_set(swigCPtr, ctl_power_optimization_dpst_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_optimization_feature_specific_info_t_DPSTInfo_get(swigCPtr);
-      ctl_power_optimization_dpst_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_optimization_dpst_t(cPtr, false);
+      ctl_power_optimization_dpst_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_optimization_dpst_t(cPtr, false);
       return ret;
     } 
   }

@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_lace_lux_aggr_map_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_lace_lux_aggr_map_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_lace_lux_aggr_map_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint MaxNumEntries {
     set {
       IGCLPINVOKE.ctl_lace_lux_aggr_map_t_MaxNumEntries_set(swigCPtr, value);
@@ -77,13 +84,13 @@ public class ctl_lace_lux_aggr_map_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_lace_lux_aggr_map_entry_t pLuxToAggrMappingTable {
+  public ctl_lace_lux_aggr_map_entry_t? pLuxToAggrMappingTable {
     set {
       IGCLPINVOKE.ctl_lace_lux_aggr_map_t_pLuxToAggrMappingTable_set(swigCPtr, ctl_lace_lux_aggr_map_entry_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_lace_lux_aggr_map_t_pLuxToAggrMappingTable_get(swigCPtr);
-      ctl_lace_lux_aggr_map_entry_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_lace_lux_aggr_map_entry_t(cPtr, false);
+      ctl_lace_lux_aggr_map_entry_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_lace_lux_aggr_map_entry_t(cPtr, false);
       return ret;
     } 
   }

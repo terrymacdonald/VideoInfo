@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_power_telemetry_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_power_telemetry_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_power_telemetry_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_Size_set(swigCPtr, value);
@@ -77,90 +84,90 @@ public class ctl_power_telemetry_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_oc_telemetry_item_t timeStamp {
+  public ctl_oc_telemetry_item_t? timeStamp {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_timeStamp_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_timeStamp_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuEnergyCounter {
+  public ctl_oc_telemetry_item_t? gpuEnergyCounter {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuEnergyCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuEnergyCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuVoltage {
+  public ctl_oc_telemetry_item_t? gpuVoltage {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuVoltage_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuVoltage_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuCurrentClockFrequency {
+  public ctl_oc_telemetry_item_t? gpuCurrentClockFrequency {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuCurrentClockFrequency_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuCurrentClockFrequency_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuCurrentTemperature {
+  public ctl_oc_telemetry_item_t? gpuCurrentTemperature {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuCurrentTemperature_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuCurrentTemperature_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t globalActivityCounter {
+  public ctl_oc_telemetry_item_t? globalActivityCounter {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_globalActivityCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_globalActivityCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t renderComputeActivityCounter {
+  public ctl_oc_telemetry_item_t? renderComputeActivityCounter {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_renderComputeActivityCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_renderComputeActivityCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t mediaActivityCounter {
+  public ctl_oc_telemetry_item_t? mediaActivityCounter {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_mediaActivityCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_mediaActivityCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
@@ -215,79 +222,79 @@ public class ctl_power_telemetry_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramEnergyCounter {
+  public ctl_oc_telemetry_item_t? vramEnergyCounter {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramEnergyCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramEnergyCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramVoltage {
+  public ctl_oc_telemetry_item_t? vramVoltage {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramVoltage_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramVoltage_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramCurrentClockFrequency {
+  public ctl_oc_telemetry_item_t? vramCurrentClockFrequency {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramCurrentClockFrequency_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramCurrentClockFrequency_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramCurrentEffectiveFrequency {
+  public ctl_oc_telemetry_item_t? vramCurrentEffectiveFrequency {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramCurrentEffectiveFrequency_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramCurrentEffectiveFrequency_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramReadBandwidthCounter {
+  public ctl_oc_telemetry_item_t? vramReadBandwidthCounter {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramReadBandwidthCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramReadBandwidthCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramWriteBandwidthCounter {
+  public ctl_oc_telemetry_item_t? vramWriteBandwidthCounter {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramWriteBandwidthCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramWriteBandwidthCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramCurrentTemperature {
+  public ctl_oc_telemetry_item_t? vramCurrentTemperature {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramCurrentTemperature_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramCurrentTemperature_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
@@ -342,13 +349,13 @@ public class ctl_power_telemetry_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_oc_telemetry_item_t totalCardEnergyCounter {
+  public ctl_oc_telemetry_item_t? totalCardEnergyCounter {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_totalCardEnergyCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_totalCardEnergyCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
@@ -375,101 +382,101 @@ public class ctl_power_telemetry_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuVrTemp {
+  public ctl_oc_telemetry_item_t? gpuVrTemp {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuVrTemp_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuVrTemp_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramVrTemp {
+  public ctl_oc_telemetry_item_t? vramVrTemp {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramVrTemp_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramVrTemp_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t saVrTemp {
+  public ctl_oc_telemetry_item_t? saVrTemp {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_saVrTemp_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_saVrTemp_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuEffectiveClock {
+  public ctl_oc_telemetry_item_t? gpuEffectiveClock {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuEffectiveClock_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuEffectiveClock_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuOverVoltagePercent {
+  public ctl_oc_telemetry_item_t? gpuOverVoltagePercent {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuOverVoltagePercent_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuOverVoltagePercent_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuPowerPercent {
+  public ctl_oc_telemetry_item_t? gpuPowerPercent {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuPowerPercent_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuPowerPercent_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t gpuTemperaturePercent {
+  public ctl_oc_telemetry_item_t? gpuTemperaturePercent {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_gpuTemperaturePercent_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_gpuTemperaturePercent_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramReadBandwidth {
+  public ctl_oc_telemetry_item_t? vramReadBandwidth {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramReadBandwidth_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramReadBandwidth_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t vramWriteBandwidth {
+  public ctl_oc_telemetry_item_t? vramWriteBandwidth {
     set {
       IGCLPINVOKE.ctl_power_telemetry_t_vramWriteBandwidth_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_telemetry_t_vramWriteBandwidth_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }

@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_sharpness_filter_properties_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_sharpness_filter_properties_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_sharpness_filter_properties_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint FilterType {
     set {
       IGCLPINVOKE.ctl_sharpness_filter_properties_t_FilterType_set(swigCPtr, value);
@@ -67,13 +74,13 @@ public class ctl_sharpness_filter_properties_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_property_range_info_t FilterDetails {
+  public ctl_property_range_info_t? FilterDetails {
     set {
       IGCLPINVOKE.ctl_sharpness_filter_properties_t_FilterDetails_set(swigCPtr, ctl_property_range_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_sharpness_filter_properties_t_FilterDetails_get(swigCPtr);
-      ctl_property_range_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_range_info_t(cPtr, false);
+      ctl_property_range_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_range_info_t(cPtr, false);
       return ret;
     } 
   }

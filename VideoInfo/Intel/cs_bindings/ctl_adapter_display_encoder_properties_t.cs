@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_adapter_display_encoder_properties_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_adapter_display_encoder_properties_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_adapter_display_encoder_properties_t : global::System.IDisposab
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_adapter_display_encoder_properties_t_Size_set(swigCPtr, value);
@@ -77,13 +84,13 @@ public class ctl_adapter_display_encoder_properties_t : global::System.IDisposab
     } 
   }
 
-  public ctl_os_display_encoder_identifier_t Os_display_encoder_handle {
+  public ctl_os_display_encoder_identifier_t? Os_display_encoder_handle {
     set {
       IGCLPINVOKE.ctl_adapter_display_encoder_properties_t_Os_display_encoder_handle_set(swigCPtr, ctl_os_display_encoder_identifier_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_adapter_display_encoder_properties_t_Os_display_encoder_handle_get(swigCPtr);
-      ctl_os_display_encoder_identifier_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_os_display_encoder_identifier_t(cPtr, false);
+      ctl_os_display_encoder_identifier_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_os_display_encoder_identifier_t(cPtr, false);
       return ret;
     } 
   }
@@ -108,13 +115,13 @@ public class ctl_adapter_display_encoder_properties_t : global::System.IDisposab
     } 
   }
 
-  public ctl_revision_datatype_t SupportedSpec {
+  public ctl_revision_datatype_t? SupportedSpec {
     set {
       IGCLPINVOKE.ctl_adapter_display_encoder_properties_t_SupportedSpec_set(swigCPtr, ctl_revision_datatype_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_adapter_display_encoder_properties_t_SupportedSpec_get(swigCPtr);
-      ctl_revision_datatype_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_revision_datatype_t(cPtr, false);
+      ctl_revision_datatype_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_revision_datatype_t(cPtr, false);
       return ret;
     } 
   }

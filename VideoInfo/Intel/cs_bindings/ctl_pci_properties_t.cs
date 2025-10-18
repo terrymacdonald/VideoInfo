@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_pci_properties_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_pci_properties_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_pci_properties_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_pci_properties_t_Size_set(swigCPtr, value);
@@ -77,24 +84,24 @@ public class ctl_pci_properties_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_pci_address_t address {
+  public ctl_pci_address_t? address {
     set {
       IGCLPINVOKE.ctl_pci_properties_t_address_set(swigCPtr, ctl_pci_address_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_pci_properties_t_address_get(swigCPtr);
-      ctl_pci_address_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pci_address_t(cPtr, false);
+      ctl_pci_address_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pci_address_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_pci_speed_t maxSpeed {
+  public ctl_pci_speed_t? maxSpeed {
     set {
       IGCLPINVOKE.ctl_pci_properties_t_maxSpeed_set(swigCPtr, ctl_pci_speed_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_pci_properties_t_maxSpeed_get(swigCPtr);
-      ctl_pci_speed_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pci_speed_t(cPtr, false);
+      ctl_pci_speed_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pci_speed_t(cPtr, false);
       return ret;
     } 
   }

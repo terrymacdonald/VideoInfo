@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_device_adapter_properties_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_device_adapter_properties_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_device_adapter_properties_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_device_adapter_properties_t_Size_set(swigCPtr, value);
@@ -77,13 +84,13 @@ public class ctl_device_adapter_properties_t : global::System.IDisposable {
     } 
   }
 
-  public SWIGTYPE_p_void pDeviceID {
+  public SWIGTYPE_p_void? pDeviceID {
     set {
       IGCLPINVOKE.ctl_device_adapter_properties_t_pDeviceID_set(swigCPtr, SWIGTYPE_p_void.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_device_adapter_properties_t_pDeviceID_get(swigCPtr);
-      SWIGTYPE_p_void ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
+      SWIGTYPE_p_void? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
       return ret;
     } 
   }
@@ -128,13 +135,13 @@ public class ctl_device_adapter_properties_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_firmware_version_t firmware_version {
+  public ctl_firmware_version_t? firmware_version {
     set {
       IGCLPINVOKE.ctl_device_adapter_properties_t_firmware_version_set(swigCPtr, ctl_firmware_version_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_device_adapter_properties_t_firmware_version_get(swigCPtr);
-      ctl_firmware_version_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_firmware_version_t(cPtr, false);
+      ctl_firmware_version_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_firmware_version_t(cPtr, false);
       return ret;
     } 
   }
@@ -249,13 +256,13 @@ public class ctl_device_adapter_properties_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_adapter_bdf_t adapter_bdf {
+  public ctl_adapter_bdf_t? adapter_bdf {
     set {
       IGCLPINVOKE.ctl_device_adapter_properties_t_adapter_bdf_set(swigCPtr, ctl_adapter_bdf_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_device_adapter_properties_t_adapter_bdf_get(swigCPtr);
-      ctl_adapter_bdf_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_adapter_bdf_t(cPtr, false);
+      ctl_adapter_bdf_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_adapter_bdf_t(cPtr, false);
       return ret;
     } 
   }

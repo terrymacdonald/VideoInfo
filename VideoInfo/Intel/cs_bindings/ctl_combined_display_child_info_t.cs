@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_combined_display_child_info_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_combined_display_child_info_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_combined_display_child_info_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public global::System.IntPtr hDisplayOutput {
     set {
       IGCLPINVOKE.ctl_combined_display_child_info_t_hDisplayOutput_set(swigCPtr, value);
@@ -67,24 +74,24 @@ public class ctl_combined_display_child_info_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_rect_t FbSrc {
+  public ctl_rect_t? FbSrc {
     set {
       IGCLPINVOKE.ctl_combined_display_child_info_t_FbSrc_set(swigCPtr, ctl_rect_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_combined_display_child_info_t_FbSrc_get(swigCPtr);
-      ctl_rect_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_rect_t(cPtr, false);
+      ctl_rect_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_rect_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_rect_t FbPos {
+  public ctl_rect_t? FbPos {
     set {
       IGCLPINVOKE.ctl_combined_display_child_info_t_FbPos_set(swigCPtr, ctl_rect_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_combined_display_child_info_t_FbPos_get(swigCPtr);
-      ctl_rect_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_rect_t(cPtr, false);
+      ctl_rect_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_rect_t(cPtr, false);
       return ret;
     } 
   }
@@ -99,13 +106,13 @@ public class ctl_combined_display_child_info_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_child_display_target_mode_t TargetMode {
+  public ctl_child_display_target_mode_t? TargetMode {
     set {
       IGCLPINVOKE.ctl_combined_display_child_info_t_TargetMode_set(swigCPtr, ctl_child_display_target_mode_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_combined_display_child_info_t_TargetMode_get(swigCPtr);
-      ctl_child_display_target_mode_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_child_display_target_mode_t(cPtr, false);
+      ctl_child_display_target_mode_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_child_display_target_mode_t(cPtr, false);
       return ret;
     } 
   }

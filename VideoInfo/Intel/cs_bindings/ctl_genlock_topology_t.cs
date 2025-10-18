@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_genlock_topology_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_genlock_topology_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_genlock_topology_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public byte NumGenlockDisplays {
     set {
       IGCLPINVOKE.ctl_genlock_topology_t_NumGenlockDisplays_set(swigCPtr, value);
@@ -77,35 +84,35 @@ public class ctl_genlock_topology_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_display_timing_t CommonTargetMode {
+  public ctl_display_timing_t? CommonTargetMode {
     set {
       IGCLPINVOKE.ctl_genlock_topology_t_CommonTargetMode_set(swigCPtr, ctl_display_timing_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_genlock_topology_t_CommonTargetMode_get(swigCPtr);
-      ctl_display_timing_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_display_timing_t(cPtr, false);
+      ctl_display_timing_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_display_timing_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_genlock_display_info_t pGenlockDisplayInfo {
+  public ctl_genlock_display_info_t? pGenlockDisplayInfo {
     set {
       IGCLPINVOKE.ctl_genlock_topology_t_pGenlockDisplayInfo_set(swigCPtr, ctl_genlock_display_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_genlock_topology_t_pGenlockDisplayInfo_get(swigCPtr);
-      ctl_genlock_display_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_genlock_display_info_t(cPtr, false);
+      ctl_genlock_display_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_genlock_display_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_genlock_target_mode_list_t pGenlockModeList {
+  public ctl_genlock_target_mode_list_t? pGenlockModeList {
     set {
       IGCLPINVOKE.ctl_genlock_topology_t_pGenlockModeList_set(swigCPtr, ctl_genlock_target_mode_list_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_genlock_topology_t_pGenlockModeList_get(swigCPtr);
-      ctl_genlock_target_mode_list_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_genlock_target_mode_list_t(cPtr, false);
+      ctl_genlock_target_mode_list_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_genlock_target_mode_list_t(cPtr, false);
       return ret;
     } 
   }

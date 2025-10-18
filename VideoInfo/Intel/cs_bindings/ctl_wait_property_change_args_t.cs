@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_wait_property_change_args_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_wait_property_change_args_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -56,6 +61,8 @@ public class ctl_wait_property_change_args_t : global::System.IDisposable {
       }
     }
   }
+
+#nullable enable
 
   public uint Size {
     set {
@@ -107,13 +114,13 @@ public class ctl_wait_property_change_args_t : global::System.IDisposable {
     } 
   }
 
-  public SWIGTYPE_p_void pReserved {
+  public SWIGTYPE_p_void? pReserved {
     set {
       IGCLPINVOKE.ctl_wait_property_change_args_t_pReserved_set(swigCPtr, SWIGTYPE_p_void.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_wait_property_change_args_t_pReserved_get(swigCPtr);
-      SWIGTYPE_p_void ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
+      SWIGTYPE_p_void? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
       return ret;
     } 
   }

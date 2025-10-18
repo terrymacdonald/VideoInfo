@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_genlock_args_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_genlock_args_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_genlock_args_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_genlock_args_t_Size_set(swigCPtr, value);
@@ -87,13 +94,13 @@ public class ctl_genlock_args_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_genlock_topology_t GenlockTopology {
+  public ctl_genlock_topology_t? GenlockTopology {
     set {
       IGCLPINVOKE.ctl_genlock_args_t_GenlockTopology_set(swigCPtr, ctl_genlock_topology_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_genlock_args_t_GenlockTopology_get(swigCPtr);
-      ctl_genlock_topology_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_genlock_topology_t(cPtr, false);
+      ctl_genlock_topology_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_genlock_topology_t(cPtr, false);
       return ret;
     } 
   }

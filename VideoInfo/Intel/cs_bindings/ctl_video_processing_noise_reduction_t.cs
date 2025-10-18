@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_video_processing_noise_reduction_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_video_processing_noise_reduction_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_video_processing_noise_reduction_t : global::System.IDisposable
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_video_processing_noise_reduction_t_Size_set(swigCPtr, value);
@@ -77,24 +84,24 @@ public class ctl_video_processing_noise_reduction_t : global::System.IDisposable
     } 
   }
 
-  public ctl_property_uint_t noise_reduction {
+  public ctl_property_uint_t? noise_reduction {
     set {
       IGCLPINVOKE.ctl_video_processing_noise_reduction_t_noise_reduction_set(swigCPtr, ctl_property_uint_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_video_processing_noise_reduction_t_noise_reduction_get(swigCPtr);
-      ctl_property_uint_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_uint_t(cPtr, false);
+      ctl_property_uint_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_uint_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_boolean_t noise_reduction_auto_detect {
+  public ctl_property_boolean_t? noise_reduction_auto_detect {
     set {
       IGCLPINVOKE.ctl_video_processing_noise_reduction_t_noise_reduction_auto_detect_set(swigCPtr, ctl_property_boolean_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_video_processing_noise_reduction_t_noise_reduction_auto_detect_get(swigCPtr);
-      ctl_property_boolean_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_boolean_t(cPtr, false);
+      ctl_property_boolean_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_boolean_t(cPtr, false);
       return ret;
     } 
   }

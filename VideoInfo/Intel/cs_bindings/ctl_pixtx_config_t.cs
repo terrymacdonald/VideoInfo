@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_pixtx_config_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_pixtx_config_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,35 +62,37 @@ public class ctl_pixtx_config_t : global::System.IDisposable {
     }
   }
 
-  public ctl_pixtx_1dlut_config_t OneDLutConfig {
+#nullable enable
+
+  public ctl_pixtx_1dlut_config_t? OneDLutConfig {
     set {
       IGCLPINVOKE.ctl_pixtx_config_t_OneDLutConfig_set(swigCPtr, ctl_pixtx_1dlut_config_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_pixtx_config_t_OneDLutConfig_get(swigCPtr);
-      ctl_pixtx_1dlut_config_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_1dlut_config_t(cPtr, false);
+      ctl_pixtx_1dlut_config_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_1dlut_config_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_pixtx_3dlut_config_t ThreeDLutConfig {
+  public ctl_pixtx_3dlut_config_t? ThreeDLutConfig {
     set {
       IGCLPINVOKE.ctl_pixtx_config_t_ThreeDLutConfig_set(swigCPtr, ctl_pixtx_3dlut_config_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_pixtx_config_t_ThreeDLutConfig_get(swigCPtr);
-      ctl_pixtx_3dlut_config_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_3dlut_config_t(cPtr, false);
+      ctl_pixtx_3dlut_config_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_3dlut_config_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_pixtx_matrix_config_t MatrixConfig {
+  public ctl_pixtx_matrix_config_t? MatrixConfig {
     set {
       IGCLPINVOKE.ctl_pixtx_config_t_MatrixConfig_set(swigCPtr, ctl_pixtx_matrix_config_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_pixtx_config_t_MatrixConfig_get(swigCPtr);
-      ctl_pixtx_matrix_config_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_matrix_config_t(cPtr, false);
+      ctl_pixtx_matrix_config_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_matrix_config_t(cPtr, false);
       return ret;
     } 
   }

@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_adapter_bdf_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_adapter_bdf_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -56,6 +61,8 @@ public class ctl_adapter_bdf_t : global::System.IDisposable {
       }
     }
   }
+
+#nullable enable
 
   public byte bus {
     set {

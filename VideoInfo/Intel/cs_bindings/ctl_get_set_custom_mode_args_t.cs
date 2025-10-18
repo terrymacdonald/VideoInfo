@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_get_set_custom_mode_args_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_get_set_custom_mode_args_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_get_set_custom_mode_args_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_get_set_custom_mode_args_t_Size_set(swigCPtr, value);
@@ -97,13 +104,13 @@ public class ctl_get_set_custom_mode_args_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_custom_src_mode_t pCustomSrcModeList {
+  public ctl_custom_src_mode_t? pCustomSrcModeList {
     set {
       IGCLPINVOKE.ctl_get_set_custom_mode_args_t_pCustomSrcModeList_set(swigCPtr, ctl_custom_src_mode_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_get_set_custom_mode_args_t_pCustomSrcModeList_get(swigCPtr);
-      ctl_custom_src_mode_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_custom_src_mode_t(cPtr, false);
+      ctl_custom_src_mode_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_custom_src_mode_t(cPtr, false);
       return ret;
     } 
   }

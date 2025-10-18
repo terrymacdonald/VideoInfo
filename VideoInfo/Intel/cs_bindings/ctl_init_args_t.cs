@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_init_args_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_init_args_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -56,6 +61,8 @@ public class ctl_init_args_t : global::System.IDisposable {
       }
     }
   }
+
+#nullable enable
 
   public uint Size {
     set {
@@ -107,13 +114,13 @@ public class ctl_init_args_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_application_id_t ApplicationUID {
+  public ctl_application_id_t? ApplicationUID {
     set {
       IGCLPINVOKE.ctl_init_args_t_ApplicationUID_set(swigCPtr, ctl_application_id_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_init_args_t_ApplicationUID_get(swigCPtr);
-      ctl_application_id_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_application_id_t(cPtr, false);
+      ctl_application_id_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_application_id_t(cPtr, false);
       return ret;
     } 
   }

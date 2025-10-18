@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_mux_properties_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_mux_properties_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_mux_properties_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_mux_properties_t_Size_set(swigCPtr, value);
@@ -97,13 +104,13 @@ public class ctl_mux_properties_t : global::System.IDisposable {
     } 
   }
 
-  public SWIGTYPE_p_p__ctl_display_output_handle_t phDisplayOutputs {
+  public SWIGTYPE_p_p__ctl_display_output_handle_t? phDisplayOutputs {
     set {
       IGCLPINVOKE.ctl_mux_properties_t_phDisplayOutputs_set(swigCPtr, SWIGTYPE_p_p__ctl_display_output_handle_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_mux_properties_t_phDisplayOutputs_get(swigCPtr);
-      SWIGTYPE_p_p__ctl_display_output_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_display_output_handle_t(cPtr, false);
+      SWIGTYPE_p_p__ctl_display_output_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_display_output_handle_t(cPtr, false);
       return ret;
     } 
   }

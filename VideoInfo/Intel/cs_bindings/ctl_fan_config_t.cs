@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_fan_config_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_fan_config_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_fan_config_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_fan_config_t_Size_set(swigCPtr, value);
@@ -87,24 +94,24 @@ public class ctl_fan_config_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_fan_speed_t speedFixed {
+  public ctl_fan_speed_t? speedFixed {
     set {
       IGCLPINVOKE.ctl_fan_config_t_speedFixed_set(swigCPtr, ctl_fan_speed_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_fan_config_t_speedFixed_get(swigCPtr);
-      ctl_fan_speed_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_fan_speed_t(cPtr, false);
+      ctl_fan_speed_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_fan_speed_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_fan_speed_table_t speedTable {
+  public ctl_fan_speed_table_t? speedTable {
     set {
       IGCLPINVOKE.ctl_fan_config_t_speedTable_set(swigCPtr, ctl_fan_speed_table_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_fan_config_t_speedTable_get(swigCPtr);
-      ctl_fan_speed_table_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_fan_speed_table_t(cPtr, false);
+      ctl_fan_speed_table_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_fan_speed_table_t(cPtr, false);
       return ret;
     } 
   }

@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_video_processing_standard_color_correction_info_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_video_processing_standard_color_correction_info_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_video_processing_standard_color_correction_info_t : global::Sys
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_Size_set(swigCPtr, value);
@@ -87,46 +94,46 @@ public class ctl_video_processing_standard_color_correction_info_t : global::Sys
     } 
   }
 
-  public ctl_property_info_float_t brightness {
+  public ctl_property_info_float_t? brightness {
     set {
       IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_brightness_set(swigCPtr, ctl_property_info_float_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_brightness_get(swigCPtr);
-      ctl_property_info_float_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
+      ctl_property_info_float_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_float_t contrast {
+  public ctl_property_info_float_t? contrast {
     set {
       IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_contrast_set(swigCPtr, ctl_property_info_float_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_contrast_get(swigCPtr);
-      ctl_property_info_float_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
+      ctl_property_info_float_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_float_t hue {
+  public ctl_property_info_float_t? hue {
     set {
       IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_hue_set(swigCPtr, ctl_property_info_float_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_hue_get(swigCPtr);
-      ctl_property_info_float_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
+      ctl_property_info_float_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_float_t saturation {
+  public ctl_property_info_float_t? saturation {
     set {
       IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_saturation_set(swigCPtr, ctl_property_info_float_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_video_processing_standard_color_correction_info_t_saturation_get(swigCPtr);
-      ctl_property_info_float_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
+      ctl_property_info_float_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
       return ret;
     } 
   }

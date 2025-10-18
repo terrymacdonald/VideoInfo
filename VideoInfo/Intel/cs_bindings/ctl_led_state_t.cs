@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_led_state_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_led_state_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_led_state_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_led_state_t_Size_set(swigCPtr, value);
@@ -97,13 +104,13 @@ public class ctl_led_state_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_led_color_t color {
+  public ctl_led_color_t? color {
     set {
       IGCLPINVOKE.ctl_led_state_t_color_set(swigCPtr, ctl_led_color_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_led_state_t_color_get(swigCPtr);
-      ctl_led_color_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_led_color_t(cPtr, false);
+      ctl_led_color_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_led_color_t(cPtr, false);
       return ret;
     } 
   }

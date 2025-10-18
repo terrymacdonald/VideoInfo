@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_oc_properties_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_oc_properties_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_oc_properties_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_Size_set(swigCPtr, value);
@@ -87,101 +94,101 @@ public class ctl_oc_properties_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_oc_control_info_t gpuFrequencyOffset {
+  public ctl_oc_control_info_t? gpuFrequencyOffset {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_gpuFrequencyOffset_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_gpuFrequencyOffset_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_control_info_t gpuVoltageOffset {
+  public ctl_oc_control_info_t? gpuVoltageOffset {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_gpuVoltageOffset_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_gpuVoltageOffset_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_control_info_t vramFrequencyOffset {
+  public ctl_oc_control_info_t? vramFrequencyOffset {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_vramFrequencyOffset_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_vramFrequencyOffset_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_control_info_t vramVoltageOffset {
+  public ctl_oc_control_info_t? vramVoltageOffset {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_vramVoltageOffset_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_vramVoltageOffset_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_control_info_t powerLimit {
+  public ctl_oc_control_info_t? powerLimit {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_powerLimit_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_powerLimit_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_control_info_t temperatureLimit {
+  public ctl_oc_control_info_t? temperatureLimit {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_temperatureLimit_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_temperatureLimit_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_control_info_t vramMemSpeedLimit {
+  public ctl_oc_control_info_t? vramMemSpeedLimit {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_vramMemSpeedLimit_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_vramMemSpeedLimit_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_control_info_t gpuVFCurveVoltageLimit {
+  public ctl_oc_control_info_t? gpuVFCurveVoltageLimit {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_gpuVFCurveVoltageLimit_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_gpuVFCurveVoltageLimit_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_control_info_t gpuVFCurveFrequencyLimit {
+  public ctl_oc_control_info_t? gpuVFCurveFrequencyLimit {
     set {
       IGCLPINVOKE.ctl_oc_properties_t_gpuVFCurveFrequencyLimit_set(swigCPtr, ctl_oc_control_info_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_oc_properties_t_gpuVFCurveFrequencyLimit_get(swigCPtr);
-      ctl_oc_control_info_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
+      ctl_oc_control_info_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_control_info_t(cPtr, false);
       return ret;
     } 
   }

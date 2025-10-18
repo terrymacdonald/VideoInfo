@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_psu_info_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_psu_info_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_psu_info_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public bool bSupported {
     set {
       IGCLPINVOKE.ctl_psu_info_t_bSupported_set(swigCPtr, value);
@@ -77,24 +84,24 @@ public class ctl_psu_info_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_oc_telemetry_item_t energyCounter {
+  public ctl_oc_telemetry_item_t? energyCounter {
     set {
       IGCLPINVOKE.ctl_psu_info_t_energyCounter_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_psu_info_t_energyCounter_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_oc_telemetry_item_t voltage {
+  public ctl_oc_telemetry_item_t? voltage {
     set {
       IGCLPINVOKE.ctl_psu_info_t_voltage_set(swigCPtr, ctl_oc_telemetry_item_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_psu_info_t_voltage_get(swigCPtr);
-      ctl_oc_telemetry_item_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
+      ctl_oc_telemetry_item_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_oc_telemetry_item_t(cPtr, false);
       return ret;
     } 
   }

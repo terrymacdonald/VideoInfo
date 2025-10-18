@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_pixtx_pipe_get_config_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_pixtx_pipe_get_config_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_pixtx_pipe_get_config_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_pixtx_pipe_get_config_t_Size_set(swigCPtr, value);
@@ -87,24 +94,24 @@ public class ctl_pixtx_pipe_get_config_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_pixtx_pixel_format_t InputPixelFormat {
+  public ctl_pixtx_pixel_format_t? InputPixelFormat {
     set {
       IGCLPINVOKE.ctl_pixtx_pipe_get_config_t_InputPixelFormat_set(swigCPtr, ctl_pixtx_pixel_format_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_pixtx_pipe_get_config_t_InputPixelFormat_get(swigCPtr);
-      ctl_pixtx_pixel_format_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_pixel_format_t(cPtr, false);
+      ctl_pixtx_pixel_format_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_pixel_format_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_pixtx_pixel_format_t OutputPixelFormat {
+  public ctl_pixtx_pixel_format_t? OutputPixelFormat {
     set {
       IGCLPINVOKE.ctl_pixtx_pipe_get_config_t_OutputPixelFormat_set(swigCPtr, ctl_pixtx_pixel_format_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_pixtx_pipe_get_config_t_OutputPixelFormat_get(swigCPtr);
-      ctl_pixtx_pixel_format_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_pixel_format_t(cPtr, false);
+      ctl_pixtx_pixel_format_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_pixel_format_t(cPtr, false);
       return ret;
     } 
   }
@@ -119,13 +126,13 @@ public class ctl_pixtx_pipe_get_config_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_pixtx_block_config_t pBlockConfigs {
+  public ctl_pixtx_block_config_t? pBlockConfigs {
     set {
       IGCLPINVOKE.ctl_pixtx_pipe_get_config_t_pBlockConfigs_set(swigCPtr, ctl_pixtx_block_config_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_pixtx_pipe_get_config_t_pBlockConfigs_get(swigCPtr);
-      ctl_pixtx_block_config_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_block_config_t(cPtr, false);
+      ctl_pixtx_block_config_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_pixtx_block_config_t(cPtr, false);
       return ret;
     } 
   }

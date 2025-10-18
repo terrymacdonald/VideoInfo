@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_property_info_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_property_info_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,57 +62,59 @@ public class ctl_property_info_t : global::System.IDisposable {
     }
   }
 
-  public ctl_property_info_boolean_t BoolType {
+#nullable enable
+
+  public ctl_property_info_boolean_t? BoolType {
     set {
       IGCLPINVOKE.ctl_property_info_t_BoolType_set(swigCPtr, ctl_property_info_boolean_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_property_info_t_BoolType_get(swigCPtr);
-      ctl_property_info_boolean_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_boolean_t(cPtr, false);
+      ctl_property_info_boolean_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_boolean_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_float_t FloatType {
+  public ctl_property_info_float_t? FloatType {
     set {
       IGCLPINVOKE.ctl_property_info_t_FloatType_set(swigCPtr, ctl_property_info_float_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_property_info_t_FloatType_get(swigCPtr);
-      ctl_property_info_float_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
+      ctl_property_info_float_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_float_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_int_t IntType {
+  public ctl_property_info_int_t? IntType {
     set {
       IGCLPINVOKE.ctl_property_info_t_IntType_set(swigCPtr, ctl_property_info_int_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_property_info_t_IntType_get(swigCPtr);
-      ctl_property_info_int_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_int_t(cPtr, false);
+      ctl_property_info_int_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_int_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_enum_t EnumType {
+  public ctl_property_info_enum_t? EnumType {
     set {
       IGCLPINVOKE.ctl_property_info_t_EnumType_set(swigCPtr, ctl_property_info_enum_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_property_info_t_EnumType_get(swigCPtr);
-      ctl_property_info_enum_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_enum_t(cPtr, false);
+      ctl_property_info_enum_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_enum_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_uint_t UIntType {
+  public ctl_property_info_uint_t? UIntType {
     set {
       IGCLPINVOKE.ctl_property_info_t_UIntType_set(swigCPtr, ctl_property_info_uint_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_property_info_t_UIntType_get(swigCPtr);
-      ctl_property_info_uint_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_uint_t(cPtr, false);
+      ctl_property_info_uint_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_uint_t(cPtr, false);
       return ret;
     } 
   }

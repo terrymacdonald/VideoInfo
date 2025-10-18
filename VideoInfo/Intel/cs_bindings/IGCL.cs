@@ -11,616 +11,645 @@
 namespace IGCLWrapper {
 
 public partial class IGCL {
-  public static SWIGTYPE_p_unsigned_int new_igcl_uint32P() {
+
+#nullable enable
+
+  public static SWIGTYPE_p_unsigned_int? new_igcl_uint32P() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_igcl_uint32P();
-    SWIGTYPE_p_unsigned_int ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);
+    SWIGTYPE_p_unsigned_int? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_unsigned_int copy_igcl_uint32P(uint value) {
+  public static SWIGTYPE_p_unsigned_int? copy_igcl_uint32P(uint value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_igcl_uint32P(value);
-    SWIGTYPE_p_unsigned_int ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);
+    SWIGTYPE_p_unsigned_int? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);
     return ret;
   }
 
-  public static void delete_igcl_uint32P(SWIGTYPE_p_unsigned_int obj) {
+  public static void delete_igcl_uint32P(SWIGTYPE_p_unsigned_int? obj) {
     IGCLPINVOKE.delete_igcl_uint32P(SWIGTYPE_p_unsigned_int.getCPtr(obj));
   }
 
-  public static void igcl_uint32P_assign(SWIGTYPE_p_unsigned_int obj, uint value) {
+  public static void igcl_uint32P_assign(SWIGTYPE_p_unsigned_int? obj, uint value) {
     IGCLPINVOKE.igcl_uint32P_assign(SWIGTYPE_p_unsigned_int.getCPtr(obj), value);
   }
 
-  public static uint igcl_uint32P_value(SWIGTYPE_p_unsigned_int obj) {
+  public static uint igcl_uint32P_value(SWIGTYPE_p_unsigned_int? obj) {
     uint ret = IGCLPINVOKE.igcl_uint32P_value(SWIGTYPE_p_unsigned_int.getCPtr(obj));
     return ret;
   }
 
-  public static SWIGTYPE_p_unsigned_long_long new_igcl_uint64P() {
+  public static SWIGTYPE_p_unsigned_long_long? new_igcl_uint64P() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_igcl_uint64P();
-    SWIGTYPE_p_unsigned_long_long ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_long_long(cPtr, false);
+    SWIGTYPE_p_unsigned_long_long? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_long_long(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_unsigned_long_long copy_igcl_uint64P(ulong value) {
+  public static SWIGTYPE_p_unsigned_long_long? copy_igcl_uint64P(ulong value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_igcl_uint64P(value);
-    SWIGTYPE_p_unsigned_long_long ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_long_long(cPtr, false);
+    SWIGTYPE_p_unsigned_long_long? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_long_long(cPtr, false);
     return ret;
   }
 
-  public static void delete_igcl_uint64P(SWIGTYPE_p_unsigned_long_long obj) {
+  public static void delete_igcl_uint64P(SWIGTYPE_p_unsigned_long_long? obj) {
     IGCLPINVOKE.delete_igcl_uint64P(SWIGTYPE_p_unsigned_long_long.getCPtr(obj));
   }
 
-  public static void igcl_uint64P_assign(SWIGTYPE_p_unsigned_long_long obj, ulong value) {
+  public static void igcl_uint64P_assign(SWIGTYPE_p_unsigned_long_long? obj, ulong value) {
     IGCLPINVOKE.igcl_uint64P_assign(SWIGTYPE_p_unsigned_long_long.getCPtr(obj), value);
   }
 
-  public static ulong igcl_uint64P_value(SWIGTYPE_p_unsigned_long_long obj) {
+  public static ulong igcl_uint64P_value(SWIGTYPE_p_unsigned_long_long? obj) {
     ulong ret = IGCLPINVOKE.igcl_uint64P_value(SWIGTYPE_p_unsigned_long_long.getCPtr(obj));
     return ret;
   }
 
-  public static SWIGTYPE_p_int new_igcl_int32P() {
+  public static SWIGTYPE_p_int? new_igcl_int32P() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_igcl_int32P();
-    SWIGTYPE_p_int ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_int(cPtr, false);
+    SWIGTYPE_p_int? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_int(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_int copy_igcl_int32P(int value) {
+  public static SWIGTYPE_p_int? copy_igcl_int32P(int value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_igcl_int32P(value);
-    SWIGTYPE_p_int ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_int(cPtr, false);
+    SWIGTYPE_p_int? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_int(cPtr, false);
     return ret;
   }
 
-  public static void delete_igcl_int32P(SWIGTYPE_p_int obj) {
+  public static void delete_igcl_int32P(SWIGTYPE_p_int? obj) {
     IGCLPINVOKE.delete_igcl_int32P(SWIGTYPE_p_int.getCPtr(obj));
   }
 
-  public static void igcl_int32P_assign(SWIGTYPE_p_int obj, int value) {
+  public static void igcl_int32P_assign(SWIGTYPE_p_int? obj, int value) {
     IGCLPINVOKE.igcl_int32P_assign(SWIGTYPE_p_int.getCPtr(obj), value);
   }
 
-  public static int igcl_int32P_value(SWIGTYPE_p_int obj) {
+  public static int igcl_int32P_value(SWIGTYPE_p_int? obj) {
     int ret = IGCLPINVOKE.igcl_int32P_value(SWIGTYPE_p_int.getCPtr(obj));
     return ret;
   }
 
-  public static SWIGTYPE_p_long_long new_igcl_int64P() {
+  public static SWIGTYPE_p_long_long? new_igcl_int64P() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_igcl_int64P();
-    SWIGTYPE_p_long_long ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_long_long(cPtr, false);
+    SWIGTYPE_p_long_long? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_long_long(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_long_long copy_igcl_int64P(long value) {
+  public static SWIGTYPE_p_long_long? copy_igcl_int64P(long value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_igcl_int64P(value);
-    SWIGTYPE_p_long_long ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_long_long(cPtr, false);
+    SWIGTYPE_p_long_long? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_long_long(cPtr, false);
     return ret;
   }
 
-  public static void delete_igcl_int64P(SWIGTYPE_p_long_long obj) {
+  public static void delete_igcl_int64P(SWIGTYPE_p_long_long? obj) {
     IGCLPINVOKE.delete_igcl_int64P(SWIGTYPE_p_long_long.getCPtr(obj));
   }
 
-  public static void igcl_int64P_assign(SWIGTYPE_p_long_long obj, long value) {
+  public static void igcl_int64P_assign(SWIGTYPE_p_long_long? obj, long value) {
     IGCLPINVOKE.igcl_int64P_assign(SWIGTYPE_p_long_long.getCPtr(obj), value);
   }
 
-  public static long igcl_int64P_value(SWIGTYPE_p_long_long obj) {
+  public static long igcl_int64P_value(SWIGTYPE_p_long_long? obj) {
     long ret = IGCLPINVOKE.igcl_int64P_value(SWIGTYPE_p_long_long.getCPtr(obj));
     return ret;
   }
 
-  public static SWIGTYPE_p_WCHAR new_wcharP() {
+  public static SWIGTYPE_p_WCHAR? new_wcharP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_wcharP();
-    SWIGTYPE_p_WCHAR ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_WCHAR(cPtr, false);
+    SWIGTYPE_p_WCHAR? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_WCHAR(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_WCHAR copy_wcharP(SWIGTYPE_p_WCHAR value) {
+  public static SWIGTYPE_p_WCHAR? copy_wcharP(SWIGTYPE_p_WCHAR value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_wcharP(SWIGTYPE_p_WCHAR.getCPtr(value));
-    SWIGTYPE_p_WCHAR ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_WCHAR(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    SWIGTYPE_p_WCHAR? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_WCHAR(cPtr, false);
     return ret;
   }
 
-  public static void delete_wcharP(SWIGTYPE_p_WCHAR obj) {
+  public static void delete_wcharP(SWIGTYPE_p_WCHAR? obj) {
     IGCLPINVOKE.delete_wcharP(SWIGTYPE_p_WCHAR.getCPtr(obj));
   }
 
-  public static void wcharP_assign(SWIGTYPE_p_WCHAR obj, SWIGTYPE_p_WCHAR value) {
+  public static void wcharP_assign(SWIGTYPE_p_WCHAR? obj, SWIGTYPE_p_WCHAR value) {
     IGCLPINVOKE.wcharP_assign(SWIGTYPE_p_WCHAR.getCPtr(obj), SWIGTYPE_p_WCHAR.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static SWIGTYPE_p_WCHAR wcharP_value(SWIGTYPE_p_WCHAR obj) {
+  public static SWIGTYPE_p_WCHAR wcharP_value(SWIGTYPE_p_WCHAR? obj) {
     SWIGTYPE_p_WCHAR ret = new SWIGTYPE_p_WCHAR(IGCLPINVOKE.wcharP_value(SWIGTYPE_p_WCHAR.getCPtr(obj)), true);
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_device_adapter_handle_t new_deviceAdapterHandleP() {
+  public static SWIGTYPE_p_p__ctl_api_handle_t? new_apiHandleP() {
+    global::System.IntPtr cPtr = IGCLPINVOKE.new_apiHandleP();
+    SWIGTYPE_p_p__ctl_api_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_api_handle_t(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p__ctl_api_handle_t? copy_apiHandleP(SWIGTYPE_p__ctl_api_handle_t? value) {
+    global::System.IntPtr cPtr = IGCLPINVOKE.copy_apiHandleP(SWIGTYPE_p__ctl_api_handle_t.getCPtr(value));
+    SWIGTYPE_p_p__ctl_api_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_api_handle_t(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_apiHandleP(SWIGTYPE_p_p__ctl_api_handle_t? obj) {
+    IGCLPINVOKE.delete_apiHandleP(SWIGTYPE_p_p__ctl_api_handle_t.getCPtr(obj));
+  }
+
+  public static void apiHandleP_assign(SWIGTYPE_p_p__ctl_api_handle_t? obj, SWIGTYPE_p__ctl_api_handle_t? value) {
+    IGCLPINVOKE.apiHandleP_assign(SWIGTYPE_p_p__ctl_api_handle_t.getCPtr(obj), SWIGTYPE_p__ctl_api_handle_t.getCPtr(value));
+  }
+
+  public static SWIGTYPE_p__ctl_api_handle_t? apiHandleP_value(SWIGTYPE_p_p__ctl_api_handle_t? obj) {
+    global::System.IntPtr cPtr = IGCLPINVOKE.apiHandleP_value(SWIGTYPE_p_p__ctl_api_handle_t.getCPtr(obj));
+    SWIGTYPE_p__ctl_api_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p__ctl_api_handle_t(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p__ctl_device_adapter_handle_t? new_deviceAdapterHandleP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_deviceAdapterHandleP();
-    SWIGTYPE_p_p__ctl_device_adapter_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_device_adapter_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_device_adapter_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_device_adapter_handle_t(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_device_adapter_handle_t copy_deviceAdapterHandleP(global::System.IntPtr value) {
+  public static SWIGTYPE_p_p__ctl_device_adapter_handle_t? copy_deviceAdapterHandleP(global::System.IntPtr value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_deviceAdapterHandleP(value);
-    SWIGTYPE_p_p__ctl_device_adapter_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_device_adapter_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_device_adapter_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_device_adapter_handle_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_deviceAdapterHandleP(SWIGTYPE_p_p__ctl_device_adapter_handle_t obj) {
+  public static void delete_deviceAdapterHandleP(SWIGTYPE_p_p__ctl_device_adapter_handle_t? obj) {
     IGCLPINVOKE.delete_deviceAdapterHandleP(SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(obj));
   }
 
-  public static void deviceAdapterHandleP_assign(SWIGTYPE_p_p__ctl_device_adapter_handle_t obj, global::System.IntPtr value) {
+  public static void deviceAdapterHandleP_assign(SWIGTYPE_p_p__ctl_device_adapter_handle_t? obj, global::System.IntPtr value) {
     IGCLPINVOKE.deviceAdapterHandleP_assign(SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(obj), value);
   }
 
-  public static global::System.IntPtr deviceAdapterHandleP_value(SWIGTYPE_p_p__ctl_device_adapter_handle_t obj) {
+  public static global::System.IntPtr deviceAdapterHandleP_value(SWIGTYPE_p_p__ctl_device_adapter_handle_t? obj) {
     global::System.IntPtr ret = IGCLPINVOKE.deviceAdapterHandleP_value(SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(obj));
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_display_output_handle_t new_displayOutputHandleP() {
+  public static SWIGTYPE_p_p__ctl_display_output_handle_t? new_displayOutputHandleP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_displayOutputHandleP();
-    SWIGTYPE_p_p__ctl_display_output_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_display_output_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_display_output_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_display_output_handle_t(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_display_output_handle_t copy_displayOutputHandleP(global::System.IntPtr value) {
+  public static SWIGTYPE_p_p__ctl_display_output_handle_t? copy_displayOutputHandleP(global::System.IntPtr value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_displayOutputHandleP(value);
-    SWIGTYPE_p_p__ctl_display_output_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_display_output_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_display_output_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_display_output_handle_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_displayOutputHandleP(SWIGTYPE_p_p__ctl_display_output_handle_t obj) {
+  public static void delete_displayOutputHandleP(SWIGTYPE_p_p__ctl_display_output_handle_t? obj) {
     IGCLPINVOKE.delete_displayOutputHandleP(SWIGTYPE_p_p__ctl_display_output_handle_t.getCPtr(obj));
   }
 
-  public static void displayOutputHandleP_assign(SWIGTYPE_p_p__ctl_display_output_handle_t obj, global::System.IntPtr value) {
+  public static void displayOutputHandleP_assign(SWIGTYPE_p_p__ctl_display_output_handle_t? obj, global::System.IntPtr value) {
     IGCLPINVOKE.displayOutputHandleP_assign(SWIGTYPE_p_p__ctl_display_output_handle_t.getCPtr(obj), value);
   }
 
-  public static global::System.IntPtr displayOutputHandleP_value(SWIGTYPE_p_p__ctl_display_output_handle_t obj) {
+  public static global::System.IntPtr displayOutputHandleP_value(SWIGTYPE_p_p__ctl_display_output_handle_t? obj) {
     global::System.IntPtr ret = IGCLPINVOKE.displayOutputHandleP_value(SWIGTYPE_p_p__ctl_display_output_handle_t.getCPtr(obj));
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t new_i2cPinPairHandleP() {
+  public static SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t? new_i2cPinPairHandleP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_i2cPinPairHandleP();
-    SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t copy_i2cPinPairHandleP(SWIGTYPE_p__ctl_i2c_pin_pair_handle_t value) {
+  public static SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t? copy_i2cPinPairHandleP(SWIGTYPE_p__ctl_i2c_pin_pair_handle_t? value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_i2cPinPairHandleP(SWIGTYPE_p__ctl_i2c_pin_pair_handle_t.getCPtr(value));
-    SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_i2cPinPairHandleP(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t obj) {
+  public static void delete_i2cPinPairHandleP(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t? obj) {
     IGCLPINVOKE.delete_i2cPinPairHandleP(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t.getCPtr(obj));
   }
 
-  public static void i2cPinPairHandleP_assign(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t obj, SWIGTYPE_p__ctl_i2c_pin_pair_handle_t value) {
+  public static void i2cPinPairHandleP_assign(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t? obj, SWIGTYPE_p__ctl_i2c_pin_pair_handle_t? value) {
     IGCLPINVOKE.i2cPinPairHandleP_assign(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t.getCPtr(obj), SWIGTYPE_p__ctl_i2c_pin_pair_handle_t.getCPtr(value));
   }
 
-  public static SWIGTYPE_p__ctl_i2c_pin_pair_handle_t i2cPinPairHandleP_value(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t obj) {
+  public static SWIGTYPE_p__ctl_i2c_pin_pair_handle_t? i2cPinPairHandleP_value(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t? obj) {
     global::System.IntPtr cPtr = IGCLPINVOKE.i2cPinPairHandleP_value(SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t.getCPtr(obj));
-    SWIGTYPE_p__ctl_i2c_pin_pair_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p__ctl_i2c_pin_pair_handle_t(cPtr, false);
+    SWIGTYPE_p__ctl_i2c_pin_pair_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p__ctl_i2c_pin_pair_handle_t(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_engine_handle_t new_engineHandleP() {
+  public static SWIGTYPE_p_p__ctl_engine_handle_t? new_engineHandleP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_engineHandleP();
-    SWIGTYPE_p_p__ctl_engine_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_engine_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_engine_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_engine_handle_t(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_engine_handle_t copy_engineHandleP(SWIGTYPE_p__ctl_engine_handle_t value) {
+  public static SWIGTYPE_p_p__ctl_engine_handle_t? copy_engineHandleP(SWIGTYPE_p__ctl_engine_handle_t? value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_engineHandleP(SWIGTYPE_p__ctl_engine_handle_t.getCPtr(value));
-    SWIGTYPE_p_p__ctl_engine_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_engine_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_engine_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_engine_handle_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_engineHandleP(SWIGTYPE_p_p__ctl_engine_handle_t obj) {
+  public static void delete_engineHandleP(SWIGTYPE_p_p__ctl_engine_handle_t? obj) {
     IGCLPINVOKE.delete_engineHandleP(SWIGTYPE_p_p__ctl_engine_handle_t.getCPtr(obj));
   }
 
-  public static void engineHandleP_assign(SWIGTYPE_p_p__ctl_engine_handle_t obj, SWIGTYPE_p__ctl_engine_handle_t value) {
+  public static void engineHandleP_assign(SWIGTYPE_p_p__ctl_engine_handle_t? obj, SWIGTYPE_p__ctl_engine_handle_t? value) {
     IGCLPINVOKE.engineHandleP_assign(SWIGTYPE_p_p__ctl_engine_handle_t.getCPtr(obj), SWIGTYPE_p__ctl_engine_handle_t.getCPtr(value));
   }
 
-  public static SWIGTYPE_p__ctl_engine_handle_t engineHandleP_value(SWIGTYPE_p_p__ctl_engine_handle_t obj) {
+  public static SWIGTYPE_p__ctl_engine_handle_t? engineHandleP_value(SWIGTYPE_p_p__ctl_engine_handle_t? obj) {
     global::System.IntPtr cPtr = IGCLPINVOKE.engineHandleP_value(SWIGTYPE_p_p__ctl_engine_handle_t.getCPtr(obj));
-    SWIGTYPE_p__ctl_engine_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p__ctl_engine_handle_t(cPtr, false);
+    SWIGTYPE_p__ctl_engine_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p__ctl_engine_handle_t(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_mem_handle_t new_memHandleP() {
+  public static SWIGTYPE_p_p__ctl_mem_handle_t? new_memHandleP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_memHandleP();
-    SWIGTYPE_p_p__ctl_mem_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_mem_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_mem_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_mem_handle_t(cPtr, false);
     return ret;
   }
 
-  public static SWIGTYPE_p_p__ctl_mem_handle_t copy_memHandleP(SWIGTYPE_p__ctl_mem_handle_t value) {
+  public static SWIGTYPE_p_p__ctl_mem_handle_t? copy_memHandleP(SWIGTYPE_p__ctl_mem_handle_t? value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_memHandleP(SWIGTYPE_p__ctl_mem_handle_t.getCPtr(value));
-    SWIGTYPE_p_p__ctl_mem_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_mem_handle_t(cPtr, false);
+    SWIGTYPE_p_p__ctl_mem_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_mem_handle_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_memHandleP(SWIGTYPE_p_p__ctl_mem_handle_t obj) {
+  public static void delete_memHandleP(SWIGTYPE_p_p__ctl_mem_handle_t? obj) {
     IGCLPINVOKE.delete_memHandleP(SWIGTYPE_p_p__ctl_mem_handle_t.getCPtr(obj));
   }
 
-  public static void memHandleP_assign(SWIGTYPE_p_p__ctl_mem_handle_t obj, SWIGTYPE_p__ctl_mem_handle_t value) {
+  public static void memHandleP_assign(SWIGTYPE_p_p__ctl_mem_handle_t? obj, SWIGTYPE_p__ctl_mem_handle_t? value) {
     IGCLPINVOKE.memHandleP_assign(SWIGTYPE_p_p__ctl_mem_handle_t.getCPtr(obj), SWIGTYPE_p__ctl_mem_handle_t.getCPtr(value));
   }
 
-  public static SWIGTYPE_p__ctl_mem_handle_t memHandleP_value(SWIGTYPE_p_p__ctl_mem_handle_t obj) {
+  public static SWIGTYPE_p__ctl_mem_handle_t? memHandleP_value(SWIGTYPE_p_p__ctl_mem_handle_t? obj) {
     global::System.IntPtr cPtr = IGCLPINVOKE.memHandleP_value(SWIGTYPE_p_p__ctl_mem_handle_t.getCPtr(obj));
-    SWIGTYPE_p__ctl_mem_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p__ctl_mem_handle_t(cPtr, false);
+    SWIGTYPE_p__ctl_mem_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p__ctl_mem_handle_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_property_t new_propertyP() {
+  public static ctl_property_t? new_propertyP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_propertyP();
-    ctl_property_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_t(cPtr, false);
+    ctl_property_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_property_t copy_propertyP(ctl_property_t value) {
+  public static ctl_property_t? copy_propertyP(ctl_property_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_propertyP(ctl_property_t.getCPtr(value));
-    ctl_property_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_property_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_propertyP(ctl_property_t obj) {
+  public static void delete_propertyP(ctl_property_t? obj) {
     IGCLPINVOKE.delete_propertyP(ctl_property_t.getCPtr(obj));
   }
 
-  public static void propertyP_assign(ctl_property_t obj, ctl_property_t value) {
+  public static void propertyP_assign(ctl_property_t? obj, ctl_property_t value) {
     IGCLPINVOKE.propertyP_assign(ctl_property_t.getCPtr(obj), ctl_property_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_property_t propertyP_value(ctl_property_t obj) {
+  public static ctl_property_t propertyP_value(ctl_property_t? obj) {
     ctl_property_t ret = new ctl_property_t(IGCLPINVOKE.propertyP_value(ctl_property_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_display_properties_t new_displayPropertiesP() {
+  public static ctl_display_properties_t? new_displayPropertiesP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_displayPropertiesP();
-    ctl_display_properties_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_display_properties_t(cPtr, false);
+    ctl_display_properties_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_display_properties_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_display_properties_t copy_displayPropertiesP(ctl_display_properties_t value) {
+  public static ctl_display_properties_t? copy_displayPropertiesP(ctl_display_properties_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_displayPropertiesP(ctl_display_properties_t.getCPtr(value));
-    ctl_display_properties_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_display_properties_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_display_properties_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_display_properties_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_displayPropertiesP(ctl_display_properties_t obj) {
+  public static void delete_displayPropertiesP(ctl_display_properties_t? obj) {
     IGCLPINVOKE.delete_displayPropertiesP(ctl_display_properties_t.getCPtr(obj));
   }
 
-  public static void displayPropertiesP_assign(ctl_display_properties_t obj, ctl_display_properties_t value) {
+  public static void displayPropertiesP_assign(ctl_display_properties_t? obj, ctl_display_properties_t value) {
     IGCLPINVOKE.displayPropertiesP_assign(ctl_display_properties_t.getCPtr(obj), ctl_display_properties_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_display_properties_t displayPropertiesP_value(ctl_display_properties_t obj) {
+  public static ctl_display_properties_t displayPropertiesP_value(ctl_display_properties_t? obj) {
     ctl_display_properties_t ret = new ctl_display_properties_t(IGCLPINVOKE.displayPropertiesP_value(ctl_display_properties_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_device_adapter_properties_t new_adapterPropertiesP() {
+  public static ctl_device_adapter_properties_t? new_adapterPropertiesP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_adapterPropertiesP();
-    ctl_device_adapter_properties_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_device_adapter_properties_t(cPtr, false);
+    ctl_device_adapter_properties_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_device_adapter_properties_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_device_adapter_properties_t copy_adapterPropertiesP(ctl_device_adapter_properties_t value) {
+  public static ctl_device_adapter_properties_t? copy_adapterPropertiesP(ctl_device_adapter_properties_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_adapterPropertiesP(ctl_device_adapter_properties_t.getCPtr(value));
-    ctl_device_adapter_properties_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_device_adapter_properties_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_device_adapter_properties_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_device_adapter_properties_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_adapterPropertiesP(ctl_device_adapter_properties_t obj) {
+  public static void delete_adapterPropertiesP(ctl_device_adapter_properties_t? obj) {
     IGCLPINVOKE.delete_adapterPropertiesP(ctl_device_adapter_properties_t.getCPtr(obj));
   }
 
-  public static void adapterPropertiesP_assign(ctl_device_adapter_properties_t obj, ctl_device_adapter_properties_t value) {
+  public static void adapterPropertiesP_assign(ctl_device_adapter_properties_t? obj, ctl_device_adapter_properties_t value) {
     IGCLPINVOKE.adapterPropertiesP_assign(ctl_device_adapter_properties_t.getCPtr(obj), ctl_device_adapter_properties_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_device_adapter_properties_t adapterPropertiesP_value(ctl_device_adapter_properties_t obj) {
+  public static ctl_device_adapter_properties_t adapterPropertiesP_value(ctl_device_adapter_properties_t? obj) {
     ctl_device_adapter_properties_t ret = new ctl_device_adapter_properties_t(IGCLPINVOKE.adapterPropertiesP_value(ctl_device_adapter_properties_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_3d_feature_caps_t new_featureCapsP() {
+  public static ctl_3d_feature_caps_t? new_featureCapsP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_featureCapsP();
-    ctl_3d_feature_caps_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_3d_feature_caps_t(cPtr, false);
+    ctl_3d_feature_caps_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_3d_feature_caps_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_3d_feature_caps_t copy_featureCapsP(ctl_3d_feature_caps_t value) {
+  public static ctl_3d_feature_caps_t? copy_featureCapsP(ctl_3d_feature_caps_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_featureCapsP(ctl_3d_feature_caps_t.getCPtr(value));
-    ctl_3d_feature_caps_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_3d_feature_caps_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_3d_feature_caps_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_3d_feature_caps_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_featureCapsP(ctl_3d_feature_caps_t obj) {
+  public static void delete_featureCapsP(ctl_3d_feature_caps_t? obj) {
     IGCLPINVOKE.delete_featureCapsP(ctl_3d_feature_caps_t.getCPtr(obj));
   }
 
-  public static void featureCapsP_assign(ctl_3d_feature_caps_t obj, ctl_3d_feature_caps_t value) {
+  public static void featureCapsP_assign(ctl_3d_feature_caps_t? obj, ctl_3d_feature_caps_t value) {
     IGCLPINVOKE.featureCapsP_assign(ctl_3d_feature_caps_t.getCPtr(obj), ctl_3d_feature_caps_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_3d_feature_caps_t featureCapsP_value(ctl_3d_feature_caps_t obj) {
+  public static ctl_3d_feature_caps_t featureCapsP_value(ctl_3d_feature_caps_t? obj) {
     ctl_3d_feature_caps_t ret = new ctl_3d_feature_caps_t(IGCLPINVOKE.featureCapsP_value(ctl_3d_feature_caps_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_engine_stats_t new_engineStatsP() {
+  public static ctl_engine_stats_t? new_engineStatsP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_engineStatsP();
-    ctl_engine_stats_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_engine_stats_t(cPtr, false);
+    ctl_engine_stats_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_engine_stats_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_engine_stats_t copy_engineStatsP(ctl_engine_stats_t value) {
+  public static ctl_engine_stats_t? copy_engineStatsP(ctl_engine_stats_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_engineStatsP(ctl_engine_stats_t.getCPtr(value));
-    ctl_engine_stats_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_engine_stats_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_engine_stats_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_engine_stats_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_engineStatsP(ctl_engine_stats_t obj) {
+  public static void delete_engineStatsP(ctl_engine_stats_t? obj) {
     IGCLPINVOKE.delete_engineStatsP(ctl_engine_stats_t.getCPtr(obj));
   }
 
-  public static void engineStatsP_assign(ctl_engine_stats_t obj, ctl_engine_stats_t value) {
+  public static void engineStatsP_assign(ctl_engine_stats_t? obj, ctl_engine_stats_t value) {
     IGCLPINVOKE.engineStatsP_assign(ctl_engine_stats_t.getCPtr(obj), ctl_engine_stats_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_engine_stats_t engineStatsP_value(ctl_engine_stats_t obj) {
+  public static ctl_engine_stats_t engineStatsP_value(ctl_engine_stats_t? obj) {
     ctl_engine_stats_t ret = new ctl_engine_stats_t(IGCLPINVOKE.engineStatsP_value(ctl_engine_stats_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_mem_state_t new_memStateP() {
+  public static ctl_mem_state_t? new_memStateP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_memStateP();
-    ctl_mem_state_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_mem_state_t(cPtr, false);
+    ctl_mem_state_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_mem_state_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_mem_state_t copy_memStateP(ctl_mem_state_t value) {
+  public static ctl_mem_state_t? copy_memStateP(ctl_mem_state_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_memStateP(ctl_mem_state_t.getCPtr(value));
-    ctl_mem_state_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_mem_state_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_mem_state_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_mem_state_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_memStateP(ctl_mem_state_t obj) {
+  public static void delete_memStateP(ctl_mem_state_t? obj) {
     IGCLPINVOKE.delete_memStateP(ctl_mem_state_t.getCPtr(obj));
   }
 
-  public static void memStateP_assign(ctl_mem_state_t obj, ctl_mem_state_t value) {
+  public static void memStateP_assign(ctl_mem_state_t? obj, ctl_mem_state_t value) {
     IGCLPINVOKE.memStateP_assign(ctl_mem_state_t.getCPtr(obj), ctl_mem_state_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_mem_state_t memStateP_value(ctl_mem_state_t obj) {
+  public static ctl_mem_state_t memStateP_value(ctl_mem_state_t? obj) {
     ctl_mem_state_t ret = new ctl_mem_state_t(IGCLPINVOKE.memStateP_value(ctl_mem_state_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_power_telemetry_t new_powerTelemetryP() {
+  public static ctl_power_telemetry_t? new_powerTelemetryP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_powerTelemetryP();
-    ctl_power_telemetry_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_telemetry_t(cPtr, false);
+    ctl_power_telemetry_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_telemetry_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_power_telemetry_t copy_powerTelemetryP(ctl_power_telemetry_t value) {
+  public static ctl_power_telemetry_t? copy_powerTelemetryP(ctl_power_telemetry_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_powerTelemetryP(ctl_power_telemetry_t.getCPtr(value));
-    ctl_power_telemetry_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_telemetry_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_power_telemetry_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_telemetry_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_powerTelemetryP(ctl_power_telemetry_t obj) {
+  public static void delete_powerTelemetryP(ctl_power_telemetry_t? obj) {
     IGCLPINVOKE.delete_powerTelemetryP(ctl_power_telemetry_t.getCPtr(obj));
   }
 
-  public static void powerTelemetryP_assign(ctl_power_telemetry_t obj, ctl_power_telemetry_t value) {
+  public static void powerTelemetryP_assign(ctl_power_telemetry_t? obj, ctl_power_telemetry_t value) {
     IGCLPINVOKE.powerTelemetryP_assign(ctl_power_telemetry_t.getCPtr(obj), ctl_power_telemetry_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_power_telemetry_t powerTelemetryP_value(ctl_power_telemetry_t obj) {
+  public static ctl_power_telemetry_t powerTelemetryP_value(ctl_power_telemetry_t? obj) {
     ctl_power_telemetry_t ret = new ctl_power_telemetry_t(IGCLPINVOKE.powerTelemetryP_value(ctl_power_telemetry_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_i2c_access_args_t new_i2cAccessArgsP() {
+  public static ctl_i2c_access_args_t? new_i2cAccessArgsP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_i2cAccessArgsP();
-    ctl_i2c_access_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_i2c_access_args_t(cPtr, false);
+    ctl_i2c_access_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_i2c_access_args_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_i2c_access_args_t copy_i2cAccessArgsP(ctl_i2c_access_args_t value) {
+  public static ctl_i2c_access_args_t? copy_i2cAccessArgsP(ctl_i2c_access_args_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_i2cAccessArgsP(ctl_i2c_access_args_t.getCPtr(value));
-    ctl_i2c_access_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_i2c_access_args_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_i2c_access_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_i2c_access_args_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_i2cAccessArgsP(ctl_i2c_access_args_t obj) {
+  public static void delete_i2cAccessArgsP(ctl_i2c_access_args_t? obj) {
     IGCLPINVOKE.delete_i2cAccessArgsP(ctl_i2c_access_args_t.getCPtr(obj));
   }
 
-  public static void i2cAccessArgsP_assign(ctl_i2c_access_args_t obj, ctl_i2c_access_args_t value) {
+  public static void i2cAccessArgsP_assign(ctl_i2c_access_args_t? obj, ctl_i2c_access_args_t value) {
     IGCLPINVOKE.i2cAccessArgsP_assign(ctl_i2c_access_args_t.getCPtr(obj), ctl_i2c_access_args_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_i2c_access_args_t i2cAccessArgsP_value(ctl_i2c_access_args_t obj) {
+  public static ctl_i2c_access_args_t i2cAccessArgsP_value(ctl_i2c_access_args_t? obj) {
     ctl_i2c_access_args_t ret = new ctl_i2c_access_args_t(IGCLPINVOKE.i2cAccessArgsP_value(ctl_i2c_access_args_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_aux_access_args_t new_auxAccessArgsP() {
+  public static ctl_aux_access_args_t? new_auxAccessArgsP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_auxAccessArgsP();
-    ctl_aux_access_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_aux_access_args_t(cPtr, false);
+    ctl_aux_access_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_aux_access_args_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_aux_access_args_t copy_auxAccessArgsP(ctl_aux_access_args_t value) {
+  public static ctl_aux_access_args_t? copy_auxAccessArgsP(ctl_aux_access_args_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_auxAccessArgsP(ctl_aux_access_args_t.getCPtr(value));
-    ctl_aux_access_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_aux_access_args_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_aux_access_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_aux_access_args_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_auxAccessArgsP(ctl_aux_access_args_t obj) {
+  public static void delete_auxAccessArgsP(ctl_aux_access_args_t? obj) {
     IGCLPINVOKE.delete_auxAccessArgsP(ctl_aux_access_args_t.getCPtr(obj));
   }
 
-  public static void auxAccessArgsP_assign(ctl_aux_access_args_t obj, ctl_aux_access_args_t value) {
+  public static void auxAccessArgsP_assign(ctl_aux_access_args_t? obj, ctl_aux_access_args_t value) {
     IGCLPINVOKE.auxAccessArgsP_assign(ctl_aux_access_args_t.getCPtr(obj), ctl_aux_access_args_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_aux_access_args_t auxAccessArgsP_value(ctl_aux_access_args_t obj) {
+  public static ctl_aux_access_args_t auxAccessArgsP_value(ctl_aux_access_args_t? obj) {
     ctl_aux_access_args_t ret = new ctl_aux_access_args_t(IGCLPINVOKE.auxAccessArgsP_value(ctl_aux_access_args_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_panel_descriptor_access_args_t new_panelDescriptorArgsP() {
+  public static ctl_panel_descriptor_access_args_t? new_panelDescriptorArgsP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_panelDescriptorArgsP();
-    ctl_panel_descriptor_access_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_panel_descriptor_access_args_t(cPtr, false);
+    ctl_panel_descriptor_access_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_panel_descriptor_access_args_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_panel_descriptor_access_args_t copy_panelDescriptorArgsP(ctl_panel_descriptor_access_args_t value) {
+  public static ctl_panel_descriptor_access_args_t? copy_panelDescriptorArgsP(ctl_panel_descriptor_access_args_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_panelDescriptorArgsP(ctl_panel_descriptor_access_args_t.getCPtr(value));
-    ctl_panel_descriptor_access_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_panel_descriptor_access_args_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_panel_descriptor_access_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_panel_descriptor_access_args_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_panelDescriptorArgsP(ctl_panel_descriptor_access_args_t obj) {
+  public static void delete_panelDescriptorArgsP(ctl_panel_descriptor_access_args_t? obj) {
     IGCLPINVOKE.delete_panelDescriptorArgsP(ctl_panel_descriptor_access_args_t.getCPtr(obj));
   }
 
-  public static void panelDescriptorArgsP_assign(ctl_panel_descriptor_access_args_t obj, ctl_panel_descriptor_access_args_t value) {
+  public static void panelDescriptorArgsP_assign(ctl_panel_descriptor_access_args_t? obj, ctl_panel_descriptor_access_args_t value) {
     IGCLPINVOKE.panelDescriptorArgsP_assign(ctl_panel_descriptor_access_args_t.getCPtr(obj), ctl_panel_descriptor_access_args_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_panel_descriptor_access_args_t panelDescriptorArgsP_value(ctl_panel_descriptor_access_args_t obj) {
+  public static ctl_panel_descriptor_access_args_t panelDescriptorArgsP_value(ctl_panel_descriptor_access_args_t? obj) {
     ctl_panel_descriptor_access_args_t ret = new ctl_panel_descriptor_access_args_t(IGCLPINVOKE.panelDescriptorArgsP_value(ctl_panel_descriptor_access_args_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_dce_args_t new_dceArgsP() {
+  public static ctl_dce_args_t? new_dceArgsP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_dceArgsP();
-    ctl_dce_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_dce_args_t(cPtr, false);
+    ctl_dce_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_dce_args_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_dce_args_t copy_dceArgsP(ctl_dce_args_t value) {
+  public static ctl_dce_args_t? copy_dceArgsP(ctl_dce_args_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_dceArgsP(ctl_dce_args_t.getCPtr(value));
-    ctl_dce_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_dce_args_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_dce_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_dce_args_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_dceArgsP(ctl_dce_args_t obj) {
+  public static void delete_dceArgsP(ctl_dce_args_t? obj) {
     IGCLPINVOKE.delete_dceArgsP(ctl_dce_args_t.getCPtr(obj));
   }
 
-  public static void dceArgsP_assign(ctl_dce_args_t obj, ctl_dce_args_t value) {
+  public static void dceArgsP_assign(ctl_dce_args_t? obj, ctl_dce_args_t value) {
     IGCLPINVOKE.dceArgsP_assign(ctl_dce_args_t.getCPtr(obj), ctl_dce_args_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_dce_args_t dceArgsP_value(ctl_dce_args_t obj) {
+  public static ctl_dce_args_t dceArgsP_value(ctl_dce_args_t? obj) {
     ctl_dce_args_t ret = new ctl_dce_args_t(IGCLPINVOKE.dceArgsP_value(ctl_dce_args_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_wait_property_change_args_t new_waitPropertyChangeArgsP() {
+  public static ctl_wait_property_change_args_t? new_waitPropertyChangeArgsP() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_waitPropertyChangeArgsP();
-    ctl_wait_property_change_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_wait_property_change_args_t(cPtr, false);
+    ctl_wait_property_change_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_wait_property_change_args_t(cPtr, false);
     return ret;
   }
 
-  public static ctl_wait_property_change_args_t copy_waitPropertyChangeArgsP(ctl_wait_property_change_args_t value) {
+  public static ctl_wait_property_change_args_t? copy_waitPropertyChangeArgsP(ctl_wait_property_change_args_t value) {
     global::System.IntPtr cPtr = IGCLPINVOKE.copy_waitPropertyChangeArgsP(ctl_wait_property_change_args_t.getCPtr(value));
-    ctl_wait_property_change_args_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_wait_property_change_args_t(cPtr, false);
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
+    ctl_wait_property_change_args_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_wait_property_change_args_t(cPtr, false);
     return ret;
   }
 
-  public static void delete_waitPropertyChangeArgsP(ctl_wait_property_change_args_t obj) {
+  public static void delete_waitPropertyChangeArgsP(ctl_wait_property_change_args_t? obj) {
     IGCLPINVOKE.delete_waitPropertyChangeArgsP(ctl_wait_property_change_args_t.getCPtr(obj));
   }
 
-  public static void waitPropertyChangeArgsP_assign(ctl_wait_property_change_args_t obj, ctl_wait_property_change_args_t value) {
+  public static void waitPropertyChangeArgsP_assign(ctl_wait_property_change_args_t? obj, ctl_wait_property_change_args_t value) {
     IGCLPINVOKE.waitPropertyChangeArgsP_assign(ctl_wait_property_change_args_t.getCPtr(obj), ctl_wait_property_change_args_t.getCPtr(value));
     if (IGCLPINVOKE.SWIGPendingException.Pending) throw IGCLPINVOKE.SWIGPendingException.Retrieve();
   }
 
-  public static ctl_wait_property_change_args_t waitPropertyChangeArgsP_value(ctl_wait_property_change_args_t obj) {
+  public static ctl_wait_property_change_args_t waitPropertyChangeArgsP_value(ctl_wait_property_change_args_t? obj) {
     ctl_wait_property_change_args_t ret = new ctl_wait_property_change_args_t(IGCLPINVOKE.waitPropertyChangeArgsP_value(ctl_wait_property_change_args_t.getCPtr(obj)), true);
     return ret;
   }
 
-  public static ctl_result_t ctlInit(ctl_init_args_t pInitDesc, SWIGTYPE_p_p__ctl_api_handle_t phAPIHandle) {
+  public static ctl_result_t ctlInit(ctl_init_args_t? pInitDesc, SWIGTYPE_p_p__ctl_api_handle_t? phAPIHandle) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlInit(ctl_init_args_t.getCPtr(pInitDesc), SWIGTYPE_p_p__ctl_api_handle_t.getCPtr(phAPIHandle));
     return ret;
   }
 
-  public static ctl_result_t ctlClose(SWIGTYPE_p__ctl_api_handle_t hAPIHandle) {
+  public static ctl_result_t ctlClose(SWIGTYPE_p__ctl_api_handle_t? hAPIHandle) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlClose(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hAPIHandle));
     return ret;
   }
 
-  public static ctl_result_t ctlSetRuntimePath(ctl_runtime_path_args_t pArgs) {
+  public static ctl_result_t ctlSetRuntimePath(ctl_runtime_path_args_t? pArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSetRuntimePath(ctl_runtime_path_args_t.getCPtr(pArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlWaitForPropertyChange(global::System.IntPtr hDeviceAdapter, ctl_wait_property_change_args_t pArgs) {
+  public static ctl_result_t ctlWaitForPropertyChange(global::System.IntPtr hDeviceAdapter, ctl_wait_property_change_args_t? pArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlWaitForPropertyChange(hDeviceAdapter, ctl_wait_property_change_args_t.getCPtr(pArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlReservedCall(global::System.IntPtr hDeviceAdapter, ctl_reserved_args_t pArgs) {
+  public static ctl_result_t ctlReservedCall(global::System.IntPtr hDeviceAdapter, ctl_reserved_args_t? pArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlReservedCall(hDeviceAdapter, ctl_reserved_args_t.getCPtr(pArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSupported3DCapabilities(global::System.IntPtr hDAhandle, ctl_3d_feature_caps_t pFeatureCaps) {
+  public static ctl_result_t ctlGetSupported3DCapabilities(global::System.IntPtr hDAhandle, ctl_3d_feature_caps_t? pFeatureCaps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSupported3DCapabilities(hDAhandle, ctl_3d_feature_caps_t.getCPtr(pFeatureCaps));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSet3DFeature(global::System.IntPtr hDAhandle, ctl_3d_feature_getset_t pFeature) {
+  public static ctl_result_t ctlGetSet3DFeature(global::System.IntPtr hDAhandle, ctl_3d_feature_getset_t? pFeature) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSet3DFeature(hDAhandle, ctl_3d_feature_getset_t.getCPtr(pFeature));
     return ret;
   }
@@ -630,207 +659,207 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlEnumerateDevices(SWIGTYPE_p__ctl_api_handle_t hAPIHandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t phDevices) {
+  public static ctl_result_t ctlEnumerateDevices(SWIGTYPE_p__ctl_api_handle_t? hAPIHandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t? phDevices) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumerateDevices(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hAPIHandle), SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(phDevices));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumerateDisplayOutputs(global::System.IntPtr hDeviceAdapter, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_display_output_handle_t phDisplayOutputs) {
+  public static ctl_result_t ctlEnumerateDisplayOutputs(global::System.IntPtr hDeviceAdapter, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_display_output_handle_t? phDisplayOutputs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumerateDisplayOutputs(hDeviceAdapter, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_display_output_handle_t.getCPtr(phDisplayOutputs));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumerateI2CPinPairs(global::System.IntPtr hDeviceAdapter, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t phI2cPinPairs) {
+  public static ctl_result_t ctlEnumerateI2CPinPairs(global::System.IntPtr hDeviceAdapter, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t? phI2cPinPairs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumerateI2CPinPairs(hDeviceAdapter, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t.getCPtr(phI2cPinPairs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetDeviceProperties(global::System.IntPtr hDAhandle, ctl_device_adapter_properties_t pProperties) {
+  public static ctl_result_t ctlGetDeviceProperties(global::System.IntPtr hDAhandle, ctl_device_adapter_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetDeviceProperties(hDAhandle, ctl_device_adapter_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlGetDisplayProperties(global::System.IntPtr hDisplayOutput, ctl_display_properties_t pProperties) {
+  public static ctl_result_t ctlGetDisplayProperties(global::System.IntPtr hDisplayOutput, ctl_display_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetDisplayProperties(hDisplayOutput, ctl_display_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlGetAdaperDisplayEncoderProperties(global::System.IntPtr hDisplayOutput, ctl_adapter_display_encoder_properties_t pProperties) {
+  public static ctl_result_t ctlGetAdaperDisplayEncoderProperties(global::System.IntPtr hDisplayOutput, ctl_adapter_display_encoder_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetAdaperDisplayEncoderProperties(hDisplayOutput, ctl_adapter_display_encoder_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlGetZeDevice(global::System.IntPtr hDAhandle, SWIGTYPE_p_void pZeDevice, SWIGTYPE_p_p_void hInstance) {
+  public static ctl_result_t ctlGetZeDevice(global::System.IntPtr hDAhandle, SWIGTYPE_p_void? pZeDevice, SWIGTYPE_p_p_void? hInstance) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetZeDevice(hDAhandle, SWIGTYPE_p_void.getCPtr(pZeDevice), SWIGTYPE_p_p_void.getCPtr(hInstance));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSharpnessCaps(global::System.IntPtr hDisplayOutput, ctl_sharpness_caps_t pSharpnessCaps) {
+  public static ctl_result_t ctlGetSharpnessCaps(global::System.IntPtr hDisplayOutput, ctl_sharpness_caps_t? pSharpnessCaps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSharpnessCaps(hDisplayOutput, ctl_sharpness_caps_t.getCPtr(pSharpnessCaps));
     return ret;
   }
 
-  public static ctl_result_t ctlGetCurrentSharpness(global::System.IntPtr hDisplayOutput, ctl_sharpness_settings_t pSharpnessSettings) {
+  public static ctl_result_t ctlGetCurrentSharpness(global::System.IntPtr hDisplayOutput, ctl_sharpness_settings_t? pSharpnessSettings) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetCurrentSharpness(hDisplayOutput, ctl_sharpness_settings_t.getCPtr(pSharpnessSettings));
     return ret;
   }
 
-  public static ctl_result_t ctlSetCurrentSharpness(global::System.IntPtr hDisplayOutput, ctl_sharpness_settings_t pSharpnessSettings) {
+  public static ctl_result_t ctlSetCurrentSharpness(global::System.IntPtr hDisplayOutput, ctl_sharpness_settings_t? pSharpnessSettings) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSetCurrentSharpness(hDisplayOutput, ctl_sharpness_settings_t.getCPtr(pSharpnessSettings));
     return ret;
   }
 
-  public static ctl_result_t ctlI2CAccess(global::System.IntPtr hDisplayOutput, ctl_i2c_access_args_t pI2cAccessArgs) {
+  public static ctl_result_t ctlI2CAccess(global::System.IntPtr hDisplayOutput, ctl_i2c_access_args_t? pI2cAccessArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlI2CAccess(hDisplayOutput, ctl_i2c_access_args_t.getCPtr(pI2cAccessArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlI2CAccessOnPinPair(SWIGTYPE_p__ctl_i2c_pin_pair_handle_t hI2cPinPair, ctl_i2c_access_pinpair_args_t pI2cAccessArgs) {
+  public static ctl_result_t ctlI2CAccessOnPinPair(SWIGTYPE_p__ctl_i2c_pin_pair_handle_t? hI2cPinPair, ctl_i2c_access_pinpair_args_t? pI2cAccessArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlI2CAccessOnPinPair(SWIGTYPE_p__ctl_i2c_pin_pair_handle_t.getCPtr(hI2cPinPair), ctl_i2c_access_pinpair_args_t.getCPtr(pI2cAccessArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlAUXAccess(global::System.IntPtr hDisplayOutput, ctl_aux_access_args_t pAuxAccessArgs) {
+  public static ctl_result_t ctlAUXAccess(global::System.IntPtr hDisplayOutput, ctl_aux_access_args_t? pAuxAccessArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlAUXAccess(hDisplayOutput, ctl_aux_access_args_t.getCPtr(pAuxAccessArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetPowerOptimizationCaps(global::System.IntPtr hDisplayOutput, ctl_power_optimization_caps_t pPowerOptimizationCaps) {
+  public static ctl_result_t ctlGetPowerOptimizationCaps(global::System.IntPtr hDisplayOutput, ctl_power_optimization_caps_t? pPowerOptimizationCaps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetPowerOptimizationCaps(hDisplayOutput, ctl_power_optimization_caps_t.getCPtr(pPowerOptimizationCaps));
     return ret;
   }
 
-  public static ctl_result_t ctlGetPowerOptimizationSetting(global::System.IntPtr hDisplayOutput, ctl_power_optimization_settings_t pPowerOptimizationSettings) {
+  public static ctl_result_t ctlGetPowerOptimizationSetting(global::System.IntPtr hDisplayOutput, ctl_power_optimization_settings_t? pPowerOptimizationSettings) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetPowerOptimizationSetting(hDisplayOutput, ctl_power_optimization_settings_t.getCPtr(pPowerOptimizationSettings));
     return ret;
   }
 
-  public static ctl_result_t ctlSetPowerOptimizationSetting(global::System.IntPtr hDisplayOutput, ctl_power_optimization_settings_t pPowerOptimizationSettings) {
+  public static ctl_result_t ctlSetPowerOptimizationSetting(global::System.IntPtr hDisplayOutput, ctl_power_optimization_settings_t? pPowerOptimizationSettings) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSetPowerOptimizationSetting(hDisplayOutput, ctl_power_optimization_settings_t.getCPtr(pPowerOptimizationSettings));
     return ret;
   }
 
-  public static ctl_result_t ctlSetBrightnessSetting(global::System.IntPtr hDisplayOutput, ctl_set_brightness_t pSetBrightnessSetting) {
+  public static ctl_result_t ctlSetBrightnessSetting(global::System.IntPtr hDisplayOutput, ctl_set_brightness_t? pSetBrightnessSetting) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSetBrightnessSetting(hDisplayOutput, ctl_set_brightness_t.getCPtr(pSetBrightnessSetting));
     return ret;
   }
 
-  public static ctl_result_t ctlGetBrightnessSetting(global::System.IntPtr hDisplayOutput, ctl_get_brightness_t pGetBrightnessSetting) {
+  public static ctl_result_t ctlGetBrightnessSetting(global::System.IntPtr hDisplayOutput, ctl_get_brightness_t? pGetBrightnessSetting) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetBrightnessSetting(hDisplayOutput, ctl_get_brightness_t.getCPtr(pGetBrightnessSetting));
     return ret;
   }
 
-  public static ctl_result_t ctlPixelTransformationGetConfig(global::System.IntPtr hDisplayOutput, ctl_pixtx_pipe_get_config_t pPixTxGetConfigArgs) {
+  public static ctl_result_t ctlPixelTransformationGetConfig(global::System.IntPtr hDisplayOutput, ctl_pixtx_pipe_get_config_t? pPixTxGetConfigArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPixelTransformationGetConfig(hDisplayOutput, ctl_pixtx_pipe_get_config_t.getCPtr(pPixTxGetConfigArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlPixelTransformationSetConfig(global::System.IntPtr hDisplayOutput, ctl_pixtx_pipe_set_config_t pPixTxSetConfigArgs) {
+  public static ctl_result_t ctlPixelTransformationSetConfig(global::System.IntPtr hDisplayOutput, ctl_pixtx_pipe_set_config_t? pPixTxSetConfigArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPixelTransformationSetConfig(hDisplayOutput, ctl_pixtx_pipe_set_config_t.getCPtr(pPixTxSetConfigArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlPanelDescriptorAccess(global::System.IntPtr hDisplayOutput, ctl_panel_descriptor_access_args_t pPanelDescriptorAccessArgs) {
+  public static ctl_result_t ctlPanelDescriptorAccess(global::System.IntPtr hDisplayOutput, ctl_panel_descriptor_access_args_t? pPanelDescriptorAccessArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPanelDescriptorAccess(hDisplayOutput, ctl_panel_descriptor_access_args_t.getCPtr(pPanelDescriptorAccessArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSupportedRetroScalingCapability(global::System.IntPtr hDAhandle, ctl_retro_scaling_caps_t pRetroScalingCaps) {
+  public static ctl_result_t ctlGetSupportedRetroScalingCapability(global::System.IntPtr hDAhandle, ctl_retro_scaling_caps_t? pRetroScalingCaps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSupportedRetroScalingCapability(hDAhandle, ctl_retro_scaling_caps_t.getCPtr(pRetroScalingCaps));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSetRetroScaling(global::System.IntPtr hDAhandle, ctl_retro_scaling_settings_t pGetSetRetroScalingType) {
+  public static ctl_result_t ctlGetSetRetroScaling(global::System.IntPtr hDAhandle, ctl_retro_scaling_settings_t? pGetSetRetroScalingType) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSetRetroScaling(hDAhandle, ctl_retro_scaling_settings_t.getCPtr(pGetSetRetroScalingType));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSupportedScalingCapability(global::System.IntPtr hDisplayOutput, ctl_scaling_caps_t pScalingCaps) {
+  public static ctl_result_t ctlGetSupportedScalingCapability(global::System.IntPtr hDisplayOutput, ctl_scaling_caps_t? pScalingCaps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSupportedScalingCapability(hDisplayOutput, ctl_scaling_caps_t.getCPtr(pScalingCaps));
     return ret;
   }
 
-  public static ctl_result_t ctlGetCurrentScaling(global::System.IntPtr hDisplayOutput, ctl_scaling_settings_t pGetCurrentScalingType) {
+  public static ctl_result_t ctlGetCurrentScaling(global::System.IntPtr hDisplayOutput, ctl_scaling_settings_t? pGetCurrentScalingType) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetCurrentScaling(hDisplayOutput, ctl_scaling_settings_t.getCPtr(pGetCurrentScalingType));
     return ret;
   }
 
-  public static ctl_result_t ctlSetCurrentScaling(global::System.IntPtr hDisplayOutput, ctl_scaling_settings_t pSetScalingType) {
+  public static ctl_result_t ctlSetCurrentScaling(global::System.IntPtr hDisplayOutput, ctl_scaling_settings_t? pSetScalingType) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSetCurrentScaling(hDisplayOutput, ctl_scaling_settings_t.getCPtr(pSetScalingType));
     return ret;
   }
 
-  public static ctl_result_t ctlGetLACEConfig(global::System.IntPtr hDisplayOutput, ctl_lace_config_t pLaceConfig) {
+  public static ctl_result_t ctlGetLACEConfig(global::System.IntPtr hDisplayOutput, ctl_lace_config_t? pLaceConfig) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetLACEConfig(hDisplayOutput, ctl_lace_config_t.getCPtr(pLaceConfig));
     return ret;
   }
 
-  public static ctl_result_t ctlSetLACEConfig(global::System.IntPtr hDisplayOutput, ctl_lace_config_t pLaceConfig) {
+  public static ctl_result_t ctlSetLACEConfig(global::System.IntPtr hDisplayOutput, ctl_lace_config_t? pLaceConfig) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSetLACEConfig(hDisplayOutput, ctl_lace_config_t.getCPtr(pLaceConfig));
     return ret;
   }
 
-  public static ctl_result_t ctlSoftwarePSR(global::System.IntPtr hDisplayOutput, ctl_sw_psr_settings_t pSoftwarePsrSetting) {
+  public static ctl_result_t ctlSoftwarePSR(global::System.IntPtr hDisplayOutput, ctl_sw_psr_settings_t? pSoftwarePsrSetting) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSoftwarePSR(hDisplayOutput, ctl_sw_psr_settings_t.getCPtr(pSoftwarePsrSetting));
     return ret;
   }
 
-  public static ctl_result_t ctlGetIntelArcSyncInfoForMonitor(global::System.IntPtr hDisplayOutput, ctl_intel_arc_sync_monitor_params_t pIntelArcSyncMonitorParams) {
+  public static ctl_result_t ctlGetIntelArcSyncInfoForMonitor(global::System.IntPtr hDisplayOutput, ctl_intel_arc_sync_monitor_params_t? pIntelArcSyncMonitorParams) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetIntelArcSyncInfoForMonitor(hDisplayOutput, ctl_intel_arc_sync_monitor_params_t.getCPtr(pIntelArcSyncMonitorParams));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumerateMuxDevices(SWIGTYPE_p__ctl_api_handle_t hAPIHandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_mux_output_handle_t phMuxDevices) {
+  public static ctl_result_t ctlEnumerateMuxDevices(SWIGTYPE_p__ctl_api_handle_t? hAPIHandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_mux_output_handle_t? phMuxDevices) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumerateMuxDevices(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hAPIHandle), SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_mux_output_handle_t.getCPtr(phMuxDevices));
     return ret;
   }
 
-  public static ctl_result_t ctlGetMuxProperties(SWIGTYPE_p__ctl_mux_output_handle_t hMuxDevice, ctl_mux_properties_t pMuxProperties) {
+  public static ctl_result_t ctlGetMuxProperties(SWIGTYPE_p__ctl_mux_output_handle_t? hMuxDevice, ctl_mux_properties_t? pMuxProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetMuxProperties(SWIGTYPE_p__ctl_mux_output_handle_t.getCPtr(hMuxDevice), ctl_mux_properties_t.getCPtr(pMuxProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlSwitchMux(SWIGTYPE_p__ctl_mux_output_handle_t hMuxDevice, global::System.IntPtr hInactiveDisplayOutput) {
+  public static ctl_result_t ctlSwitchMux(SWIGTYPE_p__ctl_mux_output_handle_t? hMuxDevice, global::System.IntPtr hInactiveDisplayOutput) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSwitchMux(SWIGTYPE_p__ctl_mux_output_handle_t.getCPtr(hMuxDevice), hInactiveDisplayOutput);
     return ret;
   }
 
-  public static ctl_result_t ctlGetIntelArcSyncProfile(global::System.IntPtr hDisplayOutput, ctl_intel_arc_sync_profile_params_t pIntelArcSyncProfileParams) {
+  public static ctl_result_t ctlGetIntelArcSyncProfile(global::System.IntPtr hDisplayOutput, ctl_intel_arc_sync_profile_params_t? pIntelArcSyncProfileParams) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetIntelArcSyncProfile(hDisplayOutput, ctl_intel_arc_sync_profile_params_t.getCPtr(pIntelArcSyncProfileParams));
     return ret;
   }
 
-  public static ctl_result_t ctlSetIntelArcSyncProfile(global::System.IntPtr hDisplayOutput, ctl_intel_arc_sync_profile_params_t pIntelArcSyncProfileParams) {
+  public static ctl_result_t ctlSetIntelArcSyncProfile(global::System.IntPtr hDisplayOutput, ctl_intel_arc_sync_profile_params_t? pIntelArcSyncProfileParams) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlSetIntelArcSyncProfile(hDisplayOutput, ctl_intel_arc_sync_profile_params_t.getCPtr(pIntelArcSyncProfileParams));
     return ret;
   }
 
-  public static ctl_result_t ctlEdidManagement(global::System.IntPtr hDisplayOutput, ctl_edid_management_args_t pEdidManagementArgs) {
+  public static ctl_result_t ctlEdidManagement(global::System.IntPtr hDisplayOutput, ctl_edid_management_args_t? pEdidManagementArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEdidManagement(hDisplayOutput, ctl_edid_management_args_t.getCPtr(pEdidManagementArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSetCustomMode(global::System.IntPtr hDisplayOutput, ctl_get_set_custom_mode_args_t pCustomModeArgs) {
+  public static ctl_result_t ctlGetSetCustomMode(global::System.IntPtr hDisplayOutput, ctl_get_set_custom_mode_args_t? pCustomModeArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSetCustomMode(hDisplayOutput, ctl_get_set_custom_mode_args_t.getCPtr(pCustomModeArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSetCombinedDisplay(global::System.IntPtr hDeviceAdapter, ctl_combined_display_args_t pCombinedDisplayArgs) {
+  public static ctl_result_t ctlGetSetCombinedDisplay(global::System.IntPtr hDeviceAdapter, ctl_combined_display_args_t? pCombinedDisplayArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSetCombinedDisplay(hDeviceAdapter, ctl_combined_display_args_t.getCPtr(pCombinedDisplayArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSetDisplayGenlock(SWIGTYPE_p_p__ctl_device_adapter_handle_t hDeviceAdapter, ctl_genlock_args_t pGenlockArgs, uint AdapterCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t hFailureDeviceAdapter) {
+  public static ctl_result_t ctlGetSetDisplayGenlock(SWIGTYPE_p_p__ctl_device_adapter_handle_t? hDeviceAdapter, ctl_genlock_args_t? pGenlockArgs, uint AdapterCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t? hFailureDeviceAdapter) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSetDisplayGenlock(SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(hDeviceAdapter), ctl_genlock_args_t.getCPtr(pGenlockArgs), AdapterCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(hFailureDeviceAdapter));
     return ret;
   }
 
-  public static ctl_result_t ctlGetVblankTimestamp(global::System.IntPtr hDisplayOutput, ctl_vblank_ts_args_t pVblankTSArgs) {
+  public static ctl_result_t ctlGetVblankTimestamp(global::System.IntPtr hDisplayOutput, ctl_vblank_ts_args_t? pVblankTSArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetVblankTimestamp(hDisplayOutput, ctl_vblank_ts_args_t.getCPtr(pVblankTSArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlLinkDisplayAdapters(global::System.IntPtr hPrimaryAdapter, ctl_lda_args_t pLdaArgs) {
+  public static ctl_result_t ctlLinkDisplayAdapters(global::System.IntPtr hPrimaryAdapter, ctl_lda_args_t? pLdaArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlLinkDisplayAdapters(hPrimaryAdapter, ctl_lda_args_t.getCPtr(pLdaArgs));
     return ret;
   }
@@ -840,102 +869,102 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlGetLinkedDisplayAdapters(global::System.IntPtr hPrimaryAdapter, ctl_lda_args_t pLdaArgs) {
+  public static ctl_result_t ctlGetLinkedDisplayAdapters(global::System.IntPtr hPrimaryAdapter, ctl_lda_args_t? pLdaArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetLinkedDisplayAdapters(hPrimaryAdapter, ctl_lda_args_t.getCPtr(pLdaArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSetDynamicContrastEnhancement(global::System.IntPtr hDisplayOutput, ctl_dce_args_t pDceArgs) {
+  public static ctl_result_t ctlGetSetDynamicContrastEnhancement(global::System.IntPtr hDisplayOutput, ctl_dce_args_t? pDceArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSetDynamicContrastEnhancement(hDisplayOutput, ctl_dce_args_t.getCPtr(pDceArgs));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSetWireFormat(global::System.IntPtr hDisplayOutput, ctl_get_set_wire_format_config_t pGetSetWireFormatSetting) {
+  public static ctl_result_t ctlGetSetWireFormat(global::System.IntPtr hDisplayOutput, ctl_get_set_wire_format_config_t? pGetSetWireFormatSetting) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSetWireFormat(hDisplayOutput, ctl_get_set_wire_format_config_t.getCPtr(pGetSetWireFormatSetting));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSetDisplaySettings(global::System.IntPtr hDisplayOutput, ctl_display_settings_t pDisplaySettings) {
+  public static ctl_result_t ctlGetSetDisplaySettings(global::System.IntPtr hDisplayOutput, ctl_display_settings_t? pDisplaySettings) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSetDisplaySettings(hDisplayOutput, ctl_display_settings_t.getCPtr(pDisplaySettings));
     return ret;
   }
 
-  public static ctl_result_t ctlEccGetProperties(global::System.IntPtr hDAhandle, ctl_ecc_properties_t pProperties) {
+  public static ctl_result_t ctlEccGetProperties(global::System.IntPtr hDAhandle, ctl_ecc_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEccGetProperties(hDAhandle, ctl_ecc_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlEccGetState(global::System.IntPtr hDAhandle, ctl_ecc_state_desc_t pState) {
+  public static ctl_result_t ctlEccGetState(global::System.IntPtr hDAhandle, ctl_ecc_state_desc_t? pState) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEccGetState(hDAhandle, ctl_ecc_state_desc_t.getCPtr(pState));
     return ret;
   }
 
-  public static ctl_result_t ctlEccSetState(global::System.IntPtr hDAhandle, ctl_ecc_state_desc_t pState) {
+  public static ctl_result_t ctlEccSetState(global::System.IntPtr hDAhandle, ctl_ecc_state_desc_t? pState) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEccSetState(hDAhandle, ctl_ecc_state_desc_t.getCPtr(pState));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumEngineGroups(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_engine_handle_t phEngine) {
+  public static ctl_result_t ctlEnumEngineGroups(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_engine_handle_t? phEngine) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumEngineGroups(hDAhandle, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_engine_handle_t.getCPtr(phEngine));
     return ret;
   }
 
-  public static ctl_result_t ctlEngineGetProperties(SWIGTYPE_p__ctl_engine_handle_t hEngine, ctl_engine_properties_t pProperties) {
+  public static ctl_result_t ctlEngineGetProperties(SWIGTYPE_p__ctl_engine_handle_t? hEngine, ctl_engine_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEngineGetProperties(SWIGTYPE_p__ctl_engine_handle_t.getCPtr(hEngine), ctl_engine_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlEngineGetActivity(SWIGTYPE_p__ctl_engine_handle_t hEngine, ctl_engine_stats_t pStats) {
+  public static ctl_result_t ctlEngineGetActivity(SWIGTYPE_p__ctl_engine_handle_t? hEngine, ctl_engine_stats_t? pStats) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEngineGetActivity(SWIGTYPE_p__ctl_engine_handle_t.getCPtr(hEngine), ctl_engine_stats_t.getCPtr(pStats));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumFans(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_fan_handle_t phFan) {
+  public static ctl_result_t ctlEnumFans(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_fan_handle_t? phFan) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumFans(hDAhandle, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_fan_handle_t.getCPtr(phFan));
     return ret;
   }
 
-  public static ctl_result_t ctlFanGetProperties(SWIGTYPE_p__ctl_fan_handle_t hFan, ctl_fan_properties_t pProperties) {
+  public static ctl_result_t ctlFanGetProperties(SWIGTYPE_p__ctl_fan_handle_t? hFan, ctl_fan_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFanGetProperties(SWIGTYPE_p__ctl_fan_handle_t.getCPtr(hFan), ctl_fan_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlFanGetConfig(SWIGTYPE_p__ctl_fan_handle_t hFan, ctl_fan_config_t pConfig) {
+  public static ctl_result_t ctlFanGetConfig(SWIGTYPE_p__ctl_fan_handle_t? hFan, ctl_fan_config_t? pConfig) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFanGetConfig(SWIGTYPE_p__ctl_fan_handle_t.getCPtr(hFan), ctl_fan_config_t.getCPtr(pConfig));
     return ret;
   }
 
-  public static ctl_result_t ctlFanSetDefaultMode(SWIGTYPE_p__ctl_fan_handle_t hFan) {
+  public static ctl_result_t ctlFanSetDefaultMode(SWIGTYPE_p__ctl_fan_handle_t? hFan) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFanSetDefaultMode(SWIGTYPE_p__ctl_fan_handle_t.getCPtr(hFan));
     return ret;
   }
 
-  public static ctl_result_t ctlFanSetFixedSpeedMode(SWIGTYPE_p__ctl_fan_handle_t hFan, ctl_fan_speed_t speed) {
+  public static ctl_result_t ctlFanSetFixedSpeedMode(SWIGTYPE_p__ctl_fan_handle_t? hFan, ctl_fan_speed_t? speed) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFanSetFixedSpeedMode(SWIGTYPE_p__ctl_fan_handle_t.getCPtr(hFan), ctl_fan_speed_t.getCPtr(speed));
     return ret;
   }
 
-  public static ctl_result_t ctlFanSetSpeedTableMode(SWIGTYPE_p__ctl_fan_handle_t hFan, ctl_fan_speed_table_t speedTable) {
+  public static ctl_result_t ctlFanSetSpeedTableMode(SWIGTYPE_p__ctl_fan_handle_t? hFan, ctl_fan_speed_table_t? speedTable) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFanSetSpeedTableMode(SWIGTYPE_p__ctl_fan_handle_t.getCPtr(hFan), ctl_fan_speed_table_t.getCPtr(speedTable));
     return ret;
   }
 
-  public static ctl_result_t ctlFanGetState(SWIGTYPE_p__ctl_fan_handle_t hFan, ctl_fan_speed_units_t units, SWIGTYPE_p_int pSpeed) {
+  public static ctl_result_t ctlFanGetState(SWIGTYPE_p__ctl_fan_handle_t? hFan, ctl_fan_speed_units_t units, SWIGTYPE_p_int? pSpeed) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFanGetState(SWIGTYPE_p__ctl_fan_handle_t.getCPtr(hFan), (int)units, SWIGTYPE_p_int.getCPtr(pSpeed));
     return ret;
   }
 
-  public static ctl_result_t ctlGetFirmwareProperties(global::System.IntPtr hDeviceAdapter, ctl_firmware_properties_t pProperties) {
+  public static ctl_result_t ctlGetFirmwareProperties(global::System.IntPtr hDeviceAdapter, ctl_firmware_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetFirmwareProperties(hDeviceAdapter, ctl_firmware_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumerateFirmwareComponents(global::System.IntPtr hDeviceAdapter, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_firmware_component_handle_t phFirmware) {
+  public static ctl_result_t ctlEnumerateFirmwareComponents(global::System.IntPtr hDeviceAdapter, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_firmware_component_handle_t? phFirmware) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumerateFirmwareComponents(hDeviceAdapter, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_firmware_component_handle_t.getCPtr(phFirmware));
     return ret;
   }
 
-  public static ctl_result_t ctlGetFirmwareComponentProperties(SWIGTYPE_p__ctl_firmware_component_handle_t hFirmware, ctl_firmware_component_properties_t pProperties) {
+  public static ctl_result_t ctlGetFirmwareComponentProperties(SWIGTYPE_p__ctl_firmware_component_handle_t? hFirmware, ctl_firmware_component_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetFirmwareComponentProperties(SWIGTYPE_p__ctl_firmware_component_handle_t.getCPtr(hFirmware), ctl_firmware_component_properties_t.getCPtr(pProperties));
     return ret;
   }
@@ -945,92 +974,92 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlEnumFrequencyDomains(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_freq_handle_t phFrequency) {
+  public static ctl_result_t ctlEnumFrequencyDomains(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_freq_handle_t? phFrequency) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumFrequencyDomains(hDAhandle, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_freq_handle_t.getCPtr(phFrequency));
     return ret;
   }
 
-  public static ctl_result_t ctlFrequencyGetProperties(SWIGTYPE_p__ctl_freq_handle_t hFrequency, ctl_freq_properties_t pProperties) {
+  public static ctl_result_t ctlFrequencyGetProperties(SWIGTYPE_p__ctl_freq_handle_t? hFrequency, ctl_freq_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFrequencyGetProperties(SWIGTYPE_p__ctl_freq_handle_t.getCPtr(hFrequency), ctl_freq_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlFrequencyGetAvailableClocks(SWIGTYPE_p__ctl_freq_handle_t hFrequency, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_double phFrequency) {
+  public static ctl_result_t ctlFrequencyGetAvailableClocks(SWIGTYPE_p__ctl_freq_handle_t? hFrequency, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_double? phFrequency) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFrequencyGetAvailableClocks(SWIGTYPE_p__ctl_freq_handle_t.getCPtr(hFrequency), SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_double.getCPtr(phFrequency));
     return ret;
   }
 
-  public static ctl_result_t ctlFrequencyGetRange(SWIGTYPE_p__ctl_freq_handle_t hFrequency, ctl_freq_range_t pLimits) {
+  public static ctl_result_t ctlFrequencyGetRange(SWIGTYPE_p__ctl_freq_handle_t? hFrequency, ctl_freq_range_t? pLimits) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFrequencyGetRange(SWIGTYPE_p__ctl_freq_handle_t.getCPtr(hFrequency), ctl_freq_range_t.getCPtr(pLimits));
     return ret;
   }
 
-  public static ctl_result_t ctlFrequencySetRange(SWIGTYPE_p__ctl_freq_handle_t hFrequency, ctl_freq_range_t pLimits) {
+  public static ctl_result_t ctlFrequencySetRange(SWIGTYPE_p__ctl_freq_handle_t? hFrequency, ctl_freq_range_t? pLimits) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFrequencySetRange(SWIGTYPE_p__ctl_freq_handle_t.getCPtr(hFrequency), ctl_freq_range_t.getCPtr(pLimits));
     return ret;
   }
 
-  public static ctl_result_t ctlFrequencyGetState(SWIGTYPE_p__ctl_freq_handle_t hFrequency, ctl_freq_state_t pState) {
+  public static ctl_result_t ctlFrequencyGetState(SWIGTYPE_p__ctl_freq_handle_t? hFrequency, ctl_freq_state_t? pState) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFrequencyGetState(SWIGTYPE_p__ctl_freq_handle_t.getCPtr(hFrequency), ctl_freq_state_t.getCPtr(pState));
     return ret;
   }
 
-  public static ctl_result_t ctlFrequencyGetThrottleTime(SWIGTYPE_p__ctl_freq_handle_t hFrequency, ctl_freq_throttle_time_t pThrottleTime) {
+  public static ctl_result_t ctlFrequencyGetThrottleTime(SWIGTYPE_p__ctl_freq_handle_t? hFrequency, ctl_freq_throttle_time_t? pThrottleTime) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlFrequencyGetThrottleTime(SWIGTYPE_p__ctl_freq_handle_t.getCPtr(hFrequency), ctl_freq_throttle_time_t.getCPtr(pThrottleTime));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumLeds(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_led_handle_t phLed) {
+  public static ctl_result_t ctlEnumLeds(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_led_handle_t? phLed) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumLeds(hDAhandle, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_led_handle_t.getCPtr(phLed));
     return ret;
   }
 
-  public static ctl_result_t ctlLedGetProperties(SWIGTYPE_p__ctl_led_handle_t hLed, ctl_led_properties_t pProperties) {
+  public static ctl_result_t ctlLedGetProperties(SWIGTYPE_p__ctl_led_handle_t? hLed, ctl_led_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlLedGetProperties(SWIGTYPE_p__ctl_led_handle_t.getCPtr(hLed), ctl_led_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlLedGetState(SWIGTYPE_p__ctl_led_handle_t hLed, ctl_led_state_t pState) {
+  public static ctl_result_t ctlLedGetState(SWIGTYPE_p__ctl_led_handle_t? hLed, ctl_led_state_t? pState) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlLedGetState(SWIGTYPE_p__ctl_led_handle_t.getCPtr(hLed), ctl_led_state_t.getCPtr(pState));
     return ret;
   }
 
-  public static ctl_result_t ctlLedSetState(SWIGTYPE_p__ctl_led_handle_t hLed, SWIGTYPE_p_void pBuffer, uint bufferSize) {
+  public static ctl_result_t ctlLedSetState(SWIGTYPE_p__ctl_led_handle_t? hLed, SWIGTYPE_p_void? pBuffer, uint bufferSize) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlLedSetState(SWIGTYPE_p__ctl_led_handle_t.getCPtr(hLed), SWIGTYPE_p_void.getCPtr(pBuffer), bufferSize);
     return ret;
   }
 
-  public static ctl_result_t ctlGetSupportedVideoProcessingCapabilities(global::System.IntPtr hDAhandle, ctl_video_processing_feature_caps_t pFeatureCaps) {
+  public static ctl_result_t ctlGetSupportedVideoProcessingCapabilities(global::System.IntPtr hDAhandle, ctl_video_processing_feature_caps_t? pFeatureCaps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSupportedVideoProcessingCapabilities(hDAhandle, ctl_video_processing_feature_caps_t.getCPtr(pFeatureCaps));
     return ret;
   }
 
-  public static ctl_result_t ctlGetSetVideoProcessingFeature(global::System.IntPtr hDAhandle, ctl_video_processing_feature_getset_t pFeature) {
+  public static ctl_result_t ctlGetSetVideoProcessingFeature(global::System.IntPtr hDAhandle, ctl_video_processing_feature_getset_t? pFeature) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlGetSetVideoProcessingFeature(hDAhandle, ctl_video_processing_feature_getset_t.getCPtr(pFeature));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumMemoryModules(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_mem_handle_t phMemory) {
+  public static ctl_result_t ctlEnumMemoryModules(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_mem_handle_t? phMemory) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumMemoryModules(hDAhandle, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_mem_handle_t.getCPtr(phMemory));
     return ret;
   }
 
-  public static ctl_result_t ctlMemoryGetProperties(SWIGTYPE_p__ctl_mem_handle_t hMemory, ctl_mem_properties_t pProperties) {
+  public static ctl_result_t ctlMemoryGetProperties(SWIGTYPE_p__ctl_mem_handle_t? hMemory, ctl_mem_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlMemoryGetProperties(SWIGTYPE_p__ctl_mem_handle_t.getCPtr(hMemory), ctl_mem_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlMemoryGetState(SWIGTYPE_p__ctl_mem_handle_t hMemory, ctl_mem_state_t pState) {
+  public static ctl_result_t ctlMemoryGetState(SWIGTYPE_p__ctl_mem_handle_t? hMemory, ctl_mem_state_t? pState) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlMemoryGetState(SWIGTYPE_p__ctl_mem_handle_t.getCPtr(hMemory), ctl_mem_state_t.getCPtr(pState));
     return ret;
   }
 
-  public static ctl_result_t ctlMemoryGetBandwidth(SWIGTYPE_p__ctl_mem_handle_t hMemory, ctl_mem_bandwidth_t pBandwidth) {
+  public static ctl_result_t ctlMemoryGetBandwidth(SWIGTYPE_p__ctl_mem_handle_t? hMemory, ctl_mem_bandwidth_t? pBandwidth) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlMemoryGetBandwidth(SWIGTYPE_p__ctl_mem_handle_t.getCPtr(hMemory), ctl_mem_bandwidth_t.getCPtr(pBandwidth));
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockGetProperties(global::System.IntPtr hDeviceHandle, ctl_oc_properties_t pOcProperties) {
+  public static ctl_result_t ctlOverclockGetProperties(global::System.IntPtr hDeviceHandle, ctl_oc_properties_t? pOcProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockGetProperties(hDeviceHandle, ctl_oc_properties_t.getCPtr(pOcProperties));
     return ret;
   }
@@ -1040,7 +1069,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockGpuFrequencyOffsetGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pOcFrequencyOffset) {
+  public static ctl_result_t ctlOverclockGpuFrequencyOffsetGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pOcFrequencyOffset) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockGpuFrequencyOffsetGet(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pOcFrequencyOffset));
     return ret;
   }
@@ -1050,7 +1079,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockGpuVoltageOffsetGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pOcVoltageOffset) {
+  public static ctl_result_t ctlOverclockGpuVoltageOffsetGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pOcVoltageOffset) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockGpuVoltageOffsetGet(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pOcVoltageOffset));
     return ret;
   }
@@ -1060,7 +1089,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockGpuLockGet(global::System.IntPtr hDeviceHandle, ctl_oc_vf_pair_t pVfPair) {
+  public static ctl_result_t ctlOverclockGpuLockGet(global::System.IntPtr hDeviceHandle, ctl_oc_vf_pair_t? pVfPair) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockGpuLockGet(hDeviceHandle, ctl_oc_vf_pair_t.getCPtr(pVfPair));
     return ret;
   }
@@ -1071,7 +1100,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockVramFrequencyOffsetGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pOcFrequencyOffset) {
+  public static ctl_result_t ctlOverclockVramFrequencyOffsetGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pOcFrequencyOffset) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockVramFrequencyOffsetGet(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pOcFrequencyOffset));
     return ret;
   }
@@ -1081,7 +1110,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockVramVoltageOffsetGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pVoltage) {
+  public static ctl_result_t ctlOverclockVramVoltageOffsetGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pVoltage) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockVramVoltageOffsetGet(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pVoltage));
     return ret;
   }
@@ -1091,7 +1120,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockPowerLimitGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pSustainedPowerLimit) {
+  public static ctl_result_t ctlOverclockPowerLimitGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pSustainedPowerLimit) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockPowerLimitGet(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pSustainedPowerLimit));
     return ret;
   }
@@ -1101,7 +1130,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockTemperatureLimitGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pTemperatureLimit) {
+  public static ctl_result_t ctlOverclockTemperatureLimitGet(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pTemperatureLimit) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockTemperatureLimitGet(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pTemperatureLimit));
     return ret;
   }
@@ -1111,7 +1140,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlPowerTelemetryGet(global::System.IntPtr hDeviceHandle, ctl_power_telemetry_t pTelemetryInfo) {
+  public static ctl_result_t ctlPowerTelemetryGet(global::System.IntPtr hDeviceHandle, ctl_power_telemetry_t? pTelemetryInfo) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPowerTelemetryGet(hDeviceHandle, ctl_power_telemetry_t.getCPtr(pTelemetryInfo));
     return ret;
   }
@@ -1121,7 +1150,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockGpuFrequencyOffsetGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pOcFrequencyOffset) {
+  public static ctl_result_t ctlOverclockGpuFrequencyOffsetGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pOcFrequencyOffset) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockGpuFrequencyOffsetGetV2(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pOcFrequencyOffset));
     return ret;
   }
@@ -1131,7 +1160,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockGpuMaxVoltageOffsetGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pOcMaxVoltageOffset) {
+  public static ctl_result_t ctlOverclockGpuMaxVoltageOffsetGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pOcMaxVoltageOffset) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockGpuMaxVoltageOffsetGetV2(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pOcMaxVoltageOffset));
     return ret;
   }
@@ -1141,7 +1170,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockVramMemSpeedLimitGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pOcVramMemSpeedLimit) {
+  public static ctl_result_t ctlOverclockVramMemSpeedLimitGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pOcVramMemSpeedLimit) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockVramMemSpeedLimitGetV2(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pOcVramMemSpeedLimit));
     return ret;
   }
@@ -1151,7 +1180,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockPowerLimitGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pSustainedPowerLimit) {
+  public static ctl_result_t ctlOverclockPowerLimitGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pSustainedPowerLimit) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockPowerLimitGetV2(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pSustainedPowerLimit));
     return ret;
   }
@@ -1161,7 +1190,7 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockTemperatureLimitGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double pTemperatureLimit) {
+  public static ctl_result_t ctlOverclockTemperatureLimitGetV2(global::System.IntPtr hDeviceHandle, SWIGTYPE_p_double? pTemperatureLimit) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockTemperatureLimitGetV2(hDeviceHandle, SWIGTYPE_p_double.getCPtr(pTemperatureLimit));
     return ret;
   }
@@ -1171,126 +1200,126 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockReadVFCurve(global::System.IntPtr hDeviceAdapter, ctl_vf_curve_type_t VFCurveType, ctl_vf_curve_details_t VFCurveDetail, SWIGTYPE_p_unsigned_int pNumPoints, ctl_voltage_frequency_point_t pVFCurveTable) {
+  public static ctl_result_t ctlOverclockReadVFCurve(global::System.IntPtr hDeviceAdapter, ctl_vf_curve_type_t VFCurveType, ctl_vf_curve_details_t VFCurveDetail, SWIGTYPE_p_unsigned_int? pNumPoints, ctl_voltage_frequency_point_t? pVFCurveTable) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockReadVFCurve(hDeviceAdapter, (int)VFCurveType, (int)VFCurveDetail, SWIGTYPE_p_unsigned_int.getCPtr(pNumPoints), ctl_voltage_frequency_point_t.getCPtr(pVFCurveTable));
     return ret;
   }
 
-  public static ctl_result_t ctlOverclockWriteCustomVFCurve(global::System.IntPtr hDeviceAdapter, uint NumPoints, ctl_voltage_frequency_point_t pCustomVFCurveTable) {
+  public static ctl_result_t ctlOverclockWriteCustomVFCurve(global::System.IntPtr hDeviceAdapter, uint NumPoints, ctl_voltage_frequency_point_t? pCustomVFCurveTable) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlOverclockWriteCustomVFCurve(hDeviceAdapter, NumPoints, ctl_voltage_frequency_point_t.getCPtr(pCustomVFCurveTable));
     return ret;
   }
 
-  public static ctl_result_t ctlPciGetProperties(global::System.IntPtr hDAhandle, ctl_pci_properties_t pProperties) {
+  public static ctl_result_t ctlPciGetProperties(global::System.IntPtr hDAhandle, ctl_pci_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPciGetProperties(hDAhandle, ctl_pci_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlPciGetState(global::System.IntPtr hDAhandle, ctl_pci_state_t pState) {
+  public static ctl_result_t ctlPciGetState(global::System.IntPtr hDAhandle, ctl_pci_state_t? pState) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPciGetState(hDAhandle, ctl_pci_state_t.getCPtr(pState));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumPowerDomains(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_pwr_handle_t phPower) {
+  public static ctl_result_t ctlEnumPowerDomains(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_pwr_handle_t? phPower) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumPowerDomains(hDAhandle, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_pwr_handle_t.getCPtr(phPower));
     return ret;
   }
 
-  public static ctl_result_t ctlPowerGetProperties(SWIGTYPE_p__ctl_pwr_handle_t hPower, ctl_power_properties_t pProperties) {
+  public static ctl_result_t ctlPowerGetProperties(SWIGTYPE_p__ctl_pwr_handle_t? hPower, ctl_power_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPowerGetProperties(SWIGTYPE_p__ctl_pwr_handle_t.getCPtr(hPower), ctl_power_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlPowerGetEnergyCounter(SWIGTYPE_p__ctl_pwr_handle_t hPower, ctl_power_energy_counter_t pEnergy) {
+  public static ctl_result_t ctlPowerGetEnergyCounter(SWIGTYPE_p__ctl_pwr_handle_t? hPower, ctl_power_energy_counter_t? pEnergy) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPowerGetEnergyCounter(SWIGTYPE_p__ctl_pwr_handle_t.getCPtr(hPower), ctl_power_energy_counter_t.getCPtr(pEnergy));
     return ret;
   }
 
-  public static ctl_result_t ctlPowerGetLimits(SWIGTYPE_p__ctl_pwr_handle_t hPower, ctl_power_limits_t pPowerLimits) {
+  public static ctl_result_t ctlPowerGetLimits(SWIGTYPE_p__ctl_pwr_handle_t? hPower, ctl_power_limits_t? pPowerLimits) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPowerGetLimits(SWIGTYPE_p__ctl_pwr_handle_t.getCPtr(hPower), ctl_power_limits_t.getCPtr(pPowerLimits));
     return ret;
   }
 
-  public static ctl_result_t ctlPowerSetLimits(SWIGTYPE_p__ctl_pwr_handle_t hPower, ctl_power_limits_t pPowerLimits) {
+  public static ctl_result_t ctlPowerSetLimits(SWIGTYPE_p__ctl_pwr_handle_t? hPower, ctl_power_limits_t? pPowerLimits) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlPowerSetLimits(SWIGTYPE_p__ctl_pwr_handle_t.getCPtr(hPower), ctl_power_limits_t.getCPtr(pPowerLimits));
     return ret;
   }
 
-  public static ctl_result_t ctlEnumTemperatureSensors(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_temp_handle_t phTemperature) {
+  public static ctl_result_t ctlEnumTemperatureSensors(global::System.IntPtr hDAhandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_temp_handle_t? phTemperature) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlEnumTemperatureSensors(hDAhandle, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_temp_handle_t.getCPtr(phTemperature));
     return ret;
   }
 
-  public static ctl_result_t ctlTemperatureGetProperties(SWIGTYPE_p__ctl_temp_handle_t hTemperature, ctl_temp_properties_t pProperties) {
+  public static ctl_result_t ctlTemperatureGetProperties(SWIGTYPE_p__ctl_temp_handle_t? hTemperature, ctl_temp_properties_t? pProperties) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlTemperatureGetProperties(SWIGTYPE_p__ctl_temp_handle_t.getCPtr(hTemperature), ctl_temp_properties_t.getCPtr(pProperties));
     return ret;
   }
 
-  public static ctl_result_t ctlTemperatureGetState(SWIGTYPE_p__ctl_temp_handle_t hTemperature, SWIGTYPE_p_double pTemperature) {
+  public static ctl_result_t ctlTemperatureGetState(SWIGTYPE_p__ctl_temp_handle_t? hTemperature, SWIGTYPE_p_double? pTemperature) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.ctlTemperatureGetState(SWIGTYPE_p__ctl_temp_handle_t.getCPtr(hTemperature), SWIGTYPE_p_double.getCPtr(pTemperature));
     return ret;
   }
 
-  public static ctl_result_t IGCL_InitDefault(SWIGTYPE_p_p__ctl_api_handle_t phAPI) {
+  public static ctl_result_t IGCL_InitDefault(SWIGTYPE_p_p__ctl_api_handle_t? phAPI) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_InitDefault(SWIGTYPE_p_p__ctl_api_handle_t.getCPtr(phAPI));
     return ret;
   }
 
-  public static ctl_result_t IGCL_EnumerateAdapters(SWIGTYPE_p__ctl_api_handle_t hAPI, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t pAdapters) {
+  public static ctl_result_t IGCL_EnumerateAdapters(SWIGTYPE_p__ctl_api_handle_t? hAPI, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t? pAdapters) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_EnumerateAdapters(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hAPI), SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(pAdapters));
     return ret;
   }
 
-  public static ctl_result_t IGCL_EnumerateDisplays(global::System.IntPtr hAdapter, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p__ctl_display_output_handle_t pDisplays) {
+  public static ctl_result_t IGCL_EnumerateDisplays(global::System.IntPtr hAdapter, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_display_output_handle_t? pDisplays) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_EnumerateDisplays(hAdapter, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_display_output_handle_t.getCPtr(pDisplays));
     return ret;
   }
 
-  public static ctl_result_t IGCL_GetDisplayProperties(global::System.IntPtr hDisplay, ctl_display_properties_t pProps) {
+  public static ctl_result_t IGCL_GetDisplayProperties(global::System.IntPtr hDisplay, ctl_display_properties_t? pProps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetDisplayProperties(hDisplay, ctl_display_properties_t.getCPtr(pProps));
     return ret;
   }
 
-  public static ctl_result_t IGCL_GetAdapterProperties(global::System.IntPtr hAdapter, ctl_device_adapter_properties_t pProps) {
+  public static ctl_result_t IGCL_GetAdapterProperties(global::System.IntPtr hAdapter, ctl_device_adapter_properties_t? pProps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetAdapterProperties(hAdapter, ctl_device_adapter_properties_t.getCPtr(pProps));
     return ret;
   }
 
-  public static ctl_result_t IGCL_I2CAccess(global::System.IntPtr hDisplay, ctl_i2c_access_args_t pArgs) {
+  public static ctl_result_t IGCL_I2CAccess(global::System.IntPtr hDisplay, ctl_i2c_access_args_t? pArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_I2CAccess(hDisplay, ctl_i2c_access_args_t.getCPtr(pArgs));
     return ret;
   }
 
-  public static ctl_result_t IGCL_AUXAccess(global::System.IntPtr hDisplay, ctl_aux_access_args_t pArgs) {
+  public static ctl_result_t IGCL_AUXAccess(global::System.IntPtr hDisplay, ctl_aux_access_args_t? pArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_AUXAccess(hDisplay, ctl_aux_access_args_t.getCPtr(pArgs));
     return ret;
   }
 
-  public static ctl_result_t IGCL_GetPanelDescriptor(global::System.IntPtr hDisplay, ctl_panel_descriptor_access_args_t pArgs, SWIGTYPE_p_p_unsigned_char pBuffer) {
+  public static ctl_result_t IGCL_GetPanelDescriptor(global::System.IntPtr hDisplay, ctl_panel_descriptor_access_args_t? pArgs, SWIGTYPE_p_p_unsigned_char? pBuffer) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetPanelDescriptor(hDisplay, ctl_panel_descriptor_access_args_t.getCPtr(pArgs), SWIGTYPE_p_p_unsigned_char.getCPtr(pBuffer));
     return ret;
   }
 
-  public static ctl_result_t IGCL_GetSetDCE(global::System.IntPtr hDisplay, ctl_dce_args_t pArgs) {
+  public static ctl_result_t IGCL_GetSetDCE(global::System.IntPtr hDisplay, ctl_dce_args_t? pArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetSetDCE(hDisplay, ctl_dce_args_t.getCPtr(pArgs));
     return ret;
   }
 
-  public static ctl_result_t IGCL_EnumDisplays(global::System.IntPtr hAdapter, SWIGTYPE_p_unsigned_int pCount, SWIGTYPE_p_p_p__ctl_display_output_handle_t ppDisplays) {
+  public static ctl_result_t IGCL_EnumDisplays(global::System.IntPtr hAdapter, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p_p__ctl_display_output_handle_t? ppDisplays) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_EnumDisplays(hAdapter, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p_p__ctl_display_output_handle_t.getCPtr(ppDisplays));
     return ret;
   }
 
-  public static ctl_result_t IGCL_Close(SWIGTYPE_p__ctl_api_handle_t hAPI) {
+  public static ctl_result_t IGCL_Close(SWIGTYPE_p__ctl_api_handle_t? hAPI) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_Close(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hAPI));
     return ret;
   }
 
-  public static void IGCL_FreeBuffer(SWIGTYPE_p_void ptr) {
+  public static void IGCL_FreeBuffer(SWIGTYPE_p_void? ptr) {
     IGCLPINVOKE.IGCL_FreeBuffer(SWIGTYPE_p_void.getCPtr(ptr));
   }
 
-  public static ctl_result_t IGCL_WaitForDisplayChange(global::System.IntPtr hAdapter, ctl_wait_property_change_args_t pArgs) {
+  public static ctl_result_t IGCL_WaitForDisplayChange(global::System.IntPtr hAdapter, ctl_wait_property_change_args_t? pArgs) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_WaitForDisplayChange(hAdapter, ctl_wait_property_change_args_t.getCPtr(pArgs));
     return ret;
   }

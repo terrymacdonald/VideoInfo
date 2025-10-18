@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_dce_args_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_dce_args_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -56,6 +61,8 @@ public class ctl_dce_args_t : global::System.IDisposable {
       }
     }
   }
+
+#nullable enable
 
   public uint Size {
     set {
@@ -137,13 +144,13 @@ public class ctl_dce_args_t : global::System.IDisposable {
     } 
   }
 
-  public SWIGTYPE_p_unsigned_int pHistogram {
+  public SWIGTYPE_p_unsigned_int? pHistogram {
     set {
       IGCLPINVOKE.ctl_dce_args_t_pHistogram_set(swigCPtr, SWIGTYPE_p_unsigned_int.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_dce_args_t_pHistogram_get(swigCPtr);
-      SWIGTYPE_p_unsigned_int ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);
+      SWIGTYPE_p_unsigned_int? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);
       return ret;
     } 
   }

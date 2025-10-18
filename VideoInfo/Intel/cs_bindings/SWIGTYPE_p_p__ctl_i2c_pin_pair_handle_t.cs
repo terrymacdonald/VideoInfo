@@ -10,6 +10,11 @@
 
 namespace IGCLWrapper {
 
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
 public class SWIGTYPE_p_p__ctl_i2c_pin_pair_handle_t {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 

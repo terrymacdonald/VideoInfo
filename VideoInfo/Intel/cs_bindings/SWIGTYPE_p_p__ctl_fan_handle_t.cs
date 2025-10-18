@@ -10,6 +10,11 @@
 
 namespace IGCLWrapper {
 
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
 public class SWIGTYPE_p_p__ctl_fan_handle_t {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
 

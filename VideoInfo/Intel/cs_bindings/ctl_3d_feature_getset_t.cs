@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_3d_feature_getset_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_3d_feature_getset_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -56,6 +61,8 @@ public class ctl_3d_feature_getset_t : global::System.IDisposable {
       }
     }
   }
+
+#nullable enable
 
   public uint Size {
     set {
@@ -127,13 +134,13 @@ public class ctl_3d_feature_getset_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_property_t Value {
+  public ctl_property_t? Value {
     set {
       IGCLPINVOKE.ctl_3d_feature_getset_t_Value_set(swigCPtr, ctl_property_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_3d_feature_getset_t_Value_get(swigCPtr);
-      ctl_property_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_t(cPtr, false);
+      ctl_property_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_t(cPtr, false);
       return ret;
     } 
   }
@@ -148,13 +155,13 @@ public class ctl_3d_feature_getset_t : global::System.IDisposable {
     } 
   }
 
-  public SWIGTYPE_p_void pCustomValue {
+  public SWIGTYPE_p_void? pCustomValue {
     set {
       IGCLPINVOKE.ctl_3d_feature_getset_t_pCustomValue_set(swigCPtr, SWIGTYPE_p_void.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_3d_feature_getset_t_pCustomValue_get(swigCPtr);
-      SWIGTYPE_p_void ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
+      SWIGTYPE_p_void? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
       return ret;
     } 
   }

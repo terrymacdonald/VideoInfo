@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_lda_args_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_lda_args_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_lda_args_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_lda_args_t_Size_set(swigCPtr, value);
@@ -87,13 +94,13 @@ public class ctl_lda_args_t : global::System.IDisposable {
     } 
   }
 
-  public SWIGTYPE_p_p__ctl_device_adapter_handle_t hLinkedAdapters {
+  public SWIGTYPE_p_p__ctl_device_adapter_handle_t? hLinkedAdapters {
     set {
       IGCLPINVOKE.ctl_lda_args_t_hLinkedAdapters_set(swigCPtr, SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_lda_args_t_hLinkedAdapters_get(swigCPtr);
-      SWIGTYPE_p_p__ctl_device_adapter_handle_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_device_adapter_handle_t(cPtr, false);
+      SWIGTYPE_p_p__ctl_device_adapter_handle_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p__ctl_device_adapter_handle_t(cPtr, false);
       return ret;
     } 
   }

@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_generic_void_datatype_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_generic_void_datatype_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,13 +62,15 @@ public class ctl_generic_void_datatype_t : global::System.IDisposable {
     }
   }
 
-  public SWIGTYPE_p_void pData {
+#nullable enable
+
+  public SWIGTYPE_p_void? pData {
     set {
       IGCLPINVOKE.ctl_generic_void_datatype_t_pData_set(swigCPtr, SWIGTYPE_p_void.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_generic_void_datatype_t_pData_get(swigCPtr);
-      SWIGTYPE_p_void ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
+      SWIGTYPE_p_void? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_void(cPtr, false);
       return ret;
     } 
   }

@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_video_processing_super_resolution_info_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_video_processing_super_resolution_info_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_video_processing_super_resolution_info_t : global::System.IDisp
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_video_processing_super_resolution_info_t_Size_set(swigCPtr, value);
@@ -87,24 +94,24 @@ public class ctl_video_processing_super_resolution_info_t : global::System.IDisp
     } 
   }
 
-  public ctl_property_info_uint_t super_resolution_range_in_width {
+  public ctl_property_info_uint_t? super_resolution_range_in_width {
     set {
       IGCLPINVOKE.ctl_video_processing_super_resolution_info_t_super_resolution_range_in_width_set(swigCPtr, ctl_property_info_uint_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_video_processing_super_resolution_info_t_super_resolution_range_in_width_get(swigCPtr);
-      ctl_property_info_uint_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_uint_t(cPtr, false);
+      ctl_property_info_uint_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_uint_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_uint_t super_resolution_range_in_height {
+  public ctl_property_info_uint_t? super_resolution_range_in_height {
     set {
       IGCLPINVOKE.ctl_video_processing_super_resolution_info_t_super_resolution_range_in_height_set(swigCPtr, ctl_property_info_uint_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_video_processing_super_resolution_info_t_super_resolution_range_in_height_get(swigCPtr);
-      ctl_property_info_uint_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_uint_t(cPtr, false);
+      ctl_property_info_uint_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_uint_t(cPtr, false);
       return ret;
     } 
   }

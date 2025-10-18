@@ -391,78 +391,19 @@ namespace DisplayMagicianShared.Intel
                 //_adlxHelper = new ADLXHelper();
                 SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: Intialising Intel IGCL Helper interface");
                 ctl_init_args_t ctl_Init_Args = new ctl_init_args_t();
-                SWIGTYPE_p_p__ctl_api_handle_t ppApiHandle = IGCL.memHandleP_value();
+                SWIGTYPE_p_p__ctl_api_handle_t ppApiHandle = IGCL.new_apiHandleP();
                 ctl_result_t status = IGCL.ctlInit(ctl_Init_Args, ppApiHandle);
                 if (status != ctl_result_t.CTL_RESULT_SUCCESS)
                 {
-                    SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. ADLXHelper.Initialize() returned error code {status.ToString("G")}");
+                    SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. IGCL.ctlInit() returned error code {status.ToString("G")}");
                     _initialised = false;
                     return;
                 }
                 else
                 {
-                    try
-                    {
-                        // Get system services
-                        SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Successfully intialised Intel IGCL Helper.");
-                        SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attemping to access Intel IGCL System Services.");
-                        _adlxSystem = _adlxHelper.GetSystemServices();
-                        if (_adlxSystem != null)
-                        {
-                            _initialised = true;
-                            _adlxHighestSupportedSystemVersion = 0;
-                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Successfully got Intel IGCL System Services.");
-                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Intel IGCL library was initialised successfully");
-                        }
-                        else
-                        {
-                            _initialised = false;
-                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Failed to get Intel IGCL System Services. Disabling Intel support in this config.");
-                            return;
-                        }
-
-                        // Check for SystemServices1
-                        _adlxSystem1 = ADLX.QuerySystem1Interface(_adlxSystem);
-                        if (_adlxSystem1 != null)
-                        {
-                            _adlxHighestSupportedSystemVersion = 1;
-                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Intel IGCL System Services1 object is supported on this PC");
-
-                            // Check for SystemServices2
-                            _adlxSystem2 = ADLX.QuerySystem2Interface(_adlxSystem);
-                            if (_adlxSystem2 != null)
-                            {
-                                _adlxHighestSupportedSystemVersion = 2;
-                                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Intel IGCL System Services2 object is supported on this PC");
-                            }
-                            else
-                            { 
-                                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Failed to get Intel IGCL System Services2. Intel IGCL System Services2 object is NOT supported on this PC.");
-                            }
-
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Failed to get Intel IGCL System Services1. Intel IGCL System Services1 object is NOT supported on this PC.");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedLogger.logger.Trace(ex, $"IntelLibrary/IntelLibrary: Exception getting the Intel IGCL System Services");
-                        SharedLogger.logger.Trace(ex, $"IntelLibrary/IntelLibrary: Terminating the Intel IGCL Helper to avoid memory leaks");
-                        _adlxHelper.Terminate();
-                        SharedLogger.logger.Trace(ex, $"IntelLibrary/IntelLibrary: Setting Intel IGCL Helper to null");
-                        _adlxHelper = null;
-                        _initialised = false;
-                        return;
-                    }
-
-                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Display Configuration");
-                    _activeDisplayConfig = GetActiveConfig();
-                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Connected Display Identifiers");
-                    _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
+                    SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Successfully intialised Intel IGCL library!");
+                    _initialised = true;
                 }
-
             }
             catch (TypeInitializationException ex)
             {

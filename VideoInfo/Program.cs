@@ -120,7 +120,7 @@ namespace VideoInfo
             NLog.LogManager.Configuration = config;
 
             // Start the Log file
-            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v1.9.3");
+            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v2.0.0");
             // Log the commandline options
             SharedLogger.logger.Info($"VideoInfo/Main: cmdline options: {string.Join(" ", args)}");
 

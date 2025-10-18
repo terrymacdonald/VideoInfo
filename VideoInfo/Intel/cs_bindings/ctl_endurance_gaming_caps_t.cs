@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_endurance_gaming_caps_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_endurance_gaming_caps_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,24 +62,26 @@ public class ctl_endurance_gaming_caps_t : global::System.IDisposable {
     }
   }
 
-  public ctl_property_info_enum_t EGControlCaps {
+#nullable enable
+
+  public ctl_property_info_enum_t? EGControlCaps {
     set {
       IGCLPINVOKE.ctl_endurance_gaming_caps_t_EGControlCaps_set(swigCPtr, ctl_property_info_enum_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_endurance_gaming_caps_t_EGControlCaps_get(swigCPtr);
-      ctl_property_info_enum_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_enum_t(cPtr, false);
+      ctl_property_info_enum_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_enum_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_property_info_enum_t EGModeCaps {
+  public ctl_property_info_enum_t? EGModeCaps {
     set {
       IGCLPINVOKE.ctl_endurance_gaming_caps_t_EGModeCaps_set(swigCPtr, ctl_property_info_enum_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_endurance_gaming_caps_t_EGModeCaps_get(swigCPtr);
-      ctl_property_info_enum_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_enum_t(cPtr, false);
+      ctl_property_info_enum_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_property_info_enum_t(cPtr, false);
       return ret;
     } 
   }

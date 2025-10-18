@@ -10,7 +10,12 @@
 
 namespace IGCLWrapper {
 
-public class ctl_power_limits_t : global::System.IDisposable {
+using System;
+using System.Runtime.InteropServices;
+
+#nullable enable
+
+public partial class ctl_power_limits_t : global::System.IDisposable {
   private global::System.Runtime.InteropServices.HandleRef swigCPtr;
   protected bool swigCMemOwn;
 
@@ -57,6 +62,8 @@ public class ctl_power_limits_t : global::System.IDisposable {
     }
   }
 
+#nullable enable
+
   public uint Size {
     set {
       IGCLPINVOKE.ctl_power_limits_t_Size_set(swigCPtr, value);
@@ -77,35 +84,35 @@ public class ctl_power_limits_t : global::System.IDisposable {
     } 
   }
 
-  public ctl_power_sustained_limit_t sustainedPowerLimit {
+  public ctl_power_sustained_limit_t? sustainedPowerLimit {
     set {
       IGCLPINVOKE.ctl_power_limits_t_sustainedPowerLimit_set(swigCPtr, ctl_power_sustained_limit_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_limits_t_sustainedPowerLimit_get(swigCPtr);
-      ctl_power_sustained_limit_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_sustained_limit_t(cPtr, false);
+      ctl_power_sustained_limit_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_sustained_limit_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_power_burst_limit_t burstPowerLimit {
+  public ctl_power_burst_limit_t? burstPowerLimit {
     set {
       IGCLPINVOKE.ctl_power_limits_t_burstPowerLimit_set(swigCPtr, ctl_power_burst_limit_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_limits_t_burstPowerLimit_get(swigCPtr);
-      ctl_power_burst_limit_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_burst_limit_t(cPtr, false);
+      ctl_power_burst_limit_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_burst_limit_t(cPtr, false);
       return ret;
     } 
   }
 
-  public ctl_power_peak_limit_t peakPowerLimits {
+  public ctl_power_peak_limit_t? peakPowerLimits {
     set {
       IGCLPINVOKE.ctl_power_limits_t_peakPowerLimits_set(swigCPtr, ctl_power_peak_limit_t.getCPtr(value));
     } 
     get {
       global::System.IntPtr cPtr = IGCLPINVOKE.ctl_power_limits_t_peakPowerLimits_get(swigCPtr);
-      ctl_power_peak_limit_t ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_peak_limit_t(cPtr, false);
+      ctl_power_peak_limit_t? ret = (cPtr == global::System.IntPtr.Zero) ? null : new ctl_power_peak_limit_t(cPtr, false);
       return ret;
     } 
   }
