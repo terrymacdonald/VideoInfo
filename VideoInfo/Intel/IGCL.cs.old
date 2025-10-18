@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace DisplayMagicianShared.Intel
+namespace ParkedDisplayMagicianShared.Intel
 {
     // This code was based upon initial code developed by Lesueur Benjamin (@Valkirie) for their HandlheldCompanion application
     // (https://github.com/Valkirie/HandheldCompanion) and was extended using code and examples from the Intel Graphics Command Line Interface (IGCL) API documentation and headers.
