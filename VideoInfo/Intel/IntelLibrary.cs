@@ -1,13 +1,11 @@
 using DisplayMagicianShared;
 using DisplayMagicianShared.Windows;
+using IGCLWrapper; // SWIG-generated bindings
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using IGCLWrapper; // SWIG-generated bindings
-using System;
-using System.Collections.Generic;
 
 namespace DisplayMagicianShared.Intel
 {
@@ -325,6 +323,8 @@ namespace DisplayMagicianShared.Intel
         public List<string> _allConnectedDisplayIdentifiers;
         public IntPtr hIGCLModule = IntPtr.Zero;
         public const string Intel_IGCL_DLL = "ControlLib.dll";
+        public IntPtr hIGCLBindingModule = IntPtr.Zero;
+        public const string INTEL_IGCL_BINDING_DLL = "IGCLWrapper.dll";
 
         static IntelLibrary() { }
         
@@ -347,31 +347,156 @@ namespace DisplayMagicianShared.Intel
                     return;
                 }
 
-                // Attempt to load the Intel IGCL 64-bit DLL
-                IntPtr hIGCLModuleTmp = LoadLibrary(Intel_IGCL_DLL);
-                if (hIGCLModuleTmp != IntPtr.Zero)
+                try { 
+                    // Attempt to load the Intel IGCL 64-bit DLL
+                    IntPtr hIGCLModuleTmp = LoadLibrary(Intel_IGCL_DLL);
+                    if (hIGCLModuleTmp != IntPtr.Zero)
+                    {
+                        hIGCLModule = hIGCLModuleTmp;
+                        SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully loaded the Intel IGCL DLL which means the Intel Graphics driver software is installed.");
+                    }
+                    else
+                    {
+                        // LoadLibrary failed, DLL is not available
+                        _initialised = false;
+                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to load the Intel IGCL DLL. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
+                        return;
+                    }
+
+                    // Attempt to load the Custom ADLX Binding DLL
+                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to load the Intel IGCL CSharp Binding DLL {INTEL_IGCL_BINDING_DLL} so we can access the Intel IGCL DLL from C#");
+                    hIGCLBindingModule = LoadLibrary(INTEL_IGCL_BINDING_DLL);
+                    if (hIGCLBindingModule != IntPtr.Zero)
+                    {
+
+                        // Successfully loaded our custom ADLX Binding DLL, which means it's installed!
+                        _initialised = true;
+                        SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully loaded our custom Intel IGCL CSharp Binding DLL! We can use the Intel IGCL API");
+                    }
+                    else
+                    {
+                        // LoadLibrary failed, DLL is not available
+                        _initialised = false;
+                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to load the Intel IGCL CSharp Binding DLL.");
+                        return;
+                    }
+                }
+                catch (Exception ex)
                 {
-                    hIGCLModule = hIGCLModuleTmp;
-                    SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully loaded the Intel IGCL DLL which means the Intel Graphics driver software is installed.");
+                    _initialised = false;
+                    SharedLogger.logger.Error(ex, "IntelLibrary/IntelLibrary: Exception while trying to load the Intel IGCL DLL or Intel IGCL CSharp Binding DLL. You may need to install the Intel Graphics driver.");
+                }
+
+                // Initialize ADLX with ADLXHelper
+                //_adlxHelper = new ADLXHelper();
+                SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: Intialising Intel IGCL Helper interface");
+                ctl_init_args_t ctl_Init_Args = new ctl_init_args_t();
+                SWIGTYPE_p_p__ctl_api_handle_t ppApiHandle = IGCL.memHandleP_value();
+                ctl_result_t status = IGCL.ctlInit(ctl_Init_Args, ppApiHandle);
+                if (status != ctl_result_t.CTL_RESULT_SUCCESS)
+                {
+                    SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. ADLXHelper.Initialize() returned error code {status.ToString("G")}");
+                    _initialised = false;
+                    return;
                 }
                 else
                 {
-                    // LoadLibrary failed, DLL is not available
-                    _initialised = false;
-                    SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to load the Intel IGCL DLL. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
-                    return;
+                    try
+                    {
+                        // Get system services
+                        SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Successfully intialised Intel IGCL Helper.");
+                        SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attemping to access Intel IGCL System Services.");
+                        _adlxSystem = _adlxHelper.GetSystemServices();
+                        if (_adlxSystem != null)
+                        {
+                            _initialised = true;
+                            _adlxHighestSupportedSystemVersion = 0;
+                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Successfully got Intel IGCL System Services.");
+                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Intel IGCL library was initialised successfully");
+                        }
+                        else
+                        {
+                            _initialised = false;
+                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Failed to get Intel IGCL System Services. Disabling Intel support in this config.");
+                            return;
+                        }
+
+                        // Check for SystemServices1
+                        _adlxSystem1 = ADLX.QuerySystem1Interface(_adlxSystem);
+                        if (_adlxSystem1 != null)
+                        {
+                            _adlxHighestSupportedSystemVersion = 1;
+                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Intel IGCL System Services1 object is supported on this PC");
+
+                            // Check for SystemServices2
+                            _adlxSystem2 = ADLX.QuerySystem2Interface(_adlxSystem);
+                            if (_adlxSystem2 != null)
+                            {
+                                _adlxHighestSupportedSystemVersion = 2;
+                                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Intel IGCL System Services2 object is supported on this PC");
+                            }
+                            else
+                            { 
+                                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Failed to get Intel IGCL System Services2. Intel IGCL System Services2 object is NOT supported on this PC.");
+                            }
+
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Failed to get Intel IGCL System Services1. Intel IGCL System Services1 object is NOT supported on this PC.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Trace(ex, $"IntelLibrary/IntelLibrary: Exception getting the Intel IGCL System Services");
+                        SharedLogger.logger.Trace(ex, $"IntelLibrary/IntelLibrary: Terminating the Intel IGCL Helper to avoid memory leaks");
+                        _adlxHelper.Terminate();
+                        SharedLogger.logger.Trace(ex, $"IntelLibrary/IntelLibrary: Setting Intel IGCL Helper to null");
+                        _adlxHelper = null;
+                        _initialised = false;
+                        return;
+                    }
+
+                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Display Configuration");
+                    _activeDisplayConfig = GetActiveConfig();
+                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Connected Display Identifiers");
+                    _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
                 }
 
-                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initialise the Intel IGCL API");
+            }
+            catch (TypeInitializationException ex)
+            {
+                SharedLogger.logger.Info(ex, $"IntelLibrary/IntelLibrary: TypeInitializationException trying to load the Intel IGCL DLL {Intel_IGCL_DLL}. This generally means you don't have the Intel IGCL driver installed.");
+                _initialised = false;
+                return;
+            }
+            catch (DllNotFoundException ex)
+            {
+                // If we get here then the Intel IGCL DLL wasn't found. We can't continue to use it, so we log the error and exit
+                SharedLogger.logger.Info(ex, $"IntelLibrary/IntelLibrary: DllNotFoundException trying to load the Intel IGCL DLL {Intel_IGCL_DLL}. This generally means you don't have the Intel IGCL driver installed.");
+                _initialised = false;
+                return;
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Info(ex, $"IntelLibrary/IntelLibrary: A general exception trying to load the Intel IGCL DLL {Intel_IGCL_DLL}.");
+                _initialised = false;
+                return;
+            }
+
+
+            /*SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initialise the Intel IGCL API");
                 try
                 {
-                    // Initialize IGCL
+                    // Initialize IGCL - using the helper pointer functions
                     SWIGTYPE_p_p__ctl_api_handle_t ppApiHandle = IGCL.new_deviceAdapterHandleP();
                     ctl_result_t result = IGCL.IGCL_InitDefault(ppApiHandle);
                     
                     if (result == ctl_result_t.CTL_RESULT_SUCCESS)
                     {
-                        _igclApiHandle = new SWIGTYPE_p__ctl_api_handle_t(IGCL.deviceAdapterHandleP_value(ppApiHandle), false);
+                        // Extract the actual API handle from the pointer-to-pointer
+                        IntPtr apiHandlePtr = IGCL.deviceAdapterHandleP_value(ppApiHandle);
+                        _igclApiHandle = new SWIGTYPE_p__ctl_api_handle_t(apiHandlePtr, false);
                         _initialised = true;
                         SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully initialised the Intel IGCL API which means that the Intel Graphics driver software is installed and working.");
                     }
@@ -400,7 +525,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Info(ex, $"IntelLibrary/IntelLibrary: A general exception trying to load the Intel IGCL DLL {Intel_IGCL_DLL}.");
                 _initialised = false; 
                 return;
-            }
+            }*/
         }
 
         ~IntelLibrary()
@@ -669,15 +794,20 @@ namespace DisplayMagicianShared.Intel
 
                         // Create display with settings
                         INTEL_DISPLAY_WITH_SETTINGS displayWithSettings = new INTEL_DISPLAY_WITH_SETTINGS();
+                        
+                        // Get display name - using display index as identifier since name isn't directly available
+                        string displayName = $"Intel Display {displayIdx} on Adapter {adapterIdx}";
+                        string deviceId = $"IntelDisplay_{adapterIdx}_{displayIdx}";
+                        
                         displayWithSettings.Display = new INTEL_DISPLAY
                         {
-                            Name = displayProps.name,
-                            DeviceID = displayProps.os_display_name,
+                            Name = displayName,
+                            DeviceID = deviceId,
                             DisplayIndex = displayIdx,
                             AdapterIndex = adapterIdx
                         };
 
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayIdx}: {displayProps.name}");
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayIdx}: {displayName}");
 
                         //------------------------------------
                         // GET INTEGER SCALING (RETRO SCALING) SETTINGS
@@ -696,7 +826,7 @@ namespace DisplayMagicianShared.Intel
                             if (status == ctl_result_t.CTL_RESULT_SUCCESS)
                             {
                                 displayWithSettings.IsEnabledIntegerScaling = retroScalingSettings.Enable;
-                                displayWithSettings.IntegerScalingType = retroScalingSettings.RetroScalingType;
+                                displayWithSettings.IntegerScalingType = (ctl_retro_scaling_type_flag_t)retroScalingSettings.RetroScalingType;
                                 SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Integer Scaling: Enabled={retroScalingSettings.Enable}, Type={retroScalingSettings.RetroScalingType}");
                             }
                         }
@@ -717,7 +847,7 @@ namespace DisplayMagicianShared.Intel
                             if (status == ctl_result_t.CTL_RESULT_SUCCESS)
                             {
                                 displayWithSettings.IsEnabledGPUScaling = scalingSettings.Enable;
-                                displayWithSettings.ScalingType = scalingSettings.ScalingType;
+                                displayWithSettings.ScalingType = (ctl_scaling_type_flag_t)scalingSettings.ScalingType;
                                 SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: GPU Scaling: Enabled={scalingSettings.Enable}, Type={scalingSettings.ScalingType}");
                             }
                         }
@@ -738,7 +868,7 @@ namespace DisplayMagicianShared.Intel
                             if (status == ctl_result_t.CTL_RESULT_SUCCESS)
                             {
                                 displayWithSettings.IsEnabledImageSharpening = sharpnessSettings.Enable;
-                                displayWithSettings.SharpeningFilterType = sharpnessSettings.FilterType;
+                                displayWithSettings.SharpeningFilterType = (ctl_sharpness_filter_type_flag_t)sharpnessSettings.FilterType;
                                 displayWithSettings.SharpeningIntensity = sharpnessSettings.Intensity;
                                 SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Image Sharpening: Enabled={sharpnessSettings.Enable}, Intensity={sharpnessSettings.Intensity}");
                             }
@@ -876,7 +1006,7 @@ namespace DisplayMagicianShared.Intel
                             
                             ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
                             combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_ENABLE;
-                            combinedDisplayArgs.NumOutputs = displayConfig.CombinedDisplay.NumOutputs;
+                            combinedDisplayArgs.NumOutputs = (byte)displayConfig.CombinedDisplay.NumOutputs;
                             combinedDisplayArgs.CombinedDesktopWidth = displayConfig.CombinedDisplay.CombinedDesktopWidth;
                             combinedDisplayArgs.CombinedDesktopHeight = displayConfig.CombinedDisplay.CombinedDesktopHeight;
                             
@@ -1045,11 +1175,11 @@ namespace DisplayMagicianShared.Intel
                                 
                                 if (status == ctl_result_t.CTL_RESULT_SUCCESS && 
                                     (retroScalingSettings.Enable != displaySettingsWeStored.IsEnabledIntegerScaling ||
-                                     retroScalingSettings.RetroScalingType != displaySettingsWeStored.IntegerScalingType))
+                                     (uint)retroScalingSettings.RetroScalingType != (uint)displaySettingsWeStored.IntegerScalingType))
                                 {
                                     retroScalingSettings.Get = false;
                                     retroScalingSettings.Enable = displaySettingsWeStored.IsEnabledIntegerScaling;
-                                    retroScalingSettings.RetroScalingType = displaySettingsWeStored.IntegerScalingType;
+                                    retroScalingSettings.RetroScalingType = (uint)displaySettingsWeStored.IntegerScalingType;
                                     
                                     status = IGCL.ctlGetSetRetroScaling(hAdapter, retroScalingSettings);
                                     if (status == ctl_result_t.CTL_RESULT_SUCCESS)
@@ -1083,10 +1213,10 @@ namespace DisplayMagicianShared.Intel
                                 
                                 if (status == ctl_result_t.CTL_RESULT_SUCCESS &&
                                     (scalingSettings.Enable != displaySettingsWeStored.IsEnabledGPUScaling ||
-                                     scalingSettings.ScalingType != displaySettingsWeStored.ScalingType))
+                                     (uint)scalingSettings.ScalingType != (uint)displaySettingsWeStored.ScalingType))
                                 {
                                     scalingSettings.Enable = displaySettingsWeStored.IsEnabledGPUScaling;
-                                    scalingSettings.ScalingType = displaySettingsWeStored.ScalingType;
+                                    scalingSettings.ScalingType = (uint)displaySettingsWeStored.ScalingType;
                                     
                                     status = IGCL.ctlSetCurrentScaling(hDisplay, scalingSettings);
                                     if (status == ctl_result_t.CTL_RESULT_SUCCESS)
@@ -1120,11 +1250,11 @@ namespace DisplayMagicianShared.Intel
                                 
                                 if (status == ctl_result_t.CTL_RESULT_SUCCESS &&
                                     (sharpnessSettings.Enable != displaySettingsWeStored.IsEnabledImageSharpening ||
-                                     sharpnessSettings.FilterType != displaySettingsWeStored.SharpeningFilterType ||
+                                     (uint)sharpnessSettings.FilterType != (uint)displaySettingsWeStored.SharpeningFilterType ||
                                      Math.Abs(sharpnessSettings.Intensity - displaySettingsWeStored.SharpeningIntensity) > 0.001f))
                                 {
                                     sharpnessSettings.Enable = displaySettingsWeStored.IsEnabledImageSharpening;
-                                    sharpnessSettings.FilterType = displaySettingsWeStored.SharpeningFilterType;
+                                    sharpnessSettings.FilterType = (uint)displaySettingsWeStored.SharpeningFilterType;
                                     sharpnessSettings.Intensity = displaySettingsWeStored.SharpeningIntensity;
                                     
                                     status = IGCL.ctlSetCurrentSharpness(hDisplay, sharpnessSettings);
@@ -1292,12 +1422,11 @@ namespace DisplayMagicianShared.Intel
                             continue;
                         }
 
-                        // Create display identifier: IntelIGCL|AdapterName|DisplayName|DisplayIndex|AdapterIndex
+                        // Create display identifier: IntelIGCL|AdapterName|DisplayIndex|AdapterIndex
                         List<string> displayInfo = new List<string>
                         {
                             "IntelIGCL",
                             adapterProps.name,
-                            displayProps.name,
                             displayIdx.ToString(),
                             adapterIdx.ToString()
                         };
