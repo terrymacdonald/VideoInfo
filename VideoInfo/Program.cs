@@ -1,5 +1,6 @@
 ﻿using DisplayMagicianShared;
 using DisplayMagicianShared.AMD;
+using DisplayMagicianShared.Intel;
 using DisplayMagicianShared.NVIDIA;
 using DisplayMagicianShared.Windows;
 using Newtonsoft.Json;
@@ -9,11 +10,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using VideoInfo.Intel;
 
 namespace VideoInfo
 {

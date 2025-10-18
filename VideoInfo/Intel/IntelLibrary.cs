@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using IGCLWrapper; // SWIG-generated bindings
+using System;
+using System.Collections.Generic;
 
 namespace DisplayMagicianShared.Intel
 {
@@ -71,7 +73,7 @@ namespace DisplayMagicianShared.Intel
         // Integer Scaling (Retro Scaling)
         public bool IsSupportedIntegerScaling;
         public bool IsEnabledIntegerScaling;
-        public ctl_retro_scaling_type_flags_t IntegerScalingType;
+        public ctl_retro_scaling_type_flag_t IntegerScalingType;
         
         // GPU Scaling
         public bool IsSupportedGPUScaling;
@@ -89,7 +91,7 @@ namespace DisplayMagicianShared.Intel
             Display = new INTEL_DISPLAY();
             IsSupportedIntegerScaling = false;
             IsEnabledIntegerScaling = false;
-            IntegerScalingType = ctl_retro_scaling_type_flags_t.CTL_RETRO_SCALING_TYPE_FLAG_INTEGER;
+            IntegerScalingType = ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_INTEGER;
             IsSupportedGPUScaling = false;
             IsEnabledGPUScaling = false;
             ScalingType = ctl_scaling_type_flag_t.CTL_SCALING_TYPE_FLAG_IDENTITY;
