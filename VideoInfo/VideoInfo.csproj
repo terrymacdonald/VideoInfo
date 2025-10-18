@@ -20,10 +20,6 @@
     <Compile Remove="TaskbarHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Intel\IGCL.cs.old" />
-    <Compile Include="Intel\IntelLibrary.cs.old" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="EDIDParser">
       <Version>1.2.5.4</Version>
     </PackageReference>
