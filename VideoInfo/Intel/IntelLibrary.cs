@@ -4,6 +4,8 @@ using IGCLWrapper; // SWIG-generated bindings
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -347,12 +349,36 @@ namespace DisplayMagicianShared.Intel
                     return;
                 }
 
-                try { 
+                try {
                     // Attempt to load the Intel IGCL 64-bit DLL
-                    IntPtr hIGCLModuleTmp = LoadLibrary(Intel_IGCL_DLL);
-                    if (hIGCLModuleTmp != IntPtr.Zero)
+                    
+                    string system32Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),"DriverStore","FileRepository");
+
+                    Console.WriteLine($"Searching for {Intel_IGCL_DLL} in {system32Path} and its subdirectories...");
+
+                    // Find all files matching the DLL name.
+                    string[] foundDlls = FindAllFiles(system32Path, Intel_IGCL_DLL);
+
+                    if (foundDlls.Length == 0)
                     {
-                        hIGCLModule = hIGCLModuleTmp;
+                        Console.WriteLine($"{Intel_IGCL_DLL} not found in System32 or its subdirectories.");
+                        return;
+                    }
+
+                    // Find the newest version among the found DLLs.
+                    string newestDllPath = GetNewestDllPath(foundDlls);
+                    if (newestDllPath == null)
+                    {
+                        Console.WriteLine("Could not determine the newest DLL version.");
+                        return;
+                    }
+
+                    Console.WriteLine($"Found newest version of {Intel_IGCL_DLL} at: {newestDllPath}");
+
+                    hIGCLModule = LoadLibrary(newestDllPath);
+                    //hIGCLModule = LoadLibrary(intelDriverPath);
+                    if (hIGCLModule != IntPtr.Zero)
+                    {
                         SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully loaded the Intel IGCL DLL which means the Intel Graphics driver software is installed.");
                     }
                     else
@@ -832,6 +858,55 @@ namespace DisplayMagicianShared.Intel
             
             // Return the configuration
             return myDisplayConfig;
+        }
+
+        /// <summary>
+        /// Searches for all instances of a file recursively within a specified directory.
+        /// </summary>
+        private string[] FindAllFiles(string startPath, string fileName)
+        {
+            try
+            {
+                return Directory.GetFiles(startPath, fileName, SearchOption.AllDirectories);
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is DirectoryNotFoundException)
+            {
+                // Ignore access errors in protected directories.
+                Console.WriteLine($"Access error during search: {ex.Message}");
+            }
+
+            return new string[0];
+        }
+
+        /// <summary>
+        /// Compares the file version information of multiple DLLs and returns the path to the newest one.
+        /// </summary>
+        private string GetNewestDllPath(string[] dllPaths)
+        {
+            Version newestVersion = new Version(0, 0);
+            string newestPath = null;
+
+            foreach (string path in dllPaths)
+            {
+                try
+                {
+                    FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(path);
+                    Version fileVersion = new Version(versionInfo.FileVersion);
+
+                    if (fileVersion > newestVersion)
+                    {
+                        newestVersion = fileVersion;
+                        newestPath = path;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // This can happen if the file is locked or corrupt.
+                    Console.WriteLine($"Could not get version info for {path}. Error: {ex.Message}");
+                }
+            }
+
+            return newestPath;
         }
 
         public string PrintActiveConfig()
