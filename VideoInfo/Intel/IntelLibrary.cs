@@ -328,6 +328,10 @@ namespace DisplayMagicianShared.Intel
         public IntPtr hIGCLBindingModule = IntPtr.Zero;
         public const string INTEL_IGCL_BINDING_DLL = "IGCLWrapper.dll";
 
+        const uint IGCL_IMPL_MAJOR = 1;
+        const uint IGCL_IMPL_MINOR = 1;
+        const uint IGCL_VERSION = (IGCL_IMPL_MAJOR << 16) | (IGCL_IMPL_MINOR & 0x0000FFFF);
+
         static IntelLibrary() { }
         
         public IntelLibrary()
@@ -417,6 +421,12 @@ namespace DisplayMagicianShared.Intel
                 //_adlxHelper = new ADLXHelper();
                 SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: Intialising Intel IGCL Helper interface");
                 ctl_init_args_t ctl_Init_Args = new ctl_init_args_t();
+                //ctl_Init_Args.Size = (uint)Marshal.SizeOf(typeof(ctl_init_args_t)); // or the alias type
+                //ctl_Init_Args.Version = (byte)1.1;  // or 0 if header says so
+                //ctl_Init_Args.flags = (uint)ctl_init_flag_t.CTL_INIT_FLAG_USE_LEVEL_ZERO; // or 0 if no special flags
+                                                                                          // If there’s an ApplicationUID field:
+                //ctl_Init_Args.ApplicationUID = new ctl_application_id_t();
+                // zero it out if necessary
                 SWIGTYPE_p_p__ctl_api_handle_t ppApiHandle = IGCL.new_apiHandleP();
                 ctl_result_t status = IGCL.ctlInit(ctl_Init_Args, ppApiHandle);
                 if (status != ctl_result_t.CTL_RESULT_SUCCESS)
