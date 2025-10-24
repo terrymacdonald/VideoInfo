@@ -14,6 +14,26 @@ public partial class IGCL {
 
 #nullable enable
 
+  public static uint CTL_MakeVersion(uint major, uint minor) {
+    uint ret = IGCLPINVOKE.CTL_MakeVersion(major, minor);
+    return ret;
+  }
+
+  public static uint CTL_GetMajorVersion(uint version) {
+    uint ret = IGCLPINVOKE.CTL_GetMajorVersion(version);
+    return ret;
+  }
+
+  public static uint CTL_GetMinorVersion(uint version) {
+    uint ret = IGCLPINVOKE.CTL_GetMinorVersion(version);
+    return ret;
+  }
+
+  public static uint CTL_GetImplVersion() {
+    uint ret = IGCLPINVOKE.CTL_GetImplVersion();
+    return ret;
+  }
+
   public static SWIGTYPE_p_unsigned_int? new_igcl_uint32P() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_igcl_uint32P();
     SWIGTYPE_p_unsigned_int? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);

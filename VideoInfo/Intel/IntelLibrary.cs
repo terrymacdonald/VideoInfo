@@ -420,23 +420,52 @@ namespace DisplayMagicianShared.Intel
                 // Initialize ADLX with ADLXHelper
                 //_adlxHelper = new ADLXHelper();
                 SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: Intialising Intel IGCL Helper interface");
+
+                // Create a pointer to hold the API handle
+                var ppApiHandle = IGCL.new_apiHandleP();
+
+                /* CtlInitArgs.AppVersion = CTL_MAKE_VERSION(CTL_IMPL_MAJOR_VERSION, CTL_IMPL_MINOR_VERSION);
+                CtlInitArgs.flags = 0;
+                CtlInitArgs.Size = sizeof(CtlInitArgs);
+                CtlInitArgs.Version = 0;*/
+
                 ctl_init_args_t ctl_Init_Args = new ctl_init_args_t();
+                ctl_Init_Args.Version = 1;
+                ctl_Init_Args.flags = 0;
+                ctl_Init_Args.AppVersion = (uint)IGCL.CTL_MakeVersion((uint)IGCL.CTL_IMPL_MAJOR_VERSION, (uint)IGCL.CTL_IMPL_MINOR_VERSION);
+
+                
                 //ctl_Init_Args.Size = (uint)Marshal.SizeOf(typeof(ctl_init_args_t)); // or the alias type
                 //ctl_Init_Args.Version = (byte)1.1;  // or 0 if header says so
                 //ctl_Init_Args.flags = (uint)ctl_init_flag_t.CTL_INIT_FLAG_USE_LEVEL_ZERO; // or 0 if no special flags
-                                                                                          // If there’s an ApplicationUID field:
+                // If there’s an ApplicationUID field:
                 //ctl_Init_Args.ApplicationUID = new ctl_application_id_t();
                 // zero it out if necessary
-                SWIGTYPE_p_p__ctl_api_handle_t ppApiHandle = IGCL.new_apiHandleP();
+                // Initialize IGCL with default settings
+                //ctl_result_t status = IGCL.IGCL_InitDefault(apiHandlePtr);
                 ctl_result_t status = IGCL.ctlInit(ctl_Init_Args, ppApiHandle);
                 if (status != ctl_result_t.CTL_RESULT_SUCCESS)
                 {
-                    SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. IGCL.ctlInit() returned error code {status.ToString("G")}");
+                    if (status == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_VERSION)
+                    {
+                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. This version of the IGCL API is not supported on your PC. IGCL is supported on Alderlake-P and later CPUs and select GPUs.");
+                    }
+                    else if (status == ctl_result_t.CTL_RESULT_ERROR_PLATFORM_NOT_SUPPORTED)
+                    {
+                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. The IGCL API Platform is not supported on your PC. IGCL is supported on Alderlake-P and later CPUs and select GPUs.");
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. IGCL.ctlInit() returned error code {status.ToString("G")}");
+                    }
                     _initialised = false;
                     return;
                 }
                 else
                 {
+                    // Get the actual API handle from the pointer
+                    _igclApiHandle = IGCL.apiHandleP_value(ppApiHandle);
+                    Console.WriteLine("IGCL initialized successfully");
                     SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Successfully intialised Intel IGCL library!");
                     _initialised = true;
                 }

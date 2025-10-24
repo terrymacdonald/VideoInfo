@@ -228,6 +228,18 @@ public partial class IGCLPINVOKE {
 #nullable enable
 
 
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_CTL_MakeVersion")]
+  public static extern uint CTL_MakeVersion(uint jarg1, uint jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_CTL_GetMajorVersion")]
+  public static extern uint CTL_GetMajorVersion(uint jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_CTL_GetMinorVersion")]
+  public static extern uint CTL_GetMinorVersion(uint jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_CTL_GetImplVersion")]
+  public static extern uint CTL_GetImplVersion();
+
   [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_new_igcl_uint32P")]
   public static extern global::System.IntPtr new_igcl_uint32P();
 
