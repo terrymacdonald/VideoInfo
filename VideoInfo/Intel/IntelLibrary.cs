@@ -331,6 +331,11 @@ namespace DisplayMagicianShared.Intel
         public IntelLibrary()
         {
             _activeDisplayConfig = CreateDefaultConfig();
+
+            // TODO: Disable the IGCL library use for now until we can properly test it
+            _initialised = false;
+            return;
+
             try
             {
                 _initialised = false;
