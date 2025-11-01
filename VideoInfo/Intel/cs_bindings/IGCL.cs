@@ -14,6 +14,26 @@ public partial class IGCL {
 
 #nullable enable
 
+  public static uint CTL_MakeVersion(uint major, uint minor) {
+    uint ret = IGCLPINVOKE.CTL_MakeVersion(major, minor);
+    return ret;
+  }
+
+  public static uint CTL_GetMajorVersion(uint version) {
+    uint ret = IGCLPINVOKE.CTL_GetMajorVersion(version);
+    return ret;
+  }
+
+  public static uint CTL_GetMinorVersion(uint version) {
+    uint ret = IGCLPINVOKE.CTL_GetMinorVersion(version);
+    return ret;
+  }
+
+  public static uint CTL_GetImplVersion() {
+    uint ret = IGCLPINVOKE.CTL_GetImplVersion();
+    return ret;
+  }
+
   public static SWIGTYPE_p_unsigned_int? new_igcl_uint32P() {
     global::System.IntPtr cPtr = IGCLPINVOKE.new_igcl_uint32P();
     SWIGTYPE_p_unsigned_int? ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_int(cPtr, false);
@@ -1260,13 +1280,18 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t IGCL_InitDefault(SWIGTYPE_p_p__ctl_api_handle_t? phAPI) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_InitDefault(SWIGTYPE_p_p__ctl_api_handle_t.getCPtr(phAPI));
+  public static ctl_result_t IGCL_InitDefault(SWIGTYPE_p_p__ctl_api_handle_t? pApiHandle) {
+    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_InitDefault(SWIGTYPE_p_p__ctl_api_handle_t.getCPtr(pApiHandle));
     return ret;
   }
 
-  public static ctl_result_t IGCL_EnumerateAdapters(SWIGTYPE_p__ctl_api_handle_t? hAPI, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t? pAdapters) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_EnumerateAdapters(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hAPI), SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(pAdapters));
+  public static ctl_result_t IGCL_Close(SWIGTYPE_p__ctl_api_handle_t? hApiHandle) {
+    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_Close(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hApiHandle));
+    return ret;
+  }
+
+  public static ctl_result_t IGCL_EnumerateAdapters(SWIGTYPE_p__ctl_api_handle_t? hApiHandle, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p__ctl_device_adapter_handle_t? pAdapters) {
+    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_EnumerateAdapters(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hApiHandle), SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p__ctl_device_adapter_handle_t.getCPtr(pAdapters));
     return ret;
   }
 
@@ -1275,52 +1300,13 @@ public partial class IGCL {
     return ret;
   }
 
-  public static ctl_result_t IGCL_GetDisplayProperties(global::System.IntPtr hDisplay, ctl_display_properties_t? pProps) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetDisplayProperties(hDisplay, ctl_display_properties_t.getCPtr(pProps));
-    return ret;
-  }
-
   public static ctl_result_t IGCL_GetAdapterProperties(global::System.IntPtr hAdapter, ctl_device_adapter_properties_t? pProps) {
     ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetAdapterProperties(hAdapter, ctl_device_adapter_properties_t.getCPtr(pProps));
     return ret;
   }
 
-  public static ctl_result_t IGCL_I2CAccess(global::System.IntPtr hDisplay, ctl_i2c_access_args_t? pArgs) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_I2CAccess(hDisplay, ctl_i2c_access_args_t.getCPtr(pArgs));
-    return ret;
-  }
-
-  public static ctl_result_t IGCL_AUXAccess(global::System.IntPtr hDisplay, ctl_aux_access_args_t? pArgs) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_AUXAccess(hDisplay, ctl_aux_access_args_t.getCPtr(pArgs));
-    return ret;
-  }
-
-  public static ctl_result_t IGCL_GetPanelDescriptor(global::System.IntPtr hDisplay, ctl_panel_descriptor_access_args_t? pArgs, SWIGTYPE_p_p_unsigned_char? pBuffer) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetPanelDescriptor(hDisplay, ctl_panel_descriptor_access_args_t.getCPtr(pArgs), SWIGTYPE_p_p_unsigned_char.getCPtr(pBuffer));
-    return ret;
-  }
-
-  public static ctl_result_t IGCL_GetSetDCE(global::System.IntPtr hDisplay, ctl_dce_args_t? pArgs) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetSetDCE(hDisplay, ctl_dce_args_t.getCPtr(pArgs));
-    return ret;
-  }
-
-  public static ctl_result_t IGCL_EnumDisplays(global::System.IntPtr hAdapter, SWIGTYPE_p_unsigned_int? pCount, SWIGTYPE_p_p_p__ctl_display_output_handle_t? ppDisplays) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_EnumDisplays(hAdapter, SWIGTYPE_p_unsigned_int.getCPtr(pCount), SWIGTYPE_p_p_p__ctl_display_output_handle_t.getCPtr(ppDisplays));
-    return ret;
-  }
-
-  public static ctl_result_t IGCL_Close(SWIGTYPE_p__ctl_api_handle_t? hAPI) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_Close(SWIGTYPE_p__ctl_api_handle_t.getCPtr(hAPI));
-    return ret;
-  }
-
-  public static void IGCL_FreeBuffer(SWIGTYPE_p_void? ptr) {
-    IGCLPINVOKE.IGCL_FreeBuffer(SWIGTYPE_p_void.getCPtr(ptr));
-  }
-
-  public static ctl_result_t IGCL_WaitForDisplayChange(global::System.IntPtr hAdapter, ctl_wait_property_change_args_t? pArgs) {
-    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_WaitForDisplayChange(hAdapter, ctl_wait_property_change_args_t.getCPtr(pArgs));
+  public static ctl_result_t IGCL_GetDisplayProperties(global::System.IntPtr hDisplay, ctl_display_properties_t? pProps) {
+    ctl_result_t ret = (ctl_result_t)IGCLPINVOKE.IGCL_GetDisplayProperties(hDisplay, ctl_display_properties_t.getCPtr(pProps));
     return ret;
   }
 

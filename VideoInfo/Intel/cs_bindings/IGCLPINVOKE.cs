@@ -228,6 +228,18 @@ public partial class IGCLPINVOKE {
 #nullable enable
 
 
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_CTL_MakeVersion")]
+  public static extern uint CTL_MakeVersion(uint jarg1, uint jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_CTL_GetMajorVersion")]
+  public static extern uint CTL_GetMajorVersion(uint jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_CTL_GetMinorVersion")]
+  public static extern uint CTL_GetMinorVersion(uint jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_CTL_GetImplVersion")]
+  public static extern uint CTL_GetImplVersion();
+
   [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_new_igcl_uint32P")]
   public static extern global::System.IntPtr new_igcl_uint32P();
 
@@ -6978,41 +6990,20 @@ public partial class IGCLPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_InitDefault")]
   public static extern int IGCL_InitDefault(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_Close")]
+  public static extern int IGCL_Close(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_EnumerateAdapters")]
   public static extern int IGCL_EnumerateAdapters(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
   [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_EnumerateDisplays")]
   public static extern int IGCL_EnumerateDisplays(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_GetDisplayProperties")]
-  public static extern int IGCL_GetDisplayProperties(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
   [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_GetAdapterProperties")]
   public static extern int IGCL_GetAdapterProperties(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_I2CAccess")]
-  public static extern int IGCL_I2CAccess(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_AUXAccess")]
-  public static extern int IGCL_AUXAccess(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_GetPanelDescriptor")]
-  public static extern int IGCL_GetPanelDescriptor(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
-
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_GetSetDCE")]
-  public static extern int IGCL_GetSetDCE(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
-
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_EnumDisplays")]
-  public static extern int IGCL_EnumDisplays(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
-
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_Close")]
-  public static extern int IGCL_Close(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_FreeBuffer")]
-  public static extern void IGCL_FreeBuffer(global::System.Runtime.InteropServices.HandleRef jarg1);
-
-  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_WaitForDisplayChange")]
-  public static extern int IGCL_WaitForDisplayChange(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+  [global::System.Runtime.InteropServices.DllImport("IGCLWrapper", EntryPoint="CSharp_IGCLWrapper_IGCL_GetDisplayProperties")]
+  public static extern int IGCL_GetDisplayProperties(global::System.IntPtr jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
 }
 
 }

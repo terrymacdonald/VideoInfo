@@ -4,6 +4,8 @@ using IGCLWrapper; // SWIG-generated bindings
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -326,6 +328,10 @@ namespace DisplayMagicianShared.Intel
         public IntPtr hIGCLBindingModule = IntPtr.Zero;
         public const string INTEL_IGCL_BINDING_DLL = "IGCLWrapper.dll";
 
+        const uint IGCL_IMPL_MAJOR = 1;
+        const uint IGCL_IMPL_MINOR = 1;
+        const uint IGCL_VERSION = (IGCL_IMPL_MAJOR << 16) | (IGCL_IMPL_MINOR & 0x0000FFFF);
+
         static IntelLibrary() { }
         
         public IntelLibrary()
@@ -352,12 +358,36 @@ namespace DisplayMagicianShared.Intel
                     return;
                 }
 
-                try { 
+                try {
                     // Attempt to load the Intel IGCL 64-bit DLL
-                    IntPtr hIGCLModuleTmp = LoadLibrary(Intel_IGCL_DLL);
-                    if (hIGCLModuleTmp != IntPtr.Zero)
+                    
+                    string system32Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),"DriverStore","FileRepository");
+
+                    Console.WriteLine($"Searching for {Intel_IGCL_DLL} in {system32Path} and its subdirectories...");
+
+                    // Find all files matching the DLL name.
+                    string[] foundDlls = FindAllFiles(system32Path, Intel_IGCL_DLL);
+
+                    if (foundDlls.Length == 0)
                     {
-                        hIGCLModule = hIGCLModuleTmp;
+                        Console.WriteLine($"{Intel_IGCL_DLL} not found in System32 or its subdirectories.");
+                        return;
+                    }
+
+                    // Find the newest version among the found DLLs.
+                    string newestDllPath = GetNewestDllPath(foundDlls);
+                    if (newestDllPath == null)
+                    {
+                        Console.WriteLine("Could not determine the newest DLL version.");
+                        return;
+                    }
+
+                    Console.WriteLine($"Found newest version of {Intel_IGCL_DLL} at: {newestDllPath}");
+
+                    hIGCLModule = LoadLibrary(newestDllPath);
+                    //hIGCLModule = LoadLibrary(intelDriverPath);
+                    if (hIGCLModule != IntPtr.Zero)
+                    {
                         SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully loaded the Intel IGCL DLL which means the Intel Graphics driver software is installed.");
                     }
                     else
@@ -395,17 +425,52 @@ namespace DisplayMagicianShared.Intel
                 // Initialize ADLX with ADLXHelper
                 //_adlxHelper = new ADLXHelper();
                 SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: Intialising Intel IGCL Helper interface");
+
+                // Create a pointer to hold the API handle
+                var ppApiHandle = IGCL.new_apiHandleP();
+
+                /* CtlInitArgs.AppVersion = CTL_MAKE_VERSION(CTL_IMPL_MAJOR_VERSION, CTL_IMPL_MINOR_VERSION);
+                CtlInitArgs.flags = 0;
+                CtlInitArgs.Size = sizeof(CtlInitArgs);
+                CtlInitArgs.Version = 0;*/
+
                 ctl_init_args_t ctl_Init_Args = new ctl_init_args_t();
-                SWIGTYPE_p_p__ctl_api_handle_t ppApiHandle = IGCL.new_apiHandleP();
+                ctl_Init_Args.Version = 1;
+                ctl_Init_Args.flags = 0;
+                ctl_Init_Args.AppVersion = (uint)IGCL.CTL_MakeVersion((uint)IGCL.CTL_IMPL_MAJOR_VERSION, (uint)IGCL.CTL_IMPL_MINOR_VERSION);
+
+                
+                //ctl_Init_Args.Size = (uint)Marshal.SizeOf(typeof(ctl_init_args_t)); // or the alias type
+                //ctl_Init_Args.Version = (byte)1.1;  // or 0 if header says so
+                //ctl_Init_Args.flags = (uint)ctl_init_flag_t.CTL_INIT_FLAG_USE_LEVEL_ZERO; // or 0 if no special flags
+                // If there’s an ApplicationUID field:
+                //ctl_Init_Args.ApplicationUID = new ctl_application_id_t();
+                // zero it out if necessary
+                // Initialize IGCL with default settings
+                //ctl_result_t status = IGCL.IGCL_InitDefault(apiHandlePtr);
                 ctl_result_t status = IGCL.ctlInit(ctl_Init_Args, ppApiHandle);
                 if (status != ctl_result_t.CTL_RESULT_SUCCESS)
                 {
-                    SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. IGCL.ctlInit() returned error code {status.ToString("G")}");
+                    if (status == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_VERSION)
+                    {
+                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. This version of the IGCL API is not supported on your PC. IGCL is supported on Alderlake-P and later CPUs and select GPUs.");
+                    }
+                    else if (status == ctl_result_t.CTL_RESULT_ERROR_PLATFORM_NOT_SUPPORTED)
+                    {
+                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. The IGCL API Platform is not supported on your PC. IGCL is supported on Alderlake-P and later CPUs and select GPUs.");
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. IGCL.ctlInit() returned error code {status.ToString("G")}");
+                    }
                     _initialised = false;
                     return;
                 }
                 else
                 {
+                    // Get the actual API handle from the pointer
+                    _igclApiHandle = IGCL.apiHandleP_value(ppApiHandle);
+                    Console.WriteLine("IGCL initialized successfully");
                     SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Successfully intialised Intel IGCL library!");
                     _initialised = true;
                 }
@@ -837,6 +902,55 @@ namespace DisplayMagicianShared.Intel
             
             // Return the configuration
             return myDisplayConfig;
+        }
+
+        /// <summary>
+        /// Searches for all instances of a file recursively within a specified directory.
+        /// </summary>
+        private string[] FindAllFiles(string startPath, string fileName)
+        {
+            try
+            {
+                return Directory.GetFiles(startPath, fileName, SearchOption.AllDirectories);
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is DirectoryNotFoundException)
+            {
+                // Ignore access errors in protected directories.
+                Console.WriteLine($"Access error during search: {ex.Message}");
+            }
+
+            return new string[0];
+        }
+
+        /// <summary>
+        /// Compares the file version information of multiple DLLs and returns the path to the newest one.
+        /// </summary>
+        private string GetNewestDllPath(string[] dllPaths)
+        {
+            Version newestVersion = new Version(0, 0);
+            string newestPath = null;
+
+            foreach (string path in dllPaths)
+            {
+                try
+                {
+                    FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(path);
+                    Version fileVersion = new Version(versionInfo.FileVersion);
+
+                    if (fileVersion > newestVersion)
+                    {
+                        newestVersion = fileVersion;
+                        newestPath = path;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // This can happen if the file is locked or corrupt.
+                    Console.WriteLine($"Could not get version info for {path}. Error: {ex.Message}");
+                }
+            }
+
+            return newestPath;
         }
 
         public string PrintActiveConfig()
