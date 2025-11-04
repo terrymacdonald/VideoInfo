@@ -2453,92 +2453,191 @@ namespace DisplayMagicianShared.NVIDIA
                             continue;
                         }
 
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn on colour if it's user set colour.");
-                        // Now we try to set each display color
-                        ColorDataV5 colorData = (ColorDataV5)myDisplay.ColorData;
-                        try
+                        if (myDisplay.HasColorData)
                         {
-                            ColorDataV5 activeColorData = (ColorDataV5)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData;
-                            // If the setting for this display is not the same as we want, then we set it to NV_COLOR_SELECTION_POLICY_BEST_QUALITY
-                            if (ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData.SelectionPolicy != colorData.SelectionPolicy)
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn on colour if it's user set colour.");
+                            // Now we try to set each display color
+                            ColorDataV5 colorData = (ColorDataV5)myDisplay.ColorData;
+                            try
                             {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to set the NVIDIA custom colour settings for display {displayId} to what the user wants them to be.");
-
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to use custom NVIDIA HDR Colour for display {displayId}.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want the standard colour settings to be {myDisplay.ColorData.SelectionPolicy.ToString()} and they are {ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData.SelectionPolicy.ToString()} for Mosaic display {displayId}.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn off standard colour mode for Mosaic display {displayId}.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings Color selection policy {colorData.SelectionPolicy.ToString()} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings Desktop Colour Depth {colorData.DesktopColorDepth} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings colour format {colorData.ColorFormat} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings colourimetry {colorData.Colorimetry} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings colour depth {colorData.ColorDepth} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings dynamic range {colorData.DynamicRange} for Mosaic display {displayId}");
-
-                                // Set the command as a 'SET'
-                                //colorData.Cmd = NV_COLOR_CMD.NV_COLOR_CMD_SET;
-                                // TODO - set the command to set the color data!
-                                try
+                                ColorDataV5 activeColorData = (ColorDataV5)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData;
+                                // If the setting for this display is not the same as we want, then we set it to NV_COLOR_SELECTION_POLICY_BEST_QUALITY
+                                if (ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData.SelectionPolicy != colorData.SelectionPolicy)
                                 {
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to set the custom NVIDIA Color settings to what the user wants.");
-                                    ColorDataV5 newColorData = new ColorDataV5(ColorDataCommand.Set, colorData.ColorFormat, colorData.Colorimetry, colorData.DynamicRange.Value, colorData.ColorDepth.Value, colorData.SelectionPolicy.Value, colorData.DesktopColorDepth.Value);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to set the displayconfig layout.");
-                                    NVAPI.ColorControl(displayId, ref newColorData);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Successfully changed to the user's custom NVIDIA Color settings.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to set the NVIDIA custom colour settings for display {displayId} to what the user wants them to be.");
+
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to use custom NVIDIA HDR Colour for display {displayId}.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want the standard colour settings to be {myDisplay.ColorData.SelectionPolicy.ToString()} and they are {ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData.SelectionPolicy.ToString()} for Mosaic display {displayId}.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn off standard colour mode for Mosaic display {displayId}.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings Color selection policy {colorData.SelectionPolicy.ToString()} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings Desktop Colour Depth {colorData.DesktopColorDepth} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings colour format {colorData.ColorFormat} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings colourimetry {colorData.Colorimetry} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings colour depth {colorData.ColorDepth} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings dynamic range {colorData.DynamicRange} for Mosaic display {displayId}");
+
+                                    // Set the command as a 'SET'
+                                    //colorData.Cmd = NV_COLOR_CMD.NV_COLOR_CMD_SET;
+                                    // TODO - set the command to set the color data!
+                                    try
+                                    {
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to set the custom NVIDIA Color settings to what the user wants.");
+                                        ColorDataV5 newColorData = new ColorDataV5(ColorDataCommand.Set, colorData.ColorFormat, colorData.Colorimetry, colorData.DynamicRange.Value, colorData.ColorDepth.Value, colorData.SelectionPolicy.Value, colorData.DesktopColorDepth.Value);
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to set the displayconfig layout.");
+                                        NVAPI.ColorControl(displayId, ref newColorData);
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Successfully changed to the user's custom NVIDIA Color settings.");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception occurred whilst trying to dset the user's custom color settings.");
+                                    }
                                 }
-                                catch (Exception ex)
+                                else
                                 {
-                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception occurred whilst trying to dset the user's custom color settings.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want only want to set the user's custom NVIDIA colour settings if needed for display {displayId}, and that currently isn't required. Skipping changing NVIDIA colour mode.");
                                 }
                             }
-                            else
+
+                            catch (Exception ex)
                             {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want only want to set the user's custom NVIDIA colour settings if needed for display {displayId}, and that currently isn't required. Skipping changing NVIDIA colour mode.");
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused while attempting to set the user's NVIDIA colour settings for display {displayId}.");
+                            }
+
+                            // Apply any custom NVIDIA HDR Colour settings
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn on NVIDIA HDR colour if it's user wants to use NVIDIA HDR colour.");
+
+                            HDRColorDataV2 hdrColorData = (HDRColorDataV2)myDisplay.HdrColorData;
+                            try
+                            {
+
+                                // if it's not the same HDR we want, then we turn off HDR (and will apply it if needed later on in SetActiveOverride)
+                                HDRColorDataV2 activeHdrColorData = (HDRColorDataV2)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].HdrColorData;
+                                // if it's HDR and it's a different mode than what we are in now, then set HDR
+                                if (activeHdrColorData.HDRMode != hdrColorData.HDRMode)
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn on user-set HDR mode for display {displayId} as it's supposed to be on.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: HDR mode is currently {activeHdrColorData.HDRMode.ToString("G")} for Mosaic display {displayId}.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings ColorDepth  {hdrColorData.ColorDepth} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings HDR Colour Format {hdrColorData.ColorFormat} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings HDR dynamic range {hdrColorData.DynamicRange} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings HDR Mode {hdrColorData.HDRMode} for Mosaic display {displayId}");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings Mastering Display Data {hdrColorData.MasteringDisplayData} for Mosaic display {displayId}");
+                                    // Apply the HDR removal
+                                    HDRColorDataV2 newHdrColorData = new HDRColorDataV2(ColorDataHDRCommand.Set,
+                                        hdrColorData.HDRMode,
+                                        hdrColorData.MasteringDisplayData,
+                                        hdrColorData.ColorFormat.Value,
+                                        hdrColorData.DynamicRange.Value,
+                                        hdrColorData.ColorDepth.Value);
+                                    NVAPI.HDRColorControl(displayId, ref newHdrColorData);
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to set the HDR settings that the user wants.");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want only want to turn on custom NVIDIA HDR settings if the settings the user wants for display {displayId} are different to those already set. The settings are the same, so skipping changing NVIDIA HDR mode.");
+                                }
+
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception caused while attempting to set the user's NVIDIA HDR colour settings for display {displayId}.");
+                            }
+
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: No Color Data or HDR Color Data settings to apply for display {displayId}.");
+                        }
+
+                        if (myDisplay.HasDVCInfo)
+                        {
+                            // Set any Digital Vibrance Control (DVC) settings
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to set Digital Vibrance Control settings if different from current.");
+
+                            PrivateDisplayDVCInfoEx dvcInfo = myDisplay.DVCInfo;
+                            try
+                            {
+                                PrivateDisplayDVCInfoEx activeDvcInfo = ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].DVCInfo;
+
+                                if (activeDvcInfo.CurrentLevel != dvcInfo.CurrentLevel)
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: DVC level is currently {activeDvcInfo.CurrentLevel} for display {displayId}, but we want it to be {dvcInfo.CurrentLevel}.");
+
+                                    // Convert displayId to OutputId for the SetDVCLevel call
+                                    PhysicalGPUHandle physicalGpu = new PhysicalGPUHandle();
+                                    OutputId gpuOutputId = OutputId.Invalid;
+                                    NVAPI.GetGpuAndOutputIdFromDisplayId(displayId, out physicalGpu, out gpuOutputId);
+
+                                    try
+                                    {
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to set DVC level to {dvcInfo.CurrentLevel} for display {displayId}.");
+                                        NVAPI.SetDVCLevelEx(gpuOutputId, dvcInfo.CurrentLevel);
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Successfully set DVC level to {dvcInfo.CurrentLevel} for display {displayId}.");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception occurred whilst setting DVC level to {dvcInfo.CurrentLevel} for display {displayId}.");
+                                    }
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: DVC level is already set correctly to {dvcInfo.CurrentLevel} for display {displayId}. Skipping DVC adjustment.");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception caused while attempting to set DVC settings for display {displayId}.");
+                            }
+
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: No DVC settings to apply for display {displayId}.");
+                        }
+
+                            // Set any HUE settings
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to set HUE settings if different from current.");
+
+                        if (myDisplay.HasHUEInfo)
+                        {
+                            PrivateDisplayHUEInfo hueInfo = myDisplay.HUEInfo;
+                            try
+                            {
+                                PrivateDisplayHUEInfo activeHueInfo = ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].HUEInfo;
+
+                                if (activeHueInfo.CurrentAngle != hueInfo.CurrentAngle)
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: HUE angle is currently {activeHueInfo.CurrentAngle} for display {displayId}, but we want it to be {hueInfo.CurrentAngle}.");
+
+                                    // Convert displayId to OutputId for the SetHUEAngle call
+                                    PhysicalGPUHandle physicalGpu = new PhysicalGPUHandle();
+                                    OutputId gpuOutputId = OutputId.Invalid;
+                                    NVAPI.GetGpuAndOutputIdFromDisplayId(displayId, out physicalGpu, out gpuOutputId);
+
+                                    try
+                                    {
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to set HUE angle to {hueInfo.CurrentAngle} for display {displayId}.");
+                                        NVAPI.SetHUEAngle(gpuOutputId, hueInfo.CurrentAngle);
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Successfully set HUE angle to {hueInfo.CurrentAngle} for display {displayId}.");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception occurred whilst setting HUE angle to {hueInfo.CurrentAngle} for display {displayId}.");
+                                    }
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: HUE angle is already set correctly to {hueInfo.CurrentAngle} for display {displayId}. Skipping HUE adjustment.");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception caused while attempting to set HUE settings for display {displayId}.");
                             }
                         }
-                        
-                        catch (Exception ex)
+                        else
                         {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused while attempting to set the user's NVIDIA colour settings for display {displayId}.");
-                        }                        
-
-                        // Apply any custom NVIDIA HDR Colour settings
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn on NVIDIA HDR colour if it's user wants to use NVIDIA HDR colour.");
-
-                        HDRColorDataV2 hdrColorData = (HDRColorDataV2)myDisplay.HdrColorData;
-                        try
-                        {
-
-                            // if it's not the same HDR we want, then we turn off HDR (and will apply it if needed later on in SetActiveOverride)
-                            HDRColorDataV2 activeHdrColorData = (HDRColorDataV2)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].HdrColorData;
-                            // if it's HDR and it's a different mode than what we are in now, then set HDR
-                            if (activeHdrColorData.HDRMode != hdrColorData.HDRMode)
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn on user-set HDR mode for display {displayId} as it's supposed to be on.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: HDR mode is currently {activeHdrColorData.HDRMode.ToString("G")} for Mosaic display {displayId}.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings ColorDepth  {hdrColorData.ColorDepth} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings HDR Colour Format {hdrColorData.ColorFormat} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings HDR dynamic range {hdrColorData.DynamicRange} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings HDR Mode {hdrColorData.HDRMode} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want HDR settings Mastering Display Data {hdrColorData.MasteringDisplayData} for Mosaic display {displayId}");
-                                // Apply the HDR removal
-                                HDRColorDataV2 newHdrColorData = new HDRColorDataV2(ColorDataHDRCommand.Set,
-                                    hdrColorData.HDRMode,
-                                    hdrColorData.MasteringDisplayData,
-                                    hdrColorData.ColorFormat.Value,
-                                    hdrColorData.DynamicRange.Value,
-                                    hdrColorData.ColorDepth.Value);
-                                NVAPI.HDRColorControl(displayId, ref newHdrColorData);
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to set the HDR settings that the user wants.");
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want only want to turn on custom NVIDIA HDR settings if the settings the user wants for display {displayId} are different to those already set. The settings are the same, so skipping changing NVIDIA HDR mode.");
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused while attempting to set the user's NVIDIA HDR colour settings for display {displayId}.");
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: No HUE settings to apply for display {displayId}.");
                         }
 
                         // Disabled the Adaptive Sync equality matching as we are having trouble applying it, which is causing issues in profile matching in DisplayMagician
