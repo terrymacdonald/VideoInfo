@@ -113,6 +113,10 @@ namespace DisplayMagicianShared.NVIDIA
         public ColorDataV5 ColorData;
         public bool HasCustomDisplay;
         public List<CustomDisplay> CustomDisplays;
+        public bool HasDVCInfo;
+        public PrivateDisplayDVCInfoEx DVCInfo;
+        public bool HasHUEInfo;
+        public PrivateDisplayHUEInfo HUEInfo;
 
         public NVIDIA_PER_DISPLAY_CONFIG()
         {
@@ -125,6 +129,10 @@ namespace DisplayMagicianShared.NVIDIA
             ColorData = new ColorDataV5();
             HasCustomDisplay = false;
             CustomDisplays = new List<CustomDisplay>();
+            HasDVCInfo = false;
+            DVCInfo = new PrivateDisplayDVCInfoEx();
+            HasHUEInfo = false;
+            HUEInfo = new PrivateDisplayHUEInfo();
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_DISPLAY_CONFIG other && this.Equals(other);
@@ -189,6 +197,27 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The CustomDisplays lists don't match!");
                     return false;
                 }
+                if (HasDVCInfo != other.HasDVCInfo)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasDVCInfo fields don't match!");
+                    return false;
+                }
+
+                if (!DVCInfo.Equals(other.DVCInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The DVCInfo fields don't match!");
+                    return false;
+                }
+                if (HasHUEInfo != other.HasHUEInfo)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasHUEInfo fields don't match!");
+                    return false;
+                }
+                if (!HUEInfo.Equals(other.HUEInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HUEInfo fields don't match!");
+                    return false;
+                }
 
                 // If we make it here then the two configs are equal
                 return true;
@@ -206,7 +235,7 @@ namespace DisplayMagicianShared.NVIDIA
             // To fix this bit, we need to test the SetActiveConfigOverride Adaptive Sync part of the codebase to apply this properly.
             // But for now, we'll exclude it from the equality matching and also stop trying to use the adaptive sync config.
             //return (HasNvHdrEnabled, HdrCapabilities, HdrColorData, HasAdaptiveSync, AdaptiveSyncConfig, HasColorData, ColorData, HasCustomDisplay, CustomDisplays).GetHashCode();
-            return (HasNvHdrEnabled, HdrCapabilities, HdrColorData, HasColorData, ColorData, HasCustomDisplay, CustomDisplays).GetHashCode();
+            return (HasNvHdrEnabled, HdrCapabilities, HdrColorData, HasColorData, ColorData, HasCustomDisplay, CustomDisplays, HasDVCInfo, DVCInfo, HasHUEInfo, HUEInfo).GetHashCode();
         }
         public static bool operator ==(NVIDIA_PER_DISPLAY_CONFIG lhs, NVIDIA_PER_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -1245,10 +1274,17 @@ namespace DisplayMagicianShared.NVIDIA
                             myDisplay.HasNvHdrEnabled = false;
                             myDisplay.HasAdaptiveSync = false;
                             myDisplay.HasCustomDisplay = false;
+                            myDisplay.HasColorData = false;
 
                             // We need to skip recording anything that doesn't support color communication
                             if (!SkippedColorConnectionTypes.Contains(displayIds[displayIndex].ConnectionType))
                             {
+                                // Convert displayId to OutputId for the GetDVCInfoEx calls and others later
+                                PhysicalGPUHandle physicalGpu = new PhysicalGPUHandle();
+                                OutputId gpuOutputId = OutputId.Invalid;
+                                NVAPI.GetGpuAndOutputIdFromDisplayId(displayIds[displayIndex].DisplayId, out physicalGpu, out gpuOutputId);
+
+
                                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: This display supports color information, so attempting to get the various color configuration settings from it.");
 
                                 // skip this monitor connection type as it won't provide the data in the section, and just creates errors                                
@@ -1398,6 +1434,37 @@ namespace DisplayMagicianShared.NVIDIA
                                     SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the Adaptive Sync Settings for Display ID# {displayIds[displayIndex].DisplayId}.");
                                 }
 
+                                // Now we get the Digital Vibrance Control (DVC) information
+                                PrivateDisplayDVCInfoEx dvcInfo;
+                                try
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Digital Vibrance Control info for Display ID# {displayIds[displayIndex].DisplayId}.");
+                                    dvcInfo = NVAPI.GetDVCInfoEx(gpuOutputId);
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got DVC info. Current level: {dvcInfo.CurrentLevel}");
+                                    myDisplay.DVCInfo = dvcInfo;
+                                    myDisplay.HasDVCInfo = true;
+                                }
+                                catch (Exception nex)
+                                {
+                                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting DVC info for Display ID# {displayIds[displayIndex].DisplayId}.");
+                                    dvcInfo = new PrivateDisplayDVCInfoEx();
+                                }
+
+                                // Now we get the Hue information
+                                PrivateDisplayHUEInfo hueInfo;
+                                try
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Hue info for Display ID# {displayIds[displayIndex].DisplayId}.");
+                                    hueInfo = NVAPI.GetHUEInfo(gpuOutputId);
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Hue info. Current angle: {hueInfo.CurrentAngle}");
+                                    myDisplay.HUEInfo = hueInfo;
+                                    myDisplay.HasHUEInfo = true;
+                                }
+                                catch (Exception nex)
+                                {
+                                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting Hue info for Display ID# {displayIds[displayIndex].DisplayId}.");
+                                    hueInfo = new PrivateDisplayHUEInfo();
+                                }
 
                                 // TEMPORARILY DISABLING THE CUSTOM DISPLAY CODE FOR NOW, AS NOT SURE WHAT NVIDIA SETTINGS IT TRACKS
                                 // KEEPING IT IN CASE I NEED IT FOR LATER. I ORIGINALLY THOUGHT THAT IS WHERE INTEGER SCALING SETTINGS LIVED< BUT WAS WRONG
