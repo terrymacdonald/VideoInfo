@@ -213,6 +213,31 @@ public class ADLX {
     return ret;
   }
 
+  public static SWIGTYPE_p_unsigned_long_long new_adlx_uint64P() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_adlx_uint64P();
+    SWIGTYPE_p_unsigned_long_long ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_long_long(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_unsigned_long_long copy_adlx_uint64P(ulong value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_adlx_uint64P(value);
+    SWIGTYPE_p_unsigned_long_long ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_unsigned_long_long(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_adlx_uint64P(SWIGTYPE_p_unsigned_long_long obj) {
+    ADLXPINVOKE.delete_adlx_uint64P(SWIGTYPE_p_unsigned_long_long.getCPtr(obj));
+  }
+
+  public static void adlx_uint64P_assign(SWIGTYPE_p_unsigned_long_long obj, ulong value) {
+    ADLXPINVOKE.adlx_uint64P_assign(SWIGTYPE_p_unsigned_long_long.getCPtr(obj), value);
+  }
+
+  public static ulong adlx_uint64P_value(SWIGTYPE_p_unsigned_long_long obj) {
+    ulong ret = ADLXPINVOKE.adlx_uint64P_value(SWIGTYPE_p_unsigned_long_long.getCPtr(obj));
+    return ret;
+  }
+
   public static SWIGTYPE_p_bool new_adlx_boolP() {
     global::System.IntPtr cPtr = ADLXPINVOKE.new_adlx_boolP();
     SWIGTYPE_p_bool ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_bool(cPtr, false);
@@ -882,6 +907,31 @@ public class ADLX {
 
   public static ADLX_ANTI_ALIASING_MODE adlx_antiAliasingModeP_value(SWIGTYPE_p_ADLX_ANTI_ALIASING_MODE obj) {
     ADLX_ANTI_ALIASING_MODE ret = (ADLX_ANTI_ALIASING_MODE)ADLXPINVOKE.adlx_antiAliasingModeP_value(SWIGTYPE_p_ADLX_ANTI_ALIASING_MODE.getCPtr(obj));
+    return ret;
+  }
+
+  public static SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE new_adlx_asicFamilyTypeP() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_adlx_asicFamilyTypeP();
+    SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE copy_adlx_asicFamilyTypeP(ADLX_ASIC_FAMILY_TYPE value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_adlx_asicFamilyTypeP((int)value);
+    SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_adlx_asicFamilyTypeP(SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE obj) {
+    ADLXPINVOKE.delete_adlx_asicFamilyTypeP(SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE.getCPtr(obj));
+  }
+
+  public static void adlx_asicFamilyTypeP_assign(SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE obj, ADLX_ASIC_FAMILY_TYPE value) {
+    ADLXPINVOKE.adlx_asicFamilyTypeP_assign(SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE.getCPtr(obj), (int)value);
+  }
+
+  public static ADLX_ASIC_FAMILY_TYPE adlx_asicFamilyTypeP_value(SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE obj) {
+    ADLX_ASIC_FAMILY_TYPE ret = (ADLX_ASIC_FAMILY_TYPE)ADLXPINVOKE.adlx_asicFamilyTypeP_value(SWIGTYPE_p_ADLX_ASIC_FAMILY_TYPE.getCPtr(obj));
     return ret;
   }
 
@@ -2054,6 +2104,84 @@ public class ADLX {
     return ret;
   }
 
+  public static SWIGTYPE_p_p_adlx__IADLXSystem new_systemP_Ptr() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_systemP_Ptr();
+    SWIGTYPE_p_p_adlx__IADLXSystem ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXSystem(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXSystem copy_systemP_Ptr(IADLXSystem value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_systemP_Ptr(IADLXSystem.getCPtr(value));
+    SWIGTYPE_p_p_adlx__IADLXSystem ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXSystem(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_systemP_Ptr(SWIGTYPE_p_p_adlx__IADLXSystem obj) {
+    ADLXPINVOKE.delete_systemP_Ptr(SWIGTYPE_p_p_adlx__IADLXSystem.getCPtr(obj));
+  }
+
+  public static void systemP_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXSystem obj, IADLXSystem value) {
+    ADLXPINVOKE.systemP_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXSystem.getCPtr(obj), IADLXSystem.getCPtr(value));
+  }
+
+  public static IADLXSystem systemP_Ptr_value(SWIGTYPE_p_p_adlx__IADLXSystem obj) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.systemP_Ptr_value(SWIGTYPE_p_p_adlx__IADLXSystem.getCPtr(obj));
+    IADLXSystem ret = (cPtr == global::System.IntPtr.Zero) ? null : new IADLXSystem(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXSystem1 new_system1P_Ptr() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_system1P_Ptr();
+    SWIGTYPE_p_p_adlx__IADLXSystem1 ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXSystem1(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXSystem1 copy_system1P_Ptr(IADLXSystem1 value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_system1P_Ptr(IADLXSystem1.getCPtr(value));
+    SWIGTYPE_p_p_adlx__IADLXSystem1 ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXSystem1(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_system1P_Ptr(SWIGTYPE_p_p_adlx__IADLXSystem1 obj) {
+    ADLXPINVOKE.delete_system1P_Ptr(SWIGTYPE_p_p_adlx__IADLXSystem1.getCPtr(obj));
+  }
+
+  public static void system1P_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXSystem1 obj, IADLXSystem1 value) {
+    ADLXPINVOKE.system1P_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXSystem1.getCPtr(obj), IADLXSystem1.getCPtr(value));
+  }
+
+  public static IADLXSystem1 system1P_Ptr_value(SWIGTYPE_p_p_adlx__IADLXSystem1 obj) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.system1P_Ptr_value(SWIGTYPE_p_p_adlx__IADLXSystem1.getCPtr(obj));
+    IADLXSystem1 ret = (cPtr == global::System.IntPtr.Zero) ? null : new IADLXSystem1(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXSystem2 new_system2P_Ptr() {
+    global::System.IntPtr cPtr = ADLXPINVOKE.new_system2P_Ptr();
+    SWIGTYPE_p_p_adlx__IADLXSystem2 ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXSystem2(cPtr, false);
+    return ret;
+  }
+
+  public static SWIGTYPE_p_p_adlx__IADLXSystem2 copy_system2P_Ptr(IADLXSystem2 value) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.copy_system2P_Ptr(IADLXSystem2.getCPtr(value));
+    SWIGTYPE_p_p_adlx__IADLXSystem2 ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXSystem2(cPtr, false);
+    return ret;
+  }
+
+  public static void delete_system2P_Ptr(SWIGTYPE_p_p_adlx__IADLXSystem2 obj) {
+    ADLXPINVOKE.delete_system2P_Ptr(SWIGTYPE_p_p_adlx__IADLXSystem2.getCPtr(obj));
+  }
+
+  public static void system2P_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXSystem2 obj, IADLXSystem2 value) {
+    ADLXPINVOKE.system2P_Ptr_assign(SWIGTYPE_p_p_adlx__IADLXSystem2.getCPtr(obj), IADLXSystem2.getCPtr(value));
+  }
+
+  public static IADLXSystem2 system2P_Ptr_value(SWIGTYPE_p_p_adlx__IADLXSystem2 obj) {
+    global::System.IntPtr cPtr = ADLXPINVOKE.system2P_Ptr_value(SWIGTYPE_p_p_adlx__IADLXSystem2.getCPtr(obj));
+    IADLXSystem2 ret = (cPtr == global::System.IntPtr.Zero) ? null : new IADLXSystem2(cPtr, false);
+    return ret;
+  }
+
   public static SWIGTYPE_p_p_adlx__IADLXGPUTuningServices new_gpuTuningP_Ptr() {
     global::System.IntPtr cPtr = ADLXPINVOKE.new_gpuTuningP_Ptr();
     SWIGTYPE_p_p_adlx__IADLXGPUTuningServices ret = (cPtr == global::System.IntPtr.Zero) ? null : new SWIGTYPE_p_p_adlx__IADLXGPUTuningServices(cPtr, false);
@@ -2858,6 +2986,19 @@ public class ADLX {
     return ret;
   }
 
+  public static ulong ADLX_MAKE_FULL_VERSION(uint major, uint minor) {
+    ulong ret = ADLXPINVOKE.ADLX_MAKE_FULL_VERSION(major, minor);
+    return ret;
+  }
+
+  public static readonly string ADLX_DLL_NAME_64 = ADLXPINVOKE.ADLX_DLL_NAME_64_get();
+  public static readonly string ADLX_DLL_NAME_32 = ADLXPINVOKE.ADLX_DLL_NAME_32_get();
+  public static readonly string ADLX_QUERY_FULL_VERSION_FN = ADLXPINVOKE.ADLX_QUERY_FULL_VERSION_FN_get();
+  public static readonly string ADLX_QUERY_VERSION_FN = ADLXPINVOKE.ADLX_QUERY_VERSION_FN_get();
+  public static readonly string ADLX_INIT_FN = ADLXPINVOKE.ADLX_INIT_FN_get();
+  public static readonly string ADLX_INIT_WITH_INCOMPATIBLE_DRIVER_FN = ADLXPINVOKE.ADLX_INIT_WITH_INCOMPATIBLE_DRIVER_FN_get();
+  public static readonly string ADLX_INIT_WITH_CALLER_ADL_FN = ADLXPINVOKE.ADLX_INIT_WITH_CALLER_ADL_FN_get();
+  public static readonly string ADLX_TERMINATE_FN = ADLXPINVOKE.ADLX_TERMINATE_FN_get();
   public static readonly string ADLX_QUERY_FULL_VERSION_FUNCTION_NAME = ADLXPINVOKE.ADLX_QUERY_FULL_VERSION_FUNCTION_NAME_get();
   public static readonly string ADLX_QUERY_VERSION_FUNCTION_NAME = ADLXPINVOKE.ADLX_QUERY_VERSION_FUNCTION_NAME_get();
   public static readonly string ADLX_INIT_FUNCTION_NAME = ADLXPINVOKE.ADLX_INIT_FUNCTION_NAME_get();

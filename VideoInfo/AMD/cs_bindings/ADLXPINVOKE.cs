@@ -225,6 +225,66 @@ class ADLXPINVOKE {
   }
 
 
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_DLL_NAME_64_get")]
+  public static extern string ADLX_DLL_NAME_64_get();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_DLL_NAME_32_get")]
+  public static extern string ADLX_DLL_NAME_32_get();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_QUERY_FULL_VERSION_FN_get")]
+  public static extern string ADLX_QUERY_FULL_VERSION_FN_get();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_QUERY_VERSION_FN_get")]
+  public static extern string ADLX_QUERY_VERSION_FN_get();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_INIT_FN_get")]
+  public static extern string ADLX_INIT_FN_get();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_INIT_WITH_INCOMPATIBLE_DRIVER_FN_get")]
+  public static extern string ADLX_INIT_WITH_INCOMPATIBLE_DRIVER_FN_get();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_INIT_WITH_CALLER_ADL_FN_get")]
+  public static extern string ADLX_INIT_WITH_CALLER_ADL_FN_get();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_TERMINATE_FN_get")]
+  public static extern string ADLX_TERMINATE_FN_get();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_ADLXLoader")]
+  public static extern global::System.IntPtr new_ADLXLoader();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_delete_ADLXLoader")]
+  public static extern void delete_ADLXLoader(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_Load")]
+  public static extern bool ADLXLoader_Load(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_Unload")]
+  public static extern void ADLXLoader_Unload(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_IsLoaded")]
+  public static extern bool ADLXLoader_IsLoaded(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_QueryFullVersion")]
+  public static extern int ADLXLoader_QueryFullVersion(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_QueryVersion")]
+  public static extern int ADLXLoader_QueryVersion(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_Initialize")]
+  public static extern int ADLXLoader_Initialize(global::System.Runtime.InteropServices.HandleRef jarg1, ulong jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_InitializeWithIncompatibleDriver")]
+  public static extern int ADLXLoader_InitializeWithIncompatibleDriver(global::System.Runtime.InteropServices.HandleRef jarg1, ulong jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_InitializeWithCallerAdl")]
+  public static extern int ADLXLoader_InitializeWithCallerAdl(global::System.Runtime.InteropServices.HandleRef jarg1, ulong jarg2, global::System.Runtime.InteropServices.HandleRef jarg3, global::System.Runtime.InteropServices.HandleRef jarg4, global::System.IntPtr jarg5, global::System.Runtime.InteropServices.HandleRef jarg6);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_Terminate")]
+  public static extern int ADLXLoader_Terminate(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLXLoader_GetModuleHandle")]
+  public static extern global::System.IntPtr ADLXLoader_GetModuleHandle(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_IsADLXRuntimeAvailable")]
   public static extern bool IsADLXRuntimeAvailable();
 
@@ -1209,8 +1269,14 @@ class ADLXPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_IADLXGPUAppsListEventListener_OnGPUAppsListChanged")]
   public static extern bool IADLXGPUAppsListEventListener_OnGPUAppsListChanged(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2, global::System.Runtime.InteropServices.HandleRef jarg3);
 
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_IADLXGPUAppsListEventListener")]
+  public static extern global::System.IntPtr new_IADLXGPUAppsListEventListener();
+
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_delete_IADLXGPUAppsListEventListener")]
   public static extern void delete_IADLXGPUAppsListEventListener(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_IADLXGPUAppsListEventListener_director_connect")]
+  public static extern void IADLXGPUAppsListEventListener_director_connect(global::System.Runtime.InteropServices.HandleRef jarg1, IADLXGPUAppsListEventListener.SwigDelegateIADLXGPUAppsListEventListener_0 delegate0);
 
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_IADLXGPUAppsListChangedHandling_IID")]
   public static extern global::System.IntPtr IADLXGPUAppsListChangedHandling_IID();
@@ -3942,6 +4008,21 @@ class ADLXPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_adlx_uint16P_value")]
   public static extern ushort adlx_uint16P_value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_adlx_uint64P")]
+  public static extern global::System.IntPtr new_adlx_uint64P();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_copy_adlx_uint64P")]
+  public static extern global::System.IntPtr copy_adlx_uint64P(ulong jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_delete_adlx_uint64P")]
+  public static extern void delete_adlx_uint64P(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_adlx_uint64P_assign")]
+  public static extern void adlx_uint64P_assign(global::System.Runtime.InteropServices.HandleRef jarg1, ulong jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_adlx_uint64P_value")]
+  public static extern ulong adlx_uint64P_value(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_adlx_boolP")]
   public static extern global::System.IntPtr new_adlx_boolP();
 
@@ -4331,6 +4412,21 @@ class ADLXPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_adlx_antiAliasingModeP_value")]
   public static extern int adlx_antiAliasingModeP_value(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_adlx_asicFamilyTypeP")]
+  public static extern global::System.IntPtr new_adlx_asicFamilyTypeP();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_copy_adlx_asicFamilyTypeP")]
+  public static extern global::System.IntPtr copy_adlx_asicFamilyTypeP(int jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_delete_adlx_asicFamilyTypeP")]
+  public static extern void delete_adlx_asicFamilyTypeP(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_adlx_asicFamilyTypeP_assign")]
+  public static extern void adlx_asicFamilyTypeP_assign(global::System.Runtime.InteropServices.HandleRef jarg1, int jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_adlx_asicFamilyTypeP_value")]
+  public static extern int adlx_asicFamilyTypeP_value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_adlx_colorDepthP")]
   public static extern global::System.IntPtr new_adlx_colorDepthP();
@@ -5022,6 +5118,51 @@ class ADLXPINVOKE {
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_adlxInterfaceP_Ptr_value")]
   public static extern global::System.IntPtr adlxInterfaceP_Ptr_value(global::System.Runtime.InteropServices.HandleRef jarg1);
 
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_systemP_Ptr")]
+  public static extern global::System.IntPtr new_systemP_Ptr();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_copy_systemP_Ptr")]
+  public static extern global::System.IntPtr copy_systemP_Ptr(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_delete_systemP_Ptr")]
+  public static extern void delete_systemP_Ptr(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_systemP_Ptr_assign")]
+  public static extern void systemP_Ptr_assign(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_systemP_Ptr_value")]
+  public static extern global::System.IntPtr systemP_Ptr_value(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_system1P_Ptr")]
+  public static extern global::System.IntPtr new_system1P_Ptr();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_copy_system1P_Ptr")]
+  public static extern global::System.IntPtr copy_system1P_Ptr(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_delete_system1P_Ptr")]
+  public static extern void delete_system1P_Ptr(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_system1P_Ptr_assign")]
+  public static extern void system1P_Ptr_assign(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_system1P_Ptr_value")]
+  public static extern global::System.IntPtr system1P_Ptr_value(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_system2P_Ptr")]
+  public static extern global::System.IntPtr new_system2P_Ptr();
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_copy_system2P_Ptr")]
+  public static extern global::System.IntPtr copy_system2P_Ptr(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_delete_system2P_Ptr")]
+  public static extern void delete_system2P_Ptr(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_system2P_Ptr_assign")]
+  public static extern void system2P_Ptr_assign(global::System.Runtime.InteropServices.HandleRef jarg1, global::System.Runtime.InteropServices.HandleRef jarg2);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_system2P_Ptr_value")]
+  public static extern global::System.IntPtr system2P_Ptr_value(global::System.Runtime.InteropServices.HandleRef jarg1);
+
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_new_gpuTuningP_Ptr")]
   public static extern global::System.IntPtr new_gpuTuningP_Ptr();
 
@@ -5486,6 +5627,9 @@ class ADLXPINVOKE {
 
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_displayCFreeSyncColorAccuracyP_Ptr_value")]
   public static extern global::System.IntPtr displayCFreeSyncColorAccuracyP_Ptr_value(global::System.Runtime.InteropServices.HandleRef jarg1);
+
+  [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_ADLX_MAKE_FULL_VERSION")]
+  public static extern ulong ADLX_MAKE_FULL_VERSION(uint jarg1, uint jarg2);
 
   [global::System.Runtime.InteropServices.DllImport("ADLXWrapper", EntryPoint="CSharp_ADLXWrapper_IADLXChangedEvent_SWIGUpcast")]
   public static extern global::System.IntPtr IADLXChangedEvent_SWIGUpcast(global::System.IntPtr jarg1);

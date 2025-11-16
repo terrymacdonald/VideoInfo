@@ -62,6 +62,59 @@ public class IADLXGPUAppsListEventListener : global::System.IDisposable {
     return ret;
   }
 
+  public IADLXGPUAppsListEventListener() : this(ADLXPINVOKE.new_IADLXGPUAppsListEventListener(), true) {
+    SwigDirectorConnect();
+  }
+
+  private void SwigDirectorConnect() {
+    if (SwigDerivedClassHasMethod("OnGPUAppsListChanged", swigMethodTypes0))
+      swigDelegate0 = new SwigDelegateIADLXGPUAppsListEventListener_0(SwigDirectorMethodOnGPUAppsListChanged);
+    ADLXPINVOKE.IADLXGPUAppsListEventListener_director_connect(swigCPtr, swigDelegate0);
+  }
+
+  private bool SwigDerivedClassHasMethod(string methodName, global::System.Type[] methodTypes) {
+    global::System.Reflection.MethodInfo[] methodInfos = this.GetType().GetMethods(
+        global::System.Reflection.BindingFlags.Public | global::System.Reflection.BindingFlags.NonPublic | global::System.Reflection.BindingFlags.Instance);
+    foreach (global::System.Reflection.MethodInfo methodInfo in methodInfos) {
+      if (methodInfo.DeclaringType == null)
+        continue;
+
+      if (methodInfo.Name != methodName)
+        continue;
+
+      var parameters = methodInfo.GetParameters();
+      if (parameters.Length != methodTypes.Length)
+        continue;
+
+      bool parametersMatch = true;
+      for (var i = 0; i < parameters.Length; i++) {
+        if (parameters[i].ParameterType != methodTypes[i]) {
+          parametersMatch = false;
+          break;
+        }
+      }
+
+      if (!parametersMatch)
+        continue;
+
+      if (methodInfo.IsVirtual && (methodInfo.DeclaringType.IsSubclassOf(typeof(IADLXGPUAppsListEventListener))) &&
+        methodInfo.DeclaringType != methodInfo.GetBaseDefinition().DeclaringType) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private bool SwigDirectorMethodOnGPUAppsListChanged(global::System.IntPtr pGPU, global::System.IntPtr pApplications) {
+    return OnGPUAppsListChanged((pGPU == global::System.IntPtr.Zero) ? null : new IADLXGPU2(pGPU, false), (pApplications == global::System.IntPtr.Zero) ? null : new IADLXApplicationList(pApplications, false));
+  }
+
+  public delegate bool SwigDelegateIADLXGPUAppsListEventListener_0(global::System.IntPtr pGPU, global::System.IntPtr pApplications);
+
+  private SwigDelegateIADLXGPUAppsListEventListener_0 swigDelegate0;
+
+  private static global::System.Type[] swigMethodTypes0 = new global::System.Type[] { typeof(IADLXGPU2), typeof(IADLXApplicationList) };
 }
 
 }
