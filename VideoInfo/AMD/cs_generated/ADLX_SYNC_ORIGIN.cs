@@ -1,0 +1,8 @@
+namespace ADLXWrapper;
+
+public enum ADLX_SYNC_ORIGIN
+{
+    SYNC_ORIGIN_UNKNOWN = 1,
+    SYNC_ORIGIN_INTERNAL,
+    SYNC_ORIGIN_EXTERNAL,
+}

@@ -1,0 +1,10 @@
+namespace ADLXWrapper;
+
+public enum ADLX_WHITE_POINT
+{
+    WHITE_POINT_5000K = 0,
+    WHITE_POINT_6500K,
+    WHITE_POINT_7500K,
+    WHITE_POINT_9300K,
+    WHITE_POINT_CUSTOM,
+}

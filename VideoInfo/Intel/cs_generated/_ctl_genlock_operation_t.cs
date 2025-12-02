@@ -1,0 +1,12 @@
+namespace IGCLWrapper
+{
+    public enum _ctl_genlock_operation_t
+    {
+        CTL_GENLOCK_OPERATION_GET_TIMING_DETAILS = 0,
+        CTL_GENLOCK_OPERATION_VALIDATE = 1,
+        CTL_GENLOCK_OPERATION_ENABLE = 2,
+        CTL_GENLOCK_OPERATION_DISABLE = 3,
+        CTL_GENLOCK_OPERATION_GET_TOPOLOGY = 4,
+        CTL_GENLOCK_OPERATION_MAX,
+    }
+}
