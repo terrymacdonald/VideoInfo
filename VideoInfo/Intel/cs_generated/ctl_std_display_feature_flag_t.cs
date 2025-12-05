@@ -1,0 +1,16 @@
+namespace IGCLWrapper
+{
+    public enum ctl_std_display_feature_flag_t
+    {
+        CTL_STD_DISPLAY_FEATURE_FLAG_HDCP = (1 << 0),
+        CTL_STD_DISPLAY_FEATURE_FLAG_HD_AUDIO = (1 << 1),
+        CTL_STD_DISPLAY_FEATURE_FLAG_PSR = (1 << 2),
+        CTL_STD_DISPLAY_FEATURE_FLAG_ADAPTIVESYNC_VRR = (1 << 3),
+        CTL_STD_DISPLAY_FEATURE_FLAG_VESA_COMPRESSION = (1 << 4),
+        CTL_STD_DISPLAY_FEATURE_FLAG_HDR = (1 << 5),
+        CTL_STD_DISPLAY_FEATURE_FLAG_HDMI_QMS = (1 << 6),
+        CTL_STD_DISPLAY_FEATURE_FLAG_HDR10_PLUS_CERTIFIED = (1 << 7),
+        CTL_STD_DISPLAY_FEATURE_FLAG_VESA_HDR_CERTIFIED = (1 << 8),
+        CTL_STD_DISPLAY_FEATURE_FLAG_MAX = unchecked((int)(0x80000000)),
+    }
+}

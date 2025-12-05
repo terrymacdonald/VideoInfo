@@ -5,516 +5,388 @@ namespace IGCLWrapper
     public static unsafe partial class IGCL
     {
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlInit([NativeTypeName("ctl_init_args_t *")] _ctl_init_args_t* pInitDesc, [NativeTypeName("ctl_api_handle_t *")] _ctl_api_handle_t** phAPIHandle);
+        public static extern ctl_result_t ctlInit(ctl_init_args_t* pInitDesc, [NativeTypeName("ctl_api_handle_t *")] _ctl_api_handle_t** phAPIHandle);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlClose([NativeTypeName("ctl_api_handle_t")] _ctl_api_handle_t* hAPIHandle);
+        public static extern ctl_result_t ctlClose([NativeTypeName("ctl_api_handle_t")] _ctl_api_handle_t* hAPIHandle);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSetRuntimePath([NativeTypeName("ctl_runtime_path_args_t *")] _ctl_runtime_path_args_t* pArgs);
+        public static extern ctl_result_t ctlSetRuntimePath(ctl_runtime_path_args_t* pArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlWaitForPropertyChange([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("ctl_wait_property_change_args_t *")] _ctl_wait_property_change_args_t* pArgs);
+        public static extern ctl_result_t ctlWaitForPropertyChange([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, ctl_wait_property_change_args_t* pArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlReservedCall([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("ctl_reserved_args_t *")] _ctl_reserved_args_t* pArgs);
+        public static extern ctl_result_t ctlReservedCall([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, ctl_reserved_args_t* pArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSupported3DCapabilities([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_3d_feature_caps_t *")] _ctl_3d_feature_caps_t* pFeatureCaps);
+        public static extern ctl_result_t ctlGetSupported3DCapabilities([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_3d_feature_caps_t* pFeatureCaps);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSet3DFeature([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_3d_feature_getset_t *")] _ctl_3d_feature_getset_t* pFeature);
+        public static extern ctl_result_t ctlGetSet3DFeature([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_3d_feature_getset_t* pFeature);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlCheckDriverVersion([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("ctl_version_info_t")] uint version_info);
+        public static extern ctl_result_t ctlCheckDriverVersion([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("ctl_version_info_t")] uint version_info);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumerateDevices([NativeTypeName("ctl_api_handle_t")] _ctl_api_handle_t* hAPIHandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_device_adapter_handle_t *")] _ctl_device_adapter_handle_t** phDevices);
+        public static extern ctl_result_t ctlEnumerateDevices([NativeTypeName("ctl_api_handle_t")] _ctl_api_handle_t* hAPIHandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_device_adapter_handle_t *")] _ctl_device_adapter_handle_t** phDevices);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumerateDisplayOutputs([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_display_output_handle_t *")] _ctl_display_output_handle_t** phDisplayOutputs);
+        public static extern ctl_result_t ctlEnumerateDisplayOutputs([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_display_output_handle_t *")] _ctl_display_output_handle_t** phDisplayOutputs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumerateI2CPinPairs([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_i2c_pin_pair_handle_t *")] _ctl_i2c_pin_pair_handle_t** phI2cPinPairs);
+        public static extern ctl_result_t ctlEnumerateI2CPinPairs([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_i2c_pin_pair_handle_t *")] _ctl_i2c_pin_pair_handle_t** phI2cPinPairs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetDeviceProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_device_adapter_properties_t *")] _ctl_device_adapter_properties_t* pProperties);
+        public static extern ctl_result_t ctlGetDeviceProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_device_adapter_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetDisplayProperties([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_display_properties_t *")] _ctl_display_properties_t* pProperties);
+        public static extern ctl_result_t ctlGetDisplayProperties([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_display_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetAdaperDisplayEncoderProperties([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_adapter_display_encoder_properties_t *")] _ctl_adapter_display_encoder_properties_t* pProperties);
+        public static extern ctl_result_t ctlGetAdaperDisplayEncoderProperties([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_adapter_display_encoder_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetZeDevice([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, void* pZeDevice, void** hInstance);
+        public static extern ctl_result_t ctlGetZeDevice([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, void* pZeDevice, void** hInstance);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSharpnessCaps([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_sharpness_caps_t *")] _ctl_sharpness_caps_t* pSharpnessCaps);
+        public static extern ctl_result_t ctlGetSharpnessCaps([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_sharpness_caps_t* pSharpnessCaps);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetCurrentSharpness([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_sharpness_settings_t *")] _ctl_sharpness_settings_t* pSharpnessSettings);
+        public static extern ctl_result_t ctlGetCurrentSharpness([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_sharpness_settings_t* pSharpnessSettings);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSetCurrentSharpness([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_sharpness_settings_t *")] _ctl_sharpness_settings_t* pSharpnessSettings);
+        public static extern ctl_result_t ctlSetCurrentSharpness([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_sharpness_settings_t* pSharpnessSettings);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlI2CAccess([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_i2c_access_args_t *")] _ctl_i2c_access_args_t* pI2cAccessArgs);
+        public static extern ctl_result_t ctlI2CAccess([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_i2c_access_args_t* pI2cAccessArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlI2CAccessOnPinPair([NativeTypeName("ctl_i2c_pin_pair_handle_t")] _ctl_i2c_pin_pair_handle_t* hI2cPinPair, [NativeTypeName("ctl_i2c_access_pinpair_args_t *")] _ctl_i2c_access_pinpair_args_t* pI2cAccessArgs);
+        public static extern ctl_result_t ctlI2CAccessOnPinPair([NativeTypeName("ctl_i2c_pin_pair_handle_t")] _ctl_i2c_pin_pair_handle_t* hI2cPinPair, ctl_i2c_access_pinpair_args_t* pI2cAccessArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlAUXAccess([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_aux_access_args_t *")] _ctl_aux_access_args_t* pAuxAccessArgs);
+        public static extern ctl_result_t ctlAUXAccess([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_aux_access_args_t* pAuxAccessArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetPowerOptimizationCaps([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_power_optimization_caps_t *")] _ctl_power_optimization_caps_t* pPowerOptimizationCaps);
+        public static extern ctl_result_t ctlGetPowerOptimizationCaps([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_power_optimization_caps_t* pPowerOptimizationCaps);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetPowerOptimizationSetting([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_power_optimization_settings_t *")] _ctl_power_optimization_settings_t* pPowerOptimizationSettings);
+        public static extern ctl_result_t ctlGetPowerOptimizationSetting([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_power_optimization_settings_t* pPowerOptimizationSettings);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSetPowerOptimizationSetting([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_power_optimization_settings_t *")] _ctl_power_optimization_settings_t* pPowerOptimizationSettings);
+        public static extern ctl_result_t ctlSetPowerOptimizationSetting([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_power_optimization_settings_t* pPowerOptimizationSettings);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSetBrightnessSetting([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_set_brightness_t *")] _ctl_set_brightness_t* pSetBrightnessSetting);
+        public static extern ctl_result_t ctlSetBrightnessSetting([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_set_brightness_t* pSetBrightnessSetting);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetBrightnessSetting([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_get_brightness_t *")] _ctl_get_brightness_t* pGetBrightnessSetting);
+        public static extern ctl_result_t ctlGetBrightnessSetting([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_get_brightness_t* pGetBrightnessSetting);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPixelTransformationGetConfig([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_pixtx_pipe_get_config_t *")] _ctl_pixtx_pipe_get_config_t* pPixTxGetConfigArgs);
+        public static extern ctl_result_t ctlPixelTransformationGetConfig([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_pixtx_pipe_get_config_t* pPixTxGetConfigArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPixelTransformationSetConfig([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_pixtx_pipe_set_config_t *")] _ctl_pixtx_pipe_set_config_t* pPixTxSetConfigArgs);
+        public static extern ctl_result_t ctlPixelTransformationSetConfig([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_pixtx_pipe_set_config_t* pPixTxSetConfigArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPanelDescriptorAccess([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_panel_descriptor_access_args_t *")] _ctl_panel_descriptor_access_args_t* pPanelDescriptorAccessArgs);
+        public static extern ctl_result_t ctlPanelDescriptorAccess([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_panel_descriptor_access_args_t* pPanelDescriptorAccessArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSupportedRetroScalingCapability([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_retro_scaling_caps_t *")] _ctl_retro_scaling_caps_t* pRetroScalingCaps);
+        public static extern ctl_result_t ctlGetSupportedRetroScalingCapability([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_retro_scaling_caps_t* pRetroScalingCaps);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSetRetroScaling([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_retro_scaling_settings_t *")] _ctl_retro_scaling_settings_t* pGetSetRetroScalingType);
+        public static extern ctl_result_t ctlGetSetRetroScaling([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_retro_scaling_settings_t* pGetSetRetroScalingType);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSupportedScalingCapability([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_scaling_caps_t *")] _ctl_scaling_caps_t* pScalingCaps);
+        public static extern ctl_result_t ctlGetSupportedScalingCapability([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_scaling_caps_t* pScalingCaps);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetCurrentScaling([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_scaling_settings_t *")] _ctl_scaling_settings_t* pGetCurrentScalingType);
+        public static extern ctl_result_t ctlGetCurrentScaling([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_scaling_settings_t* pGetCurrentScalingType);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSetCurrentScaling([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_scaling_settings_t *")] _ctl_scaling_settings_t* pSetScalingType);
+        public static extern ctl_result_t ctlSetCurrentScaling([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_scaling_settings_t* pSetScalingType);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetLACEConfig([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_lace_config_t *")] _ctl_lace_config_t* pLaceConfig);
+        public static extern ctl_result_t ctlGetLACEConfig([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_lace_config_t* pLaceConfig);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSetLACEConfig([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_lace_config_t *")] _ctl_lace_config_t* pLaceConfig);
+        public static extern ctl_result_t ctlSetLACEConfig([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_lace_config_t* pLaceConfig);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSoftwarePSR([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_sw_psr_settings_t *")] _ctl_sw_psr_settings_t* pSoftwarePsrSetting);
+        public static extern ctl_result_t ctlSoftwarePSR([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_sw_psr_settings_t* pSoftwarePsrSetting);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetIntelArcSyncInfoForMonitor([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_intel_arc_sync_monitor_params_t *")] _ctl_intel_arc_sync_monitor_params_t* pIntelArcSyncMonitorParams);
+        public static extern ctl_result_t ctlGetIntelArcSyncInfoForMonitor([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_intel_arc_sync_monitor_params_t* pIntelArcSyncMonitorParams);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumerateMuxDevices([NativeTypeName("ctl_api_handle_t")] _ctl_api_handle_t* hAPIHandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_mux_output_handle_t *")] _ctl_mux_output_handle_t** phMuxDevices);
+        public static extern ctl_result_t ctlEnumerateMuxDevices([NativeTypeName("ctl_api_handle_t")] _ctl_api_handle_t* hAPIHandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_mux_output_handle_t *")] _ctl_mux_output_handle_t** phMuxDevices);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetMuxProperties([NativeTypeName("ctl_mux_output_handle_t")] _ctl_mux_output_handle_t* hMuxDevice, [NativeTypeName("ctl_mux_properties_t *")] _ctl_mux_properties_t* pMuxProperties);
+        public static extern ctl_result_t ctlGetMuxProperties([NativeTypeName("ctl_mux_output_handle_t")] _ctl_mux_output_handle_t* hMuxDevice, ctl_mux_properties_t* pMuxProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSwitchMux([NativeTypeName("ctl_mux_output_handle_t")] _ctl_mux_output_handle_t* hMuxDevice, [NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hInactiveDisplayOutput);
+        public static extern ctl_result_t ctlSwitchMux([NativeTypeName("ctl_mux_output_handle_t")] _ctl_mux_output_handle_t* hMuxDevice, [NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hInactiveDisplayOutput);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetIntelArcSyncProfile([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_intel_arc_sync_profile_params_t *")] _ctl_intel_arc_sync_profile_params_t* pIntelArcSyncProfileParams);
+        public static extern ctl_result_t ctlGetIntelArcSyncProfile([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_intel_arc_sync_profile_params_t* pIntelArcSyncProfileParams);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlSetIntelArcSyncProfile([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_intel_arc_sync_profile_params_t *")] _ctl_intel_arc_sync_profile_params_t* pIntelArcSyncProfileParams);
+        public static extern ctl_result_t ctlSetIntelArcSyncProfile([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_intel_arc_sync_profile_params_t* pIntelArcSyncProfileParams);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEdidManagement([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_edid_management_args_t *")] _ctl_edid_management_args_t* pEdidManagementArgs);
+        public static extern ctl_result_t ctlEdidManagement([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_edid_management_args_t* pEdidManagementArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSetCustomMode([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_get_set_custom_mode_args_t *")] _ctl_get_set_custom_mode_args_t* pCustomModeArgs);
+        public static extern ctl_result_t ctlGetSetCustomMode([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_get_set_custom_mode_args_t* pCustomModeArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSetCombinedDisplay([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("ctl_combined_display_args_t *")] _ctl_combined_display_args_t* pCombinedDisplayArgs);
+        public static extern ctl_result_t ctlGetSetCombinedDisplay([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, ctl_combined_display_args_t* pCombinedDisplayArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSetDisplayGenlock([NativeTypeName("ctl_device_adapter_handle_t *")] _ctl_device_adapter_handle_t** hDeviceAdapter, [NativeTypeName("ctl_genlock_args_t *")] _ctl_genlock_args_t* pGenlockArgs, [NativeTypeName("uint32_t")] uint AdapterCount, [NativeTypeName("ctl_device_adapter_handle_t *")] _ctl_device_adapter_handle_t** hFailureDeviceAdapter);
+        public static extern ctl_result_t ctlGetSetDisplayGenlock([NativeTypeName("ctl_device_adapter_handle_t *")] _ctl_device_adapter_handle_t** hDeviceAdapter, ctl_genlock_args_t* pGenlockArgs, [NativeTypeName("uint32_t")] uint AdapterCount, [NativeTypeName("ctl_device_adapter_handle_t *")] _ctl_device_adapter_handle_t** hFailureDeviceAdapter);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetVblankTimestamp([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_vblank_ts_args_t *")] _ctl_vblank_ts_args_t* pVblankTSArgs);
+        public static extern ctl_result_t ctlGetVblankTimestamp([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_vblank_ts_args_t* pVblankTSArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlLinkDisplayAdapters([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hPrimaryAdapter, [NativeTypeName("ctl_lda_args_t *")] _ctl_lda_args_t* pLdaArgs);
+        public static extern ctl_result_t ctlLinkDisplayAdapters([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hPrimaryAdapter, ctl_lda_args_t* pLdaArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlUnlinkDisplayAdapters([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hPrimaryAdapter);
+        public static extern ctl_result_t ctlUnlinkDisplayAdapters([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hPrimaryAdapter);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetLinkedDisplayAdapters([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hPrimaryAdapter, [NativeTypeName("ctl_lda_args_t *")] _ctl_lda_args_t* pLdaArgs);
+        public static extern ctl_result_t ctlGetLinkedDisplayAdapters([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hPrimaryAdapter, ctl_lda_args_t* pLdaArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSetDynamicContrastEnhancement([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_dce_args_t *")] _ctl_dce_args_t* pDceArgs);
+        public static extern ctl_result_t ctlGetSetDynamicContrastEnhancement([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_dce_args_t* pDceArgs);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSetWireFormat([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_get_set_wire_format_config_t *")] _ctl_get_set_wire_format_config_t* pGetSetWireFormatSetting);
+        public static extern ctl_result_t ctlGetSetWireFormat([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_get_set_wire_format_config_t* pGetSetWireFormatSetting);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSetDisplaySettings([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, [NativeTypeName("ctl_display_settings_t *")] _ctl_display_settings_t* pDisplaySettings);
+        public static extern ctl_result_t ctlGetSetDisplaySettings([NativeTypeName("ctl_display_output_handle_t")] _ctl_display_output_handle_t* hDisplayOutput, ctl_display_settings_t* pDisplaySettings);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEccGetProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_ecc_properties_t *")] _ctl_ecc_properties_t* pProperties);
+        public static extern ctl_result_t ctlEccGetProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_ecc_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEccGetState([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_ecc_state_desc_t *")] _ctl_ecc_state_desc_t* pState);
+        public static extern ctl_result_t ctlEccGetState([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_ecc_state_desc_t* pState);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEccSetState([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_ecc_state_desc_t *")] _ctl_ecc_state_desc_t* pState);
+        public static extern ctl_result_t ctlEccSetState([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_ecc_state_desc_t* pState);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumEngineGroups([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_engine_handle_t *")] _ctl_engine_handle_t** phEngine);
+        public static extern ctl_result_t ctlEnumEngineGroups([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_engine_handle_t *")] _ctl_engine_handle_t** phEngine);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEngineGetProperties([NativeTypeName("ctl_engine_handle_t")] _ctl_engine_handle_t* hEngine, [NativeTypeName("ctl_engine_properties_t *")] _ctl_engine_properties_t* pProperties);
+        public static extern ctl_result_t ctlEngineGetProperties([NativeTypeName("ctl_engine_handle_t")] _ctl_engine_handle_t* hEngine, ctl_engine_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEngineGetActivity([NativeTypeName("ctl_engine_handle_t")] _ctl_engine_handle_t* hEngine, [NativeTypeName("ctl_engine_stats_t *")] _ctl_engine_stats_t* pStats);
+        public static extern ctl_result_t ctlEngineGetActivity([NativeTypeName("ctl_engine_handle_t")] _ctl_engine_handle_t* hEngine, ctl_engine_stats_t* pStats);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumFans([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_fan_handle_t *")] _ctl_fan_handle_t** phFan);
+        public static extern ctl_result_t ctlEnumFans([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_fan_handle_t *")] _ctl_fan_handle_t** phFan);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFanGetProperties([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, [NativeTypeName("ctl_fan_properties_t *")] _ctl_fan_properties_t* pProperties);
+        public static extern ctl_result_t ctlFanGetProperties([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, ctl_fan_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFanGetConfig([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, [NativeTypeName("ctl_fan_config_t *")] _ctl_fan_config_t* pConfig);
+        public static extern ctl_result_t ctlFanGetConfig([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, ctl_fan_config_t* pConfig);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFanSetDefaultMode([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan);
+        public static extern ctl_result_t ctlFanSetDefaultMode([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFanSetFixedSpeedMode([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, [NativeTypeName("const ctl_fan_speed_t *")] _ctl_fan_speed_t* speed);
+        public static extern ctl_result_t ctlFanSetFixedSpeedMode([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, [NativeTypeName("const ctl_fan_speed_t *")] ctl_fan_speed_t* speed);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFanSetSpeedTableMode([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, [NativeTypeName("const ctl_fan_speed_table_t *")] _ctl_fan_speed_table_t* speedTable);
+        public static extern ctl_result_t ctlFanSetSpeedTableMode([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, [NativeTypeName("const ctl_fan_speed_table_t *")] ctl_fan_speed_table_t* speedTable);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFanGetState([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, [NativeTypeName("ctl_fan_speed_units_t")] _ctl_fan_speed_units_t units, [NativeTypeName("int32_t *")] int* pSpeed);
+        public static extern ctl_result_t ctlFanGetState([NativeTypeName("ctl_fan_handle_t")] _ctl_fan_handle_t* hFan, ctl_fan_speed_units_t units, [NativeTypeName("int32_t *")] int* pSpeed);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetFirmwareProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("ctl_firmware_properties_t *")] _ctl_firmware_properties_t* pProperties);
+        public static extern ctl_result_t ctlGetFirmwareProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, ctl_firmware_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumerateFirmwareComponents([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_firmware_component_handle_t *")] _ctl_firmware_component_handle_t** phFirmware);
+        public static extern ctl_result_t ctlEnumerateFirmwareComponents([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_firmware_component_handle_t *")] _ctl_firmware_component_handle_t** phFirmware);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetFirmwareComponentProperties([NativeTypeName("ctl_firmware_component_handle_t")] _ctl_firmware_component_handle_t* hFirmware, [NativeTypeName("ctl_firmware_component_properties_t *")] _ctl_firmware_component_properties_t* pProperties);
+        public static extern ctl_result_t ctlGetFirmwareComponentProperties([NativeTypeName("ctl_firmware_component_handle_t")] _ctl_firmware_component_handle_t* hFirmware, ctl_firmware_component_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlAllowPCIeLinkSpeedUpdate([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("bool")] byte AllowPCIeLinkSpeedUpdate);
+        public static extern ctl_result_t ctlAllowPCIeLinkSpeedUpdate([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("bool")] byte AllowPCIeLinkSpeedUpdate);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumFrequencyDomains([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_freq_handle_t *")] _ctl_freq_handle_t** phFrequency);
+        public static extern ctl_result_t ctlEnumFrequencyDomains([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_freq_handle_t *")] _ctl_freq_handle_t** phFrequency);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFrequencyGetProperties([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, [NativeTypeName("ctl_freq_properties_t *")] _ctl_freq_properties_t* pProperties);
+        public static extern ctl_result_t ctlFrequencyGetProperties([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, ctl_freq_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFrequencyGetAvailableClocks([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, [NativeTypeName("uint32_t *")] uint* pCount, double* phFrequency);
+        public static extern ctl_result_t ctlFrequencyGetAvailableClocks([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, [NativeTypeName("uint32_t *")] uint* pCount, double* phFrequency);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFrequencyGetRange([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, [NativeTypeName("ctl_freq_range_t *")] _ctl_freq_range_t* pLimits);
+        public static extern ctl_result_t ctlFrequencyGetRange([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, ctl_freq_range_t* pLimits);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFrequencySetRange([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, [NativeTypeName("const ctl_freq_range_t *")] _ctl_freq_range_t* pLimits);
+        public static extern ctl_result_t ctlFrequencySetRange([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, [NativeTypeName("const ctl_freq_range_t *")] ctl_freq_range_t* pLimits);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFrequencyGetState([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, [NativeTypeName("ctl_freq_state_t *")] _ctl_freq_state_t* pState);
+        public static extern ctl_result_t ctlFrequencyGetState([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, ctl_freq_state_t* pState);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlFrequencyGetThrottleTime([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, [NativeTypeName("ctl_freq_throttle_time_t *")] _ctl_freq_throttle_time_t* pThrottleTime);
+        public static extern ctl_result_t ctlFrequencyGetThrottleTime([NativeTypeName("ctl_freq_handle_t")] _ctl_freq_handle_t* hFrequency, ctl_freq_throttle_time_t* pThrottleTime);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumLeds([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_led_handle_t *")] _ctl_led_handle_t** phLed);
+        public static extern ctl_result_t ctlEnumLeds([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_led_handle_t *")] _ctl_led_handle_t** phLed);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlLedGetProperties([NativeTypeName("ctl_led_handle_t")] _ctl_led_handle_t* hLed, [NativeTypeName("ctl_led_properties_t *")] _ctl_led_properties_t* pProperties);
+        public static extern ctl_result_t ctlLedGetProperties([NativeTypeName("ctl_led_handle_t")] _ctl_led_handle_t* hLed, ctl_led_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlLedGetState([NativeTypeName("ctl_led_handle_t")] _ctl_led_handle_t* hLed, [NativeTypeName("ctl_led_state_t *")] _ctl_led_state_t* pState);
+        public static extern ctl_result_t ctlLedGetState([NativeTypeName("ctl_led_handle_t")] _ctl_led_handle_t* hLed, ctl_led_state_t* pState);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlLedSetState([NativeTypeName("ctl_led_handle_t")] _ctl_led_handle_t* hLed, void* pBuffer, [NativeTypeName("uint32_t")] uint bufferSize);
+        public static extern ctl_result_t ctlLedSetState([NativeTypeName("ctl_led_handle_t")] _ctl_led_handle_t* hLed, void* pBuffer, [NativeTypeName("uint32_t")] uint bufferSize);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSupportedVideoProcessingCapabilities([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_video_processing_feature_caps_t *")] _ctl_video_processing_feature_caps_t* pFeatureCaps);
+        public static extern ctl_result_t ctlGetSupportedVideoProcessingCapabilities([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_video_processing_feature_caps_t* pFeatureCaps);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlGetSetVideoProcessingFeature([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_video_processing_feature_getset_t *")] _ctl_video_processing_feature_getset_t* pFeature);
+        public static extern ctl_result_t ctlGetSetVideoProcessingFeature([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_video_processing_feature_getset_t* pFeature);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumMemoryModules([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_mem_handle_t *")] _ctl_mem_handle_t** phMemory);
+        public static extern ctl_result_t ctlEnumMemoryModules([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_mem_handle_t *")] _ctl_mem_handle_t** phMemory);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlMemoryGetProperties([NativeTypeName("ctl_mem_handle_t")] _ctl_mem_handle_t* hMemory, [NativeTypeName("ctl_mem_properties_t *")] _ctl_mem_properties_t* pProperties);
+        public static extern ctl_result_t ctlMemoryGetProperties([NativeTypeName("ctl_mem_handle_t")] _ctl_mem_handle_t* hMemory, ctl_mem_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlMemoryGetState([NativeTypeName("ctl_mem_handle_t")] _ctl_mem_handle_t* hMemory, [NativeTypeName("ctl_mem_state_t *")] _ctl_mem_state_t* pState);
+        public static extern ctl_result_t ctlMemoryGetState([NativeTypeName("ctl_mem_handle_t")] _ctl_mem_handle_t* hMemory, ctl_mem_state_t* pState);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlMemoryGetBandwidth([NativeTypeName("ctl_mem_handle_t")] _ctl_mem_handle_t* hMemory, [NativeTypeName("ctl_mem_bandwidth_t *")] _ctl_mem_bandwidth_t* pBandwidth);
+        public static extern ctl_result_t ctlMemoryGetBandwidth([NativeTypeName("ctl_mem_handle_t")] _ctl_mem_handle_t* hMemory, ctl_mem_bandwidth_t* pBandwidth);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGetProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, [NativeTypeName("ctl_oc_properties_t *")] _ctl_oc_properties_t* pOcProperties);
+        public static extern ctl_result_t ctlOverclockGetProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, ctl_oc_properties_t* pOcProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockWaiverSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle);
+        public static extern ctl_result_t ctlOverclockWaiverSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuFrequencyOffsetGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcFrequencyOffset);
+        public static extern ctl_result_t ctlOverclockGpuFrequencyOffsetGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcFrequencyOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuFrequencyOffsetSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocFrequencyOffset);
+        public static extern ctl_result_t ctlOverclockGpuFrequencyOffsetSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocFrequencyOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuVoltageOffsetGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcVoltageOffset);
+        public static extern ctl_result_t ctlOverclockGpuVoltageOffsetGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcVoltageOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuVoltageOffsetSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocVoltageOffset);
+        public static extern ctl_result_t ctlOverclockGpuVoltageOffsetSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocVoltageOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuLockGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, [NativeTypeName("ctl_oc_vf_pair_t *")] _ctl_oc_vf_pair_t* pVfPair);
+        public static extern ctl_result_t ctlOverclockGpuLockGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, ctl_oc_vf_pair_t* pVfPair);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuLockSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, [NativeTypeName("ctl_oc_vf_pair_t")] _ctl_oc_vf_pair_t vFPair);
+        public static extern ctl_result_t ctlOverclockGpuLockSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, ctl_oc_vf_pair_t vFPair);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockVramFrequencyOffsetGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcFrequencyOffset);
+        public static extern ctl_result_t ctlOverclockVramFrequencyOffsetGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcFrequencyOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockVramFrequencyOffsetSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocFrequencyOffset);
+        public static extern ctl_result_t ctlOverclockVramFrequencyOffsetSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocFrequencyOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockVramVoltageOffsetGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pVoltage);
+        public static extern ctl_result_t ctlOverclockVramVoltageOffsetGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pVoltage);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockVramVoltageOffsetSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double voltage);
+        public static extern ctl_result_t ctlOverclockVramVoltageOffsetSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double voltage);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockPowerLimitGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pSustainedPowerLimit);
+        public static extern ctl_result_t ctlOverclockPowerLimitGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pSustainedPowerLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockPowerLimitSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double sustainedPowerLimit);
+        public static extern ctl_result_t ctlOverclockPowerLimitSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double sustainedPowerLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockTemperatureLimitGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pTemperatureLimit);
+        public static extern ctl_result_t ctlOverclockTemperatureLimitGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pTemperatureLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockTemperatureLimitSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double temperatureLimit);
+        public static extern ctl_result_t ctlOverclockTemperatureLimitSet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double temperatureLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPowerTelemetryGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, [NativeTypeName("ctl_power_telemetry_t *")] _ctl_power_telemetry_t* pTelemetryInfo);
+        public static extern ctl_result_t ctlPowerTelemetryGet([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, ctl_power_telemetry_t* pTelemetryInfo);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockResetToDefault([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle);
+        public static extern ctl_result_t ctlOverclockResetToDefault([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuFrequencyOffsetGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcFrequencyOffset);
+        public static extern ctl_result_t ctlOverclockGpuFrequencyOffsetGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcFrequencyOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuFrequencyOffsetSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocFrequencyOffset);
+        public static extern ctl_result_t ctlOverclockGpuFrequencyOffsetSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocFrequencyOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuMaxVoltageOffsetGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcMaxVoltageOffset);
+        public static extern ctl_result_t ctlOverclockGpuMaxVoltageOffsetGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcMaxVoltageOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockGpuMaxVoltageOffsetSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocMaxVoltageOffset);
+        public static extern ctl_result_t ctlOverclockGpuMaxVoltageOffsetSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocMaxVoltageOffset);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockVramMemSpeedLimitGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcVramMemSpeedLimit);
+        public static extern ctl_result_t ctlOverclockVramMemSpeedLimitGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pOcVramMemSpeedLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockVramMemSpeedLimitSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocVramMemSpeedLimit);
+        public static extern ctl_result_t ctlOverclockVramMemSpeedLimitSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double ocVramMemSpeedLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockPowerLimitGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pSustainedPowerLimit);
+        public static extern ctl_result_t ctlOverclockPowerLimitGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pSustainedPowerLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockPowerLimitSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double sustainedPowerLimit);
+        public static extern ctl_result_t ctlOverclockPowerLimitSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double sustainedPowerLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockTemperatureLimitGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pTemperatureLimit);
+        public static extern ctl_result_t ctlOverclockTemperatureLimitGetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double* pTemperatureLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockTemperatureLimitSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double temperatureLimit);
+        public static extern ctl_result_t ctlOverclockTemperatureLimitSetV2([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceHandle, double temperatureLimit);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockReadVFCurve([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("ctl_vf_curve_type_t")] _ctl_vf_curve_type_t VFCurveType, [NativeTypeName("ctl_vf_curve_details_t")] _ctl_vf_curve_details_t VFCurveDetail, [NativeTypeName("uint32_t *")] uint* pNumPoints, [NativeTypeName("ctl_voltage_frequency_point_t *")] _ctl_voltage_frequency_point_t* pVFCurveTable);
+        public static extern ctl_result_t ctlOverclockReadVFCurve([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, ctl_vf_curve_type_t VFCurveType, ctl_vf_curve_details_t VFCurveDetail, [NativeTypeName("uint32_t *")] uint* pNumPoints, ctl_voltage_frequency_point_t* pVFCurveTable);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlOverclockWriteCustomVFCurve([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("uint32_t")] uint NumPoints, [NativeTypeName("ctl_voltage_frequency_point_t *")] _ctl_voltage_frequency_point_t* pCustomVFCurveTable);
+        public static extern ctl_result_t ctlOverclockWriteCustomVFCurve([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDeviceAdapter, [NativeTypeName("uint32_t")] uint NumPoints, ctl_voltage_frequency_point_t* pCustomVFCurveTable);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPciGetProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_pci_properties_t *")] _ctl_pci_properties_t* pProperties);
+        public static extern ctl_result_t ctlPciGetProperties([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_pci_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPciGetState([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("ctl_pci_state_t *")] _ctl_pci_state_t* pState);
+        public static extern ctl_result_t ctlPciGetState([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, ctl_pci_state_t* pState);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumPowerDomains([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_pwr_handle_t *")] _ctl_pwr_handle_t** phPower);
+        public static extern ctl_result_t ctlEnumPowerDomains([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_pwr_handle_t *")] _ctl_pwr_handle_t** phPower);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPowerGetProperties([NativeTypeName("ctl_pwr_handle_t")] _ctl_pwr_handle_t* hPower, [NativeTypeName("ctl_power_properties_t *")] _ctl_power_properties_t* pProperties);
+        public static extern ctl_result_t ctlPowerGetProperties([NativeTypeName("ctl_pwr_handle_t")] _ctl_pwr_handle_t* hPower, ctl_power_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPowerGetEnergyCounter([NativeTypeName("ctl_pwr_handle_t")] _ctl_pwr_handle_t* hPower, [NativeTypeName("ctl_power_energy_counter_t *")] _ctl_power_energy_counter_t* pEnergy);
+        public static extern ctl_result_t ctlPowerGetEnergyCounter([NativeTypeName("ctl_pwr_handle_t")] _ctl_pwr_handle_t* hPower, ctl_power_energy_counter_t* pEnergy);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPowerGetLimits([NativeTypeName("ctl_pwr_handle_t")] _ctl_pwr_handle_t* hPower, [NativeTypeName("ctl_power_limits_t *")] _ctl_power_limits_t* pPowerLimits);
+        public static extern ctl_result_t ctlPowerGetLimits([NativeTypeName("ctl_pwr_handle_t")] _ctl_pwr_handle_t* hPower, ctl_power_limits_t* pPowerLimits);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlPowerSetLimits([NativeTypeName("ctl_pwr_handle_t")] _ctl_pwr_handle_t* hPower, [NativeTypeName("const ctl_power_limits_t *")] _ctl_power_limits_t* pPowerLimits);
+        public static extern ctl_result_t ctlPowerSetLimits([NativeTypeName("ctl_pwr_handle_t")] _ctl_pwr_handle_t* hPower, [NativeTypeName("const ctl_power_limits_t *")] ctl_power_limits_t* pPowerLimits);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlEnumTemperatureSensors([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_temp_handle_t *")] _ctl_temp_handle_t** phTemperature);
+        public static extern ctl_result_t ctlEnumTemperatureSensors([NativeTypeName("ctl_device_adapter_handle_t")] _ctl_device_adapter_handle_t* hDAhandle, [NativeTypeName("uint32_t *")] uint* pCount, [NativeTypeName("ctl_temp_handle_t *")] _ctl_temp_handle_t** phTemperature);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlTemperatureGetProperties([NativeTypeName("ctl_temp_handle_t")] _ctl_temp_handle_t* hTemperature, [NativeTypeName("ctl_temp_properties_t *")] _ctl_temp_properties_t* pProperties);
+        public static extern ctl_result_t ctlTemperatureGetProperties([NativeTypeName("ctl_temp_handle_t")] _ctl_temp_handle_t* hTemperature, ctl_temp_properties_t* pProperties);
 
         [DllImport("ControlLib", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        [return: NativeTypeName("ctl_result_t")]
-        public static extern _ctl_result_t ctlTemperatureGetState([NativeTypeName("ctl_temp_handle_t")] _ctl_temp_handle_t* hTemperature, double* pTemperature);
+        public static extern ctl_result_t ctlTemperatureGetState([NativeTypeName("ctl_temp_handle_t")] _ctl_temp_handle_t* hTemperature, double* pTemperature);
 
         [NativeTypeName("#define CTL_IMPL_MAJOR_VERSION 1")]
         public const int CTL_IMPL_MAJOR_VERSION = 1;

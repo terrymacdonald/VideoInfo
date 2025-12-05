@@ -1,0 +1,13 @@
+namespace IGCLWrapper
+{
+    public enum ctl_display_output_types_t
+    {
+        CTL_DISPLAY_OUTPUT_TYPES_INVALID = 0,
+        CTL_DISPLAY_OUTPUT_TYPES_DISPLAYPORT = 1,
+        CTL_DISPLAY_OUTPUT_TYPES_HDMI = 2,
+        CTL_DISPLAY_OUTPUT_TYPES_DVI = 3,
+        CTL_DISPLAY_OUTPUT_TYPES_MIPI = 4,
+        CTL_DISPLAY_OUTPUT_TYPES_CRT = 5,
+        CTL_DISPLAY_OUTPUT_TYPES_MAX,
+    }
+}

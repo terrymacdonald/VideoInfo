@@ -1,0 +1,10 @@
+namespace IGCLWrapper
+{
+    public enum ctl_display_setting_quantization_range_t
+    {
+        CTL_DISPLAY_SETTING_QUANTIZATION_RANGE_DEFAULT = 0,
+        CTL_DISPLAY_SETTING_QUANTIZATION_RANGE_LIMITED_RANGE = 1,
+        CTL_DISPLAY_SETTING_QUANTIZATION_RANGE_FULL_RANGE = 2,
+        CTL_DISPLAY_SETTING_QUANTIZATION_RANGE_MAX,
+    }
+}

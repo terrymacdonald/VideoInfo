@@ -1,0 +1,23 @@
+namespace IGCLWrapper
+{
+    public enum ctl_mem_type_t
+    {
+        CTL_MEM_TYPE_HBM = 0,
+        CTL_MEM_TYPE_DDR = 1,
+        CTL_MEM_TYPE_DDR3 = 2,
+        CTL_MEM_TYPE_DDR4 = 3,
+        CTL_MEM_TYPE_DDR5 = 4,
+        CTL_MEM_TYPE_LPDDR = 5,
+        CTL_MEM_TYPE_LPDDR3 = 6,
+        CTL_MEM_TYPE_LPDDR4 = 7,
+        CTL_MEM_TYPE_LPDDR5 = 8,
+        CTL_MEM_TYPE_GDDR4 = 9,
+        CTL_MEM_TYPE_GDDR5 = 10,
+        CTL_MEM_TYPE_GDDR5X = 11,
+        CTL_MEM_TYPE_GDDR6 = 12,
+        CTL_MEM_TYPE_GDDR6X = 13,
+        CTL_MEM_TYPE_GDDR7 = 14,
+        CTL_MEM_TYPE_UNKNOWN = 15,
+        CTL_MEM_TYPE_MAX,
+    }
+}
