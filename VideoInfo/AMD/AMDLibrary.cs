@@ -1020,12 +1020,39 @@ namespace DisplayMagicianShared.AMD
 
         public bool IsValidConfig(AMD_DISPLAY_CONFIG displayConfig)
         {
-            return true; // placeholder; validation will be added later
+            SharedLogger.logger.Trace("AMDLibrary/IsValidConfig: Testing whether the display configuration is valid");
+
+            if (displayConfig.IsInUse && displayConfig.IsEyefinity)
+            {
+                // At the moment we just assume the config is true so we try to use it
+                return true;
+            }
+
+            // Not an Eyefinity topology; defer to Windows for validity
+            return true;
         }
 
         public bool IsPossibleConfig(AMD_DISPLAY_CONFIG displayConfig)
         {
-            return true; // placeholder; feasibility checks will be added later
+            SharedLogger.logger.Trace("AMDLibrary/IsPossibleConfig: Testing whether the AMD display configuration is possible to be used now");
+
+            if (displayConfig.DisplayIdentifiers.Count == 0 && _allConnectedDisplayIdentifiers.Count == 0)
+            {
+                return true;
+            }
+            else if (_allConnectedDisplayIdentifiers.Count == 0)
+            {
+                return false;
+            }
+
+            if (displayConfig.DisplayIdentifiers.All(value => _allConnectedDisplayIdentifiers.Contains(value)))
+            {
+                SharedLogger.logger.Trace("AMDLibrary/IsPossibleConfig: Success! The AMD display configuration is possible to be used now");
+                return true;
+            }
+
+            SharedLogger.logger.Trace("AMDLibrary/IsPossibleConfig: The AMD display configuration cannot be used now");
+            return false;
         }
 
         #region ADLX Helper Methods (read-only)
@@ -1563,7 +1590,7 @@ namespace DisplayMagicianShared.AMD
             try
             {
                 using var handle = ADLXDisplaySettingsHelpers.GetVSRHandle(displayServicesPtr, displayPtr);
-                var (supported, enabled) = ADLXDisplaySettingsHelpers.GetVSRState(handle);
+                var (supported, enabled) = ADLXDisplaySettingsHelpers.GetVirtualSuperResolutionState(handle.DangerousGetHandle());
                 d.IsSupportedVSR = supported;
                 d.IsEnabledVSR = enabled;
             }
@@ -1586,6 +1613,23 @@ namespace DisplayMagicianShared.AMD
                 var (supported, enabled) = ADLXDisplaySettingsHelpers.GetVariBrightState(handle);
                 d.IsSupportedVariBright = supported;
                 d.IsEnabledVariBright = enabled;
+            }
+            catch { }
+
+            // Custom resolution (applied)
+            try
+            {
+                using var handle = ADLXDisplaySettingsHelpers.GetCustomResolutionHandle(displayServicesPtr, displayPtr);
+                var (supported, current) = ADLXDisplaySettingsHelpers.GetCustomResolutionState(handle.DangerousGetHandle());
+                d.IsSupportedCustomResolution = supported;
+                if (supported)
+                {
+                    d.CustomResWidth = current.resWidth;
+                    d.CustomResHeight = current.resHeight;
+                    d.CustomResRefreshRate = current.refreshRate;
+                    d.CustomResTimingStandard = (int)current.timingStandard;
+                    d.IsCustomResolutionApplied = current.resWidth != 0 && current.resHeight != 0;
+                }
             }
             catch { }
 
