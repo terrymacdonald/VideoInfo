@@ -1,8 +1,12 @@
 using System;
 using System.Runtime.InteropServices;
-
 namespace ADLXWrapper
 {
+    /// <summary>
+    /// Marker interface for ADLX COM-like objects to be used with ComPtr.
+    /// </summary>
+    internal interface IComObject { }
+
     /// <summary>
     /// VTable structures for ADLX COM-like interfaces
     /// These structures define the memory layout of interface vtables
@@ -15,8 +19,8 @@ namespace ADLXWrapper
         // - QueryInterface
         // - AddRef  
         // - Release
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXInterfaceVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)] // Pack = 8 for 64-bit pointers
+        internal struct IADLXInterfaceVtbl : IComObject
         {
             public IntPtr QueryInterface;  // ADLX_RESULT QueryInterface(const wchar_t* interfaceId, void** ppInterface)
             public IntPtr AddRef;          // adlx_long AddRef()
@@ -24,8 +28,8 @@ namespace ADLXWrapper
         }
 
         // IADLXList vtable (base for all list interfaces)
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXListVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXListVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -44,8 +48,8 @@ namespace ADLXWrapper
         }
 
         // IADLXGPUList vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXGPUListVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXGPUListVtbl : IComObject
         {
             // Inherit from IADLXList
             public IntPtr QueryInterface;
@@ -62,8 +66,8 @@ namespace ADLXWrapper
         }
 
         // IADLXGPU vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXGPUVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXGPUVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -90,8 +94,8 @@ namespace ADLXWrapper
         }
 
         // IADLXSystem vtable (main system interface)
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXSystemVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXSystemVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -438,7 +442,7 @@ namespace ADLXWrapper
 
         // IADLXPerformanceMonitoringServices vtable
         [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXPerformanceMonitoringServicesVtbl
+        internal struct IADLXPerformanceMonitoringServicesVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -466,8 +470,8 @@ namespace ADLXWrapper
         }
 
         // IADLXGPUMetricsSupport vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXGPUMetricsSupportVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXGPUMetricsSupportVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -488,8 +492,8 @@ namespace ADLXWrapper
         }
 
         // IADLXGPUMetrics vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXGPUMetricsVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXGPUMetricsVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -511,8 +515,8 @@ namespace ADLXWrapper
         }
 
         // IADLXGPUTuningServices vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXGPUTuningServicesVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXGPUTuningServicesVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -536,8 +540,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayServices vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayServicesVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayServicesVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -569,8 +573,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayChangedHandling vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayChangedHandlingVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayChangedHandlingVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -589,8 +593,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayList vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayListVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayListVtbl : IComObject
         {
             // Inherit from IADLXList
             public IntPtr QueryInterface;
@@ -607,8 +611,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplay vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayVtbl : IComObject
         {
             // Base interface methods
             public IntPtr QueryInterface;
@@ -630,8 +634,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayFreeSync vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayFreeSyncVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayFreeSyncVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -643,8 +647,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayGPUScaling vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayGPUScalingVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayGPUScalingVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -656,8 +660,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayScalingMode vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayScalingModeVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayScalingModeVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -669,8 +673,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayColorDepth vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayColorDepthVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayColorDepthVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -683,8 +687,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayPixelFormat vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayPixelFormatVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayPixelFormatVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -697,8 +701,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayFreeSyncColorAccuracy vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayFreeSyncColorAccuracyVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayFreeSyncColorAccuracyVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -710,8 +714,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayDynamicRefreshRateControl vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayDynamicRefreshRateControlVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayDynamicRefreshRateControlVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -723,8 +727,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplay3DLUT vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplay3DLUTVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplay3DLUTVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -753,8 +757,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayGamma vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayGammaVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayGammaVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -789,8 +793,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayGamut vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayGamutVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayGamutVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -830,7 +834,7 @@ namespace ADLXWrapper
 
 
         // IADLXMultimediaServices vtable
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
         internal struct IADLXMultimediaServicesVtbl
         {
             public IntPtr QueryInterface;
@@ -843,8 +847,8 @@ namespace ADLXWrapper
         }
 
         // IADLXMultimediaChangedHandling vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXMultimediaChangedHandlingVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXMultimediaChangedHandlingVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -855,8 +859,8 @@ namespace ADLXWrapper
         }
 
         // IADLXVideoUpscale vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXVideoUpscaleVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXVideoUpscaleVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -871,8 +875,8 @@ namespace ADLXWrapper
         }
 
         // IADLXVideoSuperResolution vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXVideoSuperResolutionVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXVideoSuperResolutionVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -884,8 +888,8 @@ namespace ADLXWrapper
         }
 
         // IADLXPowerTuningServices vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXPowerTuningServicesVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXPowerTuningServicesVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -896,8 +900,8 @@ namespace ADLXWrapper
         }
 
         // IADLXPowerTuningServices1 vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXPowerTuningServices1Vtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXPowerTuningServices1Vtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -911,8 +915,8 @@ namespace ADLXWrapper
         }
 
         // IADLXSmartShiftMax vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXSmartShiftMaxVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXSmartShiftMaxVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -927,8 +931,8 @@ namespace ADLXWrapper
         }
 
         // IADLXSmartShiftEco vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXSmartShiftEcoVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXSmartShiftEcoVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -940,8 +944,8 @@ namespace ADLXWrapper
         }
 
         // IADLXManualPowerTuning vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXManualPowerTuningVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXManualPowerTuningVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -953,8 +957,8 @@ namespace ADLXWrapper
         }
 
         // IADLXManualPowerTuning1 vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXManualPowerTuning1Vtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXManualPowerTuning1Vtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -972,8 +976,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayVSR vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayVSRVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayVSRVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -985,8 +989,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayIntegerScaling vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayIntegerScalingVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayIntegerScalingVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -998,8 +1002,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayHDCP vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayHDCPVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayHDCPVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1011,8 +1015,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayCustomColor vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayCustomColorVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayCustomColorVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1041,8 +1045,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayVariBright vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayVariBrightVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayVariBrightVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1064,8 +1068,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayVariBright1 vtable (extends VariBright)
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayVariBright1Vtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayVariBright1Vtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1093,8 +1097,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayBlanking vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayBlankingVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayBlankingVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1108,8 +1112,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayCustomResolution vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayCustomResolutionVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayCustomResolutionVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1123,8 +1127,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayResolution vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayResolutionVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayResolutionVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1135,8 +1139,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDisplayConnectivityExperience vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDisplayConnectivityExperienceVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDisplayConnectivityExperienceVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1157,8 +1161,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDesktop vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDesktopVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDesktopVtbl : IComObject
         {
             // IADLXInterface
             public IntPtr QueryInterface;
@@ -1175,8 +1179,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDesktopList vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDesktopListVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDesktopListVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1192,8 +1196,8 @@ namespace ADLXWrapper
         }
 
         // IADLXEyefinityDesktop vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXEyefinityDesktopVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXEyefinityDesktopVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1206,8 +1210,8 @@ namespace ADLXWrapper
         }
 
         // IADLXSimpleEyefinity vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXSimpleEyefinityVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXSimpleEyefinityVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;
@@ -1220,8 +1224,8 @@ namespace ADLXWrapper
         }
 
         // IADLXDesktopServices vtable
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct IADLXDesktopServicesVtbl
+        [StructLayout(LayoutKind.Sequential)] //, Pack = 8)]
+        internal struct IADLXDesktopServicesVtbl : IComObject
         {
             public IntPtr QueryInterface;
             public IntPtr AddRef;

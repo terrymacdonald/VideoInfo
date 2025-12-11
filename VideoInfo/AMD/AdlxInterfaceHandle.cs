@@ -1,57 +1,45 @@
 using System;
-using Microsoft.Win32.SafeHandles;
 
 namespace ADLXWrapper
 {
-    /// <summary>
-    /// SafeHandle wrapper for ADLX COM-like interfaces. Ensures Release() is called even if user forgets.
-    /// </summary>
-    public sealed class AdlxInterfaceHandle : SafeHandleZeroOrMinusOneIsInvalid
-    {
-        private readonly bool _addRef;
+	/// <summary>
+	/// Lightweight lifetime wrapper for raw ADLX interface pointers.
+	/// </summary>
+	public readonly unsafe struct AdlxInterfaceHandle : IDisposable
+	{
+		private readonly IntPtr _ptr;
+		private readonly bool _owns;
 
-        private AdlxInterfaceHandle(bool addRef)
-            : base(true)
-        {
-            _addRef = addRef;
-        }
+		private AdlxInterfaceHandle(IntPtr ptr, bool owns)
+		{
+			_ptr = ptr;
+			_owns = owns;
+		}
 
-        /// <summary>
-        /// Wrap an ADLX interface pointer. If addRef is true, increments the reference count.
-        /// </summary>
-        public static AdlxInterfaceHandle From(IntPtr ptr, bool addRef = false)
-        {
-            if (ptr == IntPtr.Zero)
-                throw new ArgumentNullException(nameof(ptr));
+		public bool IsInvalid => _ptr == IntPtr.Zero;
 
-            var handle = new AdlxInterfaceHandle(addRef);
+		public static AdlxInterfaceHandle From(void* ptr, bool addRef = true)
+		{
+			if (ptr == null) throw new ArgumentNullException(nameof(ptr));
+			var intPtr = (IntPtr)ptr;
+			if (addRef)
+			{
+				ADLXHelpers.AddRefInterface(intPtr);
+			}
+			return new AdlxInterfaceHandle(intPtr, owns: true);
+		}
 
-            if (addRef)
-            {
-                ADLXHelpers.AddRefInterface(ptr);
-            }
+		public T* As<T>() where T : unmanaged => (T*)_ptr;
 
-            handle.SetHandle(ptr);
-            return handle;
-        }
+		public void Dispose()
+		{
+			if (_owns && _ptr != IntPtr.Zero)
+			{
+				ADLXHelpers.ReleaseInterface(_ptr);
+			}
+		}
 
-        /// <summary>
-        /// Implicit conversion to IntPtr for interoperability with existing helper methods.
-        /// </summary>
-        public static implicit operator IntPtr(AdlxInterfaceHandle h) => h.handle;
-
-        protected override bool ReleaseHandle()
-        {
-            try
-            {
-                ADLXHelpers.ReleaseInterface(handle);
-                return true;
-            }
-            catch
-            {
-                // We can't throw from a SafeHandle release; report false to indicate failure.
-                return false;
-            }
-        }
-    }
+		public static implicit operator IntPtr(AdlxInterfaceHandle handle) => handle._ptr;
+		public static implicit operator IADLXInterface*(AdlxInterfaceHandle handle) => (IADLXInterface*)handle._ptr;
+	}
 }

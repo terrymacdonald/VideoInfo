@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-
 namespace ADLXWrapper
 {
     /// <summary>
@@ -48,7 +47,7 @@ namespace ADLXWrapper
     public sealed class ADLXApi : IDisposable
     {
         private IntPtr _hDLL;
-        private IntPtr _pSystemServices;
+        private ComPtr<IADLXSystem> _systemServices;
         private bool _disposed;
 
         // Function pointers loaded from DLL
@@ -64,10 +63,10 @@ namespace ADLXWrapper
         private ulong _fullVersion;
         private string? _version;
 
-        private ADLXApi(IntPtr hDLL, IntPtr pSystemServices)
+        private unsafe ADLXApi(IntPtr hDLL, IADLXSystem* pSystemServices)
         {
             _hDLL = hDLL;
-            _pSystemServices = pSystemServices;
+            _systemServices = new ComPtr<IADLXSystem>(pSystemServices);
         }
 
         /// <summary>
@@ -106,7 +105,7 @@ namespace ADLXWrapper
                 throw new ADLXException(result, "Failed to initialize ADLX");
             }
 
-            var api = new ADLXApi(hDLL, pSystem)
+            var api = new ADLXApi(hDLL, (IADLXSystem*)pSystem)
             {
                 _queryFullVersionFn = queryFullVersionFn,
                 _queryVersionFn = queryVersionFn,
@@ -168,7 +167,7 @@ namespace ADLXWrapper
                 throw new ADLXException(result, "Failed to initialize ADLX with ADL context");
             }
 
-            var api = new ADLXApi(hDLL, pSystem)
+            var api = new ADLXApi(hDLL, (IADLXSystem*)pSystem)
             {
                 _queryFullVersionFn = queryFullVersionFn,
                 _queryVersionFn = queryVersionFn,
@@ -209,48 +208,78 @@ namespace ADLXWrapper
         /// <summary>
         /// Get the system services as a SafeHandle (auto-release even if not disposed manually).
         /// </summary>
-        public AdlxInterfaceHandle GetSystemServicesHandle()
+        public unsafe IADLXSystem* GetSystemServices()
         {
             ThrowIfDisposed();
-            return AdlxInterfaceHandle.From(_pSystemServices, addRef: true);
+            // AddRef is handled by the ComPtr wrapper when it's created.
+            // We return the raw pointer here for convenience, but its lifetime is managed by _systemServices.
+            // Callers should not call Release() on this pointer.
+            // If a caller needs to hold onto it, they should create their own ComPtr and call AddRef().
+            return _systemServices.Get();
         }
 
         /// <summary>
-        /// Get GPU tuning services wrapped in a SafeHandle.
+        /// Enumerate GPU handles with automatic lifetime management.
         /// </summary>
-        public AdlxInterfaceHandle GetGPUTuningServicesHandle()
+        public unsafe AdlxInterfaceHandle[] EnumerateGPUHandles()
         {
-            var ptr = GetGPUTuningServicesInternal();
-            return AdlxInterfaceHandle.From(ptr);
-        }
+            ThrowIfDisposed();
 
-        /// <summary>
-        /// Get performance monitoring services wrapped in a SafeHandle.
-        /// </summary>
-        public AdlxInterfaceHandle GetPerformanceMonitoringServicesHandle()
-        {
-            var ptr = GetPerformanceMonitoringServicesInternal();
-            return AdlxInterfaceHandle.From(ptr);
-        }
+            IADLXGPUList* pGpuList = null;
+            var system = _systemServices.Get();
+            var result = system->GetGPUs(&pGpuList);
+            if (result != ADLX_RESULT.ADLX_OK)
+                throw new ADLXException(result, "Failed to enumerate GPUs");
 
-        public AdlxInterfaceHandle GetPowerTuningServicesHandle()
-        {
-            var ptr = GetPowerTuningServicesInternal();
-            return AdlxInterfaceHandle.From(ptr);
-        }
+            using var gpuList = new ComPtr<IADLXGPUList>(pGpuList);
+            var count = gpuList.Get()->Size();
+            var handles = new AdlxInterfaceHandle[count];
 
-        /// <summary>
-        /// Enumerate GPUs and wrap them in SafeHandles for automatic release.
-        /// </summary>
-        public AdlxInterfaceHandle[] EnumerateGPUHandles()
-        {
-            var raw = EnumerateGPUsInternal();
-            var handles = new AdlxInterfaceHandle[raw.Length];
-            for (int i = 0; i < raw.Length; i++)
+            for (uint i = 0; i < count; i++)
             {
-                handles[i] = AdlxInterfaceHandle.From(raw[i]);
+                IADLXGPU* pGpu = null;
+                gpuList.Get()->At(i, &pGpu);
+                handles[i] = AdlxInterfaceHandle.From(pGpu, addRef: false); // At already AddRef's
             }
+
             return handles;
+        }
+
+        /// <summary>
+        /// Get the GPU tuning services interface.
+        /// </summary>
+        public unsafe IADLXGPUTuningServices* GetGPUTuningServices()
+        {
+            ThrowIfDisposed();
+            IADLXGPUTuningServices* pServices = null;
+            var result = _systemServices.Get()->GetGPUTuningServices(&pServices);
+            if (result != ADLX_RESULT.ADLX_OK)
+                throw new ADLXException(result, "Failed to get GPU tuning services");
+            return pServices;
+        }
+
+        /// <summary>
+        /// Get the performance monitoring services as a disposable handle.
+        /// </summary>
+        public unsafe AdlxInterfaceHandle GetPerformanceMonitoringServicesHandle()
+        {
+            ThrowIfDisposed();
+            IADLXPerformanceMonitoringServices* pServices = null;
+            var result = _systemServices.Get()->GetPerformanceMonitoringServices(&pServices);
+            if (result != ADLX_RESULT.ADLX_OK)
+                throw new ADLXException(result, "Failed to get performance monitoring services");
+            return AdlxInterfaceHandle.From(pServices, addRef: false);
+        }
+
+        /// <summary>
+        /// Get the system services as a disposable handle (AddRef'd).
+        /// </summary>
+        public unsafe AdlxInterfaceHandle GetSystemServicesHandle()
+        {
+            ThrowIfDisposed();
+            var ptr = _systemServices.Get();
+            ADLXHelpers.AddRefInterface((IntPtr)ptr);
+            return AdlxInterfaceHandle.From(ptr, addRef: false);
         }
 
         /// <summary>
@@ -270,7 +299,7 @@ namespace ADLXWrapper
             unsafe
             {
                 // Terminate first (keeps system pointer valid while terminating)
-                if (_terminateFn != null && _pSystemServices != IntPtr.Zero)
+                if (_terminateFn != null && _systemServices.Get() != null)
                 {
                     try
                     {
@@ -283,11 +312,11 @@ namespace ADLXWrapper
                 }
 
                 // Release system interface if still present
-                if (_pSystemServices != IntPtr.Zero)
+                if (_systemServices.Get() != null)
                 {
                     try
                     {
-                        ADLXHelpers.ReleaseInterface(_pSystemServices);
+                        _systemServices.Dispose(); // This calls Release()
                     }
                     catch
                     {
@@ -302,8 +331,8 @@ namespace ADLXWrapper
                     _hDLL = IntPtr.Zero;
                 }
             }
-
-            _pSystemServices = IntPtr.Zero;
+            
+            _systemServices = default; // Clear the ComPtr
             _queryFullVersionFn = null;
             _queryVersionFn = null;
             _initializeFn = null;
@@ -387,119 +416,5 @@ namespace ADLXWrapper
             return true;
         }
 
-        private unsafe IntPtr GetGPUTuningServicesInternal()
-        {
-            ThrowIfDisposed();
-
-            var systemVtbl = *(ADLXVTables.IADLXSystemVtbl**)_pSystemServices;
-            var getGPUTuningServicesFn = (ADLXVTables.GetGPUTuningServicesFn)Marshal.GetDelegateForFunctionPointer(
-                systemVtbl->GetGPUTuningServices, typeof(ADLXVTables.GetGPUTuningServicesFn));
-
-            IntPtr pGPUTuningServices;
-            var result = getGPUTuningServicesFn(_pSystemServices, &pGPUTuningServices);
-
-            if (result != ADLX_RESULT.ADLX_OK)
-            {
-                throw new ADLXException(result, "Failed to get GPU tuning services");
-            }
-
-            return pGPUTuningServices;
-        }
-
-        private unsafe IntPtr GetPowerTuningServicesInternal()
-        {
-            ThrowIfDisposed();
-
-            var systemVtbl = *(ADLXVTables.IADLXSystemVtbl**)_pSystemServices;
-            var getPowerTuningServicesFn = (ADLXVTables.GetPowerTuningServicesFn)Marshal.GetDelegateForFunctionPointer(
-                systemVtbl->GetPowerTuningServices, typeof(ADLXVTables.GetPowerTuningServicesFn));
-
-            IntPtr pPowerServices;
-            var result = getPowerTuningServicesFn(_pSystemServices, &pPowerServices);
-            if (result != ADLX_RESULT.ADLX_OK)
-                throw new ADLXException(result, "Failed to get power tuning services");
-
-            return pPowerServices;
-        }
-
-        private unsafe IntPtr GetPerformanceMonitoringServicesInternal()
-        {
-            ThrowIfDisposed();
-
-            var systemVtbl = *(ADLXVTables.IADLXSystemVtbl**)_pSystemServices;
-            var getPerfMonServicesFn = (ADLXVTables.GetPerformanceMonitoringServicesFn)Marshal.GetDelegateForFunctionPointer(
-                systemVtbl->GetPerformanceMonitoringServices, typeof(ADLXVTables.GetPerformanceMonitoringServicesFn));
-
-            IntPtr pPerfMonServices;
-            var result = getPerfMonServicesFn(_pSystemServices, &pPerfMonServices);
-
-            if (result != ADLX_RESULT.ADLX_OK)
-            {
-                throw new ADLXException(result, "Failed to get performance monitoring services");
-            }
-
-            return pPerfMonServices;
-        }
-
-        private unsafe IntPtr[] EnumerateGPUsInternal()
-        {
-            ThrowIfDisposed();
-
-            var systemVtbl = *(ADLXVTables.IADLXSystemVtbl**)_pSystemServices;
-            var getGPUsFn = (ADLXVTables.GetGPUsFn)Marshal.GetDelegateForFunctionPointer(
-                systemVtbl->GetGPUs, typeof(ADLXVTables.GetGPUsFn));
-
-            IntPtr pGPUList;
-            var result = getGPUsFn(_pSystemServices, &pGPUList);
-
-            if (result != ADLX_RESULT.ADLX_OK)
-            {
-                throw new ADLXException(result, "Failed to get GPU list");
-            }
-
-            if (pGPUList == IntPtr.Zero)
-            {
-                return Array.Empty<IntPtr>();
-            }
-
-            try
-            {
-                var listVtbl = *(ADLXVTables.IADLXGPUListVtbl**)pGPUList;
-                var sizeFn = (ADLXVTables.SizeFn)Marshal.GetDelegateForFunctionPointer(
-                    listVtbl->Size, typeof(ADLXVTables.SizeFn));
-                var atFn = (ADLXVTables.AtFn)Marshal.GetDelegateForFunctionPointer(
-                    listVtbl->At, typeof(ADLXVTables.AtFn));
-
-                uint count = sizeFn(pGPUList);
-
-                if (count == 0)
-                {
-                    return Array.Empty<IntPtr>();
-                }
-
-                var gpus = new IntPtr[count];
-                for (uint i = 0; i < count; i++)
-                {
-                    IntPtr pGPU;
-                    result = atFn(pGPUList, i, &pGPU);
-
-                    if (result != ADLX_RESULT.ADLX_OK)
-                    {
-                        throw new ADLXException(result, $"Failed to get GPU at index {i}");
-                    }
-
-                    gpus[i] = pGPU;
-                }
-
-                return gpus;
-            }
-            finally
-            {
-                var listVtbl = *(ADLXVTables.IADLXListVtbl**)pGPUList;
-                var releaseFn = (ADLXVTables.ReleaseFn)Marshal.GetDelegateForFunctionPointer(
-                    listVtbl->Release, typeof(ADLXVTables.ReleaseFn));
-                releaseFn(pGPUList);
-            }
-        }
     }
 }
