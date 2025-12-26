@@ -955,11 +955,11 @@ namespace DisplayMagicianShared.AMD
         private ADLXApiHelper _adlxHelper;
         //private ADLXHelper _adlxHelper;
         private ADLXSystemServicesHelper _adlxSystem;
-        private int _adlxHighestSupportedSystemVersion = 0; // Only the base SystemServices is supported in all versions of ADLX
+        //private int _adlxHighestSupportedSystemVersion = 0; // Only the base SystemServices is supported in all versions of ADLX
         private AMD_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
-        public IntPtr hADLXBindingModule = IntPtr.Zero;
+        //public IntPtr hADLXBindingModule = IntPtr.Zero;
         public IntPtr hADLXModule = IntPtr.Zero;
         public const string AMD_ADLX_BINDING_DLL = "ADLXWrapper.dll";
         public const string AMD_ADLX_DLL = "amdadlx64.dll";
@@ -1012,7 +1012,7 @@ namespace DisplayMagicianShared.AMD
                     }
 
                     // Attempt to load the Custom ADLX Binding DLL
-                    SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLX CSharp Binding DLL {AMD_ADLX_BINDING_DLL} so we can access the AMD ADLX DLL from C#");
+                    /*SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLXWrapper DLL {AMD_ADLX_BINDING_DLL} so we can access the AMD ADLX DLL from C#");
                     hADLXBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
                     if (hADLXBindingModule != IntPtr.Zero)
                     {
@@ -1033,7 +1033,7 @@ namespace DisplayMagicianShared.AMD
                         _initialised = false;
                         SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX Binding DLL.");
                         return;
-                    }
+                    }*/
                 }
                 catch (Exception ex)
                 {
@@ -1103,7 +1103,7 @@ namespace DisplayMagicianShared.AMD
                         SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attemping to access AMD ADLX System Services.");
                         _adlxSystem = _adlxHelper.GetSystemServices();
                         _initialised = true;
-                        _adlxHighestSupportedSystemVersion = 0;
+                        //_adlxHighestSupportedSystemVersion = 0;
                         SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Successfully got AMD ADLX System Services.");
                         SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADLX library was initialised successfully");                      
                     }
@@ -1221,12 +1221,12 @@ namespace DisplayMagicianShared.AMD
                 }
             }
 
-            if (hADLXBindingModule != IntPtr.Zero)
+            /*if (hADLXBindingModule != IntPtr.Zero)
             {
                 SharedLogger.logger.Trace("AMDLibrary/Dispose: Freeing the AMD ADLX Binding DLL");
                 FreeLibrary(hADLXBindingModule);
                 hADLXBindingModule = IntPtr.Zero;
-            }
+            }*/
 
             if (hADLXModule != IntPtr.Zero)
             {
@@ -1437,7 +1437,7 @@ namespace DisplayMagicianShared.AMD
 
                         // Store the desktop type
                         newDesktop.Type = desktop.Type;
-
+/*
                         // The the desktop is an eyefinity desktop then set the eyefinity enabled flag
                         // and also process the EyefinityDesktop layout
                         if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_EYEFINITY)
@@ -1482,7 +1482,7 @@ namespace DisplayMagicianShared.AMD
                                 myDisplayConfig.EyefinityDesktop.Rows = ADLX.adlx_uintP_value(pRow);
                                 myDisplayConfig.EyefinityDesktop.Columns = ADLX.adlx_uintP_value(pCol);
 
-                                /*for (uint row=1; row<gridRows; row++)
+                                *//*for (uint row=1; row<gridRows; row++)
                                 {
                                     for (uint col = 1; col < gridCols; col++)
                                     {
@@ -1504,7 +1504,7 @@ namespace DisplayMagicianShared.AMD
                                         ADLX_Point location = ADLX.pointP_value(pLocation);
 
                                     }
-                                }*/
+                                }*//*
 
                                 // Copy over the desktop level sizes so that we can match things easier in the future
                                 myDisplayConfig.EyefinityDesktop.Orientation = newDesktop.Orientation;
@@ -1527,21 +1527,14 @@ namespace DisplayMagicianShared.AMD
                         {
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Single desktop detected");
                         }
-
+*/
                         // Release desktop interface
-                        desktop.Release();
+                        desktop.Dispose();
 
                         // Save the Desktop to the main list
                         myDisplayConfig.Desktops.Add(newDesktop);
                     }
                 }
-                // Release desktop list interface
-                desktopList.Release();
-                                      
-                }
-
-                // Release desktop services interface
-                desktopService.Release();
 
                 //-----------------------------------------------------------------------
 
@@ -1549,933 +1542,622 @@ namespace DisplayMagicianShared.AMD
                 // This lets us interact with the various displays to get the settings from them
                 
                 SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display services");
-                SWIGTYPE_p_p_adlx__IADLXDisplayServices s = ADLX.new_displaySerP_Ptr();
-                status = _adlxSystem.GetDisplaysServices(s);
-                displayService = ADLX.displaySerP_Ptr_value(s);
-                if (status != ADLX_RESULT.ADLX_OK)
+                List<ADLXDisplay> displaysList = _adlxSystem.EnumerateDisplays();
+                if (displaysList.Count == 0)
                 {
-                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display services. systemServices.GetDisplaysServices() returned error code {status}");
-                    return CreateDefaultConfig(); ;
+                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: No displays found in ADLX system services");
+                    return CreateDefaultConfig();
                 }
                 else
                 {
-                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display services");
-                    // Get the display services
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display list");
-                    // Get display list
-                    SWIGTYPE_p_p_adlx__IADLXDisplayList ppDisplayList = ADLX.new_displayListP_Ptr();
-                    status = displayService.GetDisplays(ppDisplayList);
-                    displayList = ADLX.displayListP_Ptr_value(ppDisplayList);
-                    if (status != ADLX_RESULT.ADLX_OK)
+                    foreach (var display in displaysList)
                     {
-                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
-                        return CreateDefaultConfig();
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display list");
-                        // Iterate through the display list
-                        uint it = displayList.Begin();
-                        for (; it != displayList.Size(); it++)
-                        {
-                            SWIGTYPE_p_p_adlx__IADLXDisplay ppDisplay = ADLX.new_displayP_Ptr();
-                            status = displayList.At(it, ppDisplay);
-                            IADLXDisplay display = ADLX.displayP_Ptr_value(ppDisplay);
+                        // Create a new AMD_DISPLAY_WITH_SETTINGS to store things in
+                        AMD_DISPLAY_WITH_SETTINGS newDisplay = new AMD_DISPLAY_WITH_SETTINGS();
 
+                        newDisplay.ConnectorType = display.ConnectorType;
+                        newDisplay.DisplayType = display.DisplayType;
+                        newDisplay.EDID = display.Edid;
+                        newDisplay.ManufacturerID = display.ManufacturerId;
+                        newDisplay.Name = display.Name;
+                        newDisplay.UniqueID = display.UniqueId;
+                        newDisplay.MaxHResolution = display.Width;
+                        newDisplay.MaxVResolution = display.Height;
+                        newDisplay.PixelClock = display.PixelClock;
+                        newDisplay.RefreshRate = display.RefreshRate;
+                        newDisplay.ScanType = display.ScanType;
+
+                        // Ok now start getting the various settings for this display
+
+                        //------------------------------------
+                        // GET THE COLOR DEPTH IF WE CAN
+                        //------------------------------------
+                        // Get the current color depth for this display
+                        (newDisplay.IsSupportedColorDepth, newDisplay.ColorDepth) = display.GetColorDepthState();
+
+                        //------------------------------------
+                        // GET THE DISPLAY CUSTOM COLOR IF POSSIBLE
+                        //------------------------------------
+                        // Get the current custom color object for this display
+                        var customColorInfo = display.GetCustomColor();
+                        newDisplay.CustomColorBrightness = customColorInfo.Brightness;
+                        newDisplay.CustomColorContrast = customColorInfo.Contrast;
+                        newDisplay.CustomColorHue = customColorInfo.Hue;
+                        newDisplay.CustomColorSaturation = customColorInfo.Saturation;
+                        newDisplay.CustomColorTemperature = customColorInfo.Temperature;
+
+
+                        // TODO: Fix getting and setting the gamma ramp as that is the bit that is breaking thi section
+                        //       but for now we just disable this section.
+                        // Now grab the display gamma settings if we can
+                        newDisplay.IsSupportedGamma = false;
+                        /*SWIGTYPE_p_p_adlx__IADLXDisplayGamma ppGamma = ADLX.new_displayGammaP_Ptr();
+                        status = displayService.GetGamma(display, ppGamma);
+                        if (status == ADLX_RESULT.ADLX_OK)
+                        {
+                            IADLXDisplayGamma gamma = ADLX.displayGammaP_Ptr_value(ppGamma);
+
+                            // Create a RegammaCoeff object to hold the coefficients
+                            ADLX_RegammaCoeff regammaCoeff = new ADLX_RegammaCoeff();
+                            status = gamma.GetGammaCoefficient(regammaCoeff);
                             if (status == ADLX_RESULT.ADLX_OK)
                             {
-                                // Create a new AMD_DISPLAY_WITH_SETTINGS to store things in
-                                AMD_DISPLAY_WITH_SETTINGS newDisplay = new AMD_DISPLAY_WITH_SETTINGS();
+                                // Store the gamma coefficients in the display settings
+                                newDisplay.GammaCoefficientGamma = regammaCoeff.gamma;
+                                newDisplay.GammaCoefficientA0 = regammaCoeff.coefficientA0;
+                                newDisplay.GammaCoefficientA1 = regammaCoeff.coefficientA1;
+                                newDisplay.GammaCoefficientA2 = regammaCoeff.coefficientA2;
+                                newDisplay.GammaCoefficientA3 = regammaCoeff.coefficientA3;
+                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got gamma coefficients for display.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting gamma coefficients. gamma.GetGammaCoefficient() returned error code {status}");
+                            }
 
-                                // Get the display connection type
-                                SWIGTYPE_p_ADLX_DISPLAY_CONNECTOR_TYPE pConnect = ADLX.new_adlx_displayConnectTypeP();
-                                display.ConnectorType(pConnect);
-                                newDisplay.ConnectorType = ADLX.adlx_displayConnectTypeP_value(pConnect);
+                            // Get GammaRamp
+                            ADLX_GammaRamp gammaRamp = new ADLX_GammaRamp();
+                            status = gamma.GetGammaRamp(gammaRamp);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                // Store the gamma ramp in the display settings
+                                newDisplay.GammaRamp = GammaRampExtensions.ToSerializable(gammaRamp);
+                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got gamma ramp for display.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting gamma ramp. gamma.GetGammaRamp() returned error code {status}");
+                            }
 
-                                // Get the display type
-                                SWIGTYPE_p_ADLX_DISPLAY_TYPE pDisType = ADLX.new_adlx_displayTypeP();
-                                display.DisplayType(pDisType);
-                                newDisplay.DisplayType = ADLX.adlx_displayTypeP_value(pDisType);
 
-                                // Get the EDID
-                                SWIGTYPE_p_p_char ppEDID = ADLX.new_charP_Ptr();
-                                display.EDID(ppEDID);
-                                string edid = ADLX.charP_Ptr_value(ppEDID);
+                            // Release the gamma interface when done
+                            gamma.Release();
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display gamma object. displayService.GetGamma() returned error code {status}");
+                        }*/
 
-                                // Get the manufacturer ID
-                                SWIGTYPE_p_unsigned_int pMID = ADLX.new_adlx_uintP();
-                                display.ManufacturerID(pMID);
-                                newDisplay.ManufacturerID = ADLX.adlx_uintP_value(pMID);
+                        //------------------------------------
+                        // GET THE FreeSync Settings IF WE CAN
+                        //------------------------------------                                
+                        // Check if FreeSync is supported and enabled
+                        (newDisplay.IsSupportedFreeSync, newDisplay.IsEnabledFreeSync) = display.GetFreeSyncState();
 
-                                // Get the display name
-                                SWIGTYPE_p_p_char ppName = ADLX.new_charP_Ptr();
-                                display.Name(ppName);
-                                string name = ADLX.charP_Ptr_value(ppName);
-                                newDisplay.Name = name;
+                        //------------------------------------
+                        // GET THE Display Gamut Settings IF WE CAN
+                        //------------------------------------
+                        // Get the current display gamut object for this display
+                        // TODO: Gamut is all wrong - we are missing a lot of settings
+                        //GamutInfo gamutInfo = display.GetGamut();
+                        //newDisplay.Is = gamutInfo.IsGamutSupported;
+                        /*    SWIGTYPE_p_p_adlx__IADLXDisplayGamut ppGamut = ADLX.new_displayGamutP_Ptr();
+                        status = displayService.GetGamut(display, ppGamut);
+                        if (status == ADLX_RESULT.ADLX_OK)
+                        {
+                            IADLXDisplayGamut gamut = ADLX.displayGamutP_Ptr_value(ppGamut);
 
-                                // Get the native resolution
-                                SWIGTYPE_p_int pMaxHRes = ADLX.new_adlx_intP();
-                                SWIGTYPE_p_int pMaxVRes = ADLX.new_adlx_intP();
-                                display.NativeResolution(pMaxHRes, pMaxVRes);
-                                newDisplay.MaxHResolution = ADLX.adlx_intP_value(pMaxHRes);
-                                newDisplay.MaxVResolution = ADLX.adlx_intP_value(pMaxVRes);
+                            // Check if Custom gamut color space is supported
+                            SWIGTYPE_p_bool pIsSupportedCustomColorSpace = ADLX.new_boolP();
+                            status = gamut.IsSupportedCustomColorSpace(pIsSupportedCustomColorSpace);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
 
-                                // Get the PixelClock
-                                SWIGTYPE_p_unsigned_int pPixelClock = ADLX.new_adlx_uintP();
-                                display.PixelClock(pPixelClock);
-                                newDisplay.PixelClock = ADLX.adlx_uintP_value(pPixelClock);
-                                // Get the refresh rate
-                                SWIGTYPE_p_double pRefreshRate = ADLX.new_doubleP();
-                                display.RefreshRate(pRefreshRate);
-                                newDisplay.RefreshRate = ADLX.doubleP_value(pRefreshRate);
-
-                                // Get the scan type
-                                SWIGTYPE_p_ADLX_DISPLAY_SCAN_TYPE pScanType = ADLX.new_adlx_displayScanTypeP();
-                                display.ScanType(pScanType);
-                                newDisplay.ScanType = ADLX.adlx_displayScanTypeP_value(pScanType);
-
-                                // Get the Unique ID
-                                SWIGTYPE_p_size_t pUID = ADLX.new_adlx_sizeP();
-                                display.UniqueId(pUID);
-                                newDisplay.UniqueID = ADLX.adlx_sizeP_value(pUID);
-
-                                // Ok now start getting the various settings for this display
-
-                                //------------------------------------
-                                // GET THE COLOR DEPTH IF WE CAN
-                                //------------------------------------
-                                // Get the current color depth for this display
-                                SWIGTYPE_p_p_adlx__IADLXDisplayColorDepth ppColorDepth = ADLX.new_displayColorDepthP_Ptr();
-                                status = displayService.GetColorDepth(display, ppColorDepth);
-                                if (status != ADLX_RESULT.ADLX_OK)
+                                // Get the gamut color space
+                                ADLX_GamutColorSpace pGamutColorSpace = ADLX.new_adlx_gamutColorSpaceP();
+                                status = gamut.GetGamutColorSpace(pGamutColorSpace);
+                                if (status == ADLX_RESULT.ADLX_OK)
                                 {
-                                    SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display color depth object. systemServices.GetColorDepth() returned error code {status}");
-                                    //return false;
+                                    ADLX_Point red = pGamutColorSpace.red;
+                                    newDisplay.GamutColorSpaceRedX = red.x;
+                                    newDisplay.GamutColorSpaceRedY = red.y;
+
+                                    ADLX_Point green = pGamutColorSpace.green;
+                                    newDisplay.GamutColorSpaceGreenX = green.x;
+                                    newDisplay.GamutColorSpaceGreenY = green.y;
+
+                                    ADLX_Point blue = pGamutColorSpace.blue;
+                                    newDisplay.GamutColorSpaceBlueX = blue.x;
+                                    newDisplay.GamutColorSpaceBlueY = blue.y;
+
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got Display Gamut Color Space for this display!");
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display color depth object");
-                                    // Check if the color depth is the same as the one we stored
-                                    IADLXDisplayColorDepth colorDepth = ADLX.displayColorDepthP_Ptr_value(ppColorDepth);
-                                    // Check if the color depth is supported
-                                    SWIGTYPE_p_bool pIsSupported = ADLX.new_boolP();
-                                    status = colorDepth.IsSupported(pIsSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-                                        newDisplay.IsSupportedColorDepth = ADLX.boolP_value(pIsSupported);
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Color Depth can be set for this display");
-
-                                        // Get the current color depth for this display
-                                        SWIGTYPE_p_ADLX_COLOR_DEPTH pColorDepth = ADLX.new_adlx_colorDepthP();
-                                        status = colorDepth.GetValue(pColorDepth);
-
-                                        if (status != ADLX_RESULT.ADLX_OK)
-                                        {
-                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display color depth. systemServices.GetColorDepth() returned error code {status}");
-                                            //return false;
-                                        }
-                                        else
-                                        {
-                                            newDisplay.ColorDepth = ADLX.adlx_colorDepthP_value(pColorDepth);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display color depth for this display: {newDisplay.ColorDepth}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Color Depth is NOT supported for this display so skipping setting it");
-                                    }
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting Display Gamut Color Space. gamma.GetGamutColorSpace() returned error code {status}");
                                 }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Display Gamut Color Space is NOT supported for this display.");
+                            }
 
-                                //------------------------------------
-                                // GET THE DISPLAY CUSTOM COLOR IF POSSIBLE
-                                //------------------------------------
-                                // Get the current custom color object for this display
-                                SWIGTYPE_p_p_adlx__IADLXDisplayCustomColor ppCustomColor = ADLX.new_displayCustomColorP_Ptr();
-                                status = displayService.GetCustomColor(display, ppCustomColor);
-                                if (status != ADLX_RESULT.ADLX_OK)
+
+                            // Check if Custom gamut color space is supported
+                            SWIGTYPE_p_bool pIsSupportedCustomWhitePoint = ADLX.new_boolP();
+                            status = gamut.IsSupportedCustomWhitePoint(pIsSupportedCustomWhitePoint);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+
+                                // Get the gamut white point
+                                ADLX_Point pGamutWhitePoint = new ADLX_Point();
+                                status = gamut.GetWhitePoint(pGamutWhitePoint);
+                                if (status == ADLX_RESULT.ADLX_OK)
                                 {
-                                    SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display custom color object. systemServices.GetCustomColor() returned error code {status}");
-                                    //return false;
+                                    newDisplay.GamutWhitePointX = pGamutWhitePoint.x;
+                                    newDisplay.GamutWhitePointY = pGamutWhitePoint.y;
+
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got Display Gamut White Point for this display!");
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display custom color object");
-                                    IADLXDisplayCustomColor customColor = ADLX.displayCustomColorP_Ptr_value(ppCustomColor);
-                                    // Check if the custom color brightness is supported
-                                    SWIGTYPE_p_bool pIsBrightnessSupported = ADLX.new_boolP();
-                                    status = customColor.IsBrightnessSupported(pIsBrightnessSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-                                        newDisplay.IsSupportedCustomColorBrightness = ADLX.boolP_value(pIsBrightnessSupported);
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Brightness can be set for this display!");
-                                        // Get the current color brightness for this display
-                                        SWIGTYPE_p_int pCurrentBrightness = ADLX.new_adlx_intP();
-                                        status = customColor.GetBrightness(pCurrentBrightness);
-                                        if (status != ADLX_RESULT.ADLX_OK)
-                                        {
-                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display custom color brightness. systemServices.GetBrightness() returned error code {status}");
-                                            //return false;
-                                        }
-                                        else
-                                        {
-                                            newDisplay.CustomColorBrightness = ADLX.adlx_intP_value(pCurrentBrightness);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display custom color brightness for this display: {newDisplay.CustomColorBrightness}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Brightness is NOT supported for this display.");
-                                    }
-
-                                    // Check if the custom color hue is supported
-                                    SWIGTYPE_p_bool pIsHueSupported = ADLX.new_boolP();
-                                    status = customColor.IsHueSupported(pIsHueSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-                                        newDisplay.IsSupportedCustomColorHue = ADLX.boolP_value(pIsHueSupported);
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Hue can be set for this display!");
-                                        // Get the current color hue for this display
-                                        SWIGTYPE_p_int pCurrentHue = ADLX.new_adlx_intP();
-                                        status = customColor.GetHue(pCurrentHue);
-                                        if (status != ADLX_RESULT.ADLX_OK)
-                                        {
-                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display custom color hue. systemServices.GetHue() returned error code {status}");
-                                            //return false;
-                                        }
-                                        else
-                                        {
-                                            newDisplay.CustomColorHue = ADLX.adlx_intP_value(pCurrentHue);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display custom color hue for this display: {newDisplay.CustomColorHue}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Hue is NOT supported for this display.");
-                                    }
-
-                                    // Saturation
-                                    SWIGTYPE_p_bool pIsSaturationSupported = ADLX.new_boolP();
-                                    status = customColor.IsSaturationSupported(pIsSaturationSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsSaturationSupported))
-                                    {
-                                        newDisplay.IsSupportedCustomColorSaturation = true;
-                                        SWIGTYPE_p_int pCurrentSaturation = ADLX.new_adlx_intP();
-                                        status = customColor.GetSaturation(pCurrentSaturation);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.CustomColorSaturation = ADLX.adlx_intP_value(pCurrentSaturation);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display custom color saturation for this display: {newDisplay.CustomColorSaturation}");
-                                        }
-                                        else
-                                        {
-                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display custom color saturation. systemServices.GetSaturation() returned error code {status}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedCustomColorSaturation = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Saturation is NOT supported for this display.");
-                                    }
-
-                                    // Contrast
-                                    SWIGTYPE_p_bool pIsContrastSupported = ADLX.new_boolP();
-                                    status = customColor.IsContrastSupported(pIsContrastSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsContrastSupported))
-                                    {
-                                        newDisplay.IsSupportedCustomColorContrast = true;
-                                        SWIGTYPE_p_int pCurrentContrast = ADLX.new_adlx_intP();
-                                        status = customColor.GetContrast(pCurrentContrast);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.CustomColorContrast = ADLX.adlx_intP_value(pCurrentContrast);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display custom color contrast for this display: {newDisplay.CustomColorContrast}");
-                                        }
-                                        else
-                                        {
-                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display custom color contrast. systemServices.GetContrast() returned error code {status}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedCustomColorContrast = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Contrast is NOT supported for this display.");
-                                    }
-
-                                    // Temperature
-                                    SWIGTYPE_p_bool pIsTemperatureSupported = ADLX.new_boolP();
-                                    status = customColor.IsTemperatureSupported(pIsTemperatureSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsTemperatureSupported))
-                                    {
-                                        newDisplay.IsSupportedCustomColorTemperature = true;
-                                        SWIGTYPE_p_int pCurrentTemperature = ADLX.new_adlx_intP();
-                                        status = customColor.GetTemperature(pCurrentTemperature);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.CustomColorTemperature = ADLX.adlx_intP_value(pCurrentTemperature);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got the display custom color temperature for this display: {newDisplay.CustomColorTemperature}");
-                                        }
-                                        else
-                                        {
-                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display custom color temperature. systemServices.GetTemperature() returned error code {status}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedCustomColorTemperature = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Color Temperature is NOT supported for this display.");
-                                    }
-
-                                    // Release the custom color interface when done
-                                    customColor.Release();
-
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting Display Gamut White Point. gamma.GetWhitePoint() returned error code {status}");
                                 }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Display Gamut White Point is NOT supported for this display.");
+                            }
 
-                                // TODO: Fix getting and setting the gamma ramp as that is the bit that is breaking thi section
-                                //       but for now we just disable this section.
-                                // Now grab the display gamma settings if we can
-                                newDisplay.IsSupportedGamma = false;
-                                /*SWIGTYPE_p_p_adlx__IADLXDisplayGamma ppGamma = ADLX.new_displayGammaP_Ptr();
-                                status = displayService.GetGamma(display, ppGamma);
+                            //TODO: Test for all the supported whitepoints and store them
+                            //TODO: Test for all the supported whitepoints and store them
+
+
+                            // Release the gamut interface when done
+                            gamut.Release();
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display gamut object. systemServices.GetGamut() returned error code {status}");
+                            //return false;
+                        }*/
+
+                        // Now get the Display GPU Scaling settings if we can
+                        (newDisplay.IsSupportedGPUScaling,newDisplay.IsEnabledGPUScaling) = display.GetGpuScalingState();
+
+                            // Get the Integer Display Scaling settings if we can
+                            SWIGTYPE_p_p_adlx__IADLXDisplayIntegerScaling ppIntegerScaling = ADLX.new_displayIntegerScalingP_Ptr();
+                            status = displayService.GetIntegerScaling(display, ppIntegerScaling);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                IADLXDisplayIntegerScaling integerScaling = ADLX.displayIntegerScalingP_Ptr_value(ppIntegerScaling);
+                                // Check if Integer Scaling is supported
+                                SWIGTYPE_p_bool pIsIntegerScalingSupported = ADLX.new_boolP();
+                                status = integerScaling.IsSupported(pIsIntegerScalingSupported);
                                 if (status == ADLX_RESULT.ADLX_OK)
                                 {
-                                    IADLXDisplayGamma gamma = ADLX.displayGammaP_Ptr_value(ppGamma);
-
-                                    // Create a RegammaCoeff object to hold the coefficients
-                                    ADLX_RegammaCoeff regammaCoeff = new ADLX_RegammaCoeff();
-                                    status = gamma.GetGammaCoefficient(regammaCoeff);
+                                    newDisplay.IsSupportedIntegerScaling = ADLX.boolP_value(pIsIntegerScalingSupported);
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Integer Scaling support for this display: {newDisplay.IsSupportedIntegerScaling}");
+                                    // Check if Integer Scaling is enabled
+                                    SWIGTYPE_p_bool pIsIntegerScalingEnabled = ADLX.new_boolP();
+                                    status = integerScaling.IsEnabled(pIsIntegerScalingEnabled);
                                     if (status == ADLX_RESULT.ADLX_OK)
                                     {
-                                        // Store the gamma coefficients in the display settings
-                                        newDisplay.GammaCoefficientGamma = regammaCoeff.gamma;
-                                        newDisplay.GammaCoefficientA0 = regammaCoeff.coefficientA0;
-                                        newDisplay.GammaCoefficientA1 = regammaCoeff.coefficientA1;
-                                        newDisplay.GammaCoefficientA2 = regammaCoeff.coefficientA2;
-                                        newDisplay.GammaCoefficientA3 = regammaCoeff.coefficientA3;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got gamma coefficients for display.");
+                                        newDisplay.IsEnabledIntegerScaling = ADLX.boolP_value(pIsIntegerScalingEnabled);
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Integer Scaling enabled for this display: {newDisplay.IsEnabledIntegerScaling}");
                                     }
                                     else
                                     {
-                                        SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting gamma coefficients. gamma.GetGammaCoefficient() returned error code {status}");
-                                    }
-
-                                    // Get GammaRamp
-                                    ADLX_GammaRamp gammaRamp = new ADLX_GammaRamp();
-                                    status = gamma.GetGammaRamp(gammaRamp);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-                                        // Store the gamma ramp in the display settings
-                                        newDisplay.GammaRamp = GammaRampExtensions.ToSerializable(gammaRamp);
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got gamma ramp for display.");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting gamma ramp. gamma.GetGammaRamp() returned error code {status}");
-                                    }
-
-
-                                    // Release the gamma interface when done
-                                    gamma.Release();
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display gamma object. displayService.GetGamma() returned error code {status}");
-                                }*/
-
-                                //------------------------------------
-                                // GET THE FreeSync Settings IF WE CAN
-                                //------------------------------------                                
-                                // Check if FreeSync is supported and enabled
-                                SWIGTYPE_p_p_adlx__IADLXDisplayFreeSync ppFreeSync = ADLX.new_displayFreeSyncP_Ptr();
-                                status = displayService.GetFreeSync(display, ppFreeSync);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    IADLXDisplayFreeSync freeSync = ADLX.displayFreeSyncP_Ptr_value(ppFreeSync);
-
-                                    // Check if FreeSync is supported
-                                    SWIGTYPE_p_bool pIsFreeSyncSupported = ADLX.new_boolP();
-                                    status = freeSync.IsSupported(pIsFreeSyncSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-                                        newDisplay.IsSupportedFreeSync = ADLX.boolP_value(pIsFreeSyncSupported);
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: FreeSync support for this display: {newDisplay.IsSupportedFreeSync}");
-
-                                        // Check if FreeSync is enabled
-                                        SWIGTYPE_p_bool pIsFreeSyncEnabled = ADLX.new_boolP();
-                                        status = freeSync.IsEnabled(pIsFreeSyncEnabled);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.IsEnabledFreeSync = ADLX.boolP_value(pIsFreeSyncEnabled);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: FreeSync enabled for this display: {newDisplay.IsEnabledFreeSync}");
-                                        }
-                                        else
-                                        {
-                                            newDisplay.IsEnabledFreeSync = false;
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: FreeSync enabled state could not be determined for this display.");
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedFreeSync = false;
-                                        newDisplay.IsEnabledFreeSync = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: FreeSync support could not be determined for this display.");
-                                    }
-
-                                    // Release FreeSync interface
-                                    freeSync.Release();
-                                }
-                                else
-                                {
-                                    newDisplay.IsSupportedFreeSync = false;
-                                    newDisplay.IsEnabledFreeSync = false;
-                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: FreeSync object could not be obtained for this display.");
-                                }
-
-                                //------------------------------------
-                                // GET THE Display Gamut Settings IF WE CAN
-                                //------------------------------------
-
-                                // Get the current display gamut object for this display
-                                SWIGTYPE_p_p_adlx__IADLXDisplayGamut ppGamut = ADLX.new_displayGamutP_Ptr();
-                                status = displayService.GetGamut(display, ppGamut);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    IADLXDisplayGamut gamut = ADLX.displayGamutP_Ptr_value(ppGamut);
-
-                                    // Check if Custom gamut color space is supported
-                                    SWIGTYPE_p_bool pIsSupportedCustomColorSpace = ADLX.new_boolP();
-                                    status = gamut.IsSupportedCustomColorSpace(pIsSupportedCustomColorSpace);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-
-                                        // Get the gamut color space
-                                        ADLX_GamutColorSpace pGamutColorSpace = ADLX.new_adlx_gamutColorSpaceP();
-                                        status = gamut.GetGamutColorSpace(pGamutColorSpace);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            ADLX_Point red = pGamutColorSpace.red;
-                                            newDisplay.GamutColorSpaceRedX = red.x;
-                                            newDisplay.GamutColorSpaceRedY = red.y;
-
-                                            ADLX_Point green = pGamutColorSpace.green;
-                                            newDisplay.GamutColorSpaceGreenX = green.x;
-                                            newDisplay.GamutColorSpaceGreenY = green.y;
-
-                                            ADLX_Point blue = pGamutColorSpace.blue;
-                                            newDisplay.GamutColorSpaceBlueX = blue.x;
-                                            newDisplay.GamutColorSpaceBlueY = blue.y;
-
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got Display Gamut Color Space for this display!");
-                                        }
-                                        else
-                                        {
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting Display Gamut Color Space. gamma.GetGamutColorSpace() returned error code {status}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Display Gamut Color Space is NOT supported for this display.");
-                                    }
-
-
-                                    // Check if Custom gamut color space is supported
-                                    SWIGTYPE_p_bool pIsSupportedCustomWhitePoint = ADLX.new_boolP();
-                                    status = gamut.IsSupportedCustomWhitePoint(pIsSupportedCustomWhitePoint);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-
-                                        // Get the gamut white point
-                                        ADLX_Point pGamutWhitePoint = new ADLX_Point();
-                                        status = gamut.GetWhitePoint(pGamutWhitePoint);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.GamutWhitePointX = pGamutWhitePoint.x;
-                                            newDisplay.GamutWhitePointY = pGamutWhitePoint.y;
-
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got Display Gamut White Point for this display!");
-                                        }
-                                        else
-                                        {
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting Display Gamut White Point. gamma.GetWhitePoint() returned error code {status}");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Display Gamut White Point is NOT supported for this display.");
-                                    }
-
-                                    //TODO: Test for all the supported whitepoints and store them
-                                    //TODO: Test for all the supported whitepoints and store them
-
-
-                                    // Release the gamut interface when done
-                                    gamut.Release();
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display gamut object. systemServices.GetGamut() returned error code {status}");
-                                    //return false;
-                                }
-
-                                // Now get the Display GPU Scaling settings if we can
-                                SWIGTYPE_p_p_adlx__IADLXDisplayGPUScaling ppGPUScaling = ADLX.new_displayGPUScalingP_Ptr();
-                                status = displayService.GetGPUScaling(display, ppGPUScaling);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    IADLXDisplayGPUScaling gpuScaling = ADLX.displayGPUScalingP_Ptr_value(ppGPUScaling);
-                                    // Check if GPU Scaling is supported
-                                    SWIGTYPE_p_bool pIsGPUScalingSupported = ADLX.new_boolP();
-                                    status = gpuScaling.IsSupported(pIsGPUScalingSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-                                        newDisplay.IsSupportedGPUScaling = ADLX.boolP_value(pIsGPUScalingSupported);
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: GPU Scaling support for this display: {newDisplay.IsSupportedGPUScaling}");
-                                        // Check if GPU Scaling is enabled
-                                        SWIGTYPE_p_bool pIsGPUScalingEnabled = ADLX.new_boolP();
-                                        status = gpuScaling.IsEnabled(pIsGPUScalingEnabled);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.IsEnabledGPUScaling = ADLX.boolP_value(pIsGPUScalingEnabled);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: GPU Scaling enabled for this display: {newDisplay.IsEnabledGPUScaling}");
-                                        }
-                                        else
-                                        {
-                                            newDisplay.IsEnabledGPUScaling = false;
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: GPU Scaling enabled state could not be determined for this display.");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedGPUScaling = false;
-                                        newDisplay.IsEnabledGPUScaling = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: GPU Scaling support could not be determined for this display.");
-                                    }
-                                    // Release GPU Scaling interface
-                                    gpuScaling.Release();
-                                }
-
-                                // Get the Integer Display Scaling settings if we can
-                                SWIGTYPE_p_p_adlx__IADLXDisplayIntegerScaling ppIntegerScaling = ADLX.new_displayIntegerScalingP_Ptr();
-                                status = displayService.GetIntegerScaling(display, ppIntegerScaling);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    IADLXDisplayIntegerScaling integerScaling = ADLX.displayIntegerScalingP_Ptr_value(ppIntegerScaling);
-                                    // Check if Integer Scaling is supported
-                                    SWIGTYPE_p_bool pIsIntegerScalingSupported = ADLX.new_boolP();
-                                    status = integerScaling.IsSupported(pIsIntegerScalingSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-                                        newDisplay.IsSupportedIntegerScaling = ADLX.boolP_value(pIsIntegerScalingSupported);
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Integer Scaling support for this display: {newDisplay.IsSupportedIntegerScaling}");
-                                        // Check if Integer Scaling is enabled
-                                        SWIGTYPE_p_bool pIsIntegerScalingEnabled = ADLX.new_boolP();
-                                        status = integerScaling.IsEnabled(pIsIntegerScalingEnabled);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.IsEnabledIntegerScaling = ADLX.boolP_value(pIsIntegerScalingEnabled);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Integer Scaling enabled for this display: {newDisplay.IsEnabledIntegerScaling}");
-                                        }
-                                        else
-                                        {
-                                            newDisplay.IsEnabledIntegerScaling = false;
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Integer Scaling enabled state could not be determined for this display.");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedIntegerScaling = false;
                                         newDisplay.IsEnabledIntegerScaling = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Integer Scaling support could not be determined for this display.");
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Integer Scaling enabled state could not be determined for this display.");
                                     }
-                                    // Release Integer Scaling interface
-                                    integerScaling.Release();
                                 }
+                                else
+                                {
+                                    newDisplay.IsSupportedIntegerScaling = false;
+                                    newDisplay.IsEnabledIntegerScaling = false;
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Integer Scaling support could not be determined for this display.");
+                                }
+                                // Release Integer Scaling interface
+                                integerScaling.Release();
+                            }
 
 
-                                // Get the Display Pixel Format settings if we can
-                                SWIGTYPE_p_p_adlx__IADLXDisplayPixelFormat ppPixelFormat = ADLX.new_displayPixelFormatP_Ptr();
-                                status = displayService.GetPixelFormat(display, ppPixelFormat);
+                            // Get the Display Pixel Format settings if we can
+                            SWIGTYPE_p_p_adlx__IADLXDisplayPixelFormat ppPixelFormat = ADLX.new_displayPixelFormatP_Ptr();
+                            status = displayService.GetPixelFormat(display, ppPixelFormat);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                IADLXDisplayPixelFormat pixelFormat = ADLX.displayPixelFormatP_Ptr_value(ppPixelFormat);
+                                // Check if Pixel Format is supported
+                                SWIGTYPE_p_bool pIsPixelFormatSupported = ADLX.new_boolP();
+                                status = pixelFormat.IsSupported(pIsPixelFormatSupported);
                                 if (status == ADLX_RESULT.ADLX_OK)
                                 {
-                                    IADLXDisplayPixelFormat pixelFormat = ADLX.displayPixelFormatP_Ptr_value(ppPixelFormat);
-                                    // Check if Pixel Format is supported
-                                    SWIGTYPE_p_bool pIsPixelFormatSupported = ADLX.new_boolP();
-                                    status = pixelFormat.IsSupported(pIsPixelFormatSupported);
+                                    // Step-by-step analysis and fix:
+                                    SWIGTYPE_p_ADLX_PIXEL_FORMAT pPixelFormat = ADLX.new_adlx_pixelFormatP();
+                                    status = pixelFormat.GetValue(pPixelFormat);
+                                    ADLX_PIXEL_FORMAT currentPixelFormat = ADLX.adlx_pixelFormatP_value(pPixelFormat);
+                                    // Now you can use currentPixelFormat as needed
+                                    newDisplay.CurrentPixelFormat = currentPixelFormat;
+                                }
+                                else
+                                {
+                                    newDisplay.IsSupportedPixelFormat = false;
+                                    newDisplay.CurrentPixelFormat = ADLX_PIXEL_FORMAT.FORMAT_UNKNOWN;
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Pixel Format support could not be determined for this display.");
+                                }
+                                // Release Pixel Format interface
+                                pixelFormat.Release();
+                            }
+
+                            // ----
+                            // this section needs an update to the SWIG bindings to work properly -
+                            // it is commented out for now as it isn't critical to have custom resolutions
+                            // ----
+                            //// Get the current custom resolution set for this display if there is one
+                            //SWIGTYPE_p_p_adlx__IADLXDisplayCustomResolution ppCustomResolution = ADLX.new_displayCustomResolutionP_Ptr();
+                            //status = displayService.GetCustomResolution(display, ppCustomResolution);
+                            //if (status == ADLX_RESULT.ADLX_OK)
+                            //{
+                            //    IADLXDisplayCustomResolution customResolution = ADLX.displayCustomResolutionP_Ptr_value(ppCustomResolution);
+
+                            //    // Get the current custom resolution
+                            //    SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppDisplayResolution = ADLX.new_adlx_customResolutionP();
+
+                            //    ADLX_CustomResolution adlxCurrentCustomResolution = ADLX.new_adlx_customResolutionP();
+                            //    status = customResolution.GetCurrentAppliedResolution(adlxCurrentCustomResolution);
+                            //    if (status == ADLX_RESULT.ADLX_OK)
+                            //    {
+                            //        // Store the custom resolution in the display settings
+                            //        newDisplay.CurrentCustomResolutionWidth = adlxCustomResolution.width;
+                            //        newDisplay.CurrentCustomResolutionHeight = adlxCustomResolution.height;
+                            //        newDisplay.CurrentCustomResolutionRefreshRate = adlxCustomResolution.refreshRate;
+                            //        newDisplay.CurrentCustomResolutionTimingStandard = adlxCustomResolution.timingStandard;
+                            //        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got current custom resolution for display: {newDisplay.CurrentCustomResolutionWidth}x{newDisplay.CurrentCustomResolutionHeight} @ {newDisplay.CurrentCustomResolutionRefreshRate}Hz, Timing Standard: {newDisplay.CurrentCustomResolutionTimingStandard}");
+                            //    }
+                            //    else
+                            //    {
+                            //        SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting current custom resolution. customResolution.GetCurrentCustomResolution() returned error code {status}");
+                            //    }
+                            //    // Release the custom resolution interface when done
+                            //    customResolution.Release();
+                            //}
+
+                            // Get the Display Scaling Mode if we can
+                            SWIGTYPE_p_p_adlx__IADLXDisplayScalingMode ppScalingMode = ADLX.new_displayScalingModeP_Ptr();
+                            status = displayService.GetScalingMode(display, ppScalingMode);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                IADLXDisplayScalingMode scalingMode = ADLX.displayScalingModeP_Ptr_value(ppScalingMode);
+                                // Check if Scaling Mode is supported
+                                SWIGTYPE_p_bool pIsScalingModeSupported = ADLX.new_boolP();
+                                if (status == ADLX_RESULT.ADLX_OK)
+                                {
+                                    // Now get the scaling mode with getmode
+                                    SWIGTYPE_p_ADLX_SCALE_MODE pCurrentMode = ADLX.new_adlx_scaleModeP();
+                                    status = scalingMode.GetMode(pCurrentMode);
                                     if (status == ADLX_RESULT.ADLX_OK)
                                     {
-                                        // Step-by-step analysis and fix:
-                                        SWIGTYPE_p_ADLX_PIXEL_FORMAT pPixelFormat = ADLX.new_adlx_pixelFormatP();
-                                        status = pixelFormat.GetValue(pPixelFormat);
-                                        ADLX_PIXEL_FORMAT currentPixelFormat = ADLX.adlx_pixelFormatP_value(pPixelFormat);
-                                        // Now you can use currentPixelFormat as needed
-                                        newDisplay.CurrentPixelFormat = currentPixelFormat;
+                                        ADLX_SCALE_MODE currentMode = ADLX.adlx_scaleModeP_value(pCurrentMode);
+                                        newDisplay.CurrentScalingMode = currentMode;
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got current scaling mode for display: {newDisplay.CurrentScalingMode}");
                                     }
                                     else
                                     {
-                                        newDisplay.IsSupportedPixelFormat = false;
-                                        newDisplay.CurrentPixelFormat = ADLX_PIXEL_FORMAT.FORMAT_UNKNOWN;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Pixel Format support could not be determined for this display.");
+                                        SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting current scaling mode. scalingMode.GetMode() returned error code {status}");
                                     }
-                                    // Release Pixel Format interface
-                                    pixelFormat.Release();
+                                }
+                                else
+                                {
+                                    newDisplay.IsSupportedScalingMode = false;
+                                    newDisplay.CurrentScalingMode = ADLX_SCALE_MODE.PRESERVE_ASPECT_RATIO;
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Pixel Format support could not be determined for this display.");
                                 }
 
-                                // ----
-                                // this section needs an update to the SWIG bindings to work properly -
-                                // it is commented out for now as it isn't critical to have custom resolutions
-                                // ----
-                                //// Get the current custom resolution set for this display if there is one
-                                //SWIGTYPE_p_p_adlx__IADLXDisplayCustomResolution ppCustomResolution = ADLX.new_displayCustomResolutionP_Ptr();
-                                //status = displayService.GetCustomResolution(display, ppCustomResolution);
-                                //if (status == ADLX_RESULT.ADLX_OK)
-                                //{
-                                //    IADLXDisplayCustomResolution customResolution = ADLX.displayCustomResolutionP_Ptr_value(ppCustomResolution);
 
-                                //    // Get the current custom resolution
-                                //    SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppDisplayResolution = ADLX.new_adlx_customResolutionP();
+                                // Release the scaling mode interface when done
+                                scalingMode.Release();
 
-                                //    ADLX_CustomResolution adlxCurrentCustomResolution = ADLX.new_adlx_customResolutionP();
-                                //    status = customResolution.GetCurrentAppliedResolution(adlxCurrentCustomResolution);
-                                //    if (status == ADLX_RESULT.ADLX_OK)
-                                //    {
-                                //        // Store the custom resolution in the display settings
-                                //        newDisplay.CurrentCustomResolutionWidth = adlxCustomResolution.width;
-                                //        newDisplay.CurrentCustomResolutionHeight = adlxCustomResolution.height;
-                                //        newDisplay.CurrentCustomResolutionRefreshRate = adlxCustomResolution.refreshRate;
-                                //        newDisplay.CurrentCustomResolutionTimingStandard = adlxCustomResolution.timingStandard;
-                                //        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got current custom resolution for display: {newDisplay.CurrentCustomResolutionWidth}x{newDisplay.CurrentCustomResolutionHeight} @ {newDisplay.CurrentCustomResolutionRefreshRate}Hz, Timing Standard: {newDisplay.CurrentCustomResolutionTimingStandard}");
-                                //    }
-                                //    else
-                                //    {
-                                //        SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting current custom resolution. customResolution.GetCurrentCustomResolution() returned error code {status}");
-                                //    }
-                                //    // Release the custom resolution interface when done
-                                //    customResolution.Release();
-                                //}
+                            }
 
-                                // Get the Display Scaling Mode if we can
-                                SWIGTYPE_p_p_adlx__IADLXDisplayScalingMode ppScalingMode = ADLX.new_displayScalingModeP_Ptr();
-                                status = displayService.GetScalingMode(display, ppScalingMode);
+                            // Get the VSR settings if we can
+                            SWIGTYPE_p_p_adlx__IADLXDisplayVSR ppVSR = ADLX.new_displayVSRP_Ptr();
+                            status = displayService.GetVirtualSuperResolution(display, ppVSR);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                IADLXDisplayVSR vsr = ADLX.displayVSRP_Ptr_value(ppVSR);
+                                // Check if VSR is supported
+                                SWIGTYPE_p_bool pIsVSREnabledSupported = ADLX.new_boolP();
+                                status = vsr.IsSupported(pIsVSREnabledSupported);
                                 if (status == ADLX_RESULT.ADLX_OK)
                                 {
-                                    IADLXDisplayScalingMode scalingMode = ADLX.displayScalingModeP_Ptr_value(ppScalingMode);
-                                    // Check if Scaling Mode is supported
-                                    SWIGTYPE_p_bool pIsScalingModeSupported = ADLX.new_boolP();
+                                    newDisplay.IsSupportedVSR = ADLX.boolP_value(pIsVSREnabledSupported);
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VSR support for this display: {newDisplay.IsSupportedVSR}");
+
+                                    // Check if VSR is enabled
+                                    SWIGTYPE_p_bool pIsVSREnabled = ADLX.new_boolP();
+                                    status = vsr.IsEnabled(pIsVSREnabled);
                                     if (status == ADLX_RESULT.ADLX_OK)
                                     {
-                                        // Now get the scaling mode with getmode
-                                        SWIGTYPE_p_ADLX_SCALE_MODE pCurrentMode = ADLX.new_adlx_scaleModeP();
-                                        status = scalingMode.GetMode(pCurrentMode);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            ADLX_SCALE_MODE currentMode = ADLX.adlx_scaleModeP_value(pCurrentMode);
-                                            newDisplay.CurrentScalingMode = currentMode;
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got current scaling mode for display: {newDisplay.CurrentScalingMode}");
-                                        }
-                                        else
-                                        {
-                                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting current scaling mode. scalingMode.GetMode() returned error code {status}");
-                                        }
+                                        newDisplay.IsEnabledVSR = ADLX.boolP_value(pIsVSREnabled);
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VSR enabled for this display: {newDisplay.IsEnabledVSR}");
                                     }
                                     else
                                     {
-                                        newDisplay.IsSupportedScalingMode = false;
-                                        newDisplay.CurrentScalingMode = ADLX_SCALE_MODE.PRESERVE_ASPECT_RATIO;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Pixel Format support could not be determined for this display.");
-                                    }
-
-
-                                    // Release the scaling mode interface when done
-                                    scalingMode.Release();
-
-                                }
-
-                                // Get the VSR settings if we can
-                                SWIGTYPE_p_p_adlx__IADLXDisplayVSR ppVSR = ADLX.new_displayVSRP_Ptr();
-                                status = displayService.GetVirtualSuperResolution(display, ppVSR);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    IADLXDisplayVSR vsr = ADLX.displayVSRP_Ptr_value(ppVSR);
-                                    // Check if VSR is supported
-                                    SWIGTYPE_p_bool pIsVSREnabledSupported = ADLX.new_boolP();
-                                    status = vsr.IsSupported(pIsVSREnabledSupported);
-                                    if (status == ADLX_RESULT.ADLX_OK)
-                                    {
-                                        newDisplay.IsSupportedVSR = ADLX.boolP_value(pIsVSREnabledSupported);
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VSR support for this display: {newDisplay.IsSupportedVSR}");
-
-                                        // Check if VSR is enabled
-                                        SWIGTYPE_p_bool pIsVSREnabled = ADLX.new_boolP();
-                                        status = vsr.IsEnabled(pIsVSREnabled);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.IsEnabledVSR = ADLX.boolP_value(pIsVSREnabled);
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VSR enabled for this display: {newDisplay.IsEnabledVSR}");
-                                        }
-                                        else
-                                        {
-                                            newDisplay.IsEnabledVSR = false;
-                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VSR enabled state could not be determined for this display.");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedVSR = false;
                                         newDisplay.IsEnabledVSR = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VSR support could not be determined for this display.");
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VSR enabled state could not be determined for this display.");
                                     }
-                                    // Release VSR interface
-                                    vsr.Release();
+                                }
+                                else
+                                {
+                                    newDisplay.IsSupportedVSR = false;
+                                    newDisplay.IsEnabledVSR = false;
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VSR support could not be determined for this display.");
+                                }
+                                // Release VSR interface
+                                vsr.Release();
+                            }
+
+                            // Get the HDCP settings if we can
+                            SWIGTYPE_p_p_adlx__IADLXDisplayHDCP ppHDCP = ADLX.new_displayHDCPP_Ptr();
+                            status = displayService.GetHDCP(display, ppHDCP);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                IADLXDisplayHDCP hdcp = ADLX.displayHDCPP_Ptr_value(ppHDCP);
+                                SWIGTYPE_p_bool pIsHDCPSupported = ADLX.new_boolP();
+                                if (hdcp.IsSupported(pIsHDCPSupported) == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsHDCPSupported))
+                                {
+                                    newDisplay.IsSupportedHDCP = true;
+                                    SWIGTYPE_p_bool pHDCPStatus = ADLX.new_boolP();
+                                    if (hdcp.IsEnabled(pHDCPStatus) == ADLX_RESULT.ADLX_OK)
+                                    {
+                                        newDisplay.IsEnabledHDCP = ADLX.boolP_value(pHDCPStatus);
+                                        if (newDisplay.IsEnabledHDCP)
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported and enabled");
+                                        }
+                                        else
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported but NOT enabled");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    newDisplay.IsSupportedHDCP = false;
+                                    newDisplay.IsEnabledHDCP = false;
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is NOT supported");
+                                }
+                                hdcp.Release();
+                            }
+
+                            // Get VariBright settings
+                            SWIGTYPE_p_p_adlx__IADLXDisplayVariBright ppVariBright = ADLX.new_displayVariBrightP_Ptr();
+                            status = displayService.GetVariBright(display, ppVariBright);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                IADLXDisplayVariBright vb = ADLX.displayVariBrightP_Ptr_value(ppVariBright);
+                                SWIGTYPE_p_bool pIsVBSupported = ADLX.new_boolP();
+                                if (vb.IsSupported(pIsVBSupported) == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsVBSupported))
+                                {
+                                    newDisplay.IsSupportedVariBright = true;
+                                    SWIGTYPE_p_bool pVBEnabled = ADLX.new_boolP();
+                                    if (vb.IsEnabled(pVBEnabled) == ADLX_RESULT.ADLX_OK)
+                                    {
+                                        newDisplay.IsEnabledVariBright = ADLX.boolP_value(pVBEnabled);
+                                        if (newDisplay.IsEnabledHDCP)
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is supported and enabled");
+                                        }
+                                        else
+                                        {
+                                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is supported but NOT enabled");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    newDisplay.IsSupportedVariBright = false;
+                                    newDisplay.IsEnabledVariBright = false;
+                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is NOT supported");
+                                }
+                                vb.Release();
+                            }
+
+                            // Get 3DLUT settings if we can
+                            // NOTE: This section is commented out as it needs more work to properly capture and store the 3DLUT data
+                            //       The basic structure is in place, but the actual 3DLUT map data retrieval and storage needs to be finalized
+                            /*SWIGTYPE_p_p_adlx__IADLXDisplay3DLUT pp3DLUT = ADLX.new_display3DLUTP_Ptr();
+                            status = displayService.Get3DLUT(display, pp3DLUT);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                IADLXDisplay3DLUT lut = ADLX.display3DLUTP_Ptr_value(pp3DLUT);
+
+                                // Support checks
+                                SWIGTYPE_p_bool p = ADLX.new_boolP();
+                                Display3DLUTSettings ThreeDLUT = new Display3DLUTSettings();
+                                if (lut.IsSupportedSCE(p) == ADLX_RESULT.ADLX_OK)
+                                    ThreeDLUT.IsSupportedSCE = ADLX.boolP_value(p);
+
+                                if (lut.IsSupportedSCEVividGaming(p) == ADLX_RESULT.ADLX_OK)
+                                    ThreeDLUT.IsSupportedSCEVividGaming = ADLX.boolP_value(p);
+
+                                if (lut.IsSupportedSCEDynamicContrast(p) == ADLX_RESULT.ADLX_OK)
+                                    ThreeDLUT.IsSupportedSCEDynamicContrast = ADLX.boolP_value(p);
+
+                                if (lut.IsSupportedUser3DLUT(p) == ADLX_RESULT.ADLX_OK)
+                                    ThreeDLUT.IsSupportedUser3DLUT = ADLX.boolP_value(p);
+
+                                // Current applied mode
+                                SWIGTYPE_p_bool pb = ADLX.new_boolP();
+                                if (lut.IsCurrentSCEDisabled(pb) == ADLX_RESULT.ADLX_OK)
+                                    ThreeDLUT.IsCurrentSCEDisabled = ADLX.boolP_value(pb);
+
+                                if (lut.IsCurrentSCEVividGaming(pb) == ADLX_RESULT.ADLX_OK)
+                                    ThreeDLUT.IsCurrentSCEVividGaming = ADLX.boolP_value(pb);
+
+                                if (lut.IsCurrentSCEDynamicContrast(pb) == ADLX_RESULT.ADLX_OK)
+                                    ThreeDLUT.IsCurrentSCEDynamicContrast = ADLX.boolP_value(pb);
+
+                                // If dynamic contrast is current, get contrast and range
+                                if (ThreeDLUT.IsCurrentSCEDynamicContrast)
+                                {
+                                    ADLX_IntRange range = new ADLX_IntRange();
+                                    if (lut.GetSCEDynamicContrastRange(range) == ADLX_RESULT.ADLX_OK)
+                                    {
+                                        ThreeDLUT.DynamicContrastRange = new IntRange
+                                        {
+                                            Min = range.minValue,
+                                            Max = range.maxValue,
+                                            Step = range.step
+                                        };
+                                    }
+                                    SWIGTYPE_p_int pContrast = ADLX.new_adlx_intP();
+                                    if (lut.GetSCEDynamicContrast(pContrast) == ADLX_RESULT.ADLX_OK)
+                                    {
+                                        ThreeDLUT.CurrentDynamicContrastValue = ADLX.adlx_intP_value(pContrast);
+                                    }
                                 }
 
-                                // Get the HDCP settings if we can
-                                SWIGTYPE_p_p_adlx__IADLXDisplayHDCP ppHDCP = ADLX.new_displayHDCPP_Ptr();
-                                status = displayService.GetHDCP(display, ppHDCP);
-                                if (status == ADLX_RESULT.ADLX_OK)
+                                // If user LUT is supported and you'd like to capture it:
+                                if (ThreeDLUT.IsSupportedUser3DLUT)
                                 {
-                                    IADLXDisplayHDCP hdcp = ADLX.displayHDCPP_Ptr_value(ppHDCP);
-                                    SWIGTYPE_p_bool pIsHDCPSupported = ADLX.new_boolP();
-                                    if (hdcp.IsSupported(pIsHDCPSupported) == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsHDCPSupported))
+                                    // Suppose the API has GetAllUser3DLUT or GetSDRUser3DLUT / GetHDRUser3DLUT
+                                    // Example:
+                                    ADLX_3DLUT_TRANSFER_FUNCTION tf;
+                                    ADLX_3DLUT_COLORSPACE cs;
+                                    int numPoints = 0;
+                                    ADLX_UINT16_RGB rgbData;
+                                    LutMode mode = LutMode.None;
+
+                                    // TODO: FIX THIS SECTION TO RECORD THE USER 3DLUT
+                                    SWIGTYPE_p_ADLX_3DLUT_TRANSFER_FUNCTION pADLX_3DLUT_TRANSFER_FUNCTION = ADLX.new_adlx_3dlutTransferFunctionP();
+                                    SWIGTYPE_p_ADLX_3DLUT_COLORSPACE pADLX_3DLUT_COLOR_SPACE = ADLX.new_adlx_3dlutColorSpaceP();
+                                    SWIGTYPE_p_int pNumPoints = ADLX.new_adlx_intP();
+                                    ADLX_3DLUT_Data pData = ADLX.new_adlx_3dlutP();
+                                    status = lut.GetAllUser3DLUT(pADLX_3DLUT_TRANSFER_FUNCTION, pADLX_3DLUT_COLOR_SPACE, pNumPoints, pData);
+                                    if (status == ADLX_RESULT.ADLX_OK)
                                     {
-                                        newDisplay.IsSupportedHDCP = true;
-                                        SWIGTYPE_p_bool pHDCPStatus = ADLX.new_boolP();
-                                        if (hdcp.IsEnabled(pHDCPStatus) == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.IsEnabledHDCP = ADLX.boolP_value(pHDCPStatus);
-                                            if (newDisplay.IsEnabledHDCP)
-                                            {
-                                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported and enabled");
-                                            }
-                                            else
-                                            {
-                                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is supported but NOT enabled");
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedHDCP = false;
-                                        newDisplay.IsEnabledHDCP = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: HDCP is NOT supported");
-                                    }
-                                    hdcp.Release();
-                                }
-
-                                // Get VariBright settings
-                                SWIGTYPE_p_p_adlx__IADLXDisplayVariBright ppVariBright = ADLX.new_displayVariBrightP_Ptr();
-                                status = displayService.GetVariBright(display, ppVariBright);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    IADLXDisplayVariBright vb = ADLX.displayVariBrightP_Ptr_value(ppVariBright);
-                                    SWIGTYPE_p_bool pIsVBSupported = ADLX.new_boolP();
-                                    if (vb.IsSupported(pIsVBSupported) == ADLX_RESULT.ADLX_OK && ADLX.boolP_value(pIsVBSupported))
-                                    {
-                                        newDisplay.IsSupportedVariBright = true;
-                                        SWIGTYPE_p_bool pVBEnabled = ADLX.new_boolP();
-                                        if (vb.IsEnabled(pVBEnabled) == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            newDisplay.IsEnabledVariBright = ADLX.boolP_value(pVBEnabled);
-                                            if (newDisplay.IsEnabledHDCP)
-                                            {
-                                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is supported and enabled");
-                                            }
-                                            else
-                                            {
-                                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is supported but NOT enabled");
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        newDisplay.IsSupportedVariBright = false;
-                                        newDisplay.IsEnabledVariBright = false;
-                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: VariBright is NOT supported");
-                                    }
-                                    vb.Release();
-                                }
-
-                                // Get 3DLUT settings if we can
-                                // NOTE: This section is commented out as it needs more work to properly capture and store the 3DLUT data
-                                //       The basic structure is in place, but the actual 3DLUT map data retrieval and storage needs to be finalized
-                                /*SWIGTYPE_p_p_adlx__IADLXDisplay3DLUT pp3DLUT = ADLX.new_display3DLUTP_Ptr();
-                                status = displayService.Get3DLUT(display, pp3DLUT);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    IADLXDisplay3DLUT lut = ADLX.display3DLUTP_Ptr_value(pp3DLUT);
-
-                                    // Support checks
-                                    SWIGTYPE_p_bool p = ADLX.new_boolP();
-                                    Display3DLUTSettings ThreeDLUT = new Display3DLUTSettings();
-                                    if (lut.IsSupportedSCE(p) == ADLX_RESULT.ADLX_OK)
-                                        ThreeDLUT.IsSupportedSCE = ADLX.boolP_value(p);
-
-                                    if (lut.IsSupportedSCEVividGaming(p) == ADLX_RESULT.ADLX_OK)
-                                        ThreeDLUT.IsSupportedSCEVividGaming = ADLX.boolP_value(p);
-
-                                    if (lut.IsSupportedSCEDynamicContrast(p) == ADLX_RESULT.ADLX_OK)
-                                        ThreeDLUT.IsSupportedSCEDynamicContrast = ADLX.boolP_value(p);
-
-                                    if (lut.IsSupportedUser3DLUT(p) == ADLX_RESULT.ADLX_OK)
-                                        ThreeDLUT.IsSupportedUser3DLUT = ADLX.boolP_value(p);
-
-                                    // Current applied mode
-                                    SWIGTYPE_p_bool pb = ADLX.new_boolP();
-                                    if (lut.IsCurrentSCEDisabled(pb) == ADLX_RESULT.ADLX_OK)
-                                        ThreeDLUT.IsCurrentSCEDisabled = ADLX.boolP_value(pb);
-
-                                    if (lut.IsCurrentSCEVividGaming(pb) == ADLX_RESULT.ADLX_OK)
-                                        ThreeDLUT.IsCurrentSCEVividGaming = ADLX.boolP_value(pb);
-
-                                    if (lut.IsCurrentSCEDynamicContrast(pb) == ADLX_RESULT.ADLX_OK)
-                                        ThreeDLUT.IsCurrentSCEDynamicContrast = ADLX.boolP_value(pb);
-
-                                    // If dynamic contrast is current, get contrast and range
-                                    if (ThreeDLUT.IsCurrentSCEDynamicContrast)
-                                    {
-                                        ADLX_IntRange range = new ADLX_IntRange();
-                                        if (lut.GetSCEDynamicContrastRange(range) == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            ThreeDLUT.DynamicContrastRange = new IntRange
-                                            {
-                                                Min = range.minValue,
-                                                Max = range.maxValue,
-                                                Step = range.step
-                                            };
-                                        }
-                                        SWIGTYPE_p_int pContrast = ADLX.new_adlx_intP();
-                                        if (lut.GetSCEDynamicContrast(pContrast) == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            ThreeDLUT.CurrentDynamicContrastValue = ADLX.adlx_intP_value(pContrast);
-                                        }
-                                    }
-
-                                    // If user LUT is supported and you'd like to capture it:
-                                    if (ThreeDLUT.IsSupportedUser3DLUT)
-                                    {
-                                        // Suppose the API has GetAllUser3DLUT or GetSDRUser3DLUT / GetHDRUser3DLUT
-                                        // Example:
-                                        ADLX_3DLUT_TRANSFER_FUNCTION tf;
-                                        ADLX_3DLUT_COLORSPACE cs;
-                                        int numPoints = 0;
-                                        ADLX_UINT16_RGB rgbData;
-                                        LutMode mode = LutMode.None;
-
-                                        // TODO: FIX THIS SECTION TO RECORD THE USER 3DLUT
-                                        SWIGTYPE_p_ADLX_3DLUT_TRANSFER_FUNCTION pADLX_3DLUT_TRANSFER_FUNCTION = ADLX.new_adlx_3dlutTransferFunctionP();
-                                        SWIGTYPE_p_ADLX_3DLUT_COLORSPACE pADLX_3DLUT_COLOR_SPACE = ADLX.new_adlx_3dlutColorSpaceP();
-                                        SWIGTYPE_p_int pNumPoints = ADLX.new_adlx_intP();
-                                        ADLX_3DLUT_Data pData = ADLX.new_adlx_3dlutP();
-                                        status = lut.GetAllUser3DLUT(pADLX_3DLUT_TRANSFER_FUNCTION, pADLX_3DLUT_COLOR_SPACE, pNumPoints, pData);
-                                        if (status == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            tf = ADLX.adlx_3dlutTransferFunctionP_value(pADLX_3DLUT_TRANSFER_FUNCTION);                                           
-                                            cs = ADLX.adlx_3dlutColorSpaceP_value(pADLX_3DLUT_COLOR_SPACE);
-                                            numPoints = ADLX.adlx_intP_value(pNumPoints);
-                                            rgbData = pData.data;
+                                        tf = ADLX.adlx_3dlutTransferFunctionP_value(pADLX_3DLUT_TRANSFER_FUNCTION);                                           
+                                        cs = ADLX.adlx_3dlutColorSpaceP_value(pADLX_3DLUT_COLOR_SPACE);
+                                        numPoints = ADLX.adlx_intP_value(pNumPoints);
+                                        rgbData = pData.data;
                                             
-                                            if (numPoints > 0)
-                                            {
-                                                ThreeDLUT.UserLUTMode = mode;
-                                                ThreeDLUT.UserLUTNumPoints = numPoints;
-
-                                                // Suppose each point is a struct of three ushort values, or single value, flatten accordingly
-                                                int totalEntries = numPoints * numPoints * numPoints;
-                                                var arr = new ushort[totalEntries * 3];  // or *1, depending on format
-
-                                                // Copy from unmanaged memory into the array
-                                                Marshal.Copy(dataPtr, (short[])(object)arr, 0, arr.Length);
-                                                ThreeDLUT.UserLUTData = arr;
-                                            }
-                                        } 
-                                    }
-                                    newDisplay.ThreeDLUTSettings = ThreeDLUT;
-                                    lut.Release();
-                                }*/
-
-                                // Get the Custom Resolution settings if we can
-                                // TODO: This section needs updating in the SWIG bindings to work properly. The ADLXWrapper project
-                                //       needs to be updated and rebuilt to include the necessary methods for getting custom resolutions.
-                                /*
-                                SWIGTYPE_p_p_adlx__IADLXDisplayCustomResolution ppCustomRes = ADLX.new_displayCustomResolutionP_Ptr();
-                                status = displayService.GetCustomResolution(display, ppCustomRes);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    IADLXDisplayCustomResolution customRes = ADLX.displayCustomResolutionP_Ptr_value(ppCustomRes);
-
-                                    SWIGTYPE_p_bool pIsCustomResSupported = ADLX.new_boolP();
-                                    if (customRes.IsSupported(pIsCustomResSupported) == ADLX_RESULT.ADLX_OK &&
-                                        ADLX.boolP_value(pIsCustomResSupported))
-                                    {
-                                        // Mark support
-                                        newDisplay.IsSupportedCustomResolution = true;
-
-                                        // Try to get current applied
-                                        SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppRes = ADLX.new_displayResolutionP_Ptr();
-                                        if (customRes.GetCurrentAppliedResolution(ppRes) == ADLX_RESULT.ADLX_OK)
+                                        if (numPoints > 0)
                                         {
-                                            IADLXDisplayResolution res = ADLX.displayResolutionP_Ptr_value(ppRes);
+                                            ThreeDLUT.UserLUTMode = mode;
+                                            ThreeDLUT.UserLUTNumPoints = numPoints;
 
-                                            SWIGTYPE_p_ADLX_DISPLAY_RESOLUTION pResValue = ADLX.new_adlx_displayResolutionP();
-                                            if (res.GetValue(pResValue) == ADLX_RESULT.ADLX_OK)
-                                            {
-                                                newDisplay.CustomResWidth = pResValue.width;
-                                                newDisplay.CustomResHeight = pResValue.height;
-                                                newDisplay.CustomResRefreshRate = pResValue.refreshRate;
-                                                newDisplay.CustomResTimingStandard = pResValue.timingStandard;
+                                            // Suppose each point is a struct of three ushort values, or single value, flatten accordingly
+                                            int totalEntries = numPoints * numPoints * numPoints;
+                                            var arr = new ushort[totalEntries * 3];  // or *1, depending on format
 
-                                                newDisplay.IsCustomResolutionApplied = true;
-                                            }
-                                            else
-                                            {
-                                                newDisplay.IsCustomResolutionApplied = false;
-                                            }
-                                            res.Release();
+                                            // Copy from unmanaged memory into the array
+                                            Marshal.Copy(dataPtr, (short[])(object)arr, 0, arr.Length);
+                                            ThreeDLUT.UserLUTData = arr;
+                                        }
+                                    } 
+                                }
+                                newDisplay.ThreeDLUTSettings = ThreeDLUT;
+                                lut.Release();
+                            }*/
+
+                            // Get the Custom Resolution settings if we can
+                            // TODO: This section needs updating in the SWIG bindings to work properly. The ADLXWrapper project
+                            //       needs to be updated and rebuilt to include the necessary methods for getting custom resolutions.
+                            /*
+                            SWIGTYPE_p_p_adlx__IADLXDisplayCustomResolution ppCustomRes = ADLX.new_displayCustomResolutionP_Ptr();
+                            status = displayService.GetCustomResolution(display, ppCustomRes);
+                            if (status == ADLX_RESULT.ADLX_OK)
+                            {
+                                IADLXDisplayCustomResolution customRes = ADLX.displayCustomResolutionP_Ptr_value(ppCustomRes);
+
+                                SWIGTYPE_p_bool pIsCustomResSupported = ADLX.new_boolP();
+                                if (customRes.IsSupported(pIsCustomResSupported) == ADLX_RESULT.ADLX_OK &&
+                                    ADLX.boolP_value(pIsCustomResSupported))
+                                {
+                                    // Mark support
+                                    newDisplay.IsSupportedCustomResolution = true;
+
+                                    // Try to get current applied
+                                    SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppRes = ADLX.new_displayResolutionP_Ptr();
+                                    if (customRes.GetCurrentAppliedResolution(ppRes) == ADLX_RESULT.ADLX_OK)
+                                    {
+                                        IADLXDisplayResolution res = ADLX.displayResolutionP_Ptr_value(ppRes);
+
+                                        SWIGTYPE_p_ADLX_DISPLAY_RESOLUTION pResValue = ADLX.new_adlx_displayResolutionP();
+                                        if (res.GetValue(pResValue) == ADLX_RESULT.ADLX_OK)
+                                        {
+                                            newDisplay.CustomResWidth = pResValue.width;
+                                            newDisplay.CustomResHeight = pResValue.height;
+                                            newDisplay.CustomResRefreshRate = pResValue.refreshRate;
+                                            newDisplay.CustomResTimingStandard = pResValue.timingStandard;
+
+                                            newDisplay.IsCustomResolutionApplied = true;
                                         }
                                         else
                                         {
                                             newDisplay.IsCustomResolutionApplied = false;
                                         }
-
-                                        // (Optional) enumerate all defined custom resolutions
-                                        SWIGTYPE_p_p_adlx__IADLXDisplayResolutionList ppList = ADLX.new_displayResolutionListP_Ptr();
-                                        if (customRes.GetResolutionList(ppList) == ADLX_RESULT.ADLX_OK)
-                                        {
-                                            IADLXDisplayResolutionList list = ADLX.displayResolutionListP_Ptr_value(ppList);
-                                            uint idx = list.Begin();
-                                            for (; idx != list.Size(); idx++)
-                                            {
-                                                SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppEntry = ADLX.new_displayResolutionP_Ptr();
-                                                if (list.At(idx, ppEntry) == ADLX_RESULT.ADLX_OK)
-                                                {
-                                                    IADLXDisplayResolution entry = ADLX.displayResolutionP_Ptr_value(ppEntry);
-                                                    SWIGTYPE_p_ADLX_DISPLAY_RESOLUTION pEntryVal = ADLX.new_adlx_displayResolutionP();
-                                                    if (entry.GetValue(pEntryVal) == ADLX_RESULT.ADLX_OK)
-                                                    {
-                                                        newDisplay.CustomResolutions.Add(new DisplayResolutionInfo
-                                                        {
-                                                            Width = pEntryVal.width,
-                                                            Height = pEntryVal.height,
-                                                            RefreshRate = pEntryVal.refreshRate,
-                                                            TimingStandard = pEntryVal.timingStandard
-                                                        });
-                                                    }
-                                                    entry.Release();
-                                                }
-                                            }
-                                            list.Release();
-                                        }
+                                        res.Release();
                                     }
                                     else
                                     {
-                                        newDisplay.IsSupportedCustomResolution = false;
+                                        newDisplay.IsCustomResolutionApplied = false;
                                     }
 
-                                    customRes.Release();
-                                }*/
+                                    // (Optional) enumerate all defined custom resolutions
+                                    SWIGTYPE_p_p_adlx__IADLXDisplayResolutionList ppList = ADLX.new_displayResolutionListP_Ptr();
+                                    if (customRes.GetResolutionList(ppList) == ADLX_RESULT.ADLX_OK)
+                                    {
+                                        IADLXDisplayResolutionList list = ADLX.displayResolutionListP_Ptr_value(ppList);
+                                        uint idx = list.Begin();
+                                        for (; idx != list.Size(); idx++)
+                                        {
+                                            SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppEntry = ADLX.new_displayResolutionP_Ptr();
+                                            if (list.At(idx, ppEntry) == ADLX_RESULT.ADLX_OK)
+                                            {
+                                                IADLXDisplayResolution entry = ADLX.displayResolutionP_Ptr_value(ppEntry);
+                                                SWIGTYPE_p_ADLX_DISPLAY_RESOLUTION pEntryVal = ADLX.new_adlx_displayResolutionP();
+                                                if (entry.GetValue(pEntryVal) == ADLX_RESULT.ADLX_OK)
+                                                {
+                                                    newDisplay.CustomResolutions.Add(new DisplayResolutionInfo
+                                                    {
+                                                        Width = pEntryVal.width,
+                                                        Height = pEntryVal.height,
+                                                        RefreshRate = pEntryVal.refreshRate,
+                                                        TimingStandard = pEntryVal.timingStandard
+                                                    });
+                                                }
+                                                entry.Release();
+                                            }
+                                        }
+                                        list.Release();
+                                    }
+                                }
+                                else
+                                {
+                                    newDisplay.IsSupportedCustomResolution = false;
+                                }
 
-                                // Save the Display to the main dictionary of displays with the uniqueid as the key
-                                myDisplayConfig.Displays.Add(newDisplay.UniqueID, newDisplay);
-                            }
+                                customRes.Release();
+                            }*/
+
+                            // Save the Display to the main dictionary of displays with the uniqueid as the key
+                            myDisplayConfig.Displays.Add(newDisplay.UniqueID, newDisplay);
+                        }
 
                         
 
