@@ -391,7 +391,7 @@ namespace DisplayMagicianShared.AMD
         public long PixelClock;
         public double RefreshRate;
         public ADLX_DISPLAY_SCAN_TYPE ScanType;
-        public long UniqueID;
+        public ulong UniqueID;
         public bool IsSupportedColorDepth;
         public ADLX_COLOR_DEPTH ColorDepth;
         public bool IsSupportedCustomColorBrightness;
@@ -767,7 +767,7 @@ namespace DisplayMagicianShared.AMD
         public long PixelClock;
         public double RefreshRate;
         public ADLX_DISPLAY_SCAN_TYPE ScanType;
-        public long UniqueID;
+        public ulong UniqueID;
 
         public AMD_DISPLAY()
         {
@@ -857,7 +857,7 @@ namespace DisplayMagicianShared.AMD
         public bool IsEyefinity;
         public List<AMD_DESKTOP> Desktops;
         public AMD_EYEFINITY_DESKTOP EyefinityDesktop;
-        public Dictionary<long,AMD_DISPLAY_WITH_SETTINGS> Displays;
+        public Dictionary<ulong,AMD_DISPLAY_WITH_SETTINGS> Displays;
         public AMD_SLS_CONFIG Adl2SlsConfig;
         public List<string> DisplayIdentifiers;
 
@@ -868,7 +868,7 @@ namespace DisplayMagicianShared.AMD
             IsEyefinity = false;
             Desktops = new List<AMD_DESKTOP>();
             EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
-            Displays = new Dictionary<long,AMD_DISPLAY_WITH_SETTINGS>();
+            Displays = new Dictionary<ulong,AMD_DISPLAY_WITH_SETTINGS>();
             Adl2SlsConfig = new AMD_SLS_CONFIG();
             DisplayIdentifiers = new List<string>();
         }
@@ -1083,21 +1083,10 @@ namespace DisplayMagicianShared.AMD
 
                 // Initialize ADLX with ADLXHelper
                 //_adlxHelper = new ADLXHelper();
-                SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Intialising AMD ADLX Helper interface"); 
-                ADLX_RESULT status = _adlxHelper.Initialize();
-                if (status != ADLX_RESULT.ADLX_OK)
+                SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: Intialising AMD ADLX Helper interface");
+                try
                 {
-                    SharedLogger.logger.Error($"AMDLibrary/AMDLibrary: Error intialising AMD ADLX library. ADLXHelper.Initialize() returned error code {ADLX.GetADLXErrorDescription(status)}");
-                    _initialised = false;
-
-                    if (status == ADLX_RESULT.ADLX_FAIL)
-                    {
-                        SharedLogger.logger.Error($"AMDLibrary/AMDLibrary: Please update your AMD Driver to the latest version. THis software requires AMD Adrenalin v25.6.0 or later to work!");
-                    }
-                    return; 
-                }
-                else
-                {                   
+                    _adlxHelper = ADLXApiHelper.Initialize();
                     try
                     {
                         // Get system services
@@ -1107,7 +1096,7 @@ namespace DisplayMagicianShared.AMD
                         _initialised = true;
                         //_adlxHighestSupportedSystemVersion = 0;
                         SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Successfully got AMD ADLX System Services.");
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADLX library was initialised successfully");                      
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD ADLX library was initialised successfully");
                     }
                     catch (Exception ex)
                     {
@@ -1124,8 +1113,14 @@ namespace DisplayMagicianShared.AMD
                     _activeDisplayConfig = GetActiveConfig();
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Connected Display Identifiers");
                     _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
-                }
 
+                }
+                catch (Exception ex)
+                {
+                    SharedLogger.logger.Trace(ex, $"AMDLibrary/AMDLibrary: Exception intialising AMD ADLX Helper.");
+                    _initialised = false;
+                    return;
+                }
             }
             catch (TypeInitializationException ex)
             {
@@ -1182,16 +1177,9 @@ namespace DisplayMagicianShared.AMD
                     try
                     {
                         // Terminate ADLX
-                        ADLX_RESULT status = _adlxHelper.Dispose();
+                        _adlxHelper.Dispose();
                         _adlxHelper = null;
-                        if (status != ADLX_RESULT.ADLX_OK)
-                        {
-                            SharedLogger.logger.Error($"AMDLibrary/Dispose: Error destroying AMD ADLX library. _adlxHelper.Terminate() returned error code {status}");
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/Dispose: AMD ADLX library was destroyed successfully");
-                        }
+                        SharedLogger.logger.Trace($"AMDLibrary/Dispose: AMD ADLX library was destroyed successfully");
                     }
                     catch (Exception ex)
                     {
@@ -1361,7 +1349,7 @@ namespace DisplayMagicianShared.AMD
                 AMD_EYEFINITY_DESKTOP eyefinityDesktopToStore = new AMD_EYEFINITY_DESKTOP();
 
                 SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX desktop services");
-                List<ADLXDesktop> desktopsList = _adlxSystem.EnumerateDesktops();
+                List<ADLXDesktop> desktopsList = _adlxSystem.EnumerateDesktops().ToList();
                 if (desktopsList.Count == 0)
                 {
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: No desktops found in ADLX system services");
@@ -1544,7 +1532,7 @@ namespace DisplayMagicianShared.AMD
                 // This lets us interact with the various displays to get the settings from them
                 
                 SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Attempting to get the ADLX display services");
-                List<ADLXDisplay> displaysList = _adlxSystem.EnumerateDisplays();
+                List<ADLXDisplay> displaysList = _adlxSystem.EnumerateDisplays().ToList();
                 if (displaysList.Count == 0)
                 {
                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: No displays found in ADLX system services");
@@ -1744,9 +1732,6 @@ namespace DisplayMagicianShared.AMD
                         // Get the Display Pixel Format settings if we can
                         (newDisplay.IsSupportedPixelFormat, newDisplay.CurrentPixelFormat) = display.GetPixelFormatState();
                         
-                        // ----
-                        // this section needs an update to the SWIG bindings to work properly -
-                        // it is commented out for now as it isn't critical to have custom resolutions
                         // ----
                         // //// Get the current custom resolution set for this display if there is one
                         // foreach (var customResolution in display.EnumerateCustomResolutions())
