@@ -386,8 +386,8 @@ namespace DisplayMagicianShared.AMD
         public string EDID;
         public long ManufacturerID;
         public string Name;
-        public int MaxHResolution;
-        public int MaxVResolution;
+        public int NativeResolutionWidth;
+        public int NativeResolutionHeight;
         public long PixelClock;
         public double RefreshRate;
         public ADLX_DISPLAY_SCAN_TYPE ScanType;
@@ -497,14 +497,14 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The Name values don't equal each other");
                 return false;
             }
-            if (MaxHResolution != other.MaxHResolution)
+            if (NativeResolutionWidth != other.NativeResolutionWidth)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The MaxHResolution values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The NativeResolutionWidth values don't equal each other");
                 return false;
             }
-            if (MaxVResolution != other.MaxVResolution)
+            if (NativeResolutionHeight != other.NativeResolutionHeight)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The MaxVResolution values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The NativeResolutionHeight values don't equal each other");
                 return false;
             }
             if (PixelClock != other.PixelClock)
@@ -739,7 +739,7 @@ namespace DisplayMagicianShared.AMD
         // Replace the GetHashCode method in AMD_DISPLAY_WITH_SETTINGS with the following:
         public override int GetHashCode()
         {
-            return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, MaxHResolution, MaxVResolution, PixelClock, RefreshRate, ScanType, UniqueID,
+            return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID,
                 IsSupportedColorDepth, ColorDepth, IsSupportedCustomColorBrightness, CustomColorBrightness, IsSupportedCustomColorHue, CustomColorHue,
                 IsSupportedCustomColorSaturation, CustomColorSaturation, IsSupportedCustomColorContrast, CustomColorContrast, IsSupportedCustomColorTemperature,
                 CustomColorTemperature, IsSupportedGamma, GammaCoefficientGamma, GammaCoefficientA0, GammaCoefficientA1, GammaCoefficientA2, GammaCoefficientA3,
@@ -762,8 +762,8 @@ namespace DisplayMagicianShared.AMD
         public string EDID;       
         public long ManufacturerID;
         public string Name;
-        public int MaxHResolution;
-        public int MaxVResolution;
+        public int NativeResolutionHeight;
+        public int NativeResolutionWidth;
         public long PixelClock;
         public double RefreshRate;
         public ADLX_DISPLAY_SCAN_TYPE ScanType;
@@ -806,14 +806,14 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The Name values don't equal each other");
                 return false;
             }
-            if (MaxHResolution != other.MaxHResolution)
+            if (NativeResolutionWidth  != other.NativeResolutionWidth)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The MaxHResolution values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The NativeResolutionWidth values don't equal each other");
                 return false;
             }
-            if (MaxVResolution != other.MaxVResolution)
+            if (NativeResolutionHeight != other.NativeResolutionHeight)
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The MaxVResolution values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The NativeResolutionHeight values don't equal each other");
                 return false;
             }
             if (PixelClock != other.PixelClock)
@@ -841,7 +841,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, MaxHResolution, MaxVResolution, PixelClock, RefreshRate, ScanType, UniqueID).GetHashCode();
+            return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID).GetHashCode();
         }
         public static bool operator ==(AMD_DISPLAY lhs, AMD_DISPLAY rhs) => lhs.Equals(rhs);
 
@@ -985,8 +985,8 @@ namespace DisplayMagicianShared.AMD
                 _initialised = false;
                 // Check if there is AMD hardware installed
                 SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Looking for AMD PCI hardware...");
-                if (ADLXHardwareDetection.HasAMDGPU(out string errorMessage))
-                    {
+                if (WinLibrary.IsPCIVideoCardVendorInstalled(PCIVendorIDs))
+                {
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: AMD hardware detected");
                 }
                 else
@@ -1392,8 +1392,8 @@ namespace DisplayMagicianShared.AMD
                                 newDisplay.Name = display.Name;
 
                                 // Get the native resolution
-                                newDisplay.MaxHResolution = display.Width;
-                                newDisplay.MaxVResolution = display.Height;
+                                newDisplay.NativeResolutionWidth = display.NativeResolutionWidth;
+                                newDisplay.NativeResolutionHeight = display.NativeResolutionHeight;
 
                                 // Get the PixelClock
                                 newDisplay.PixelClock = display.PixelClock;
@@ -1552,8 +1552,8 @@ namespace DisplayMagicianShared.AMD
                         newDisplay.ManufacturerID = display.ManufacturerId;
                         newDisplay.Name = display.Name;
                         newDisplay.UniqueID = display.UniqueId;
-                        newDisplay.MaxHResolution = display.Width;
-                        newDisplay.MaxVResolution = display.Height;
+                        newDisplay.NativeResolutionWidth = display.NativeResolutionWidth;
+                        newDisplay.NativeResolutionHeight = display.NativeResolutionHeight;
                         newDisplay.PixelClock = display.PixelClock;
                         newDisplay.RefreshRate = display.RefreshRate;
                         newDisplay.ScanType = display.ScanType;
@@ -3772,9 +3772,8 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMDLibrary/GetCurrentDisplayIdentifiers: Attempting to get the ADLX desktop list");
                 try
                 {
-                    // Get display list
-                    // TODO: Add EnumerateDisplaysInUse() to ADLXWrapper
-                    var displaysList =_adlxSystem.EnumerateDisplays();  
+                    // Get display list of the displays urrently in use
+                    var displaysList =_adlxSystem.EnumerateDisplaysInUse();  
                     foreach (var display in displaysList)
                     {
 

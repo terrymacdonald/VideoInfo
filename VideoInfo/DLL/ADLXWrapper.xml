@@ -531,6 +531,13 @@
             <exception cref="T:ADLXWrapper.ADLXException">If display services are unsupported or enumeration fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
         </member>
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.EnumerateDisplaysInUse">
+            <summary>
+            Enumerates displays that are part of an active desktop (in use). Callers must dispose each display.
+            </summary>
+            <exception cref="T:ADLXWrapper.ADLXException">If display/desktop services are unsupported or enumeration fails.</exception>
+            <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
+        </member>
         <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.TryEnumerateDisplays(System.Collections.Generic.IReadOnlyList{ADLXWrapper.ADLXDisplay}@)">
             <summary>
             Tries to enumerate display facades, returning false if the feature is not supported.
@@ -1527,6 +1534,14 @@
             Enumerates display facades via the display services helper.
             </summary>
             <returns>List of managed displays.</returns>
+            <exception cref="T:ADLXWrapper.ADLXException">If enumeration fails.</exception>
+            <exception cref="T:System.ObjectDisposedException">If the helper has been disposed.</exception>
+        </member>
+        <member name="M:ADLXWrapper.ADLXSystemServicesHelper.EnumerateDisplaysInUse">
+            <summary>
+            Enumerates displays that are part of an active desktop (in use) via the display services helper.
+            </summary>
+            <returns>List of managed displays in use.</returns>
             <exception cref="T:ADLXWrapper.ADLXException">If enumeration fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If the helper has been disposed.</exception>
         </member>
