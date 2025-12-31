@@ -323,7 +323,7 @@ namespace DisplayMagicianShared.AMD
         public static bool operator !=(AMD_EYEFINITY_DESKTOP lhs, AMD_EYEFINITY_DESKTOP rhs) => !(lhs == rhs);
     }
 
-    public struct Display3DLUTSettings
+    public struct AMD_3DLUT_INFO : IEquatable<AMD_3DLUT_INFO>
     {
         public bool IsSupportedSCE { get; set; }
         public bool IsSupportedSCEVividGaming { get; set; }
@@ -332,32 +332,141 @@ namespace DisplayMagicianShared.AMD
 
         public bool IsCurrentSCEDisabled { get; set; }
         public bool IsCurrentSCEVividGaming { get; set; }
-        public bool IsCurrentSCEDynamicContrast { get; set; }
-        public bool IsUser3DLUTApplied { get; set; }
+        public bool HasDynamicContrast { get; set; }
 
         // If using Dynamic Contrast mode:
         public int CurrentDynamicContrastValue { get; set; }
         public IntRange DynamicContrastRange { get; set; }  // min, max, step
 
-        // Full LUT data (optional, can be a large array).
-        // Can store as flattened list or nested arrays: e.g. [R][G][B] => value
-        public List<ushort> UserLUTData { get; set; } = new List<ushort>();
-        public int UserLUTNumPoints { get; set; }
-        public LutMode UserLUTMode { get; set; } = 0;
-
-        public Display3DLUTSettings()
+        public AMD_3DLUT_INFO()
         {
             CurrentDynamicContrastValue = 0;
-            UserLUTData = new List<ushort>();
         }
+
+        public AMD_3DLUT_INFO(bool isSupportedSCE, bool isSupportedSCEVividGaming, bool hasDynamicContrast,
+                             bool isSupportedUser3DLUT, bool isCurrentSCEDisabled, bool isCurrentSCEVividGaming,
+                             bool isCurrentSCEDynamicContrast, bool isUser3DLUTApplied, int currentDynamicContrastValue,
+                             IntRange dynamicContrastRange, List<ushort> userLUTData, int userLUTNumPoints, LutMode userLUTMode)
+        {
+            IsSupportedSCE = isSupportedSCE;
+            IsSupportedSCEVividGaming = isSupportedSCEVividGaming;
+            HasDynamicContrast = hasDynamicContrast;
+            IsSupportedUser3DLUT = isSupportedUser3DLUT;
+            IsCurrentSCEDisabled = isCurrentSCEDisabled;
+            IsCurrentSCEVividGaming = isCurrentSCEVividGaming;
+            CurrentDynamicContrastValue = currentDynamicContrastValue;
+            DynamicContrastRange = dynamicContrastRange;
+        }
+
+        public AMD_3DLUT_INFO(ThreeDLUTInfo threeDLUTInfo)
+        {
+            IsSupportedSCE = threeDLUTInfo.IsSceSupported;
+            IsSupportedSCEVividGaming = threeDLUTInfo.IsSceVividGamingSupported;
+            IsSupportedSCEDynamicContrast = threeDLUTInfo.IsSceDynamicContrastSupported;
+            IsSupportedUser3DLUT = threeDLUTInfo.IsUser3DLutSupported;
+            IsCurrentSCEDisabled = threeDLUTInfo.IsCurrentSceDisabled;
+            IsCurrentSCEVividGaming = threeDLUTInfo.IsCurrentSceVividGaming;
+            HasDynamicContrast = threeDLUTInfo.HasDynamicContrast;
+            CurrentDynamicContrastValue = threeDLUTInfo.CurrentDynamicContrast;
+            DynamicContrastRange = new IntRange
+            {
+                Min = threeDLUTInfo.DynamicContrastRange.minValue,
+                Max = threeDLUTInfo.DynamicContrastRange.maxValue,
+                Step = threeDLUTInfo.DynamicContrastRange.step
+            };
+        }
+
+        public ThreeDLUTInfo ToThreeDLUTInfo()
+        {
+            return new ThreeDLUTInfo
+            {
+                IsSceSupported = IsSupportedSCE,
+                IsSceVividGamingSupported = IsSupportedSCEVividGaming,
+                IsSceDynamicContrastSupported = IsSupportedSCEDynamicContrast,
+                IsUser3DLutSupported = IsSupportedUser3DLUT,
+                IsCurrentSceDisabled = IsCurrentSCEDisabled,
+                IsCurrentSceVividGaming = IsCurrentSCEVividGaming,
+                HasDynamicContrast = HasDynamicContrast,
+                CurrentDynamicContrast = CurrentDynamicContrastValue,
+                DynamicContrastRange = new ADLX_IntRange
+                {
+                    minValue = DynamicContrastRange.Min,
+                    maxValue = DynamicContrastRange.Max,
+                    step = DynamicContrastRange.Step
+                }
+            };
+        }
+
+        public override bool Equals(object obj) => obj is AMD_3DLUT_INFO other && this.Equals(other);
+        public bool Equals(AMD_3DLUT_INFO other)
+        {
+            if (IsSupportedSCE != other.IsSupportedSCE)
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsSupportedSCE values don't equal each other");
+                return false;
+            }
+            if (IsSupportedSCEVividGaming != other.IsSupportedSCEVividGaming)
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsSupportedSCEVividGaming values don't equal each other");
+                return false;
+            }
+            if (IsSupportedUser3DLUT != other.IsSupportedUser3DLUT)
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsSupportedUser3DLUT values don't equal each other");
+                return false;
+            }
+            if (IsCurrentSCEDisabled != other.IsCurrentSCEDisabled)
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsCurrentSCEDisabled values don't equal each other");
+                return false;
+            }
+            if (IsCurrentSCEVividGaming != other.IsCurrentSCEVividGaming)
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsCurrentSCEVividGaming values don't equal each other");
+                return false;
+            }
+            if (CurrentDynamicContrastValue != other.CurrentDynamicContrastValue)
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The CurrentDynamicContrastValue values don't equal each other");
+                return false;
+            }
+            if (!DynamicContrastRange.Equals(other.DynamicContrastRange))
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The DynamicContrastRange values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        public override int GetHashCode() => (IsSupportedSCE, IsSupportedSCEVividGaming, IsSupportedSCEDynamicContrast, IsSupportedUser3DLUT, IsCurrentSCEDisabled, IsCurrentSCEVividGaming, CurrentDynamicContrastValue, DynamicContrastRange).GetHashCode();
     }
 
     /// Range helper
-    public struct IntRange
+    public struct IntRange: IEquatable<IntRange>
     {
         public int Min { get; set; }
         public int Max { get; set; }
         public int Step { get; set; }
+        public override bool Equals(object obj) => obj is IntRange other && this.Equals(other);
+        public bool Equals(IntRange other)
+        {
+            if (Min != other.Min)
+            {
+                SharedLogger.logger.Trace($"IntRange/Equals: The Min values don't equal each other");
+                return false;
+            }
+            if (Max != other.Max)
+            {
+                SharedLogger.logger.Trace($"IntRange/Equals: The Max values don't equal each other");
+                return false;
+            }
+            if (Step != other.Step)
+            {
+                SharedLogger.logger.Trace($"IntRange/Equals: The Step values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        public override int GetHashCode() => (Min, Max, Step).GetHashCode();
     }
 
     public enum LutMode
@@ -368,30 +477,248 @@ namespace DisplayMagicianShared.AMD
         All = 3
     }
 
-    public class CustomDisplayResolutionInfo
+    public struct AMD_DISPLAY_RESOLUTION_INFO : IEquatable<AMD_DISPLAY_RESOLUTION_INFO>
     {
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int RefreshRate { get; set; }
-        public int TimingStandard { get; set; }
+        public int ResWidth { get; init; }
+        public int ResHeight { get; init; }
+        public int RefreshRate { get; init; }
 
-        // (Optional) you might want fields like “isActive” or “isDefault” etc.
+        public AMD_DISPLAY_RESOLUTION_INFO()
+        {
+            ResWidth = 0;
+            ResHeight = 0;
+            RefreshRate = 0;
+        }
+
+        public AMD_DISPLAY_RESOLUTION_INFO(int resWidth, int resHeight, int refreshRate)
+        {
+            ResWidth = resWidth;
+            ResHeight = resHeight;
+            RefreshRate = refreshRate;
+        }
+        public AMD_DISPLAY_RESOLUTION_INFO(DisplayResolutionInfo displayResInfo)
+        {
+            ResWidth = displayResInfo.ResWidth;
+            ResHeight = displayResInfo.ResHeight;
+            RefreshRate = displayResInfo.RefreshRate;
+        }
+        public DisplayResolutionInfo ToDisplayResolutionInfo()
+        {
+            return new DisplayResolutionInfo
+            {
+                ResWidth = ResWidth,
+                ResHeight = ResHeight,
+                RefreshRate = RefreshRate
+            };
+        }
+
+        public override bool Equals(object obj) => obj is AMD_DISPLAY_RESOLUTION_INFO other && this.Equals(other);
+        public bool Equals(AMD_DISPLAY_RESOLUTION_INFO other)
+        {
+            if (ResWidth != other.ResWidth)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_RESOLUTION_INFO/Equals: The ResWidth values don't equal each other");
+                return false;
+            }
+            if (ResHeight != other.ResHeight)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_RESOLUTION_INFO/Equals: The ResHeight values don't equal each other");
+                return false;
+            }
+            if (RefreshRate != other.RefreshRate)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_RESOLUTION_INFO/Equals: The RefreshRate values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        public override int GetHashCode() => (ResWidth, ResHeight, RefreshRate).GetHashCode();
+    }
+
+    public struct AMD_CUSTOM_DISPLAY_RESOLUTION_INFO : IEquatable<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO>
+    {
+        public bool IsSupported { get; init; }
+        public IReadOnlyList<AMD_DISPLAY_RESOLUTION_INFO> Resolutions { get; init; }
+
+        public AMD_CUSTOM_DISPLAY_RESOLUTION_INFO()
+        {
+            IsSupported = false;
+            Resolutions = Array.Empty<AMD_DISPLAY_RESOLUTION_INFO>();
+        }
+
+        public AMD_CUSTOM_DISPLAY_RESOLUTION_INFO(bool isSupported, IReadOnlyList<DisplayResolutionInfo> resolutions)
+        {
+            IsSupported = isSupported;
+            foreach (var res in resolutions)
+            {
+                Resolutions.Append(new AMD_DISPLAY_RESOLUTION_INFO(res));
+            }
+        }
+        public AMD_CUSTOM_DISPLAY_RESOLUTION_INFO(CustomResolutionInfo customResInfo)
+        {
+            IsSupported = customResInfo.IsSupported;
+            Resolutions = new List<AMD_DISPLAY_RESOLUTION_INFO>();
+            foreach (var res in customResInfo.Resolutions)
+            {
+                Resolutions.Append(new AMD_DISPLAY_RESOLUTION_INFO(res));
+            }
+        }
+
+        public CustomResolutionInfo ToCustomResolutionInfo()
+        {
+            return new CustomResolutionInfo
+            {
+                IsSupported = IsSupported,
+                Resolutions = Resolutions.Select(res => res.ToDisplayResolutionInfo()).ToList()
+            };
+        }
+        public override bool Equals(object obj) => obj is AMD_CUSTOM_DISPLAY_RESOLUTION_INFO other && this.Equals(other);
+        public bool Equals(AMD_CUSTOM_DISPLAY_RESOLUTION_INFO other)
+        {
+            if (IsSupported != other.IsSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_DISPLAY_RESOLUTION_INFO/Equals: The IsSupported values don't equal each other");
+                return false;
+            }
+            if (!Resolutions.SequenceEqual(other.Resolutions))
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_DISPLAY_RESOLUTION_INFO/Equals: The Resolutions values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        public override int GetHashCode() => (IsSupported, Resolutions).GetHashCode();
+    }
+
+    public struct AMD_CONNECTIVITY_EXPERIENCE_INFO : IEquatable<AMD_CONNECTIVITY_EXPERIENCE_INFO>
+    {
+        public bool IsHdmiQualityDetectionSupported { get; init; }
+        public bool IsHdmiQualityDetectionEnabled { get; init; }
+        public bool IsDpLinkRateSupported { get; init; }
+        public ADLX_DP_LINK_RATE DpLinkRate { get; init; }
+        public bool IsRelativePreEmphasisSupported { get; init; }
+        public int RelativePreEmphasis { get; init; }
+        public bool IsRelativeVoltageSwingSupported { get; init; }
+        public int RelativeVoltageSwing { get; init; }
+
+        public AMD_CONNECTIVITY_EXPERIENCE_INFO()
+        {
+            IsHdmiQualityDetectionSupported = false;
+            IsHdmiQualityDetectionEnabled = false;
+            IsDpLinkRateSupported = false;
+            DpLinkRate = ADLX_DP_LINK_RATE.DP_LINK_RATE_UNKNOWN;
+            IsRelativePreEmphasisSupported = false;
+            RelativePreEmphasis = 0;
+            IsRelativeVoltageSwingSupported = false;
+            RelativeVoltageSwing = 0;
+        }
+
+        public AMD_CONNECTIVITY_EXPERIENCE_INFO(bool isHdmiQualityDetectionSupported, bool isHdmiQualityDetectionEnabled,
+                                               bool isDpLinkRateSupported, ADLX_DP_LINK_RATE dpLinkRate,
+                                               bool isRelativePreEmphasisSupported, int relativePreEmphasis,
+                                               bool isRelativeVoltageSwingSupported, int relativeVoltageSwing)
+        {
+            IsHdmiQualityDetectionSupported = isHdmiQualityDetectionSupported;
+            IsHdmiQualityDetectionEnabled = isHdmiQualityDetectionEnabled;
+            IsDpLinkRateSupported = isDpLinkRateSupported;
+            DpLinkRate = dpLinkRate;
+            IsRelativePreEmphasisSupported = isRelativePreEmphasisSupported;
+            RelativePreEmphasis = relativePreEmphasis;
+            IsRelativeVoltageSwingSupported = isRelativeVoltageSwingSupported;
+            RelativeVoltageSwing = relativeVoltageSwing;
+        }
+
+        public AMD_CONNECTIVITY_EXPERIENCE_INFO(ConnectivityExperienceInfo ConnExp)
+        {
+            IsHdmiQualityDetectionSupported = ConnExp.IsHdmiQualityDetectionSupported;
+            IsHdmiQualityDetectionEnabled = ConnExp.IsHdmiQualityDetectionEnabled;
+            IsDpLinkRateSupported = ConnExp.IsDpLinkRateSupported;
+            DpLinkRate = ConnExp.DpLinkRate;
+            IsRelativePreEmphasisSupported = ConnExp.IsRelativePreEmphasisSupported;
+            RelativePreEmphasis = ConnExp.RelativePreEmphasis;
+            IsRelativeVoltageSwingSupported = ConnExp.IsRelativeVoltageSwingSupported;
+            RelativeVoltageSwing = ConnExp.RelativeVoltageSwing;
+        }
+
+        public ConnectivityExperienceInfo ToConnectivityExperienceInfo()
+        {
+            return new ConnectivityExperienceInfo
+            {
+                IsHdmiQualityDetectionSupported = IsHdmiQualityDetectionSupported,
+                IsHdmiQualityDetectionEnabled = IsHdmiQualityDetectionEnabled,
+                IsDpLinkRateSupported = IsDpLinkRateSupported,
+                DpLinkRate = DpLinkRate,
+                IsRelativePreEmphasisSupported = IsRelativePreEmphasisSupported,
+                RelativePreEmphasis = RelativePreEmphasis,
+                IsRelativeVoltageSwingSupported = IsRelativeVoltageSwingSupported,
+                RelativeVoltageSwing = RelativeVoltageSwing
+            };
+        }   
+
+        public override bool Equals(object obj) => obj is AMD_CONNECTIVITY_EXPERIENCE_INFO other && this.Equals(other);
+        public bool Equals(AMD_CONNECTIVITY_EXPERIENCE_INFO other)
+        {
+            if (IsHdmiQualityDetectionSupported != other.IsHdmiQualityDetectionSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CONNECTIVITY_EXPERIENCE_INFO/Equals: The IsHdmiQualityDetectionSupported values don't equal each other");
+                return false;
+            }
+            if (IsHdmiQualityDetectionEnabled != other.IsHdmiQualityDetectionEnabled)
+            {
+                SharedLogger.logger.Trace($"AMD_CONNECTIVITY_EXPERIENCE_INFO/Equals: The IsHdmiQualityDetectionEnabled values don't equal each other");
+                return false;
+            }
+            if (IsDpLinkRateSupported != other.IsDpLinkRateSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CONNECTIVITY_EXPERIENCE_INFO/Equals: The IsDpLinkRateSupported values don't equal each other");
+                return false;
+            }
+            if (DpLinkRate != other.DpLinkRate)
+            {
+                SharedLogger.logger.Trace($"AMD_CONNECTIVITY_EXPERIENCE_INFO/Equals: The DpLinkRate values don't equal each other");
+                return false;
+            }
+            if (IsRelativePreEmphasisSupported != other.IsRelativePreEmphasisSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CONNECTIVITY_EXPERIENCE_INFO/Equals: The IsRelativePreEmphasisSupported values don't equal each other");
+                return false;
+            }
+            if (RelativePreEmphasis != other.RelativePreEmphasis)
+            {
+                SharedLogger.logger.Trace($"AMD_CONNECTIVITY_EXPERIENCE_INFO/Equals: The RelativePreEmphasis values don't equal each other");
+                return false;
+            }
+            if (IsRelativeVoltageSwingSupported != other.IsRelativeVoltageSwingSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CONNECTIVITY_EXPERIENCE_INFO/Equals: The IsRelativeVoltageSwingSupported values don't equal each other");
+                return false;
+            }
+            if (RelativeVoltageSwing != other.RelativeVoltageSwing)
+            {
+                SharedLogger.logger.Trace($"AMD_CONNECTIVITY_EXPERIENCE_INFO/Equals: The RelativeVoltageSwing values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        public override int GetHashCode() => (IsHdmiQualityDetectionSupported, IsHdmiQualityDetectionEnabled, IsDpLinkRateSupported, DpLinkRate, 
+        IsRelativePreEmphasisSupported, RelativePreEmphasis, IsRelativeVoltageSwingSupported, RelativeVoltageSwing).GetHashCode();
     }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DISPLAY_WITH_SETTINGS : IEquatable<AMD_DISPLAY_WITH_SETTINGS>
     {
         public ADLX_DISPLAY_CONNECTOR_TYPE ConnectorType;
-        public ADLX_DISPLAY_TYPE DisplayType;
+        public ADLX_DISPLAY_TYPE Type;
         public string EDID;
-        public long ManufacturerID;
+        public uint ManufacturerID;
         public string Name;
         public int NativeResolutionWidth;
         public int NativeResolutionHeight;
-        public long PixelClock;
+        public uint PixelClock;
         public double RefreshRate;
         public ADLX_DISPLAY_SCAN_TYPE ScanType;
         public ulong UniqueID;
+        public int GpuUniqueID;
         public bool IsSupportedColorDepth;
         public ADLX_COLOR_DEPTH ColorDepth;
         public bool IsSupportedCustomColorBrightness;
@@ -414,7 +741,13 @@ namespace DisplayMagicianShared.AMD
         public List<double> GammaRampGreen; // done for testing
         public List<double> GammaRampBlue; // done for testing
         public bool IsSupportedFreeSync;
-        public bool IsEnabledFreeSync;
+        public bool IsEnabledFreeSync;        
+        public bool IsSupportedFreeSyncColorAccuracy;
+        public bool IsEnabledFreeSyncColorAccuracy;        
+        public bool IsSupportedDynamicRefreshRateControl;
+        public bool IsEnabledDynamicRefreshRateControl;
+        public bool IsSupportedDisplayBlanking;
+        public bool IsEnabledDisplayBlanking;
         public int GamutColorSpaceRedX;
         public int GamutColorSpaceRedY;
         public int GamutColorSpaceGreenX;
@@ -438,8 +771,9 @@ namespace DisplayMagicianShared.AMD
         public bool IsSupportedVariBright = false;
         public bool IsEnabledVariBright = false;
         public VariBrightMode VariBrightMode = VariBrightMode.Unknown;
+        public AMD_CONNECTIVITY_EXPERIENCE_INFO ConnectivityExperience;
         public bool IsSupported3DLUT = false;
-        public Display3DLUTSettings ThreeDLUTSettings { get; set; } = new Display3DLUTSettings();
+        public AMD_3DLUT_INFO ThreeDLUTSettings { get; set; } = new AMD_3DLUT_INFO();
         // Custom resolution support / status
         public bool IsSupportedCustomResolution { get; set; }
         public bool IsCustomResolutionApplied { get; set; }
@@ -451,7 +785,7 @@ namespace DisplayMagicianShared.AMD
         public int CustomResTimingStandard { get; set; }
 
         // (Optional) store the list of all defined custom resolutions for that display
-        public List<CustomDisplayResolutionInfo> CustomResolutions { get; set; } = new List<CustomDisplayResolutionInfo>();
+        public List<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO> CustomResolutions { get; set; } = new List<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO>();
 
         public AMD_DISPLAY_WITH_SETTINGS()
         {
@@ -459,14 +793,14 @@ namespace DisplayMagicianShared.AMD
             Name = "";
             ScanType = ADLX_DISPLAY_SCAN_TYPE.PROGRESSIVE;
             ConnectorType = ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_UNKNOWN;
-            DisplayType = ADLX_DISPLAY_TYPE.DISPLAY_TYPE_UNKOWN;
+            Type = ADLX_DISPLAY_TYPE.DISPLAY_TYPE_UNKOWN;
             ColorDepth = ADLX_COLOR_DEPTH.BPC_UNKNOWN;
             CurrentPixelFormat = ADLX_PIXEL_FORMAT.FORMAT_UNKNOWN;
             CurrentScalingMode = ADLX_SCALE_MODE.PRESERVE_ASPECT_RATIO;
             GammaRampRed = new List<double>();
             GammaRampGreen = new List<double>();
             GammaRampBlue = new List<double>();
-            CustomResolutions = new List<CustomDisplayResolutionInfo>();
+            CustomResolutions = new List<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO>();
         }
 
         public override bool Equals(object obj) => obj is AMD_DISPLAY_WITH_SETTINGS other && this.Equals(other);
@@ -477,7 +811,7 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ConnectorType values don't equal each other");
                 return false;
             }
-            if (DisplayType != other.DisplayType)
+            if (Type != other.Type)
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The DisplayType values don't equal each other");
                 return false;
@@ -731,6 +1065,51 @@ namespace DisplayMagicianShared.AMD
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsEnabledVSR values don't equal each other");
                 return false;
+            }  
+            if (IsSupportedCustomResolution != other.IsSupportedCustomResolution)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedCustomResolution values don't equal each other");
+                return false;
+            }
+            if (IsCustomResolutionApplied != other.IsCustomResolutionApplied)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsCustomResolutionApplied values don't equal each other");
+                return false;
+            }
+            if (CustomResWidth != other.CustomResWidth)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResWidth values don't equal each other");
+                return false;
+            }
+            if (CustomResHeight != other.CustomResHeight)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResHeight values don't equal each other");
+                return false;
+            }
+            if (CustomResRefreshRate != other.CustomResRefreshRate)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResRefreshRate values don't equal each other");
+                return false;
+            }
+            if (CustomResTimingStandard != other.CustomResTimingStandard)
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResTimingStandard values don't equal each other");
+                return false;
+            }
+            if (!CustomResolutions.SequenceEqual(other.CustomResolutions))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResolutions values don't equal each other");
+                return false;
+            }
+            if (!ConnectivityExperience.Equals(other.ConnectivityExperience))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ConnectivityExperience values don't equal each other");
+                return false;
+            }
+            if (!ThreeDLUTSettings.Equals(other.ThreeDLUTSettings))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ThreeDLUTSettings values don't equal each other");
+                return false;
             }
 
             return true;
@@ -739,14 +1118,14 @@ namespace DisplayMagicianShared.AMD
         // Replace the GetHashCode method in AMD_DISPLAY_WITH_SETTINGS with the following:
         public override int GetHashCode()
         {
-            return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID,
+            return (ConnectorType, Type, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID,
                 IsSupportedColorDepth, ColorDepth, IsSupportedCustomColorBrightness, CustomColorBrightness, IsSupportedCustomColorHue, CustomColorHue,
                 IsSupportedCustomColorSaturation, CustomColorSaturation, IsSupportedCustomColorContrast, CustomColorContrast, IsSupportedCustomColorTemperature,
                 CustomColorTemperature, IsSupportedGamma, GammaCoefficientGamma, GammaCoefficientA0, GammaCoefficientA1, GammaCoefficientA2, GammaCoefficientA3,
                 GammaRampRed, GammaRampGreen, GammaRampBlue, IsSupportedFreeSync, IsEnabledFreeSync, GamutColorSpaceRedX, GamutColorSpaceRedY, GamutColorSpaceGreenX, GamutColorSpaceGreenY,
                 GamutColorSpaceBlueX, GamutColorSpaceBlueY, GamutWhitePointX, GamutWhitePointY, IsSupportedGPUScaling, IsEnabledGPUScaling,
                 IsSupportedIntegerScaling, IsEnabledIntegerScaling, IsSupportedPixelFormat, CurrentPixelFormat, IsSupportedScalingMode, CurrentScalingMode,
-                IsSupportedVSR, IsEnabledVSR
+                IsSupportedVSR, IsEnabledVSR, IsSupportedCustomResolution, IsCustomResolutionApplied, CustomResWidth, CustomResHeight, CustomResRefreshRate
             ).GetHashCode();
         }
         public static bool operator ==(AMD_DISPLAY_WITH_SETTINGS lhs, AMD_DISPLAY_WITH_SETTINGS rhs) => lhs.Equals(rhs);
@@ -757,17 +1136,18 @@ namespace DisplayMagicianShared.AMD
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DISPLAY : IEquatable<AMD_DISPLAY>
     {
-        public ADLX_DISPLAY_CONNECTOR_TYPE ConnectorType;
-        public ADLX_DISPLAY_TYPE DisplayType;
-        public string EDID;       
-        public long ManufacturerID;
+       public ADLX_DISPLAY_CONNECTOR_TYPE ConnectorType;
+        public ADLX_DISPLAY_TYPE Type;
+        public string EDID;
+        public uint ManufacturerID;
         public string Name;
-        public int NativeResolutionHeight;
         public int NativeResolutionWidth;
-        public long PixelClock;
+        public int NativeResolutionHeight;
+        public uint PixelClock;
         public double RefreshRate;
         public ADLX_DISPLAY_SCAN_TYPE ScanType;
         public ulong UniqueID;
+        public int GpuUniqueID;
 
         public AMD_DISPLAY()
         {
@@ -775,7 +1155,7 @@ namespace DisplayMagicianShared.AMD
             Name = "";
             ScanType = ADLX_DISPLAY_SCAN_TYPE.PROGRESSIVE;
             ConnectorType = ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_UNKNOWN;
-            DisplayType = ADLX_DISPLAY_TYPE.DISPLAY_TYPE_UNKOWN;
+            Type = ADLX_DISPLAY_TYPE.DISPLAY_TYPE_UNKOWN;
         }
 
         public override bool Equals(object obj) => obj is AMD_DISPLAY other && this.Equals(other);
@@ -786,7 +1166,7 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The ConnectorType values don't equal each other");
                 return false;
             }
-            if (DisplayType != other.DisplayType)
+            if (Type != other.Type)
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY/Equals: The DisplayType values don't equal each other");
                 return false;
@@ -841,7 +1221,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (ConnectorType, DisplayType, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID).GetHashCode();
+            return (ConnectorType, Type, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID).GetHashCode();
         }
         public static bool operator ==(AMD_DISPLAY lhs, AMD_DISPLAY rhs) => lhs.Equals(rhs);
 
@@ -1547,7 +1927,7 @@ namespace DisplayMagicianShared.AMD
                         AMD_DISPLAY_WITH_SETTINGS newDisplay = new AMD_DISPLAY_WITH_SETTINGS();
 
                         newDisplay.ConnectorType = display.ConnectorType;
-                        newDisplay.DisplayType = display.Type;
+                        newDisplay.Type = display.Type;
                         newDisplay.EDID = display.Edid;
                         newDisplay.ManufacturerID = display.ManufacturerId;
                         newDisplay.Name = display.Name;
@@ -1790,7 +2170,7 @@ namespace DisplayMagicianShared.AMD
                         // TODO: This section needs the ADLXWRapper updated to get all the avilable settings
                         // and it needs the Display3DLUTSettings DTO updated to take all the settings too.
                         var threeDLUT = display.GetThreeDLut();
-                        var newDisplayThreeDLUTSettings = new Display3DLUTSettings();
+                        var newDisplayThreeDLUTSettings = new AMD_3DLUT_INFO();
                         newDisplayThreeDLUTSettings.IsSupportedSCE = threeDLUT.IsSceDynamicContrastSupported;
                         newDisplayThreeDLUTSettings.IsSupportedSCEVividGaming = threeDLUT.IsSceVividGamingSupported;
                         newDisplayThreeDLUTSettings.IsSupportedSCEDynamicContrast = threeDLUT.IsSceDynamicContrastSupported;
