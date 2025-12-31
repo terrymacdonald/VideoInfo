@@ -136,7 +136,7 @@
         </member>
         <member name="M:ADLXWrapper.ADLXApiHelper.GetSystemServicesHandle">
             <summary>
-            Get the system services as an AdlxInterfaceHandle (AddRef'd for caller ownership).
+            Get the system services as an ADLXInterfaceHandle (AddRef'd for caller ownership).
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXApiHelper.GetSystemServices">
@@ -224,7 +224,7 @@
             Wrapper over IADLXDesktopServices providing managed/native accessors and Eyefinity helpers.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDesktopServicesHelper.#ctor(ADLXWrapper.IADLXDesktopServices*,ADLXWrapper.IADLXDisplayServices*,System.Boolean,System.Boolean)">
+        <member name="M:ADLXWrapper.ADLXDesktopServicesHelper.#ctor(ADLXWrapper.IADLXDesktopServices*,ADLXWrapper.IADLXDisplayServices*,System.Boolean,System.Boolean,ADLXWrapper.IADLXSystem*)">
             <summary>
             Creates a desktop services helper from native desktop/display services.
             </summary>
@@ -232,6 +232,7 @@
             <param name="displayServices">Optional display services pointer used to build display facades.</param>
             <param name="addRefDesktopServices">True to AddRef the desktop services pointer.</param>
             <param name="addRefDisplayServices">True to AddRef the display services pointer.</param>
+            <param name="system">Optional system pointer used to reacquire desktop services per call.</param>
         </member>
         <member name="M:ADLXWrapper.ADLXDesktopServicesHelper.GetDesktopServicesHandle">
             <summary>
@@ -321,6 +322,11 @@
             <returns>Native desktop list pointer.</returns>
             <exception cref="T:ADLXWrapper.ADLXException">If enumeration is unsupported or fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
+        </member>
+        <member name="M:ADLXWrapper.ADLXDesktopServicesHelper.AcquireDesktopServices(ADLXWrapper.IADLXDesktopServices*@)">
+            <summary>
+            Acquire a desktop services pointer for the current call. Uses system to reacquire when available to avoid stale interfaces.
+            </summary>
         </member>
         <member name="T:ADLXWrapper.ADLXDisplay">
             <summary>
@@ -583,10 +589,17 @@
             <exception cref="T:ADLXWrapper.ADLXException">If display services are unsupported or enumeration fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.TryEnumerateDisplayHandles(ADLXWrapper.AdlxInterfaceHandle[]@)">
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.TryEnumerateDisplayHandles(ADLXWrapper.ADLXInterfaceHandle[]@)">
             <summary>
             Tries to enumerate display handles; returns false if not supported.
             </summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.GetDisplayListSafe">
+            <summary>
+            Enumerates a native display list using the base display services interface with the same call order as the native tests.
+            </summary>
+            <returns>Raw pointer to an IADLXDisplayList. Caller must wrap/dispose.</returns>
+            <exception cref="T:ADLXWrapper.ADLXException">If enumeration is unsupported or fails.</exception>
         </member>
         <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.GetDisplayChangedHandlingNative">
             <summary>
@@ -922,12 +935,12 @@
             </summary>
             <returns>Array of GPU names, or empty array if none found.</returns>
         </member>
-        <member name="T:ADLXWrapper.AdlxInterfaceHandle">
+        <member name="T:ADLXWrapper.ADLXInterfaceHandle">
             <summary>
             Lightweight lifetime wrapper for raw ADLX interface pointers.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.AdlxInterfaceHandle.FromNonRefCounted(System.Void*)">
+        <member name="M:ADLXWrapper.ADLXInterfaceHandle.FromNonRefCounted(System.Void*)">
             <summary>
             Create a non-owning handle for interfaces that are not ref-counted (no Acquire/Release).
             </summary>
@@ -1157,7 +1170,7 @@
             Tries to query GPUConnect support; returns false if the feature is not supported on this system.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryEnumerateGPUConnectGpuHandles(ADLXWrapper.AdlxInterfaceHandle[]@)">
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryEnumerateGPUConnectGpuHandles(ADLXWrapper.ADLXInterfaceHandle[]@)">
             <summary>
             Tries to enumerate GPUConnect-capable GPUs; returns false if not supported.
             </summary>
@@ -1214,6 +1227,14 @@
             <summary>
             Tries to apply SmartShift Eco; returns false when the feature is unsupported.
             </summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.GetManualPowerTuning(ADLXWrapper.ADLXGPUTuningServicesHelper,ADLXWrapper.ADLXInterfaceHandle)">
+            <summary>
+            Facade-friendly overload to query manual power tuning using managed helpers and GPU handles.
+            </summary>
+            <param name="tuningHelper">GPU tuning helper.</param>
+            <param name="gpuHandle">GPU handle from facade enumeration.</param>
+            <returns>Manual power tuning info.</returns>
         </member>
         <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplyManualPowerTuning(ADLXWrapper.IADLXManualPowerTuning*,ADLXWrapper.ManualPowerTuningInfo)">
             <summary>
