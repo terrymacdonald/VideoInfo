@@ -3562,11 +3562,199 @@ namespace DisplayMagicianShared.AMD
             if (_initialised)
             {                
                 // Get the current list of all displays available on the system
-                // cycle through each display
-                    // if display is one that we have settings for, then set the settings we stored in the displayConfig previously
-                    // NOTE: if there is no settings stored for this display, then we just leave it as is. 
-                    // If the display setting takes a while to apply, then wait the delayinMs time before moving to the next display                    
-                    // if there is a problem setting a setting then return false
+                var displaysList = _adlxSystem.EnumerateDisplays().ToList();
+                if (displaysList.Count == 0)
+                {
+                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No displays found in ADLX system services");
+                    return false;
+                }
+
+                foreach (var display in displaysList)
+                {
+                    // Only apply settings we have stored
+                    if (!displayConfig.Displays.TryGetValue(display.UniqueId, out var stored))
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No stored settings for display {display.UniqueId}, skipping.");
+                        continue;
+                    }
+
+                    try
+                    {
+                        // Color depth
+                        if (stored.IsSupportedColorDepth)
+                        {
+                            var currentColorDepth = display.GetColorDepthState();
+                            if (currentColorDepth.supported && currentColorDepth.current != stored.ColorDepth)
+                            {
+                                display.SetColorDepth(stored.ColorDepth);
+                            }
+                        }
+
+                        // Custom color (includes support flags inside AMD_CUSTOM_COLOR_INFO)
+                        var currentCustomColor = new AMD_CUSTOM_COLOR_INFO(display.GetCustomColor());
+                        if (!currentCustomColor.Equals(stored.CustomColorInfo))
+                        {
+                            display.ApplyCustomColor(stored.CustomColorInfo.ToCustomColorInfo());
+                        }
+
+                        // Gamma best effort reapply
+                        if (stored.GammaInfo.IsSupported)
+                        {
+                            var currentGamma = new AMD_GAMMA_INFO(display.GetGamma());
+                            if (!currentGamma.Equals(stored.GammaInfo))
+                            {
+                                display.ReapplyGamma();
+                            }
+                        }
+
+                        // Gamut best effort reapply
+                        if (stored.GamutInfo.IsGamutSupported || stored.GamutInfo.IsWhitePointSupported)
+                        {
+                            var currentGamut = new AMD_GAMUT_INFO(display.GetGamut());
+                            if (!currentGamut.Equals(stored.GamutInfo))
+                            {
+                                display.ReapplyGamut();
+                            }
+                        }
+
+                        // Connectivity experience
+                        var currentConn = new AMD_CONNECTIVITY_EXPERIENCE_INFO(display.GetConnectivityExperience());
+                        if (!currentConn.Equals(stored.ConnectivityExperience))
+                        {
+                            display.ApplyConnectivityExperience(stored.ConnectivityExperience.ToConnectivityExperienceInfo());
+                        }
+
+                        // Apply 3DLUT
+                        var current3dLut = new AMD_3DLUT_INFO(display.GetThreeDLut());
+                        if (!current3dLut.Equals(stored.ThreeDLUTSettings))
+                        {
+                            display.ReapplyThreeDLut();
+                        }
+
+                        // FreeSync
+                        if (stored.IsSupportedFreeSync)
+                        {
+                            var current = display.GetFreeSyncState();
+                            if (current.supported && current.enabled != stored.IsEnabledFreeSync)
+                            {
+                                display.SetFreeSync(stored.IsEnabledFreeSync);
+                            }
+                        }
+
+                        // FreeSync Color Accuracy
+                        if (stored.IsSupportedFreeSyncColorAccuracy)
+                        {
+                            var current = display.GetFreeSyncColorAccuracyState();
+                            if (current.supported && current.enabled != stored.IsEnabledFreeSyncColorAccuracy)
+                            {
+                                display.SetFreeSyncColorAccuracy(stored.IsEnabledFreeSyncColorAccuracy);
+                            }
+                        }
+
+                        // Dynamic Refresh Rate Control
+                        if (stored.IsSupportedDynamicRefreshRateControl)
+                        {
+                            var current = display.GetDynamicRefreshRateControlState();
+                            if (current.supported && current.enabled != stored.IsEnabledDynamicRefreshRateControl)
+                            {
+                                display.SetDynamicRefreshRateControl(stored.IsEnabledDynamicRefreshRateControl);
+                            }
+                        }
+
+                        // Display blanking
+                        if (stored.IsSupportedDisplayBlanking)
+                        {
+                            var current = display.GetDisplayBlankingState();
+                            if (current.supported && current.blanked != stored.IsEnabledDisplayBlanking)
+                            {
+                                display.SetDisplayBlanked(stored.IsEnabledDisplayBlanking);
+                            }
+                        }
+
+                        // GPU scaling
+                        if (stored.IsSupportedGPUScaling)
+                        {
+                            var current = display.GetGpuScalingState();
+                            if (current.supported && current.enabled != stored.IsEnabledGPUScaling)
+                            {
+                                display.SetGpuScaling(stored.IsEnabledGPUScaling);
+                            }
+                        }
+
+                        // Integer scaling
+                        if (stored.IsSupportedIntegerScaling)
+                        {
+                            var current = display.GetIntegerScalingState();
+                            if (current.supported && current.enabled != stored.IsEnabledIntegerScaling)
+                            {
+                                display.SetIntegerScaling(stored.IsEnabledIntegerScaling);
+                            }
+                        }
+
+                        // Pixel format
+                        if (stored.IsSupportedPixelFormat)
+                        {
+                            var current = display.GetPixelFormatState();
+                            if (current.supported && current.current != stored.CurrentPixelFormat)
+                            {
+                                display.SetPixelFormat(stored.CurrentPixelFormat);
+                            }
+                        }
+
+                        // Scaling mode
+                        if (stored.IsSupportedScalingMode)
+                        {
+                            var current = display.GetScalingMode();
+                            if (current.supported && current.mode != stored.CurrentScalingMode)
+                            {
+                                display.SetScalingMode(stored.CurrentScalingMode);
+                            }
+                        }
+
+                        // Virtual Super Resolution
+                        if (stored.IsSupportedVSR)
+                        {
+                            var current = display.GetVirtualSuperResolutionState();
+                            if (current.supported && current.enabled != stored.IsEnabledVSR)
+                            {
+                                display.SetVirtualSuperResolution(stored.IsEnabledVSR);
+                            }
+                        }
+
+                        // HDCP
+                        if (stored.IsSupportedHDCP)
+                        {
+                            var current = display.GetHdcpState();
+                            if (current.supported && current.enabled != stored.IsEnabledHDCP)
+                            {
+                                display.SetHdcp(stored.IsEnabledHDCP);
+                            }
+                        }
+
+                        // VariBright
+                        if (stored.IsSupportedVariBright)
+                        {
+                            var current = display.GetVariBrightState();
+                            if (current.supported && (current.enabled != stored.IsEnabledVariBright || current.mode != stored.VariBrightMode))
+                            {
+                                display.SetVariBright(stored.IsEnabledVariBright, stored.VariBrightMode);
+                            }
+                        }
+
+                        // Custom resolutions (not applied here; API wiring still pending)
+
+                        // Optional delay between displays if requested
+                        if (delayInMs > 0)
+                        {
+                            Thread.Sleep(delayInMs);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"AMDLibrary/SetActiveConfigOverride: Error applying settings for display {display.UniqueId}");
+                        return false;
+                    }
+                }
             }
             else
             {
