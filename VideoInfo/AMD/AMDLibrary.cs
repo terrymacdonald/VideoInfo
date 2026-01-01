@@ -941,6 +941,296 @@ namespace DisplayMagicianShared.AMD
         public override int GetHashCode() => (IsWhitePointSupported, IsGamutSupported, IsCurrent5000K, IsCurrent6500K, IsCurrent7500K, IsCurrent9300K).GetHashCode();
     }
 
+    public struct AMD_REGAMMA_COEFFICIENT : IEquatable<AMD_REGAMMA_COEFFICIENT>
+    {
+        public int coefficientA0;
+        public int coefficientA1;
+        public int coefficientA2;
+        public int coefficientA3;
+        public int gamma;
+
+        public AMD_REGAMMA_COEFFICIENT()
+        {
+            coefficientA0 = 0;
+            coefficientA1 = 0;
+            coefficientA2 = 0;
+            coefficientA3 = 0;
+            gamma = 0;
+        }
+
+        public AMD_REGAMMA_COEFFICIENT(int a0, int a1, int a2, int a3, int gammaValue)
+        {
+            coefficientA0 = a0;
+            coefficientA1 = a1;
+            coefficientA2 = a2;
+            coefficientA3 = a3;
+            gamma = gammaValue;
+        }
+
+        public AMD_REGAMMA_COEFFICIENT(ADLX_RegammaCoeff regammaCoeff)
+        {
+            coefficientA0 = regammaCoeff.coefficientA0;
+            coefficientA1 = regammaCoeff.coefficientA1;
+            coefficientA2 = regammaCoeff.coefficientA2;
+            coefficientA3 = regammaCoeff.coefficientA3;
+            gamma = regammaCoeff.gamma;
+        }
+
+        public ADLX_RegammaCoeff ToRegammaCoeff()
+        {
+            return new ADLX_RegammaCoeff
+            {
+                coefficientA0 = coefficientA0,
+                coefficientA1 = coefficientA1,
+                coefficientA2 = coefficientA2,
+                coefficientA3 = coefficientA3,
+                gamma = gamma
+            };
+        }
+
+        public override bool Equals(object obj) => obj is AMD_REGAMMA_COEFFICIENT other && this.Equals(other);
+        public bool Equals(AMD_REGAMMA_COEFFICIENT other)
+        {
+            if (coefficientA0 != other.coefficientA0)
+            {
+                SharedLogger.logger.Trace($"AMD_REGAMMA_COEFFICIENT/Equals: The coefficientA0 values don't equal each other");
+                return false;
+            }   
+            if (coefficientA1 != other.coefficientA1)
+            {
+                SharedLogger.logger.Trace($"AMD_REGAMMA_COEFFICIENT/Equals: The coefficientA1 values don't equal each other");
+                return false;
+            }
+            if (coefficientA2 != other.coefficientA2)
+            {
+                SharedLogger.logger.Trace($"AMD_REGAMMA_COEFFICIENT/Equals: The coefficientA2 values don't equal each other");
+                return false;
+            }
+            if (coefficientA3 != other.coefficientA3)
+            {
+                SharedLogger.logger.Trace($"AMD_REGAMMA_COEFFICIENT/Equals: The coefficientA3 values don't equal each other");
+                return false;
+            }
+            if (gamma != other.gamma)
+            {
+                SharedLogger.logger.Trace($"AMD_REGAMMA_COEFFICIENT/Equals: The gamma values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+
+        public override int GetHashCode() => (coefficientA0, coefficientA1, coefficientA2, coefficientA3, gamma).GetHashCode();
+    }
+
+    public struct AMD_GAMMA_RAMP : IEquatable<AMD_GAMMA_RAMP>
+    {
+        public List<ushort> Gamma { get; init; }        
+        public AMD_GAMMA_RAMP()
+        {
+            Gamma = new List<ushort>();
+        }
+
+        public AMD_GAMMA_RAMP(List<ushort> gammaValues)
+        {
+            Gamma = gammaValues;
+        }
+
+        public AMD_GAMMA_RAMP(ADLX_GammaRamp gammaRamp)
+        {
+            Gamma = new List<ushort>();
+            foreach(var gammaEntry in gammaRamp.gamma)
+            {
+                Gamma.Add(gammaEntry);
+            }            
+
+        }
+
+        public ADLX_GammaRamp ToGammaRamp()
+        {
+            ADLX_GammaRamp gammaRamp = new ADLX_GammaRamp();
+            for (int i = 0; i < Gamma.Count; i++)
+            {
+                gammaRamp.gamma[i] = Gamma[i];
+            }
+            return gammaRamp;
+        }
+
+        public override bool Equals(object obj) => obj is AMD_GAMMA_RAMP other && this.Equals(other);
+        public bool Equals(AMD_GAMMA_RAMP other)
+        {
+            if (Gamma.Count != other.Gamma.Count)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_RAMP/Equals: The gamma Count values don't equal each other");
+                return false;
+            }
+            for (int i = 0; i < Gamma.Count; i++)
+            {
+                if (Gamma[i] != other.Gamma[i])
+                {
+                    SharedLogger.logger.Trace($"AMD_GAMMA_RAMP/Equals: The gamma values at index {i} don't equal each other");
+                    return false;
+                }
+            }
+            return true;
+        }
+        public override int GetHashCode() => (Gamma).GetHashCode();
+    }
+
+    public struct AMD_GAMMA_INFO : IEquatable<AMD_GAMMA_INFO>
+    {
+        public bool IsSupported { get; init; }
+        public bool IsCurrentReGammaSRGB { get; init; }
+        public bool IsCurrentReGammaBT709 { get; init; }
+        public bool IsCurrentReGammaPQ { get; init; }
+        public bool IsCurrentReGammaPQ2084 { get; init; }
+        public bool IsCurrentReGamma36 { get; init; }
+        public bool HasRegammaCoefficient { get; init; }
+        public AMD_REGAMMA_COEFFICIENT RegammaCoefficient { get; init; }
+        public bool HasReGammaRamp { get; init; }
+        public AMD_GAMMA_RAMP ReGammaRamp { get; init; }
+        public bool HasDeGammaRamp { get; init; }
+        public AMD_GAMMA_RAMP DeGammaRamp { get; init; }
+
+        public AMD_GAMMA_INFO()
+        {
+            IsSupported = false;
+            IsCurrentReGammaSRGB = false;
+            IsCurrentReGammaBT709 = false;
+            IsCurrentReGammaPQ = false;
+            IsCurrentReGammaPQ2084 = false;
+            IsCurrentReGamma36 = false;
+            HasRegammaCoefficient = false;
+            RegammaCoefficient = new AMD_REGAMMA_COEFFICIENT();
+            HasReGammaRamp = false;
+            ReGammaRamp = new AMD_GAMMA_RAMP();
+            HasDeGammaRamp = false;
+            DeGammaRamp = new AMD_GAMMA_RAMP();
+        }
+
+        public AMD_GAMMA_INFO(bool isSupported, bool isCurrentReGammaSRGB, bool isCurrentReGammaBT709,
+                             bool isCurrentReGammaPQ, bool isCurrentReGammaPQ2084, bool isCurrentReGamma36,
+                             bool hasRegammaCoefficient, ADLX_RegammaCoeff regammaCoefficient,
+                             bool hasReGammaRamp, ADLX_GammaRamp reGammaRamp,
+                             bool hasDeGammaRamp, ADLX_GammaRamp deGammaRamp)
+        {
+            IsSupported = isSupported;
+            IsCurrentReGammaSRGB = isCurrentReGammaSRGB;
+            IsCurrentReGammaBT709 = isCurrentReGammaBT709;
+            IsCurrentReGammaPQ = isCurrentReGammaPQ;
+            IsCurrentReGammaPQ2084 = isCurrentReGammaPQ2084;
+            IsCurrentReGamma36 = isCurrentReGamma36;
+            HasRegammaCoefficient = hasRegammaCoefficient;
+            RegammaCoefficient = new AMD_REGAMMA_COEFFICIENT(regammaCoefficient);
+            HasReGammaRamp = hasReGammaRamp;
+            ReGammaRamp = new AMD_GAMMA_RAMP(reGammaRamp);
+            HasDeGammaRamp = hasDeGammaRamp;
+            DeGammaRamp = new AMD_GAMMA_RAMP(deGammaRamp);
+        }
+
+        public AMD_GAMMA_INFO(GammaInfo gammaInfo)
+        {
+            IsSupported = gammaInfo.IsSupported;
+            IsCurrentReGammaSRGB = gammaInfo.IsCurrentReGammaSRGB;
+            IsCurrentReGammaBT709 = gammaInfo.IsCurrentReGammaBT709;
+            IsCurrentReGammaPQ = gammaInfo.IsCurrentReGammaPQ;
+            IsCurrentReGammaPQ2084 = gammaInfo.IsCurrentReGammaPQ2084;
+            IsCurrentReGamma36 = gammaInfo.IsCurrentReGamma36;
+            HasRegammaCoefficient = gammaInfo.HasRegammaCoefficient;
+            RegammaCoefficient = new AMD_REGAMMA_COEFFICIENT(gammaInfo.RegammaCoefficient);
+            HasReGammaRamp = gammaInfo.HasReGammaRamp;
+            ReGammaRamp = new AMD_GAMMA_RAMP(gammaInfo.ReGammaRamp);
+            HasDeGammaRamp = gammaInfo.HasDeGammaRamp;
+            DeGammaRamp = new AMD_GAMMA_RAMP(gammaInfo.DeGammaRamp);
+        }
+
+        public GammaInfo ToGammaInfo()
+        {
+            return new GammaInfo
+            {
+                IsSupported = IsSupported,
+                IsCurrentReGammaSRGB = IsCurrentReGammaSRGB,
+                IsCurrentReGammaBT709 = IsCurrentReGammaBT709,
+                IsCurrentReGammaPQ = IsCurrentReGammaPQ,
+                IsCurrentReGammaPQ2084 = IsCurrentReGammaPQ2084,
+                IsCurrentReGamma36 = IsCurrentReGamma36,
+                HasRegammaCoefficient = HasRegammaCoefficient,
+                RegammaCoefficient = RegammaCoefficient.ToRegammaCoeff(),
+                HasReGammaRamp = HasReGammaRamp,
+                ReGammaRamp = ReGammaRamp.ToGammaRamp(),
+                HasDeGammaRamp = HasDeGammaRamp,
+                DeGammaRamp = DeGammaRamp.ToGammaRamp()
+            };
+        }
+
+        public override bool Equals(object obj) => obj is AMD_GAMMA_INFO other && this.Equals(other);
+        public bool Equals(AMD_GAMMA_INFO other)
+        {
+            if (IsSupported != other.IsSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The IsSupported values don't equal each other");
+                return false;
+            }
+            if (IsCurrentReGammaSRGB != other.IsCurrentReGammaSRGB)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The IsCurrentReGammaSRGB values don't equal each other");
+                return false;
+            }
+            if (IsCurrentReGammaBT709 != other.IsCurrentReGammaBT709)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The IsCurrentReGammaBT709 values don't equal each other");
+                return false;
+            }
+            if (IsCurrentReGammaPQ != other.IsCurrentReGammaPQ)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The IsCurrentReGammaPQ values don't equal each other");
+                return false;
+            }
+            if (IsCurrentReGammaPQ2084 != other.IsCurrentReGammaPQ2084)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The IsCurrentReGammaPQ2084 values don't equal each other");
+                return false;
+            }
+            if (IsCurrentReGamma36 != other.IsCurrentReGamma36)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The IsCurrentReGamma36 values don't equal each other");
+                return false;
+            }
+            if (HasRegammaCoefficient != other.HasRegammaCoefficient)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The HasRegammaCoefficient values don't equal each other");
+                return false;
+            }
+            if (!RegammaCoefficient.Equals(other.RegammaCoefficient))
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The RegammaCoefficient values don't equal each other");
+                return false;
+            }
+            if (HasReGammaRamp != other.HasReGammaRamp)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The HasReGammaRamp values don't equal each other");
+                return false;
+            }
+            if (!ReGammaRamp.Equals(other.ReGammaRamp))
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The ReGammaRamp values don't equal each other");
+                return false;
+            }
+            if (HasDeGammaRamp != other.HasDeGammaRamp)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The HasDeGammaRamp values don't equal each other");
+                return false;
+            }
+            if (!DeGammaRamp.Equals(other.DeGammaRamp))
+            {
+                SharedLogger.logger.Trace($"AMD_GAMMA_INFO/Equals: The DeGammaRamp values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        public override int GetHashCode() => (IsSupported, IsCurrentReGammaSRGB, IsCurrentReGammaBT709, IsCurrentReGammaPQ, IsCurrentReGammaPQ2084, 
+            IsCurrentReGamma36, HasRegammaCoefficient, RegammaCoefficient, HasReGammaRamp, ReGammaRamp, HasDeGammaRamp, DeGammaRamp).GetHashCode();
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DISPLAY_WITH_SETTINGS : IEquatable<AMD_DISPLAY_WITH_SETTINGS>
     {
@@ -976,8 +1266,8 @@ namespace DisplayMagicianShared.AMD
         public bool IsEnabledDynamicRefreshRateControl;
         public bool IsSupportedDisplayBlanking;
         public bool IsEnabledDisplayBlanking;
-        public bool IsSupportedGamma;
         public AMD_GAMUT_INFO GamutInfo;
+        public AMD_GAMMA_INFO GammaInfo;
         public bool IsSupportedGPUScaling;
         public bool IsEnabledGPUScaling;
         public bool IsSupportedIntegerScaling;
@@ -1143,11 +1433,6 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomColorTemperature values don't equal each other");
                 return false;
             }
-            if (IsSupportedGamma != other.IsSupportedGamma)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedGamma values don't equal each other");
-                return false;
-            }
             if (IsSupportedFreeSync != other.IsSupportedFreeSync)
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedFreeSync values don't equal each other");
@@ -1253,7 +1538,16 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ThreeDLUTSettings values don't equal each other");
                 return false;
             }
-
+            if (!GamutInfo.Equals(other.GamutInfo))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutInfo values don't equal each other");
+                return false;
+            }
+            if (!GammaInfo.Equals(other.GammaInfo))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaInfo values don't equal each other");
+                return false;
+            }
             return true;
         }
 
@@ -1263,9 +1557,10 @@ namespace DisplayMagicianShared.AMD
             return (ConnectorType, Type, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID,
                 IsSupportedColorDepth, ColorDepth, IsSupportedCustomColorBrightness, CustomColorBrightness, IsSupportedCustomColorHue, CustomColorHue,
                 IsSupportedCustomColorSaturation, CustomColorSaturation, IsSupportedCustomColorContrast, CustomColorContrast, IsSupportedCustomColorTemperature,
-                CustomColorTemperature, IsSupportedGamma, IsSupportedFreeSync, IsEnabledFreeSync, IsSupportedGPUScaling, IsEnabledGPUScaling,
+                CustomColorTemperature, IsSupportedFreeSync, IsEnabledFreeSync, IsSupportedGPUScaling, IsEnabledGPUScaling,
                 IsSupportedIntegerScaling, IsEnabledIntegerScaling, IsSupportedPixelFormat, CurrentPixelFormat, IsSupportedScalingMode, CurrentScalingMode,
-                IsSupportedVSR, IsEnabledVSR, IsSupportedCustomResolution, IsCustomResolutionApplied, CustomResWidth, CustomResHeight, CustomResRefreshRate
+                IsSupportedVSR, IsEnabledVSR, IsSupportedCustomResolution, IsCustomResolutionApplied, CustomResWidth, CustomResHeight, CustomResRefreshRate,
+                CustomResTimingStandard, ConnectivityExperience, ThreeDLUTSettings, GamutInfo, GammaInfo, CustomResolutions
             ).GetHashCode();
         }
         public static bool operator ==(AMD_DISPLAY_WITH_SETTINGS lhs, AMD_DISPLAY_WITH_SETTINGS rhs) => lhs.Equals(rhs);
