@@ -704,6 +704,243 @@ namespace DisplayMagicianShared.AMD
         IsRelativePreEmphasisSupported, RelativePreEmphasis, IsRelativeVoltageSwingSupported, RelativeVoltageSwing).GetHashCode();
     }
 
+    public struct AMD_GAMUT_COLOR_SPACE : IEquatable<AMD_GAMUT_COLOR_SPACE>
+    {
+        public int RedX { get; init; }
+        public int RedY { get; init; }
+        public int GreenX { get; init; }
+        public int GreenY { get; init; }
+        public int BlueX { get; init; }
+        public int BlueY { get; init; }
+
+        public AMD_GAMUT_COLOR_SPACE()
+        {
+            RedX = 0;
+            RedY = 0;
+            GreenX = 0;
+            GreenY = 0;
+            BlueX = 0;
+            BlueY = 0;
+        }
+
+        public AMD_GAMUT_COLOR_SPACE(int redX, int redY, int greenX, int greenY, int blueX, int blueY)
+        {
+            RedX = redX;
+            RedY = redY;
+            GreenX = greenX;
+            GreenY = greenY;
+            BlueX = blueX;
+            BlueY = blueY;
+        }
+
+        public AMD_GAMUT_COLOR_SPACE(ADLX_GamutColorSpace gamutColorSpace)
+        {
+            RedX = gamutColorSpace.red.x;
+            RedY = gamutColorSpace.red.y;
+            GreenX = gamutColorSpace.green.x;
+            GreenY = gamutColorSpace.green.y;
+            BlueX = gamutColorSpace.blue.x;
+            BlueY = gamutColorSpace.blue.y;
+        }
+
+        public ADLX_GamutColorSpace ToGamutColorSpace()
+        {
+            return new ADLX_GamutColorSpace
+            {
+                red = new ADLX_Point { x = RedX, y = RedY },
+                green = new ADLX_Point { x = GreenX, y = GreenY },
+                blue = new ADLX_Point { x = BlueX, y = BlueY }
+            };
+        }
+
+        public override bool Equals(object obj) => obj is AMD_GAMUT_COLOR_SPACE other && this.Equals(other);
+        public bool Equals(AMD_GAMUT_COLOR_SPACE other)
+        {
+            if (RedX != other.RedX)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_COLOR_SPACE/Equals: The RedX values don't equal each other");
+                return false;
+            }
+            if (RedY != other.RedY)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_COLOR_SPACE/Equals: The RedY values don't equal each other");
+                return false;
+            }
+            if (GreenX != other.GreenX)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_COLOR_SPACE/Equals: The GreenX values don't equal each other");
+                return false;
+            }
+            if (GreenY != other.GreenY)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_COLOR_SPACE/Equals: The GreenY values don't equal each other");
+                return false;
+            }
+            if (BlueX != other.BlueX)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_COLOR_SPACE/Equals: The BlueX values don't equal each other");
+                return false;
+            }
+            if (BlueY != other.BlueY)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_COLOR_SPACE/Equals: The BlueY values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        public override int GetHashCode() => (RedX, RedY, GreenX, GreenY, BlueX, BlueY).GetHashCode();
+    }
+
+    public struct AMD_GAMUT_INFO : IEquatable<AMD_GAMUT_INFO>
+    {
+        public bool IsWhitePointSupported { get; init; }
+        public bool IsGamutSupported { get; init; }
+        public bool IsCurrent5000K { get; init; }
+        public bool IsCurrent6500K { get; init; }
+        public bool IsCurrent7500K { get; init; }
+        public bool IsCurrent9300K { get; init; }
+        public bool IsCurrentCustomWhitePoint { get; init; }
+        public bool IsCurrent709 { get; init; }
+        public bool IsCurrent601 { get; init; }
+        public bool IsCurrentAdobe { get; init; }
+        public bool IsCurrentCieRgb { get; init; }
+        public bool IsCurrent2020 { get; init; }
+        public bool IsCurrentCustomColorSpace { get; init; }
+        public AMD_GAMUT_COLOR_SPACE CurrentGamutSpace { get; init; }
+        public int WhitePointX { get; init; }
+        public int WhitePointY { get; init; }
+        public bool HasWhitePoint { get; init; }
+
+        public AMD_GAMUT_INFO()
+        {
+            IsWhitePointSupported = false;
+            IsGamutSupported = false;
+            IsCurrent5000K = false;
+            IsCurrent6500K = false;
+            IsCurrent7500K = false;
+            IsCurrent9300K = false;
+            IsCurrentCustomWhitePoint = false;
+            IsCurrent709 = false;
+            IsCurrent601 = false;
+            IsCurrentAdobe = false;
+            IsCurrentCieRgb = false;
+            IsCurrent2020 = false;
+            IsCurrentCustomColorSpace = false;
+            CurrentGamutSpace = new AMD_GAMUT_COLOR_SPACE();
+            WhitePointX = 0;
+            WhitePointY = 0;
+            HasWhitePoint = false;
+        }
+
+        public AMD_GAMUT_INFO(bool isWhitePointSupported, bool isGamutSupported,
+                             bool isCurrent5000K, bool isCurrent6500K, bool isCurrent7500K, bool isCurrent9300K,
+                             bool isCurrentCustomWhitePoint, bool isCurrent709, bool isCurrent601,
+                             bool isCurrentAdobe, bool isCurrentCieRgb, bool isCurrent2020,
+                             bool isCurrentCustomColorSpace, ADLX_GamutColorSpace currentGamutSpace,
+                             ADLX_Point whitePoint,  bool hasWhitePoint)
+        {
+            IsWhitePointSupported = isWhitePointSupported;
+            IsGamutSupported = isGamutSupported;
+            IsCurrent5000K = isCurrent5000K;
+            IsCurrent6500K = isCurrent6500K;
+            IsCurrent7500K = isCurrent7500K;
+            IsCurrent9300K = isCurrent9300K;
+            IsCurrentCustomWhitePoint = isCurrentCustomWhitePoint;
+            IsCurrent709 = isCurrent709;
+            IsCurrent601 = isCurrent601;
+            IsCurrentAdobe = isCurrentAdobe;
+            IsCurrentCieRgb = isCurrentCieRgb;
+            IsCurrent2020 = isCurrent2020;
+            IsCurrentCustomColorSpace = isCurrentCustomColorSpace;
+            CurrentGamutSpace = new AMD_GAMUT_COLOR_SPACE(currentGamutSpace);
+            WhitePointX = whitePoint.x;
+            WhitePointY = whitePoint.y;
+            HasWhitePoint = hasWhitePoint;
+        }
+
+        public AMD_GAMUT_INFO(GamutInfo gamutInfo)
+        {
+            IsWhitePointSupported = gamutInfo.IsWhitePointSupported;
+            IsGamutSupported = gamutInfo.IsGamutSupported;
+            IsCurrent5000K = gamutInfo.IsCurrent5000K;
+            IsCurrent6500K = gamutInfo.IsCurrent6500K;
+            IsCurrent7500K = gamutInfo.IsCurrent7500K;
+            IsCurrent9300K = gamutInfo.IsCurrent9300K;
+            IsCurrentCustomWhitePoint = gamutInfo.IsCurrentCustomWhitePoint;
+            IsCurrent709 = gamutInfo.IsCurrent709;
+            IsCurrent601 = gamutInfo.IsCurrent601;
+            IsCurrentAdobe = gamutInfo.IsCurrentAdobe;
+            IsCurrentCieRgb = gamutInfo.IsCurrentCieRgb;
+            IsCurrent2020 = gamutInfo.IsCurrent2020;
+            IsCurrentCustomColorSpace = gamutInfo.IsCurrentCustomColorSpace;
+            CurrentGamutSpace = new AMD_GAMUT_COLOR_SPACE(gamutInfo.CurrentGamutSpace);
+            WhitePointX = gamutInfo.WhitePoint.x;
+            WhitePointY = gamutInfo.WhitePoint.y;
+            HasWhitePoint = gamutInfo.HasWhitePoint;
+        }
+
+        public GamutInfo ToGamutInfo()
+        {
+            return new GamutInfo
+            {
+                IsWhitePointSupported = IsWhitePointSupported,
+                IsGamutSupported = IsGamutSupported,
+                IsCurrent5000K = IsCurrent5000K,
+                IsCurrent6500K = IsCurrent6500K,
+                IsCurrent7500K = IsCurrent7500K,
+                IsCurrent9300K = IsCurrent9300K,
+                IsCurrentCustomWhitePoint = IsCurrentCustomWhitePoint,
+                IsCurrent709 = IsCurrent709,
+                IsCurrent601 = IsCurrent601,
+                IsCurrentAdobe = IsCurrentAdobe,
+                IsCurrentCieRgb = IsCurrentCieRgb,
+                IsCurrent2020 = IsCurrent2020,
+                IsCurrentCustomColorSpace = IsCurrentCustomColorSpace,
+                CurrentGamutSpace = CurrentGamutSpace.ToGamutColorSpace(),
+                WhitePoint = new ADLX_Point { x = WhitePointX, y = WhitePointY },
+                HasWhitePoint = HasWhitePoint
+            };
+        }
+
+        public override bool Equals(object obj) => obj is AMD_GAMUT_INFO other && this.Equals(other);
+        public bool Equals(AMD_GAMUT_INFO other)
+        {
+            if (IsWhitePointSupported != other.IsWhitePointSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_INFO/Equals: The IsWhitePointSupported values don't equal each other");
+                return false;
+            }
+            if (IsGamutSupported != other.IsGamutSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_INFO/Equals: The IsGamutSupported values don't equal each other");
+                return false;
+            }
+            if (IsCurrent5000K != other.IsCurrent5000K)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_INFO/Equals: The IsCurrent5000K values don't equal each other");
+                return false;
+            }
+            if (IsCurrent6500K != other.IsCurrent6500K)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_INFO/Equals: The IsCurrent6500K values don't equal each other");
+                return false;
+            }
+            if (IsCurrent7500K != other.IsCurrent7500K)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_INFO/Equals: The IsCurrent7500K values don't equal each other");
+                return false;
+            }
+            if (IsCurrent9300K != other.IsCurrent9300K)
+            {
+                SharedLogger.logger.Trace($"AMD_GAMUT_INFO/Equals: The IsCurrent9300K values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+
+        public override int GetHashCode() => (IsWhitePointSupported, IsGamutSupported, IsCurrent5000K, IsCurrent6500K, IsCurrent7500K, IsCurrent9300K).GetHashCode();
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DISPLAY_WITH_SETTINGS : IEquatable<AMD_DISPLAY_WITH_SETTINGS>
     {
@@ -731,15 +968,6 @@ namespace DisplayMagicianShared.AMD
         public int CustomColorContrast;
         public bool IsSupportedCustomColorTemperature;
         public int CustomColorTemperature;
-        public bool IsSupportedGamma = false; // Force this to be false until we can add the functionality
-        public int GammaCoefficientGamma;
-        public int GammaCoefficientA0;
-        public int GammaCoefficientA1;
-        public int GammaCoefficientA2;
-        public int GammaCoefficientA3;
-        public List<double> GammaRampRed; // done for testing
-        public List<double> GammaRampGreen; // done for testing
-        public List<double> GammaRampBlue; // done for testing
         public bool IsSupportedFreeSync;
         public bool IsEnabledFreeSync;        
         public bool IsSupportedFreeSyncColorAccuracy;
@@ -748,14 +976,8 @@ namespace DisplayMagicianShared.AMD
         public bool IsEnabledDynamicRefreshRateControl;
         public bool IsSupportedDisplayBlanking;
         public bool IsEnabledDisplayBlanking;
-        public int GamutColorSpaceRedX;
-        public int GamutColorSpaceRedY;
-        public int GamutColorSpaceGreenX;
-        public int GamutColorSpaceGreenY;
-        public int GamutColorSpaceBlueX;
-        public int GamutColorSpaceBlueY;
-        public int GamutWhitePointX;
-        public int GamutWhitePointY;
+        public bool IsSupportedGamma;
+        public AMD_GAMUT_INFO GamutInfo;
         public bool IsSupportedGPUScaling;
         public bool IsEnabledGPUScaling;
         public bool IsSupportedIntegerScaling;
@@ -797,10 +1019,10 @@ namespace DisplayMagicianShared.AMD
             ColorDepth = ADLX_COLOR_DEPTH.BPC_UNKNOWN;
             CurrentPixelFormat = ADLX_PIXEL_FORMAT.FORMAT_UNKNOWN;
             CurrentScalingMode = ADLX_SCALE_MODE.PRESERVE_ASPECT_RATIO;
-            GammaRampRed = new List<double>();
-            GammaRampGreen = new List<double>();
-            GammaRampBlue = new List<double>();
             CustomResolutions = new List<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO>();
+            ThreeDLUTSettings = new AMD_3DLUT_INFO();
+            GamutInfo = new AMD_GAMUT_INFO();
+            VariBrightMode = VariBrightMode.Unknown;
         }
 
         public override bool Equals(object obj) => obj is AMD_DISPLAY_WITH_SETTINGS other && this.Equals(other);
@@ -926,46 +1148,6 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedGamma values don't equal each other");
                 return false;
             }
-            if (GammaCoefficientGamma != other.GammaCoefficientGamma)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaCoefficientGamma values don't equal each other");
-                return false;
-            }
-            if (GammaCoefficientA0 != other.GammaCoefficientA0)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaCoefficientA0 values don't equal each other");
-                return false;
-            }
-            if (GammaCoefficientA1 != other.GammaCoefficientA1)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaCoefficientA1 values don't equal each other");
-                return false;
-            }
-            if (GammaCoefficientA2 != other.GammaCoefficientA2)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaCoefficientA2 values don't equal each other");
-                return false;
-            }
-            if (GammaCoefficientA3 != other.GammaCoefficientA3)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaCoefficientA3 values don't equal each other");
-                return false;
-            }
-            if (!GammaRampRed.SequenceEqual(other.GammaRampRed))
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaRampRed values don't equal each other");
-                return false;
-            }
-            if (!GammaRampGreen.SequenceEqual(other.GammaRampGreen))
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaRampGreen values don't equal each other");
-                return false;
-            }
-            if (!GammaRampBlue.SequenceEqual(other.GammaRampBlue))
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GammaRampBlue values don't equal each other");
-                return false;
-            }
             if (IsSupportedFreeSync != other.IsSupportedFreeSync)
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedFreeSync values don't equal each other");
@@ -974,46 +1156,6 @@ namespace DisplayMagicianShared.AMD
             if (IsEnabledFreeSync != other.IsEnabledFreeSync)
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsEnabledFreeSync values don't equal each other");
-                return false;
-            }
-            if (GamutColorSpaceRedX != other.GamutColorSpaceRedX)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutColorSpaceRedX values don't equal each other");
-                return false;
-            }
-            if (GamutColorSpaceRedY != other.GamutColorSpaceRedY)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutColorSpaceRedY values don't equal each other");
-                return false;
-            }
-            if (GamutColorSpaceGreenX != other.GamutColorSpaceGreenX)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutColorSpaceGreenX values don't equal each other");
-                return false;
-            }
-            if (GamutColorSpaceGreenY != other.GamutColorSpaceGreenY)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutColorSpaceGreenY values don't equal each other");
-                return false;
-            }
-            if (GamutColorSpaceBlueX != other.GamutColorSpaceBlueX)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutColorSpaceBlueX values don't equal each other");
-                return false;
-            }
-            if (GamutColorSpaceBlueY != other.GamutColorSpaceBlueY)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutColorSpaceBlueY values don't equal each other");
-                return false;
-            }
-            if (GamutWhitePointX != other.GamutWhitePointX)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutWhitePointX values don't equal each other");
-                return false;
-            }
-            if (GamutWhitePointY != other.GamutWhitePointY)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The GamutWhitePointY values don't equal each other");
                 return false;
             }
             if (IsSupportedGPUScaling != other.IsSupportedGPUScaling)
@@ -1121,9 +1263,7 @@ namespace DisplayMagicianShared.AMD
             return (ConnectorType, Type, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID,
                 IsSupportedColorDepth, ColorDepth, IsSupportedCustomColorBrightness, CustomColorBrightness, IsSupportedCustomColorHue, CustomColorHue,
                 IsSupportedCustomColorSaturation, CustomColorSaturation, IsSupportedCustomColorContrast, CustomColorContrast, IsSupportedCustomColorTemperature,
-                CustomColorTemperature, IsSupportedGamma, GammaCoefficientGamma, GammaCoefficientA0, GammaCoefficientA1, GammaCoefficientA2, GammaCoefficientA3,
-                GammaRampRed, GammaRampGreen, GammaRampBlue, IsSupportedFreeSync, IsEnabledFreeSync, GamutColorSpaceRedX, GamutColorSpaceRedY, GamutColorSpaceGreenX, GamutColorSpaceGreenY,
-                GamutColorSpaceBlueX, GamutColorSpaceBlueY, GamutWhitePointX, GamutWhitePointY, IsSupportedGPUScaling, IsEnabledGPUScaling,
+                CustomColorTemperature, IsSupportedGamma, IsSupportedFreeSync, IsEnabledFreeSync, IsSupportedGPUScaling, IsEnabledGPUScaling,
                 IsSupportedIntegerScaling, IsEnabledIntegerScaling, IsSupportedPixelFormat, CurrentPixelFormat, IsSupportedScalingMode, CurrentScalingMode,
                 IsSupportedVSR, IsEnabledVSR, IsSupportedCustomResolution, IsCustomResolutionApplied, CustomResWidth, CustomResHeight, CustomResRefreshRate
             ).GetHashCode();
