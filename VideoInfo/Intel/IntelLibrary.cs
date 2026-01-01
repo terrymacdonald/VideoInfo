@@ -443,7 +443,7 @@ namespace DisplayMagicianShared.Intel
                 //ctl_Init_Args.Size = (uint)Marshal.SizeOf(typeof(ctl_init_args_t)); // or the alias type
                 //ctl_Init_Args.Version = (byte)1.1;  // or 0 if header says so
                 //ctl_Init_Args.flags = (uint)ctl_init_flag_t.CTL_INIT_FLAG_USE_LEVEL_ZERO; // or 0 if no special flags
-                // If there’s an ApplicationUID field:
+                // If thereï¿½s an ApplicationUID field:
                 //ctl_Init_Args.ApplicationUID = new ctl_application_id_t();
                 // zero it out if necessary
                 // Initialize IGCL with default settings
@@ -1007,8 +1007,6 @@ namespace DisplayMagicianShared.Intel
             }
 
             stringToReturn += $"\n\n";
-            // Now we also get the Windows CCD Library info, and add it to the above
-            stringToReturn += WinLibrary.GetLibrary().PrintActiveConfig();
 
             return stringToReturn;
         }

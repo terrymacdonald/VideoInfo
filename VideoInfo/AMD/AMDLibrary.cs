@@ -3043,6 +3043,7 @@ namespace DisplayMagicianShared.AMD
             }
 
             sb.AppendLine();
+            sb.AppendLine();
 
             return sb.ToString();
         }

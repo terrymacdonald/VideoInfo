@@ -1904,8 +1904,6 @@ namespace DisplayMagicianShared.NVIDIA
             //stringToReturn += DumpAllDRSSettings();
 
             stringToReturn += $"\n\n";
-            // Now we also get the Windows CCD Library info, and add it to the above
-            stringToReturn += WinLibrary.GetLibrary().PrintActiveConfig();
 
             return stringToReturn;
         }
