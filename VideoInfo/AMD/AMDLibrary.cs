@@ -2966,8 +2966,8 @@ namespace DisplayMagicianShared.AMD
 
                 // Custom color
                 var cc = display.CustomColorInfo;
-                sb.AppendLine($"CustomColor Supported:{cc.IsSupported} 
-                sb.AppendLine($"Hue({cc.IsHueSupported}:{cc.Hue}) 
+                sb.AppendLine($"CustomColor Supported:{cc.IsSupported} ");
+                sb.AppendLine($"Hue({cc.IsHueSupported}:{cc.Hue}) ");
                 sb.AppendLine($"Sat({cc.IsSaturationSupported}:{cc.Saturation}) ");
                 sb.AppendLine($"Bright({cc.IsBrightnessSupported}:{cc.Brightness}) ");
                 sb.AppendLine($"Contrast({cc.IsContrastSupported}:{cc.Contrast}) ");
@@ -2998,12 +2998,12 @@ namespace DisplayMagicianShared.AMD
 
                 // 3DLUT
                 var lut = display.ThreeDLUTSettings;
-                sb.AppendLine($"3DLUT SupportedSCE:{lut.IsSupportedSCE} 
-                sb.AppendLine($"Vivid:{lut.IsSupportedSCEVividGaming} ");
+                sb.AppendLine($"3DLUT SupportedSCE:{lut.IsSupportedSCE} ");
+                sb.AppendLine($"Vivid:{lut.IsSupportedSCEVividGaming} ");                
                 sb.AppendLine($"DynContrast:{lut.IsSupportedSCEDynamicContrast} ");
                 sb.AppendLine($"User3DLUT:{lut.IsSupportedUser3DLUT} ");
                 sb.AppendLine($"CurrentDisabled:{lut.IsCurrentSCEDisabled} ");
-                sb.AppendLine($"CurrentVivid:{lut.IsCurrentSCEVividGaming} 
+                sb.AppendLine($"CurrentVivid:{lut.IsCurrentSCEVividGaming} ");
                 sb.AppendLine($"DynContrastEnabled:{lut.HasDynamicContrast} DynContrastValue:{lut.CurrentDynamicContrastValue} Range({lut.DynamicContrastRange.Min},{lut.DynamicContrastRange.Max},{lut.DynamicContrastRange.Step})");
 
                 // Feature toggles
