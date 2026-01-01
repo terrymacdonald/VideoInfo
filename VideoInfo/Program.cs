@@ -305,6 +305,9 @@ namespace VideoInfo
                 {
                     SharedLogger.logger.Debug($"VideoInfo/Main: printing display info as print command was provided");
                     Console.WriteLine(nvidiaLibrary.PrintActiveConfig());                    
+                    Console.WriteLine(amdLibrary.PrintActiveConfig());   
+                    Console.WriteLine(intelLibrary.PrintActiveConfig());   
+                    Console.WriteLine(winLibrary.PrintActiveConfig());   
                 }
 
                 else if (args[0] == "help" || args[0] == "--help" || args[0] == "-h" || args[0] == "/?" || args[0] == "-?")

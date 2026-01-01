@@ -2907,380 +2907,118 @@ namespace DisplayMagicianShared.AMD
         }
 
 
-        public string PrintActiveConfig()
+               public string PrintActiveConfig()
         {
-            string stringToReturn = "";
-
-            // Get the current config
-            AMD_DISPLAY_CONFIG displayConfig = ActiveDisplayConfig;
-
-            stringToReturn += $"****** AMD VIDEO CARDS *******\n";
-
-
-            /*if (_initialised)
+            if (!_initialised)
             {
-                // Get the number of AMD adapters that the OS knows about
-                int numAdapters = 0;
-                ADL_STATUS ADLRet = ADLImport.ADL2_Adapter_NumberOfAdapters_Get(_adlContextHandle, out numAdapters);
-                if (ADLRet == ADL_STATUS.ADL_OK)
+                SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - Tried to run PrintActiveConfig but the AMD ADLX library isn't initialised!");
+                throw new AMDLibraryException($"Tried to run PrintActiveConfig but the AMD ADLX library isn't initialised!");
+            }
+
+            AMD_DISPLAY_CONFIG displayConfig = ActiveDisplayConfig;
+            var sb = new StringBuilder();
+
+            sb.AppendLine("****** AMD VIDEO CARDS *******");
+
+            // GPUs
+            try
+            {
+                var gpus = _adlxSystem.EnumerateADLXGPUs();
+                foreach (var gpu in gpus)
                 {
-                    SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Adapter_NumberOfAdapters_Get returned the number of AMD Adapters the OS knows about ({numAdapters}).");
+                    var id = gpu.Identity;
+                    sb.AppendLine($"Adapter UniqueId: {id.UniqueId}");
+                    sb.AppendLine($"Name: {id.Name}");
+                    sb.AppendLine($"VendorId: {id.VendorId}");
+                    sb.AppendLine($"ProductName: {id.ProductName}");
+                    sb.AppendLine($"GPU Type: {id.GPUType}");
+                    sb.AppendLine($"Asic Family: {id.AsicFamilyType}");
+                    sb.AppendLine($"VRAM: {id.TotalVRAM} ({id.VRAMType})");
+                    sb.AppendLine($"PCI Bus: {id.PciBusType} LaneWidth: {id.PciBusLaneWidth}");
+                    sb.AppendLine($"External: {id.IsExternal} HasDesktops: {id.HasDesktops}");
+                    sb.AppendLine($"Driver: {id.DriverVersion} AMDSoftware: {id.AMDSoftwareVersion} WindowsDriver: {id.AMDWindowsDriverVersion}");
+                    sb.AppendLine($"DeviceId: {id.DeviceId} SubSystem: {id.SubSystemId} SubVendor: {id.SubSystemVendorId} Revision: {id.RevisionId}");
+                    sb.AppendLine($"PNP: {id.PNPString}");
+                    sb.AppendLine();
                 }
-                else
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Warn(ex, "AMDLibrary/PrintActiveConfig: Failed to enumerate GPUs via ADLX");
+            }
+
+            // Displays from the active display config
+            sb.AppendLine("****** AMD DISPLAYS *******");
+            foreach (var kvp in displayConfig.Displays)
+            {
+                var display = kvp.Value;
+                sb.AppendLine($"Display UniqueId: {display.UniqueID}");
+                sb.AppendLine($"Name: {display.Name}");
+                sb.AppendLine($"GPU UniqueId: {display.GpuUniqueID}");
+                sb.AppendLine($"Type: {display.Type} Connector: {display.ConnectorType}");
+                sb.AppendLine($"Native: {display.NativeResolutionWidth}x{display.NativeResolutionHeight} @ {display.RefreshRate}Hz PixelClock: {display.PixelClock}");
+                sb.AppendLine($"ScanType: {display.ScanType}");
+                sb.AppendLine($"ColorDepth: {(display.IsSupportedColorDepth ? display.ColorDepth.ToString() : "Unsupported")}");
+
+                // Custom color
+                var cc = display.CustomColorInfo;
+                sb.AppendLine($"CustomColor Supported:{cc.IsSupported} Hue({cc.IsHueSupported}:{cc.Hue}) Sat({cc.IsSaturationSupported}:{cc.Saturation}) Bright({cc.IsBrightnessSupported}:{cc.Brightness}) Contrast({cc.IsContrastSupported}:{cc.Contrast}) Temp({cc.IsTemperatureSupported}:{cc.Temperature})");
+
+                // Gamma/Gamut
+                var gamma = display.GammaInfo;
+                sb.AppendLine($"Gamma Supported:{gamma.IsSupported} Modes: SRGB={gamma.IsCurrentReGammaSRGB} BT709={gamma.IsCurrentReGammaBT709} PQ={gamma.IsCurrentReGammaPQ} PQ2084={gamma.IsCurrentReGammaPQ2084} ReGamma36={gamma.IsCurrentReGamma36} RegammaCoeff={gamma.HasRegammaCoefficient} ReRamp={gamma.HasReGammaRamp} DeRamp={gamma.HasDeGammaRamp}");
+                var gamut = display.GamutInfo;
+                sb.AppendLine($"Gamut Supported:{gamut.IsGamutSupported} WhitePointSupported:{gamut.IsWhitePointSupported} Current: 5000K={gamut.IsCurrent5000K} 6500K={gamut.IsCurrent6500K} 7500K={gamut.IsCurrent7500K} 9300K={gamut.IsCurrent9300K} CustomWP={gamut.IsCurrentCustomWhitePoint} 709={gamut.IsCurrent709} 601={gamut.IsCurrent601} Adobe={gamut.IsCurrentAdobe} CIERgb={gamut.IsCurrentCieRgb} 2020={gamut.IsCurrent2020} CustomSpace={gamut.IsCurrentCustomColorSpace} WP=({gamut.WhitePointX},{gamut.WhitePointY})");
+
+                // Connectivity
+                var conn = display.ConnectivityExperience;
+                sb.AppendLine($"Connectivity: HDMIQuality(supported={conn.IsHdmiQualityDetectionSupported},enabled={conn.IsHdmiQualityDetectionEnabled}) DPLink(supported={conn.IsDpLinkRateSupported},rate={conn.DpLinkRate}) PreEmphasis(supported={conn.IsRelativePreEmphasisSupported},value={conn.RelativePreEmphasis}) VoltageSwing(supported={conn.IsRelativeVoltageSwingSupported},value={conn.RelativeVoltageSwing})");
+
+                // 3DLUT
+                var lut = display.ThreeDLUTSettings;
+                sb.AppendLine($"3DLUT SupportedSCE:{lut.IsSupportedSCE} Vivid:{lut.IsSupportedSCEVividGaming} DynContrast:{lut.IsSupportedSCEDynamicContrast} User3DLUT:{lut.IsSupportedUser3DLUT} CurrentDisabled:{lut.IsCurrentSCEDisabled} CurrentVivid:{lut.IsCurrentSCEVividGaming} DynContrastEnabled:{lut.HasDynamicContrast} DynContrastValue:{lut.CurrentDynamicContrastValue} Range({lut.DynamicContrastRange.Min},{lut.DynamicContrastRange.Max},{lut.DynamicContrastRange.Step})");
+
+                // Feature toggles
+                sb.AppendLine($"FreeSync: Supported={display.IsSupportedFreeSync} Enabled={display.IsEnabledFreeSync}");
+                sb.AppendLine($"FreeSyncColorAccuracy: Supported={display.IsSupportedFreeSyncColorAccuracy} Enabled={display.IsEnabledFreeSyncColorAccuracy}");
+                sb.AppendLine($"DynamicRefreshRateControl: Supported={display.IsSupportedDynamicRefreshRateControl} Enabled={display.IsEnabledDynamicRefreshRateControl}");
+                sb.AppendLine($"DisplayBlanking: Supported={display.IsSupportedDisplayBlanking} Enabled={display.IsEnabledDisplayBlanking}");
+                sb.AppendLine($"GPUScaling: Supported={display.IsSupportedGPUScaling} Enabled={display.IsEnabledGPUScaling}");
+                sb.AppendLine($"IntegerScaling: Supported={display.IsSupportedIntegerScaling} Enabled={display.IsEnabledIntegerScaling}");
+                sb.AppendLine($"PixelFormat: Supported={display.IsSupportedPixelFormat} Current={display.CurrentPixelFormat}");
+                sb.AppendLine($"ScalingMode: Supported={display.IsSupportedScalingMode} Current={display.CurrentScalingMode}");
+                sb.AppendLine($"VSR: Supported={display.IsSupportedVSR} Enabled={display.IsEnabledVSR}");
+                sb.AppendLine($"HDCP: Supported={display.IsSupportedHDCP} Enabled={display.IsEnabledHDCP}");
+                sb.AppendLine($"VariBright: Supported={display.IsSupportedVariBright} Enabled={display.IsEnabledVariBright} Mode={display.VariBrightMode}");
+
+                sb.AppendLine();
+            }
+
+            // Eyefinity/SLS summary from stored config
+            sb.AppendLine("****** AMD EYEFINITY (SLS) *******");
+            if (displayConfig.Adl2SlsConfig.IsSlsEnabled)
+            {
+                sb.AppendLine("AMD Eyefinity is Enabled");
+                if (displayConfig.Adl2SlsConfig.SLSMapConfigs.Count > 0)
                 {
-                    SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - ADL2_Adapter_NumberOfAdapters_Get returned ADL_STATUS {ADLRet} when trying to get number of AMD adapters in the computer.");
+                    int idx = 0;
+                    foreach (var slsMap in displayConfig.Adl2SlsConfig.SLSMapConfigs)
+                    {
+                        sb.AppendLine($"SLS #{idx}: Grid {slsMap.SLSMap.Grid.SLSGridColumn}x{slsMap.SLSMap.Grid.SLSGridRow}, Targets={slsMap.SLSMap.NumSLSTarget}, BezelPercent={slsMap.BezelModePercent}");
+                        idx++;
+                    }
                 }
-
-                // Figure out primary adapter
-                int primaryAdapterIndex = 0;
-                ADLRet = ADLImport.ADL2_Adapter_Primary_Get(_adlContextHandle, out primaryAdapterIndex);
-                if (ADLRet == ADL_STATUS.ADL_OK)
-                {
-                    SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: The primary adapter has index {primaryAdapterIndex}.");
-                }
-                else
-                {
-                    SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - ADL2_Adapter_Primary_Get returned ADL_STATUS {ADLRet} when trying to get the primary adapter info from all the AMD adapters in the computer.");
-                }
-
-                // Now go through each adapter and get the information we need from it
-                for (int adapterIndex = 0; adapterIndex < numAdapters; adapterIndex++)
-                {
-                    // Skip this adapter if it isn't active
-                    int adapterActiveStatus = ADLImport.ADL_FALSE;
-                    ADLRet = ADLImport.ADL2_Adapter_Active_Get(_adlContextHandle, adapterIndex, out adapterActiveStatus);
-                    if (ADLRet == ADL_STATUS.ADL_OK)
-                    {
-                        if (adapterActiveStatus == ADLImport.ADL_TRUE)
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Adapter_Active_Get returned ADL_TRUE - AMD Adapter #{adapterIndex} is active! We can continue.");
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Adapter_Active_Get returned ADL_FALSE - AMD Adapter #{adapterIndex} is NOT active, so skipping.");
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Warn($"AMDLibrary/PrintActiveConfig: WARNING - ADL2_Adapter_Active_Get returned ADL_STATUS {ADLRet} when trying to see if AMD Adapter #{adapterIndex} is active. Trying to skip this adapter so something at least works.");
-                        continue;
-                    }
-
-                    // Get the Adapter info for this adapter and put it in the AdapterBuffer
-                    SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: Running ADL2_Adapter_AdapterInfoX4_Get to get the information about AMD Adapter #{adapterIndex}.");
-                    int numAdaptersInfo = 0;
-                    IntPtr adapterInfoBuffer = IntPtr.Zero;
-                    ADLRet = ADLImport.ADL2_Adapter_AdapterInfoX4_Get(_adlContextHandle, adapterIndex, out numAdaptersInfo, out adapterInfoBuffer);
-                    if (ADLRet == ADL_STATUS.ADL_OK)
-                    {
-                        SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Adapter_AdapterInfoX4_Get returned information about AMD Adapter #{adapterIndex}.");
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - ADL2_Adapter_AdapterInfoX4_Get returned ADL_STATUS {ADLRet} when trying to get the adapter info from AMD Adapter #{adapterIndex}. Trying to skip this adapter so something at least works.");
-                        continue;
-                    }
-
-                    ADL_ADAPTER_INFOX2[] adapterArray = new ADL_ADAPTER_INFOX2[numAdaptersInfo];
-                    if (numAdaptersInfo > 0)
-                    {
-                        IntPtr currentDisplayTargetBuffer = adapterInfoBuffer;
-                        for (int i = 0; i < numAdaptersInfo; i++)
-                        {
-                            // build a structure in the array slot
-                            adapterArray[i] = new ADL_ADAPTER_INFOX2();
-                            // fill the array slot structure with the data from the buffer
-                            adapterArray[i] = (ADL_ADAPTER_INFOX2)Marshal.PtrToStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                            // destroy the bit of memory we no longer need
-                            //Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_ADAPTER_INFOX2));
-                            // advance the buffer forwards to the next object
-                            currentDisplayTargetBuffer = (IntPtr)((long)currentDisplayTargetBuffer + Marshal.SizeOf(adapterArray[i]));
-                        }
-                        // Free the memory used by the buffer                        
-                        Marshal.FreeCoTaskMem(adapterInfoBuffer);
-                    }
-
-                    SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: Converted ADL2_Adapter_AdapterInfoX4_Get memory buffer into a {adapterArray.Length} long array about AMD Adapter #{adapterIndex}.");
-
-                    //AMD_ADAPTER_CONFIG savedAdapterConfig = new AMD_ADAPTER_CONFIG();
-                    ADL_ADAPTER_INFOX2 oneAdapter = adapterArray[0];
-                    if (oneAdapter.Exist != 1)
-                    {
-                        SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: AMD Adapter #{oneAdapter.AdapterIndex.ToString()} doesn't exist at present so skipping detection for this adapter.");
-                        continue;
-                    }
-
-                    // Print out what we need
-                    stringToReturn += $"Adapter #{adapterIndex}\n";
-                    stringToReturn += $"Adapter Exists: {oneAdapter.Exist}\n";
-                    stringToReturn += $"Adapter Present: {oneAdapter.Present}\n";
-                    stringToReturn += $"Adapter Name: {oneAdapter.AdapterName}\n";
-                    stringToReturn += $"Adapter Display Name: {oneAdapter.DisplayName}\n";
-                    stringToReturn += $"Adapter Driver Path: {oneAdapter.DriverPath}\n";
-                    stringToReturn += $"Adapter Driver Path Extension: {oneAdapter.DriverPathExt}\n";
-                    stringToReturn += $"Adapter UDID: {oneAdapter.UDID}\n";
-                    stringToReturn += $"Adapter Vendor ID: {oneAdapter.VendorID}\n";
-                    stringToReturn += $"Adapter PNP String: {oneAdapter.PNPString}\n";
-                    stringToReturn += $"Adapter PCI Device Number: {oneAdapter.DeviceNumber}\n";
-                    stringToReturn += $"Adapter PCI Bus Number: {oneAdapter.BusNumber}\n";
-                    stringToReturn += $"Adapter Windows OS Display Index: {oneAdapter.OSDisplayIndex}\n";
-                    stringToReturn += $"Adapter Display Connected: {oneAdapter.DisplayConnectedSet}\n";
-                    stringToReturn += $"Adapter Display Mapped in Windows: {oneAdapter.DisplayMappedSet}\n";
-                    stringToReturn += $"Adapter Is Forcibly Enabled: {oneAdapter.ForcibleSet}\n";
-                    stringToReturn += $"Adapter GetLock is Set: {oneAdapter.GenLockSet}\n";
-                    stringToReturn += $"Adapter LDA Display is Set: {oneAdapter.LDADisplaySet}\n";
-                    stringToReturn += $"Adapter Display Configuration is stretched horizontally across two displays: {oneAdapter.Manner2HStretchSet}\n";
-                    stringToReturn += $"Adapter Display Configuration is stretched vertically across two displays: {oneAdapter.Manner2VStretchSet}\n";
-                    stringToReturn += $"Adapter Display Configuration is a clone of another display: {oneAdapter.MannerCloneSet}\n";
-                    stringToReturn += $"Adapter Display Configuration is an extension of another display: {oneAdapter.MannerExtendedSet}\n";
-                    stringToReturn += $"Adapter Display Configuration is an N Strech across 1 GPU: {oneAdapter.MannerNStretch1GPUSet}\n";
-                    stringToReturn += $"Adapter Display Configuration is an N Strech across more than one GPU: {oneAdapter.MannerNStretchNGPUSet}\n";
-                    stringToReturn += $"Adapter Display Configuration is a single display: {oneAdapter.MannerSingleSet}\n";
-                    stringToReturn += $"Adapter timing override: {oneAdapter.ModeTimingOverrideSet}\n";
-                    stringToReturn += $"Adapter has MultiVPU set: {oneAdapter.MultiVPUSet}\n";
-                    stringToReturn += $"Adapter has non-local set (it is a remote display): {oneAdapter.NonLocalSet}\n";
-                    stringToReturn += $"Adapter is a Show Type Projector: {oneAdapter.ShowTypeProjectorSet}\n\n";
-
-                }
-
-                // Now we still try to get the information from each display we need to print 
-                int numDisplayTargets = 0;
-                int numDisplayMaps = 0;
-                IntPtr displayTargetBuffer = IntPtr.Zero;
-                IntPtr displayMapBuffer = IntPtr.Zero;
-                ADLRet = ADLImport.ADL2_Display_DisplayMapConfig_Get(_adlContextHandle, -1, out numDisplayMaps, out displayMapBuffer, out numDisplayTargets, out displayTargetBuffer, ADLImport.ADL_DISPLAY_DISPLAYMAP_OPTION_GPUINFO);
-                if (ADLRet == ADL_STATUS.ADL_OK)
-                {
-                    SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DisplayMapConfig_Get returned information about all displaytargets connected to all AMD adapters.");
-
-                    // Free the memory used by the buffer to avoid heap corruption
-                    Marshal.FreeCoTaskMem(displayMapBuffer);
-
-                    ADL_DISPLAY_TARGET[] displayTargetArray = { };
-                    if (numDisplayTargets > 0)
-                    {
-                        IntPtr currentDisplayTargetBuffer = displayTargetBuffer;
-                        //displayTargetArray = new ADL_DISPLAY_TARGET[numDisplayTargets];
-                        displayTargetArray = new ADL_DISPLAY_TARGET[numDisplayTargets];
-                        for (int i = 0; i < numDisplayTargets; i++)
-                        {
-                            // build a structure in the array slot
-                            displayTargetArray[i] = new ADL_DISPLAY_TARGET();
-                            //displayTargetArray[i] = new ADL_DISPLAY_TARGET();
-                            // fill the array slot structure with the data from the buffer
-                            displayTargetArray[i] = (ADL_DISPLAY_TARGET)Marshal.PtrToStructure(currentDisplayTargetBuffer, typeof(ADL_DISPLAY_TARGET));
-                            //displayTargetArray[i] = (ADL_DISPLAY_TARGET)Marshal.PtrToStructure(currentDisplayTargetBuffer, typeof(ADL_DISPLAY_TARGET));
-                            // destroy the bit of memory we no longer need
-                            Marshal.DestroyStructure(currentDisplayTargetBuffer, typeof(ADL_DISPLAY_TARGET));
-                            // advance the buffer forwards to the next object
-                            currentDisplayTargetBuffer = (IntPtr)((long)currentDisplayTargetBuffer + Marshal.SizeOf(displayTargetArray[i]));
-                            //currentDisplayTargetBuffer = (IntPtr)((long)currentDisplayTargetBuffer + Marshal.SizeOf(displayTargetArray[i]));
-
-                        }
-                        // Free the memory used by the buffer                        
-                        Marshal.FreeCoTaskMem(displayTargetBuffer);
-                    }
-
-                    foreach (var displayTarget in displayTargetArray)
-                    {
-                        int forceDetect = 0;
-                        int numDisplays;
-                        IntPtr displayInfoBuffer;
-                        ADLRet = ADLImport.ADL2_Display_DisplayInfo_Get(_adlContextHandle, displayTarget.DisplayID.DisplayLogicalAdapterIndex, out numDisplays, out displayInfoBuffer, forceDetect);
-                        if (ADLRet == ADL_STATUS.ADL_OK)
-                        {
-                            if (displayTarget.DisplayID.DisplayLogicalAdapterIndex == -1)
-                            {
-                                SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DisplayInfo_Get returned information about all displaytargets connected to all AMD adapters.");
-                                continue;
-                            }
-                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DisplayInfo_Get returned information about all displaytargets connected to all AMD adapters.");
-                        }
-                        else if (ADLRet == ADL_STATUS.ADL_ERR_NULL_POINTER || ADLRet == ADL_STATUS.ADL_ERR_NOT_SUPPORTED)
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DisplayInfo_Get returned ADL_ERR_NULL_POINTER so skipping getting display info from all AMD adapters.");
-                            continue;
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - ADL2_Display_DisplayInfo_Get returned ADL_STATUS {ADLRet} when trying to get the display target info from all AMD adapters in the computer.");
-                        }
-
-                        ADL_DISPLAY_INFO[] displayInfoArray = { };
-                        if (numDisplays > 0)
-                        {
-                            IntPtr currentDisplayInfoBuffer = displayInfoBuffer;
-                            displayInfoArray = new ADL_DISPLAY_INFO[numDisplays];
-                            for (int i = 0; i < numDisplays; i++)
-                            {
-                                // build a structure in the array slot
-                                displayInfoArray[i] = new ADL_DISPLAY_INFO();
-                                // fill the array slot structure with the data from the buffer
-                                displayInfoArray[i] = (ADL_DISPLAY_INFO)Marshal.PtrToStructure(currentDisplayInfoBuffer, typeof(ADL_DISPLAY_INFO));
-                                // destroy the bit of memory we no longer need
-                                Marshal.DestroyStructure(currentDisplayInfoBuffer, typeof(ADL_DISPLAY_INFO));
-                                // advance the buffer forwards to the next object
-                                currentDisplayInfoBuffer = (IntPtr)((long)currentDisplayInfoBuffer + Marshal.SizeOf(displayInfoArray[i]));
-                                //currentDisplayTargetBuffer = (IntPtr)((long)currentDisplayTargetBuffer + Marshal.SizeOf(displayTargetArray[i]));
-
-                            }
-                            // Free the memory used by the buffer                        
-                            Marshal.FreeCoTaskMem(displayInfoBuffer);
-                        }
-
-                        // Now we need to get all the displays connected to this adapter so that we can get their HDR state
-                        foreach (var displayInfoItem in displayInfoArray)
-                        {
-
-                            // Ignore the display if it isn't connected (note: we still need to see if it's actively mapped to windows!)
-                            if (!displayInfoItem.DisplayConnectedSet)
-                            {
-                                continue;
-                            }
-
-                            // If the display is not mapped in windows then we only want to skip this display if all alldisplays is false
-                            if (!displayInfoItem.DisplayMappedSet)
-                            {
-                                continue;
-                            }
-
-                            stringToReturn += $"\n****** AMD DISPLAY INFO *******\n";
-                            stringToReturn += $"Display #{displayInfoItem.DisplayID.DisplayLogicalIndex}\n";
-                            stringToReturn += $"Display connected via Adapter #{displayInfoItem.DisplayID.DisplayLogicalAdapterIndex}\n";
-                            stringToReturn += $"Display Name: {displayInfoItem.DisplayName}\n";
-                            stringToReturn += $"Display Manufacturer Name: {displayInfoItem.DisplayManufacturerName}\n";
-                            stringToReturn += $"Display Type: {displayInfoItem.DisplayType.ToString("G")}\n";
-                            stringToReturn += $"Display connector: {displayInfoItem.DisplayConnector.ToString("G")}\n";
-                            stringToReturn += $"Display controller index: {displayInfoItem.DisplayControllerIndex}\n";
-                            stringToReturn += $"Display Connected: {displayInfoItem.DisplayConnectedSet}\n";
-                            stringToReturn += $"Display Mapped in Windows: {displayInfoItem.DisplayMappedSet}\n";
-                            stringToReturn += $"Display Is Forcibly Enabled: {displayInfoItem.ForcibleSet}\n";
-                            stringToReturn += $"Display GetLock is Set: {displayInfoItem.GenLockSet}\n";
-                            stringToReturn += $"LDA Display is Set: {displayInfoItem.LDADisplaySet}\n";
-                            stringToReturn += $"Display Configuration is stretched horizontally across two displays: {displayInfoItem.Manner2HStretchSet}\n";
-                            stringToReturn += $"Display Configuration is stretched vertically across two displays: {displayInfoItem.Manner2VStretchSet}\n";
-                            stringToReturn += $"Display Configuration is a clone of another display: {displayInfoItem.MannerCloneSet}\n";
-                            stringToReturn += $"Display Configuration is an extension of another display: {displayInfoItem.MannerExtendedSet}\n";
-                            stringToReturn += $"Display Configuration is an N Strech across 1 GPU: {displayInfoItem.MannerNStretch1GPUSet}\n";
-                            stringToReturn += $"Display Configuration is an N Strech across more than one GPU: {displayInfoItem.MannerNStretchNGPUSet}\n";
-                            stringToReturn += $"Display Configuration is a single display: {displayInfoItem.MannerSingleSet}\n";
-                            stringToReturn += $"Display timing override: {displayInfoItem.ModeTimingOverrideSet}\n";
-                            stringToReturn += $"Display has MultiVPU set: {displayInfoItem.MultiVPUSet}\n";
-                            stringToReturn += $"Display has non-local set (it is a remote display): {displayInfoItem.NonLocalSet}\n";
-                            stringToReturn += $"Display is a Show Type Projector: {displayInfoItem.ShowTypeProjectorSet}\n\n";
-
-                            // Get some more Display Info (if we can!)
-                            ADL_DDC_INFO2 ddcInfo;
-                            ADLRet = ADLImport.ADL2_Display_DDCInfo2_Get(_adlContextHandle, displayInfoItem.DisplayID.DisplayLogicalAdapterIndex, displayInfoItem.DisplayID.DisplayLogicalIndex, out ddcInfo);
-                            if (ADLRet == ADL_STATUS.ADL_OK)
-                            {
-                                SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DDCInfo2_Get returned information about DDC Information for display {displayInfoItem.DisplayID.DisplayLogicalIndex} connected to AMD adapter {displayInfoItem.DisplayID.DisplayLogicalAdapterIndex}.");
-                                if (ddcInfo.SupportsDDC == 1)
-                                {
-                                    // The display supports DDC and returned some data!
-                                    SharedLogger.logger.Trace($"AMDLibrary/PrintActiveConfig: ADL2_Display_DDCInfo2_Get returned information about DDC Information for display {displayInfoItem.DisplayID.DisplayLogicalIndex} connected to AMD adapter {displayInfoItem.DisplayID.DisplayLogicalAdapterIndex}.");
-                                    stringToReturn += $"DDC Information: \n";
-                                    stringToReturn += $"- Display Name: {ddcInfo.DisplayName}\n";
-                                    stringToReturn += $"- Display Manufacturer ID: {ddcInfo.ManufacturerID}\n";
-                                    stringToReturn += $"- Display Product ID: {ddcInfo.ProductID}\n";
-                                    stringToReturn += $"- Display Serial ID: {ddcInfo.SerialID}\n";
-                                    stringToReturn += $"- Display FreeSync Flags: {ddcInfo.FreesyncFlags}\n";
-                                    stringToReturn += $"- Display FreeSync HDR Supported: {ddcInfo.FreeSyncHDRSupported}\n";
-                                    stringToReturn += $"- Display FreeSync HDR Backlight Supported: {ddcInfo.FreeSyncHDRBacklightSupported}\n";
-                                    stringToReturn += $"- Display FreeSync HDR Local Dimming Supported: {ddcInfo.FreeSyncHDRLocalDimmingSupported}\n";
-                                    stringToReturn += $"- Display is Digital Device: {ddcInfo.IsDigitalDevice}\n";
-                                    stringToReturn += $"- Display is HDMI Audio Device: {ddcInfo.IsHDMIAudioDevice}\n";
-                                    stringToReturn += $"- Display is Projector Device: {ddcInfo.IsProjectorDevice}\n";
-                                    stringToReturn += $"- Display Supported Colourspace: {ddcInfo.SupportedColorSpace}\n";
-                                    stringToReturn += $"- Display Supported HDR: {ddcInfo.SupportedHDR}\n";
-                                    stringToReturn += $"- Display Supported Transfer Function: {ddcInfo.SupportedTransferFunction}\n";
-                                    stringToReturn += $"- Display Supports AI: {ddcInfo.SupportsAI}\n";
-                                    stringToReturn += $"- Display Supports DDC: {ddcInfo.SupportsDDC}\n";
-                                    stringToReturn += $"- Display Supports DolbyVision: {ddcInfo.DolbyVisionSupported}\n";
-                                    stringToReturn += $"- Display Supports CEA861_3: {ddcInfo.CEA861_3Supported}\n";
-                                    stringToReturn += $"- Display Supports sxvYCC601: {ddcInfo.SupportsxvYCC601}\n";
-                                    stringToReturn += $"- Display Supports sxvYCC709: {ddcInfo.SupportsxvYCC709}\n";
-                                    stringToReturn += $"- Display Average Luminance Data: {ddcInfo.AvgLuminanceData}\n";
-                                    stringToReturn += $"- Display Diffuse Screen Reflectance: {ddcInfo.DiffuseScreenReflectance}\n";
-                                    stringToReturn += $"- Display Specular Screen Reflectance: {ddcInfo.SpecularScreenReflectance}\n";
-                                    stringToReturn += $"- Display Max Backlight Min Luminance: {ddcInfo.MaxBacklightMinLuminanceData}\n";
-                                    stringToReturn += $"- Display Max Backlight Max Luminance: {ddcInfo.MaxBacklightMaxLuminanceData}\n";
-                                    stringToReturn += $"- Display Min Luminance: {ddcInfo.MinLuminanceData}\n";
-                                    stringToReturn += $"- Display Max Luminance: {ddcInfo.MaxLuminanceData}\n";
-                                    stringToReturn += $"- Display Min Backlight Min Luminance: {ddcInfo.MinBacklightMinLuminanceData}\n";
-                                    stringToReturn += $"- Display Min Backlight Max Luminance: {ddcInfo.MinBacklightMaxLuminanceData}\n";
-                                    stringToReturn += $"- Display Min Luminance No Dimming: {ddcInfo.MinLuminanceNoDimmingData}\n";
-                                    stringToReturn += $"- Display Native Chromacity Red X: {ddcInfo.NativeDisplayChromaticityRedX}\n";
-                                    stringToReturn += $"- Display Native Chromacity Red Y: {ddcInfo.NativeDisplayChromaticityRedY}\n";
-                                    stringToReturn += $"- Display Native Chromacity Green X: {ddcInfo.NativeDisplayChromaticityGreenX}\n";
-                                    stringToReturn += $"- Display Native Chromacity Green Y: {ddcInfo.NativeDisplayChromaticityGreenY}\n";
-                                    stringToReturn += $"- Display Native Chromacity Blue X: {ddcInfo.NativeDisplayChromaticityBlueX}\n";
-                                    stringToReturn += $"- Display Native Chromacity Blue Y: {ddcInfo.NativeDisplayChromaticityBlueY}\n";
-                                    stringToReturn += $"- Display Native Chromacity White X: {ddcInfo.NativeDisplayChromaticityWhiteX}\n";
-                                    stringToReturn += $"- Display Native Chromacity White Y: {ddcInfo.NativeDisplayChromaticityWhiteY}\n";
-                                    stringToReturn += $"- Display Packed Pixel Supported: {ddcInfo.PackedPixelSupported}\n";
-                                    stringToReturn += $"- Display Panel Pixel Format: {ddcInfo.PanelPixelFormat}\n";
-                                    stringToReturn += $"- Display Pixel Format Limited Range: {ddcInfo.PixelFormatLimitedRange}\n";
-                                    stringToReturn += $"- Display PTMCx: {ddcInfo.PTMCx}\n";
-                                    stringToReturn += $"- Display PTMCy: {ddcInfo.PTMCy}\n";
-                                    stringToReturn += $"- Display PTM Refresh Rate: {ddcInfo.PTMRefreshRate}\n";
-
-                                    stringToReturn += $"- Display Serial ID: {ddcInfo.SerialID}\n";
-                                }
-
-                            }
-
-                        }
-                    }
-
-                }
-
-                stringToReturn += $"\n****** AMD EYEFINITY (SLS) *******\n";
-                if (displayConfig.SlsConfig.IsSlsEnabled)
-                {
-                    stringToReturn += $"AMD Eyefinity is Enabled\n";
-                    if (displayConfig.SlsConfig.SLSMapConfigs.Count > 1)
-                    {
-                        stringToReturn += $"There are {displayConfig.SlsConfig.SLSMapConfigs.Count} AMD Eyefinity (SLS) configurations in use.\n";
-                    }
-                    if (displayConfig.SlsConfig.SLSMapConfigs.Count == 1)
-                    {
-                        stringToReturn += $"There is 1 AMD Eyefinity (SLS) configurations in use.\n";
-                    }
-                    else
-                    {
-                        stringToReturn += $"There are no AMD Eyefinity (SLS) configurations in use.\n";
-                    }
-
-                    int count = 0;
-                    foreach (var slsMap in displayConfig.SlsConfig.SLSMapConfigs)
-                    {
-                        stringToReturn += $"NOTE: This Eyefinity (SLS) screen will be treated as a single display by Windows.\n";
-                        stringToReturn += $"The AMD Eyefinity (SLS) Grid Topology #{count} is {slsMap.SLSMap.Grid.SLSGridColumn} Columns x {slsMap.SLSMap.Grid.SLSGridRow} Rows\n";
-                        stringToReturn += $"The AMD Eyefinity (SLS) Grid Topology #{count} involves {slsMap.SLSMap.NumSLSTarget} Displays\n";
-                    }
-
-                }
-                else
-                {
-                    stringToReturn += $"AMD Eyefinity (SLS) is Disabled\n";
-                }
-
             }
             else
             {
-                SharedLogger.logger.Error($"AMDLibrary/PrintActiveConfig: ERROR - Tried to run GetSomeDisplayIdentifiers but the AMD ADL library isn't initialised!");
-                throw new AMDLibraryException($"Tried to run PrintActiveConfig but the AMD ADL library isn't initialised!");
-            }*/
+                sb.AppendLine("AMD Eyefinity (SLS) is Disabled");
+            }
 
+            sb.AppendLine();
+            // Append Windows info
+            sb.Append(WinLibrary.GetLibrary().PrintActiveConfig());
 
-
-            stringToReturn += $"\n\n";
-            // Now we also get the Windows CCD Library info, and add it to the above
-            stringToReturn += WinLibrary.GetLibrary().PrintActiveConfig();
-
-            return stringToReturn;
+            return sb.ToString();
         }
 
         public bool SetActiveConfig(AMD_DISPLAY_CONFIG displayConfig, bool useADLEyefinity, int delayInMs)
