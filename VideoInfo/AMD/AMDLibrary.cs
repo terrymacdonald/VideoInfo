@@ -3349,164 +3349,319 @@ namespace DisplayMagicianShared.AMD
                     try
                     {
                         // Color depth
-                        if (stored.IsSupportedColorDepth)
+                        var currentColorDepth = display.GetColorDepthState();
+                        if (currentColorDepth.supported)
                         {
-                            var currentColorDepth = display.GetColorDepthState();
-                            if (currentColorDepth.supported && currentColorDepth.current != stored.ColorDepth)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: ColorDepth is supported for display {display.UniqueId}.");
+                            if (currentColorDepth.current != stored.ColorDepth)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: ColorDepth is currently {currentColorDepth.current} for display {display.UniqueId} and needs to be {stored.ColorDepth}.");
                                 display.SetColorDepth(stored.ColorDepth);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: ColorDepth already {currentColorDepth.current} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: ColorDepth NOT supported for display {display.UniqueId}.");
                         }
 
                         // Custom color (includes support flags inside AMD_CUSTOM_COLOR_INFO)
                         var currentCustomColor = new AMD_CUSTOM_COLOR_INFO(display.GetCustomColor());
                         if (!currentCustomColor.Equals(stored.CustomColorInfo))
                         {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: CustomColor differs for display {display.UniqueId}, applying stored values.");
                             display.ApplyCustomColor(stored.CustomColorInfo.ToCustomColorInfo());
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: CustomColor already matches for display {display.UniqueId}, skipping.");
                         }
 
                         // Gamma best effort reapply
-                        if (stored.GammaInfo.IsSupported)
+                        var currentGamma = new AMD_GAMMA_INFO(display.GetGamma());
+                        if (currentGamma.IsSupported)
                         {
-                            var currentGamma = new AMD_GAMMA_INFO(display.GetGamma());
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Gamma supported for display {display.UniqueId}.");
                             if (!currentGamma.Equals(stored.GammaInfo))
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Gamma differs for display {display.UniqueId}, reapplying.");
                                 display.ReapplyGamma();
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Gamma already matches for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Gamma NOT supported for display {display.UniqueId}.");
                         }
 
                         // Gamut best effort reapply
-                        if (stored.GamutInfo.IsGamutSupported || stored.GamutInfo.IsWhitePointSupported)
+                        var currentGamut = new AMD_GAMUT_INFO(display.GetGamut());
+                        if (currentGamut.IsGamutSupported || currentGamut.IsWhitePointSupported)
                         {
-                            var currentGamut = new AMD_GAMUT_INFO(display.GetGamut());
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Gamut supported for display {display.UniqueId}.");
                             if (!currentGamut.Equals(stored.GamutInfo))
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Gamut differs for display {display.UniqueId}, reapplying.");
                                 display.ReapplyGamut();
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Gamut already matches for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Gamut NOT supported for display {display.UniqueId}.");
                         }
 
                         // Connectivity experience
                         var currentConn = new AMD_CONNECTIVITY_EXPERIENCE_INFO(display.GetConnectivityExperience());
                         if (!currentConn.Equals(stored.ConnectivityExperience))
                         {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Connectivity experience differs for display {display.UniqueId}, applying.");
                             display.ApplyConnectivityExperience(stored.ConnectivityExperience.ToConnectivityExperienceInfo());
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Connectivity experience already matches for display {display.UniqueId}, skipping.");
                         }
 
                         // Apply 3DLUT
                         var current3dLut = new AMD_3DLUT_INFO(display.GetThreeDLut());
                         if (!current3dLut.Equals(stored.ThreeDLUTSettings))
                         {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: 3DLUT differs for display {display.UniqueId}, reapplying.");
                             display.ReapplyThreeDLut();
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: 3DLUT already matches for display {display.UniqueId}, skipping.");
                         }
 
                         // FreeSync
-                        if (stored.IsSupportedFreeSync)
+                        var currentFreeSync = display.GetFreeSyncState();
+                        if (currentFreeSync.supported)
                         {
-                            var current = display.GetFreeSyncState();
-                            if (current.supported && current.enabled != stored.IsEnabledFreeSync)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: FreeSync supported for display {display.UniqueId}.");
+                            if (currentFreeSync.enabled != stored.IsEnabledFreeSync)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: FreeSync is {currentFreeSync.enabled} for display {display.UniqueId}, setting to {stored.IsEnabledFreeSync}.");
                                 display.SetFreeSync(stored.IsEnabledFreeSync);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: FreeSync already {currentFreeSync.enabled} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: FreeSync NOT supported for display {display.UniqueId}.");
                         }
 
                         // FreeSync Color Accuracy
-                        if (stored.IsSupportedFreeSyncColorAccuracy)
+                        var currentFsColorAcc = display.GetFreeSyncColorAccuracyState();
+                        if (currentFsColorAcc.supported)
                         {
-                            var current = display.GetFreeSyncColorAccuracyState();
-                            if (current.supported && current.enabled != stored.IsEnabledFreeSyncColorAccuracy)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: FreeSync Color Accuracy supported for display {display.UniqueId}.");
+                            if (currentFsColorAcc.enabled != stored.IsEnabledFreeSyncColorAccuracy)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: FreeSync Color Accuracy is {currentFsColorAcc.enabled} for display {display.UniqueId}, setting to {stored.IsEnabledFreeSyncColorAccuracy}.");
                                 display.SetFreeSyncColorAccuracy(stored.IsEnabledFreeSyncColorAccuracy);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: FreeSync Color Accuracy already {currentFsColorAcc.enabled} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: FreeSync Color Accuracy NOT supported for display {display.UniqueId}.");
                         }
 
                         // Dynamic Refresh Rate Control
-                        if (stored.IsSupportedDynamicRefreshRateControl)
+                        var currentDrrc = display.GetDynamicRefreshRateControlState();
+                        if (currentDrrc.supported)
                         {
-                            var current = display.GetDynamicRefreshRateControlState();
-                            if (current.supported && current.enabled != stored.IsEnabledDynamicRefreshRateControl)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: DRRC supported for display {display.UniqueId}.");
+                            if (currentDrrc.enabled != stored.IsEnabledDynamicRefreshRateControl)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: DRRC is {currentDrrc.enabled} for display {display.UniqueId}, setting to {stored.IsEnabledDynamicRefreshRateControl}.");
                                 display.SetDynamicRefreshRateControl(stored.IsEnabledDynamicRefreshRateControl);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: DRRC already {currentDrrc.enabled} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: DRRC NOT supported for display {display.UniqueId}.");
                         }
 
                         // Display blanking
-                        if (stored.IsSupportedDisplayBlanking)
+                        var currentBlanking = display.GetDisplayBlankingState();
+                        if (currentBlanking.supported)
                         {
-                            var current = display.GetDisplayBlankingState();
-                            if (current.supported && current.blanked != stored.IsEnabledDisplayBlanking)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Display blanking supported for display {display.UniqueId}.");
+                            if (currentBlanking.blanked != stored.IsEnabledDisplayBlanking)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Blanking is {currentBlanking.blanked} for display {display.UniqueId}, setting to {stored.IsEnabledDisplayBlanking}.");
                                 display.SetDisplayBlanked(stored.IsEnabledDisplayBlanking);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Blanking already {currentBlanking.blanked} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Display blanking NOT supported for display {display.UniqueId}.");
                         }
 
                         // GPU scaling
-                        if (stored.IsSupportedGPUScaling)
+                        var currentGpuScaling = display.GetGpuScalingState();
+                        if (currentGpuScaling.supported)
                         {
-                            var current = display.GetGpuScalingState();
-                            if (current.supported && current.enabled != stored.IsEnabledGPUScaling)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: GPU scaling supported for display {display.UniqueId}.");
+                            if (currentGpuScaling.enabled != stored.IsEnabledGPUScaling)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: GPU scaling is {currentGpuScaling.enabled} for display {display.UniqueId}, setting to {stored.IsEnabledGPUScaling}.");
                                 display.SetGpuScaling(stored.IsEnabledGPUScaling);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: GPU scaling already {currentGpuScaling.enabled} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: GPU scaling NOT supported for display {display.UniqueId}.");
                         }
 
                         // Integer scaling
-                        if (stored.IsSupportedIntegerScaling)
+                        var currentIntScaling = display.GetIntegerScalingState();
+                        if (currentIntScaling.supported)
                         {
-                            var current = display.GetIntegerScalingState();
-                            if (current.supported && current.enabled != stored.IsEnabledIntegerScaling)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Integer scaling supported for display {display.UniqueId}.");
+                            if (currentIntScaling.enabled != stored.IsEnabledIntegerScaling)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Integer scaling is {currentIntScaling.enabled} for display {display.UniqueId}, setting to {stored.IsEnabledIntegerScaling}.");
                                 display.SetIntegerScaling(stored.IsEnabledIntegerScaling);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Integer scaling already {currentIntScaling.enabled} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Integer scaling NOT supported for display {display.UniqueId}.");
                         }
 
                         // Pixel format
-                        if (stored.IsSupportedPixelFormat)
+                        var currentPixelFormat = display.GetPixelFormatState();
+                        if (currentPixelFormat.supported)
                         {
-                            var current = display.GetPixelFormatState();
-                            if (current.supported && current.current != stored.CurrentPixelFormat)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Pixel format supported for display {display.UniqueId}.");
+                            if (currentPixelFormat.current != stored.CurrentPixelFormat)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Pixel format is {currentPixelFormat.current} for display {display.UniqueId}, setting to {stored.CurrentPixelFormat}.");
                                 display.SetPixelFormat(stored.CurrentPixelFormat);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Pixel format already {currentPixelFormat.current} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Pixel format NOT supported for display {display.UniqueId}.");
                         }
 
                         // Scaling mode
-                        if (stored.IsSupportedScalingMode)
+                        var currentScalingMode = display.GetScalingMode();
+                        if (currentScalingMode.supported)
                         {
-                            var current = display.GetScalingMode();
-                            if (current.supported && current.mode != stored.CurrentScalingMode)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Scaling mode supported for display {display.UniqueId}.");
+                            if (currentScalingMode.mode != stored.CurrentScalingMode)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Scaling mode is {currentScalingMode.mode} for display {display.UniqueId}, setting to {stored.CurrentScalingMode}.");
                                 display.SetScalingMode(stored.CurrentScalingMode);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Scaling mode already {currentScalingMode.mode} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Scaling mode NOT supported for display {display.UniqueId}.");
                         }
 
                         // Virtual Super Resolution
-                        if (stored.IsSupportedVSR)
+                        var currentVsr = display.GetVirtualSuperResolutionState();
+                        if (currentVsr.supported)
                         {
-                            var current = display.GetVirtualSuperResolutionState();
-                            if (current.supported && current.enabled != stored.IsEnabledVSR)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VSR supported for display {display.UniqueId}.");
+                            if (currentVsr.enabled != stored.IsEnabledVSR)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VSR is {currentVsr.enabled} for display {display.UniqueId}, setting to {stored.IsEnabledVSR}.");
                                 display.SetVirtualSuperResolution(stored.IsEnabledVSR);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VSR already {currentVsr.enabled} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VSR NOT supported for display {display.UniqueId}.");
                         }
 
                         // HDCP
-                        if (stored.IsSupportedHDCP)
+                        var currentHdcp = display.GetHdcpState();
+                        if (currentHdcp.supported)
                         {
-                            var current = display.GetHdcpState();
-                            if (current.supported && current.enabled != stored.IsEnabledHDCP)
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: HDCP supported for display {display.UniqueId}.");
+                            if (currentHdcp.enabled != stored.IsEnabledHDCP)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: HDCP is {currentHdcp.enabled} for display {display.UniqueId}, setting to {stored.IsEnabledHDCP}.");
                                 display.SetHdcp(stored.IsEnabledHDCP);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: HDCP already {currentHdcp.enabled} for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: HDCP NOT supported for display {display.UniqueId}.");
                         }
 
                         // VariBright
-                        if (stored.IsSupportedVariBright)
+                        var currentVariBright = display.GetVariBrightState();
+                        if (currentVariBright.supported)
                         {
-                            var current = display.GetVariBrightState();
-                            if (current.supported && (current.enabled != stored.IsEnabledVariBright || current.mode != stored.VariBrightMode))
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VariBright supported for display {display.UniqueId}.");
+                            if (currentVariBright.enabled != stored.IsEnabledVariBright || currentVariBright.mode != stored.VariBrightMode)
                             {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VariBright is Enabled={currentVariBright.enabled} Mode={currentVariBright.mode} for display {display.UniqueId}, setting to Enabled={stored.IsEnabledVariBright} Mode={stored.VariBrightMode}.");
                                 display.SetVariBright(stored.IsEnabledVariBright, stored.VariBrightMode);
                             }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VariBright already matches for display {display.UniqueId}, skipping.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VariBright NOT supported for display {display.UniqueId}.");
                         }
 
                         // Custom resolutions (not applied here; API wiring still pending)
