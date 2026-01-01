@@ -340,20 +340,28 @@ namespace DisplayMagicianShared.AMD
 
         public AMD_3DLUT_INFO()
         {
+            IsSupportedSCE = false;
+            IsSupportedSCEVividGaming = false;
+            IsSupportedSCEDynamicContrast = false;
+            IsSupportedUser3DLUT = false;
+            IsCurrentSCEDisabled = false;
+            IsCurrentSCEVividGaming = false;
+            HasDynamicContrast = false;            
             CurrentDynamicContrastValue = 0;
+            DynamicContrastRange = new IntRange();
         }
 
-        public AMD_3DLUT_INFO(bool isSupportedSCE, bool isSupportedSCEVividGaming, bool hasDynamicContrast,
+        public AMD_3DLUT_INFO(bool isSupportedSCE, bool isSupportedSCEVividGaming, bool isSupportedSCEDynamicContrast,
                              bool isSupportedUser3DLUT, bool isCurrentSCEDisabled, bool isCurrentSCEVividGaming,
-                             bool isCurrentSCEDynamicContrast, bool isUser3DLUTApplied, int currentDynamicContrastValue,
-                             IntRange dynamicContrastRange, List<ushort> userLUTData, int userLUTNumPoints, LutMode userLUTMode)
+                             bool hasDynamicContrast, int currentDynamicContrastValue, IntRange dynamicContrastRange)
         {
             IsSupportedSCE = isSupportedSCE;
             IsSupportedSCEVividGaming = isSupportedSCEVividGaming;
-            HasDynamicContrast = hasDynamicContrast;
+            IsSupportedSCEDynamicContrast = isSupportedSCEDynamicContrast;
             IsSupportedUser3DLUT = isSupportedUser3DLUT;
             IsCurrentSCEDisabled = isCurrentSCEDisabled;
             IsCurrentSCEVividGaming = isCurrentSCEVividGaming;
+            HasDynamicContrast = hasDynamicContrast;
             CurrentDynamicContrastValue = currentDynamicContrastValue;
             DynamicContrastRange = dynamicContrastRange;
         }
@@ -477,118 +485,6 @@ namespace DisplayMagicianShared.AMD
         All = 3
     }
 
-    public struct AMD_DISPLAY_RESOLUTION_INFO : IEquatable<AMD_DISPLAY_RESOLUTION_INFO>
-    {
-        public int ResWidth { get; init; }
-        public int ResHeight { get; init; }
-        public int RefreshRate { get; init; }
-
-        public AMD_DISPLAY_RESOLUTION_INFO()
-        {
-            ResWidth = 0;
-            ResHeight = 0;
-            RefreshRate = 0;
-        }
-
-        public AMD_DISPLAY_RESOLUTION_INFO(int resWidth, int resHeight, int refreshRate)
-        {
-            ResWidth = resWidth;
-            ResHeight = resHeight;
-            RefreshRate = refreshRate;
-        }
-        public AMD_DISPLAY_RESOLUTION_INFO(DisplayResolutionInfo displayResInfo)
-        {
-            ResWidth = displayResInfo.ResWidth;
-            ResHeight = displayResInfo.ResHeight;
-            RefreshRate = displayResInfo.RefreshRate;
-        }
-        public DisplayResolutionInfo ToDisplayResolutionInfo()
-        {
-            return new DisplayResolutionInfo
-            {
-                ResWidth = ResWidth,
-                ResHeight = ResHeight,
-                RefreshRate = RefreshRate
-            };
-        }
-
-        public override bool Equals(object obj) => obj is AMD_DISPLAY_RESOLUTION_INFO other && this.Equals(other);
-        public bool Equals(AMD_DISPLAY_RESOLUTION_INFO other)
-        {
-            if (ResWidth != other.ResWidth)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_RESOLUTION_INFO/Equals: The ResWidth values don't equal each other");
-                return false;
-            }
-            if (ResHeight != other.ResHeight)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_RESOLUTION_INFO/Equals: The ResHeight values don't equal each other");
-                return false;
-            }
-            if (RefreshRate != other.RefreshRate)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_RESOLUTION_INFO/Equals: The RefreshRate values don't equal each other");
-                return false;
-            }
-            return true;
-        }
-        public override int GetHashCode() => (ResWidth, ResHeight, RefreshRate).GetHashCode();
-    }
-
-    public struct AMD_CUSTOM_DISPLAY_RESOLUTION_INFO : IEquatable<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO>
-    {
-        public bool IsSupported { get; init; }
-        public IReadOnlyList<AMD_DISPLAY_RESOLUTION_INFO> Resolutions { get; init; }
-
-        public AMD_CUSTOM_DISPLAY_RESOLUTION_INFO()
-        {
-            IsSupported = false;
-            Resolutions = Array.Empty<AMD_DISPLAY_RESOLUTION_INFO>();
-        }
-
-        public AMD_CUSTOM_DISPLAY_RESOLUTION_INFO(bool isSupported, IReadOnlyList<DisplayResolutionInfo> resolutions)
-        {
-            IsSupported = isSupported;
-            foreach (var res in resolutions)
-            {
-                Resolutions.Append(new AMD_DISPLAY_RESOLUTION_INFO(res));
-            }
-        }
-        public AMD_CUSTOM_DISPLAY_RESOLUTION_INFO(CustomResolutionInfo customResInfo)
-        {
-            IsSupported = customResInfo.IsSupported;
-            Resolutions = new List<AMD_DISPLAY_RESOLUTION_INFO>();
-            foreach (var res in customResInfo.Resolutions)
-            {
-                Resolutions.Append(new AMD_DISPLAY_RESOLUTION_INFO(res));
-            }
-        }
-
-        public CustomResolutionInfo ToCustomResolutionInfo()
-        {
-            return new CustomResolutionInfo
-            {
-                IsSupported = IsSupported,
-                Resolutions = Resolutions.Select(res => res.ToDisplayResolutionInfo()).ToList()
-            };
-        }
-        public override bool Equals(object obj) => obj is AMD_CUSTOM_DISPLAY_RESOLUTION_INFO other && this.Equals(other);
-        public bool Equals(AMD_CUSTOM_DISPLAY_RESOLUTION_INFO other)
-        {
-            if (IsSupported != other.IsSupported)
-            {
-                SharedLogger.logger.Trace($"AMD_CUSTOM_DISPLAY_RESOLUTION_INFO/Equals: The IsSupported values don't equal each other");
-                return false;
-            }
-            if (!Resolutions.SequenceEqual(other.Resolutions))
-            {
-                SharedLogger.logger.Trace($"AMD_CUSTOM_DISPLAY_RESOLUTION_INFO/Equals: The Resolutions values don't equal each other");
-                return false;
-            }
-            return true;
-        }
-        public override int GetHashCode() => (IsSupported, Resolutions).GetHashCode();
-    }
 
     public struct AMD_CONNECTIVITY_EXPERIENCE_INFO : IEquatable<AMD_CONNECTIVITY_EXPERIENCE_INFO>
     {
@@ -1231,6 +1127,147 @@ namespace DisplayMagicianShared.AMD
             IsCurrentReGamma36, HasRegammaCoefficient, RegammaCoefficient, HasReGammaRamp, ReGammaRamp, HasDeGammaRamp, DeGammaRamp).GetHashCode();
     }
 
+    public struct AMD_CUSTOM_COLOR_INFO : IEquatable<AMD_CUSTOM_COLOR_INFO>
+    {
+        public bool IsSupported { get; init; }
+        public bool IsHueSupported { get; init; }
+        public int Hue { get; init; }
+        public bool IsSaturationSupported { get; init; }
+        public int Saturation { get; init; }
+        public bool IsBrightnessSupported { get; init; }
+        public int Brightness { get; init; }
+        public bool IsContrastSupported { get; init; }
+        public int Contrast { get; init; }
+        public bool IsTemperatureSupported { get; init; }
+        public int Temperature { get; init; }
+
+        public AMD_CUSTOM_COLOR_INFO()
+        {
+            IsSupported = false;
+            IsHueSupported = false;
+            Hue = 0;
+            IsSaturationSupported = false;
+            Saturation = 0;
+            IsBrightnessSupported = false;
+            Brightness = 0;
+            IsContrastSupported = false;
+            Contrast = 0;
+            IsTemperatureSupported = false;
+            Temperature = 0;
+        }
+        public AMD_CUSTOM_COLOR_INFO(bool isSupported, bool isHueSupported, int hue,
+                                    bool isSaturationSupported, int saturation,
+                                    bool isBrightnessSupported, int brightness,
+                                    bool isContrastSupported, int contrast,
+                                    bool isTemperatureSupported, int temperature)
+        {
+            IsSupported = isSupported;
+            IsHueSupported = isHueSupported;
+            Hue = hue;
+            IsSaturationSupported = isSaturationSupported;
+            Saturation = saturation;
+            IsBrightnessSupported = isBrightnessSupported;
+            Brightness = brightness;
+            IsContrastSupported = isContrastSupported;
+            Contrast = contrast;
+            IsTemperatureSupported = isTemperatureSupported;
+            Temperature = temperature;
+        }
+        public AMD_CUSTOM_COLOR_INFO(CustomColorInfo customColorInfo)
+        {
+            IsSupported = customColorInfo.IsSupported;
+            IsHueSupported = customColorInfo.IsHueSupported;
+            Hue = customColorInfo.Hue;
+            IsSaturationSupported = customColorInfo.IsSaturationSupported;
+            Saturation = customColorInfo.Saturation;
+            IsBrightnessSupported = customColorInfo.IsBrightnessSupported;
+            Brightness = customColorInfo.Brightness;
+            IsContrastSupported = customColorInfo.IsContrastSupported;
+            Contrast = customColorInfo.Contrast;
+            IsTemperatureSupported = customColorInfo.IsTemperatureSupported;
+            Temperature = customColorInfo.Temperature;
+        }
+        public  CustomColorInfo ToCustomColorInfo()
+        {
+            return new CustomColorInfo
+            {
+                IsSupported = IsSupported,
+                IsHueSupported = IsHueSupported,
+                Hue = Hue,
+                IsSaturationSupported = IsSaturationSupported,
+                Saturation = Saturation,
+                IsBrightnessSupported = IsBrightnessSupported,
+                Brightness = Brightness,
+                IsContrastSupported = IsContrastSupported,
+                Contrast = Contrast,
+                IsTemperatureSupported = IsTemperatureSupported,
+                Temperature = Temperature
+            };
+        }   
+        public override bool Equals(object obj) => obj is AMD_CUSTOM_COLOR_INFO other && this.Equals(other);
+        public bool Equals(AMD_CUSTOM_COLOR_INFO other)
+        {
+            if (IsSupported != other.IsSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The IsSupported values don't equal each other");
+                return false;
+            }
+            if (IsHueSupported != other.IsHueSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The IsHueSupported values don't equal each other");
+                return false;
+            }
+            if (Hue != other.Hue)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The Hue values don't equal each other");
+                return false;
+            }
+            if (IsSaturationSupported != other.IsSaturationSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The IsSaturationSupported values don't equal each other");
+                return false;
+            }
+            if (Saturation != other.Saturation)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The Saturation values don't equal each other");
+                return false;
+            }
+            if (IsBrightnessSupported != other.IsBrightnessSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The IsBrightnessSupported values don't equal each other");
+                return false;
+            }
+            if (Brightness != other.Brightness)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The Brightness values don't equal each other");
+                return false;
+            }
+            if (IsContrastSupported != other.IsContrastSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The IsContrastSupported values don't equal each other");
+                return false;
+            }
+            if (Contrast != other.Contrast)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The Contrast values don't equal each other");
+                return false;
+            }
+            if (IsTemperatureSupported != other.IsTemperatureSupported)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The IsTemperatureSupported values don't equal each other");
+                return false;
+            }
+            if (Temperature != other.Temperature)
+            {
+                SharedLogger.logger.Trace($"AMD_CUSTOM_COLOR_INFO/Equals: The Temperature values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+        public override int GetHashCode() => (IsSupported, IsHueSupported, Hue, IsSaturationSupported, Saturation,
+            IsBrightnessSupported, Brightness, IsContrastSupported, Contrast, IsTemperatureSupported, Temperature).GetHashCode();
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DISPLAY_WITH_SETTINGS : IEquatable<AMD_DISPLAY_WITH_SETTINGS>
     {
@@ -1248,16 +1285,7 @@ namespace DisplayMagicianShared.AMD
         public int GpuUniqueID;
         public bool IsSupportedColorDepth;
         public ADLX_COLOR_DEPTH ColorDepth;
-        public bool IsSupportedCustomColorBrightness;
-        public int CustomColorBrightness;
-        public bool IsSupportedCustomColorHue;
-        public int CustomColorHue;
-        public bool IsSupportedCustomColorSaturation;
-        public int CustomColorSaturation;
-        public bool IsSupportedCustomColorContrast;
-        public int CustomColorContrast;
-        public bool IsSupportedCustomColorTemperature;
-        public int CustomColorTemperature;
+        public AMD_CUSTOM_COLOR_INFO CustomColorInfo;
         public bool IsSupportedFreeSync;
         public bool IsEnabledFreeSync;        
         public bool IsSupportedFreeSyncColorAccuracy;
@@ -1284,20 +1312,7 @@ namespace DisplayMagicianShared.AMD
         public bool IsEnabledVariBright = false;
         public VariBrightMode VariBrightMode = VariBrightMode.Unknown;
         public AMD_CONNECTIVITY_EXPERIENCE_INFO ConnectivityExperience;
-        public bool IsSupported3DLUT = false;
         public AMD_3DLUT_INFO ThreeDLUTSettings { get; set; } = new AMD_3DLUT_INFO();
-        // Custom resolution support / status
-        public bool IsSupportedCustomResolution { get; set; }
-        public bool IsCustomResolutionApplied { get; set; }
-
-        // The details of the currently applied custom resolution (if any)
-        public int CustomResWidth { get; set; }
-        public int CustomResHeight { get; set; }
-        public int CustomResRefreshRate { get; set; }
-        public int CustomResTimingStandard { get; set; }
-
-        // (Optional) store the list of all defined custom resolutions for that display
-        public List<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO> CustomResolutions { get; set; } = new List<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO>();
 
         public AMD_DISPLAY_WITH_SETTINGS()
         {
@@ -1309,7 +1324,6 @@ namespace DisplayMagicianShared.AMD
             ColorDepth = ADLX_COLOR_DEPTH.BPC_UNKNOWN;
             CurrentPixelFormat = ADLX_PIXEL_FORMAT.FORMAT_UNKNOWN;
             CurrentScalingMode = ADLX_SCALE_MODE.PRESERVE_ASPECT_RATIO;
-            CustomResolutions = new List<AMD_CUSTOM_DISPLAY_RESOLUTION_INFO>();
             ThreeDLUTSettings = new AMD_3DLUT_INFO();
             GamutInfo = new AMD_GAMUT_INFO();
             VariBrightMode = VariBrightMode.Unknown;
@@ -1383,54 +1397,9 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ColorDepth values don't equal each other");
                 return false;
             }
-            if (IsSupportedCustomColorBrightness != other.IsSupportedCustomColorBrightness)
+            if (!CustomColorInfo.Equals(other.CustomColorInfo))
             {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedCustomColorBrightness values don't equal each other");
-                return false;
-            }
-            if (CustomColorBrightness != other.CustomColorBrightness)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomColorBrightness values don't equal each other");
-                return false;
-            }
-            if (IsSupportedCustomColorHue != other.IsSupportedCustomColorHue)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedCustomColorHue values don't equal each other");
-                return false;
-            }
-            if (CustomColorHue != other.CustomColorHue)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomColorHue values don't equal each other");
-                return false;
-            }
-            if (IsSupportedCustomColorSaturation != other.IsSupportedCustomColorSaturation)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedCustomColorSaturation values don't equal each other");
-                return false;
-            }
-            if (CustomColorSaturation != other.CustomColorSaturation)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomColorSaturation values don't equal each other");
-                return false;
-            }
-            if (IsSupportedCustomColorContrast != other.IsSupportedCustomColorContrast)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedCustomColorContrast values don't equal each other");
-                return false;
-            }
-            if (CustomColorContrast != other.CustomColorContrast)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomColorContrast values don't equal each other");
-                return false;
-            }
-            if (IsSupportedCustomColorTemperature != other.IsSupportedCustomColorTemperature)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedCustomColorTemperature values don't equal each other");
-                return false;
-            }
-            if (CustomColorTemperature != other.CustomColorTemperature)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomColorTemperature values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomColorInfo values don't equal each other");
                 return false;
             }
             if (IsSupportedFreeSync != other.IsSupportedFreeSync)
@@ -1492,42 +1461,7 @@ namespace DisplayMagicianShared.AMD
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsEnabledVSR values don't equal each other");
                 return false;
-            }  
-            if (IsSupportedCustomResolution != other.IsSupportedCustomResolution)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedCustomResolution values don't equal each other");
-                return false;
-            }
-            if (IsCustomResolutionApplied != other.IsCustomResolutionApplied)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The IsCustomResolutionApplied values don't equal each other");
-                return false;
-            }
-            if (CustomResWidth != other.CustomResWidth)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResWidth values don't equal each other");
-                return false;
-            }
-            if (CustomResHeight != other.CustomResHeight)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResHeight values don't equal each other");
-                return false;
-            }
-            if (CustomResRefreshRate != other.CustomResRefreshRate)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResRefreshRate values don't equal each other");
-                return false;
-            }
-            if (CustomResTimingStandard != other.CustomResTimingStandard)
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResTimingStandard values don't equal each other");
-                return false;
-            }
-            if (!CustomResolutions.SequenceEqual(other.CustomResolutions))
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The CustomResolutions values don't equal each other");
-                return false;
-            }
+            }             
             if (!ConnectivityExperience.Equals(other.ConnectivityExperience))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_WITH_SETTINGS/Equals: The ConnectivityExperience values don't equal each other");
@@ -1555,12 +1489,9 @@ namespace DisplayMagicianShared.AMD
         public override int GetHashCode()
         {
             return (ConnectorType, Type, EDID, ManufacturerID, Name, NativeResolutionWidth, NativeResolutionHeight, PixelClock, RefreshRate, ScanType, UniqueID,
-                IsSupportedColorDepth, ColorDepth, IsSupportedCustomColorBrightness, CustomColorBrightness, IsSupportedCustomColorHue, CustomColorHue,
-                IsSupportedCustomColorSaturation, CustomColorSaturation, IsSupportedCustomColorContrast, CustomColorContrast, IsSupportedCustomColorTemperature,
-                CustomColorTemperature, IsSupportedFreeSync, IsEnabledFreeSync, IsSupportedGPUScaling, IsEnabledGPUScaling,
+                IsSupportedColorDepth, ColorDepth, CustomColorInfo, IsSupportedFreeSync, IsEnabledFreeSync, IsSupportedGPUScaling, IsEnabledGPUScaling,
                 IsSupportedIntegerScaling, IsEnabledIntegerScaling, IsSupportedPixelFormat, CurrentPixelFormat, IsSupportedScalingMode, CurrentScalingMode,
-                IsSupportedVSR, IsEnabledVSR, IsSupportedCustomResolution, IsCustomResolutionApplied, CustomResWidth, CustomResHeight, CustomResRefreshRate,
-                CustomResTimingStandard, ConnectivityExperience, ThreeDLUTSettings, GamutInfo, GammaInfo, CustomResolutions
+                IsSupportedVSR, IsEnabledVSR, ConnectivityExperience, ThreeDLUTSettings, GamutInfo, GammaInfo
             ).GetHashCode();
         }
         public static bool operator ==(AMD_DISPLAY_WITH_SETTINGS lhs, AMD_DISPLAY_WITH_SETTINGS rhs) => lhs.Equals(rhs);
@@ -2372,223 +2303,56 @@ namespace DisplayMagicianShared.AMD
                         newDisplay.PixelClock = display.PixelClock;
                         newDisplay.RefreshRate = display.RefreshRate;
                         newDisplay.ScanType = display.ScanType;
+                        newDisplay.GpuUniqueID = display.GpuUniqueId;
 
                         // Ok now start getting the various settings for this display
 
                         //------------------------------------
-                        // GET THE COLOR DEPTH IF WE CAN
+                        // CONVERT THE ADLX OBJECTS TO OUR OBJECTS FOR STORAGE
+
+                         // Get the current custom color object for this display
+                        newDisplay.CustomColorInfo = new AMD_CUSTOM_COLOR_INFO(display.GetCustomColor());
+                        
+                        // Get the gamma information for this display
+                        newDisplay.GammaInfo = new AMD_GAMMA_INFO(display.GetGamma());
+
+                        // Get the gammut information for this display
+                        newDisplay.GamutInfo = new AMD_GAMUT_INFO(display.GetGamut());
+
+                        // Now get the connectivity experience settings if we can
+                        newDisplay.ConnectivityExperience = new AMD_CONNECTIVITY_EXPERIENCE_INFO(display.GetConnectivityExperience());
+
+                        // Get the 3DLUT settings for this display
+                        newDisplay.ThreeDLUTSettings = new AMD_3DLUT_INFO(display.GetThreeDLut());                       
+
+                        // TODO: ADLXWrapper Helper Facade does not support custom resolutions properly yet
+                        // so we need to skip that for now. Need to fix that in ADLXWrapper later.
+
                         //------------------------------------
                         // Get the current color depth for this display
                         (newDisplay.IsSupportedColorDepth, newDisplay.ColorDepth) = display.GetColorDepthState();
 
-                        //------------------------------------
-                        // GET THE DISPLAY CUSTOM COLOR IF POSSIBLE
-                        //------------------------------------
-                        // Get the current custom color object for this display
-                        var customColorInfo = display.GetCustomColor();
-                        newDisplay.CustomColorBrightness = customColorInfo.Brightness;
-                        newDisplay.CustomColorContrast = customColorInfo.Contrast;
-                        newDisplay.CustomColorHue = customColorInfo.Hue;
-                        newDisplay.CustomColorSaturation = customColorInfo.Saturation;
-                        newDisplay.CustomColorTemperature = customColorInfo.Temperature;
-
-
-                        // TODO: Fix getting and setting the gamma ramp as that is the bit that is breaking thi section
-                        //       but for now we just disable this section.
-                        // Now grab the display gamma settings if we can
-                        newDisplay.IsSupportedGamma = false;
-                        /*SWIGTYPE_p_p_adlx__IADLXDisplayGamma ppGamma = ADLX.new_displayGammaP_Ptr();
-                        status = displayService.GetGamma(display, ppGamma);
-                        if (status == ADLX_RESULT.ADLX_OK)
-                        {
-                            IADLXDisplayGamma gamma = ADLX.displayGammaP_Ptr_value(ppGamma);
-
-                            // Create a RegammaCoeff object to hold the coefficients
-                            ADLX_RegammaCoeff regammaCoeff = new ADLX_RegammaCoeff();
-                            status = gamma.GetGammaCoefficient(regammaCoeff);
-                            if (status == ADLX_RESULT.ADLX_OK)
-                            {
-                                // Store the gamma coefficients in the display settings
-                                newDisplay.GammaCoefficientGamma = regammaCoeff.gamma;
-                                newDisplay.GammaCoefficientA0 = regammaCoeff.coefficientA0;
-                                newDisplay.GammaCoefficientA1 = regammaCoeff.coefficientA1;
-                                newDisplay.GammaCoefficientA2 = regammaCoeff.coefficientA2;
-                                newDisplay.GammaCoefficientA3 = regammaCoeff.coefficientA3;
-                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got gamma coefficients for display.");
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting gamma coefficients. gamma.GetGammaCoefficient() returned error code {status}");
-                            }
-
-                            // Get GammaRamp
-                            ADLX_GammaRamp gammaRamp = new ADLX_GammaRamp();
-                            status = gamma.GetGammaRamp(gammaRamp);
-                            if (status == ADLX_RESULT.ADLX_OK)
-                            {
-                                // Store the gamma ramp in the display settings
-                                newDisplay.GammaRamp = GammaRampExtensions.ToSerializable(gammaRamp);
-                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got gamma ramp for display.");
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting gamma ramp. gamma.GetGammaRamp() returned error code {status}");
-                            }
-
-
-                            // Release the gamma interface when done
-                            gamma.Release();
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display gamma object. displayService.GetGamma() returned error code {status}");
-                        }*/
-
-                        //------------------------------------
                         // GET THE FreeSync Settings IF WE CAN
-                        //------------------------------------                                
-                        // Check if FreeSync is supported and enabled
                         (newDisplay.IsSupportedFreeSync, newDisplay.IsEnabledFreeSync) = display.GetFreeSyncState();
 
-                        //------------------------------------
-                        // GET THE Display Gamut Settings IF WE CAN
-                        //------------------------------------
-                        // Get the current display gamut object for this display
-                        // TODO: Gamut is all wrong - we are missing a lot of settings
-                        //GamutInfo gamutInfo = display.GetGamut();
-                        //newDisplay.Is = gamutInfo.IsGamutSupported;
-                        /*    SWIGTYPE_p_p_adlx__IADLXDisplayGamut ppGamut = ADLX.new_displayGamutP_Ptr();
-                        status = displayService.GetGamut(display, ppGamut);
-                        if (status == ADLX_RESULT.ADLX_OK)
-                        {
-                            IADLXDisplayGamut gamut = ADLX.displayGamutP_Ptr_value(ppGamut);
+                        // Get the free sync accuracy range if we can
+                        (newDisplay.IsSupportedFreeSyncColorAccuracy,newDisplay.IsEnabledFreeSyncColorAccuracy) = display.GetFreeSyncColorAccuracyState();
 
-                            // Check if Custom gamut color space is supported
-                            SWIGTYPE_p_bool pIsSupportedCustomColorSpace = ADLX.new_boolP();
-                            status = gamut.IsSupportedCustomColorSpace(pIsSupportedCustomColorSpace);
-                            if (status == ADLX_RESULT.ADLX_OK)
-                            {
+                        // Get the dynamic refresh rate control if we can
+                        (newDisplay.IsSupportedDynamicRefreshRateControl, newDisplay.IsEnabledDynamicRefreshRateControl) = display.GetDynamicRefreshRateControlState();
 
-                                // Get the gamut color space
-                                ADLX_GamutColorSpace pGamutColorSpace = ADLX.new_adlx_gamutColorSpaceP();
-                                status = gamut.GetGamutColorSpace(pGamutColorSpace);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    ADLX_Point red = pGamutColorSpace.red;
-                                    newDisplay.GamutColorSpaceRedX = red.x;
-                                    newDisplay.GamutColorSpaceRedY = red.y;
-
-                                    ADLX_Point green = pGamutColorSpace.green;
-                                    newDisplay.GamutColorSpaceGreenX = green.x;
-                                    newDisplay.GamutColorSpaceGreenY = green.y;
-
-                                    ADLX_Point blue = pGamutColorSpace.blue;
-                                    newDisplay.GamutColorSpaceBlueX = blue.x;
-                                    newDisplay.GamutColorSpaceBlueY = blue.y;
-
-                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got Display Gamut Color Space for this display!");
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting Display Gamut Color Space. gamma.GetGamutColorSpace() returned error code {status}");
-                                }
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Display Gamut Color Space is NOT supported for this display.");
-                            }
-
-
-                            // Check if Custom gamut color space is supported
-                            SWIGTYPE_p_bool pIsSupportedCustomWhitePoint = ADLX.new_boolP();
-                            status = gamut.IsSupportedCustomWhitePoint(pIsSupportedCustomWhitePoint);
-                            if (status == ADLX_RESULT.ADLX_OK)
-                            {
-
-                                // Get the gamut white point
-                                ADLX_Point pGamutWhitePoint = new ADLX_Point();
-                                status = gamut.GetWhitePoint(pGamutWhitePoint);
-                                if (status == ADLX_RESULT.ADLX_OK)
-                                {
-                                    newDisplay.GamutWhitePointX = pGamutWhitePoint.x;
-                                    newDisplay.GamutWhitePointY = pGamutWhitePoint.y;
-
-                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got Display Gamut White Point for this display!");
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Error getting Display Gamut White Point. gamma.GetWhitePoint() returned error code {status}");
-                                }
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Custom Display Gamut White Point is NOT supported for this display.");
-                            }
-
-                            //TODO: Test for all the supported whitepoints and store them
-                            //TODO: Test for all the supported whitepoints and store them
-
-
-                            // Release the gamut interface when done
-                            gamut.Release();
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting the display gamut object. systemServices.GetGamut() returned error code {status}");
-                            //return false;
-                        }*/
+                        // Now get teh display blanking settings if we can
+                        (newDisplay.IsSupportedDisplayBlanking,newDisplay.IsEnabledDisplayBlanking) = display.GetDisplayBlankingState();
 
                         // Now get the Display GPU Scaling settings if we can
                         (newDisplay.IsSupportedGPUScaling,newDisplay.IsEnabledGPUScaling) = display.GetGpuScalingState();
                         
                         // Get the Integer Display Scaling settings if we can                            
-                        (newDisplay.IsEnabledIntegerScaling, newDisplay.IsEnabledIntegerScaling) = display.GetIntegerScalingState();
+                        (newDisplay.IsSupportedIntegerScaling, newDisplay.IsEnabledIntegerScaling) = display.GetIntegerScalingState();
 
                         // Get the Display Pixel Format settings if we can
-                        (newDisplay.IsSupportedPixelFormat, newDisplay.CurrentPixelFormat) = display.GetPixelFormatState();
+                        (newDisplay.IsSupportedPixelFormat, newDisplay.CurrentPixelFormat) = display.GetPixelFormatState();                        
                         
-                        // ----
-                        // //// Get the current custom resolution set for this display if there is one
-                        // foreach (var customResolution in display.EnumerateCustomResolutions())
-                        // {
-                        //     if (customResolution.IsCurrentAppliedResolution())
-                        //     {
-                        //         // Store the custom resolution in the display settings
-                        //         newDisplay.CurrentCustomResolutionWidth = customResolution.Width;
-                        //         newDisplay.CurrentCustomResolutionHeight = customResolution.Height;
-                        //         newDisplay.CurrentCustomResolutionRefreshRate = customResolution.RefreshRate;
-                        //         newDisplay.CurrentCustomResolutionTimingStandard = customResolution.TimingStandard;
-                        //         SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got current custom resolution for display: {newDisplay.CurrentCustomResolutionWidth}x{newDisplay.CurrentCustomResolutionHeight} @ {newDisplay.CurrentCustomResolutionRefreshRate}Hz, Timing Standard: {newDisplay.CurrentCustomResolutionTimingStandard}");
-                        //     }
-                        // }
-                        //SWIGTYPE_p_p_adlx__IADLXDisplayCustomResolution ppCustomResolution = ADLX.new_displayCustomResolutionP_Ptr();
-                        //status = displayService.GetCustomResolution(display, ppCustomResolution);
-                        //if (status == ADLX_RESULT.ADLX_OK)
-                        //{
-                        //    IADLXDisplayCustomResolution customResolution = ADLX.displayCustomResolutionP_Ptr_value(ppCustomResolution);
-
-                        //    // Get the current custom resolution
-                        //    SWIGTYPE_p_p_adlx__IADLXDisplayResolution ppDisplayResolution = ADLX.new_adlx_customResolutionP();
-
-                        //    ADLX_CustomResolution adlxCurrentCustomResolution = ADLX.new_adlx_customResolutionP();
-                        //    status = customResolution.GetCurrentAppliedResolution(adlxCurrentCustomResolution);
-                        //    if (status == ADLX_RESULT.ADLX_OK)
-                        //    {
-                        //        // Store the custom resolution in the display settings
-                        //        newDisplay.CurrentCustomResolutionWidth = adlxCustomResolution.width;
-                        //        newDisplay.CurrentCustomResolutionHeight = adlxCustomResolution.height;
-                        //        newDisplay.CurrentCustomResolutionRefreshRate = adlxCustomResolution.refreshRate;
-                        //        newDisplay.CurrentCustomResolutionTimingStandard = adlxCustomResolution.timingStandard;
-                        //        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Successfully got current custom resolution for display: {newDisplay.CurrentCustomResolutionWidth}x{newDisplay.CurrentCustomResolutionHeight} @ {newDisplay.CurrentCustomResolutionRefreshRate}Hz, Timing Standard: {newDisplay.CurrentCustomResolutionTimingStandard}");
-                        //    }
-                        //    else
-                        //    {
-                        //        SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: Error getting current custom resolution. customResolution.GetCurrentCustomResolution() returned error code {status}");
-                        //    }
-                        //    // Release the custom resolution interface when done
-                        //    customResolution.Release();
-                        //}
-
                         // Get the Display Scaling Mode if we can
                         (newDisplay.IsSupportedScalingMode, newDisplay.CurrentScalingMode) = display.GetScalingMode();
  
@@ -2599,31 +2363,10 @@ namespace DisplayMagicianShared.AMD
                         (newDisplay.IsSupportedHDCP, newDisplay.IsEnabledHDCP) = display.GetHdcpState();
 
                         // Get VariBright settings
-                        (newDisplay.IsSupportedVariBright, newDisplay.IsEnabledVariBright, newDisplay.VariBrightMode) = display.GetVariBrightState();
-                        
-                        // Get 3DLUT settings if we can
-                        // TODO: This section needs the ADLXWRapper updated to get all the avilable settings
-                        // and it needs the Display3DLUTSettings DTO updated to take all the settings too.
-                        var threeDLUT = display.GetThreeDLut();
-                        var newDisplayThreeDLUTSettings = new AMD_3DLUT_INFO();
-                        newDisplayThreeDLUTSettings.IsSupportedSCE = threeDLUT.IsSceDynamicContrastSupported;
-                        newDisplayThreeDLUTSettings.IsSupportedSCEVividGaming = threeDLUT.IsSceVividGamingSupported;
-                        newDisplayThreeDLUTSettings.IsSupportedSCEDynamicContrast = threeDLUT.IsSceDynamicContrastSupported;
-                        newDisplayThreeDLUTSettings.IsSupportedUser3DLUT = threeDLUT.IsUser3DLutSupported;
-                        // newDisplayThreeDLUTSettings.IsCurrentSCEDisabled = threeDLUT.IsCurrentSceDisabled;
-                        // newDisplayThreeDLUTSettings.IsCurrentSCEVividGaming = threeDLUT.IsCurrentSceVividGaming;
-                        // newDisplayThreeDLUTSettings.IsCurrentSCEDynamicContrast = threeDLUT.IsCurrentSceDynamicContrast;
-                        // if (threeDLUT.IsCurrentSceDynamicContrast)
-                        // {
-                        //     newDisplayThreeDLUTSettings.DynamicContrastRange = new IntRange
-                        //     {
-                        //         Min = threeDLUT.SceDynamicContrastRangeMin,
-                        //         Max = threeDLUT.SceDynamicContrastRangeMax,
-                        //         Step = threeDLUT.SceDynamicContrastRangeStep
-                        //     };
-                        //     newDisplayThreeDLUTSettings.CurrentDynamicContrastValue = threeDLUT.CurrentSceDynamicContrastValue;
-                        // }
+                        (newDisplay.IsSupportedVariBright, newDisplay.IsEnabledVariBright, newDisplay.VariBrightMode) = display.GetVariBrightState();                                            
 
+
+                        //------------------------------------
                         // Save the Display to the main dictionary of displays with the uniqueid as the key
                         myDisplayConfig.Displays.Add(newDisplay.UniqueID, newDisplay);
                     }
