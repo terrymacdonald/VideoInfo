@@ -2948,10 +2948,13 @@ namespace DisplayMagicianShared.AMD
             catch (Exception ex)
             {
                 SharedLogger.logger.Warn(ex, "AMDLibrary/PrintActiveConfig: Failed to enumerate GPUs via ADLX");
+                sb.AppendLine();
+                sb.AppendLine();
+                return sb.ToString();
             }
 
             // Displays from the active display config
-            sb.AppendLine("****** AMD DISPLAYS *******");
+            sb.AppendLine("AMD DISPLAYS");
             foreach (var kvp in displayConfig.Displays)
             {
                 var display = kvp.Value;
@@ -3023,7 +3026,7 @@ namespace DisplayMagicianShared.AMD
             }
 
             // Eyefinity/SLS summary from stored config (for ADL2 configuration)
-            sb.AppendLine("****** AMD EYEFINITY via ADL2 (SLS) *******");
+            sb.AppendLine("AMD EYEFINITY via ADL2 (SLS)");
             if (displayConfig.Adl2SlsConfig.IsSlsEnabled)
             {
                 sb.AppendLine("AMD Eyefinity via ADL2 is Enabled");

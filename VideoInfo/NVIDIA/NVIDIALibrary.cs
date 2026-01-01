@@ -1703,7 +1703,7 @@ namespace DisplayMagicianShared.NVIDIA
             if (physicalGpuCount == 0)
             {
                 // Print out that there aren't any video cards detected
-                stringToReturn += "No NVIDIA Video Cards detected.";
+                stringToReturn += "No NVIDIA Video Cards detected.\n\n";
                 SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: No NVIDIA Videocards detected");
                 return stringToReturn;
             }
