@@ -2907,7 +2907,7 @@ namespace DisplayMagicianShared.AMD
         }
 
 
-               public string PrintActiveConfig()
+        public string PrintActiveConfig()
         {
             if (!_initialised)
             {
@@ -2935,8 +2935,11 @@ namespace DisplayMagicianShared.AMD
                     sb.AppendLine($"Asic Family: {id.AsicFamilyType}");
                     sb.AppendLine($"VRAM: {id.TotalVRAM} ({id.VRAMType})");
                     sb.AppendLine($"PCI Bus: {id.PciBusType} LaneWidth: {id.PciBusLaneWidth}");
-                    sb.AppendLine($"External: {id.IsExternal} HasDesktops: {id.HasDesktops}");
-                    sb.AppendLine($"Driver: {id.DriverVersion} AMDSoftware: {id.AMDSoftwareVersion} WindowsDriver: {id.AMDWindowsDriverVersion}");
+                    sb.AppendLine($"External: {id.IsExternal} ");
+                    sb.AppendLine($"HasDesktops: {id.HasDesktops}");
+                    sb.AppendLine($"Driver: {id.DriverVersion} ");
+                    sb.AppendLine($"AMDSoftware: {id.AMDSoftwareVersion} ");
+                    sb.AppendLine($"WindowsDriver: {id.AMDWindowsDriverVersion}");
                     sb.AppendLine($"DeviceId: {id.DeviceId} SubSystem: {id.SubSystemId} SubVendor: {id.SubSystemVendorId} Revision: {id.RevisionId}");
                     sb.AppendLine($"PNP: {id.PNPString}");
                     sb.AppendLine();
@@ -2955,28 +2958,53 @@ namespace DisplayMagicianShared.AMD
                 sb.AppendLine($"Display UniqueId: {display.UniqueID}");
                 sb.AppendLine($"Name: {display.Name}");
                 sb.AppendLine($"GPU UniqueId: {display.GpuUniqueID}");
-                sb.AppendLine($"Type: {display.Type} Connector: {display.ConnectorType}");
+                sb.AppendLine($"Type: {display.Type} ");
+                sb.AppendLine($"Connector: {display.ConnectorType}");
                 sb.AppendLine($"Native: {display.NativeResolutionWidth}x{display.NativeResolutionHeight} @ {display.RefreshRate}Hz PixelClock: {display.PixelClock}");
                 sb.AppendLine($"ScanType: {display.ScanType}");
                 sb.AppendLine($"ColorDepth: {(display.IsSupportedColorDepth ? display.ColorDepth.ToString() : "Unsupported")}");
 
                 // Custom color
                 var cc = display.CustomColorInfo;
-                sb.AppendLine($"CustomColor Supported:{cc.IsSupported} Hue({cc.IsHueSupported}:{cc.Hue}) Sat({cc.IsSaturationSupported}:{cc.Saturation}) Bright({cc.IsBrightnessSupported}:{cc.Brightness}) Contrast({cc.IsContrastSupported}:{cc.Contrast}) Temp({cc.IsTemperatureSupported}:{cc.Temperature})");
+                sb.AppendLine($"CustomColor Supported:{cc.IsSupported} 
+                sb.AppendLine($"Hue({cc.IsHueSupported}:{cc.Hue}) 
+                sb.AppendLine($"Sat({cc.IsSaturationSupported}:{cc.Saturation}) ");
+                sb.AppendLine($"Bright({cc.IsBrightnessSupported}:{cc.Brightness}) ");
+                sb.AppendLine($"Contrast({cc.IsContrastSupported}:{cc.Contrast}) ");
+                sb.AppendLine($"Temp({cc.IsTemperatureSupported}:{cc.Temperature})");
 
                 // Gamma/Gamut
                 var gamma = display.GammaInfo;
-                sb.AppendLine($"Gamma Supported:{gamma.IsSupported} Modes: SRGB={gamma.IsCurrentReGammaSRGB} BT709={gamma.IsCurrentReGammaBT709} PQ={gamma.IsCurrentReGammaPQ} PQ2084={gamma.IsCurrentReGammaPQ2084} ReGamma36={gamma.IsCurrentReGamma36} RegammaCoeff={gamma.HasRegammaCoefficient} ReRamp={gamma.HasReGammaRamp} DeRamp={gamma.HasDeGammaRamp}");
+                sb.AppendLine($"Gamma Supported:{gamma.IsSupported} ");
+                sb.AppendLine($"Modes: SRGB={gamma.IsCurrentReGammaSRGB} ");
+                sb.AppendLine($"BT709={gamma.IsCurrentReGammaBT709} ");
+                sb.AppendLine($"PQ={gamma.IsCurrentReGammaPQ} ");
+                sb.AppendLine($"PQ2084={gamma.IsCurrentReGammaPQ2084} ");
+                sb.AppendLine($"ReGamma36={gamma.IsCurrentReGamma36} ");                
+                sb.AppendLine($"RegammaCoeff={gamma.HasRegammaCoefficient} ");
+                sb.AppendLine($"ReRamp={gamma.HasReGammaRamp} ");
+                sb.AppendLine($"DeRamp={gamma.HasDeGammaRamp}");
                 var gamut = display.GamutInfo;
-                sb.AppendLine($"Gamut Supported:{gamut.IsGamutSupported} WhitePointSupported:{gamut.IsWhitePointSupported} Current: 5000K={gamut.IsCurrent5000K} 6500K={gamut.IsCurrent6500K} 7500K={gamut.IsCurrent7500K} 9300K={gamut.IsCurrent9300K} CustomWP={gamut.IsCurrentCustomWhitePoint} 709={gamut.IsCurrent709} 601={gamut.IsCurrent601} Adobe={gamut.IsCurrentAdobe} CIERgb={gamut.IsCurrentCieRgb} 2020={gamut.IsCurrent2020} CustomSpace={gamut.IsCurrentCustomColorSpace} WP=({gamut.WhitePointX},{gamut.WhitePointY})");
+                sb.AppendLine($"Gamut Supported:{gamut.IsGamutSupported} ");
+                sb.AppendLine($"WhitePointSupported:{gamut.IsWhitePointSupported} ");
+                sb.AppendLine($"Current: 5000K={gamut.IsCurrent5000K} 6500K={gamut.IsCurrent6500K} 7500K={gamut.IsCurrent7500K} 9300K={gamut.IsCurrent9300K} CustomWP={gamut.IsCurrentCustomWhitePoint} 709={gamut.IsCurrent709} 601={gamut.IsCurrent601} Adobe={gamut.IsCurrentAdobe} CIERgb={gamut.IsCurrentCieRgb} 2020={gamut.IsCurrent2020} CustomSpace={gamut.IsCurrentCustomColorSpace} WP=({gamut.WhitePointX},{gamut.WhitePointY})");
 
                 // Connectivity
                 var conn = display.ConnectivityExperience;
-                sb.AppendLine($"Connectivity: HDMIQuality(supported={conn.IsHdmiQualityDetectionSupported},enabled={conn.IsHdmiQualityDetectionEnabled}) DPLink(supported={conn.IsDpLinkRateSupported},rate={conn.DpLinkRate}) PreEmphasis(supported={conn.IsRelativePreEmphasisSupported},value={conn.RelativePreEmphasis}) VoltageSwing(supported={conn.IsRelativeVoltageSwingSupported},value={conn.RelativeVoltageSwing})");
+                sb.AppendLine($"Connectivity: HDMIQuality(supported={conn.IsHdmiQualityDetectionSupported},enabled={conn.IsHdmiQualityDetectionEnabled}) ");
+                sb.AppendLine($"DPLink(supported={conn.IsDpLinkRateSupported},rate={conn.DpLinkRate}) ");
+                sb.AppendLine($"PreEmphasis(supported={conn.IsRelativePreEmphasisSupported},value={conn.RelativePreEmphasis}) ");
+                sb.AppendLine($"VoltageSwing(supported={conn.IsRelativeVoltageSwingSupported},value={conn.RelativeVoltageSwing})");
 
                 // 3DLUT
                 var lut = display.ThreeDLUTSettings;
-                sb.AppendLine($"3DLUT SupportedSCE:{lut.IsSupportedSCE} Vivid:{lut.IsSupportedSCEVividGaming} DynContrast:{lut.IsSupportedSCEDynamicContrast} User3DLUT:{lut.IsSupportedUser3DLUT} CurrentDisabled:{lut.IsCurrentSCEDisabled} CurrentVivid:{lut.IsCurrentSCEVividGaming} DynContrastEnabled:{lut.HasDynamicContrast} DynContrastValue:{lut.CurrentDynamicContrastValue} Range({lut.DynamicContrastRange.Min},{lut.DynamicContrastRange.Max},{lut.DynamicContrastRange.Step})");
+                sb.AppendLine($"3DLUT SupportedSCE:{lut.IsSupportedSCE} 
+                sb.AppendLine($"Vivid:{lut.IsSupportedSCEVividGaming} ");
+                sb.AppendLine($"DynContrast:{lut.IsSupportedSCEDynamicContrast} ");
+                sb.AppendLine($"User3DLUT:{lut.IsSupportedUser3DLUT} ");
+                sb.AppendLine($"CurrentDisabled:{lut.IsCurrentSCEDisabled} ");
+                sb.AppendLine($"CurrentVivid:{lut.IsCurrentSCEVividGaming} 
+                sb.AppendLine($"DynContrastEnabled:{lut.HasDynamicContrast} DynContrastValue:{lut.CurrentDynamicContrastValue} Range({lut.DynamicContrastRange.Min},{lut.DynamicContrastRange.Max},{lut.DynamicContrastRange.Step})");
 
                 // Feature toggles
                 sb.AppendLine($"FreeSync: Supported={display.IsSupportedFreeSync} Enabled={display.IsEnabledFreeSync}");
@@ -2994,11 +3022,11 @@ namespace DisplayMagicianShared.AMD
                 sb.AppendLine();
             }
 
-            // Eyefinity/SLS summary from stored config
-            sb.AppendLine("****** AMD EYEFINITY (SLS) *******");
+            // Eyefinity/SLS summary from stored config (for ADL2 configuration)
+            sb.AppendLine("****** AMD EYEFINITY via ADL2 (SLS) *******");
             if (displayConfig.Adl2SlsConfig.IsSlsEnabled)
             {
-                sb.AppendLine("AMD Eyefinity is Enabled");
+                sb.AppendLine("AMD Eyefinity via ADL2 is Enabled");
                 if (displayConfig.Adl2SlsConfig.SLSMapConfigs.Count > 0)
                 {
                     int idx = 0;
@@ -3011,12 +3039,10 @@ namespace DisplayMagicianShared.AMD
             }
             else
             {
-                sb.AppendLine("AMD Eyefinity (SLS) is Disabled");
+                sb.AppendLine("AMD Eyefinity via ADL2 (SLS) is Disabled");
             }
 
             sb.AppendLine();
-            // Append Windows info
-            sb.Append(WinLibrary.GetLibrary().PrintActiveConfig());
 
             return sb.ToString();
         }
