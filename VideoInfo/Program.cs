@@ -157,7 +157,7 @@ namespace VideoInfo
                 else if (args[0] == "load")
                 {
                     // set the defaults
-                    bool useADLEyefinity = false;
+                    bool useADLEyefinity = true;
                     int delayInMs = 500;
                     string fileToLoad = string.Empty;
                     SharedLogger.logger.Debug($"VideoInfo/Main: The load command was provided");
@@ -190,10 +190,10 @@ namespace VideoInfo
                                     delayInMs = 500;
                                 }
                             }
-                            else if (args[i].StartsWith("--oldEyefinity", StringComparison.OrdinalIgnoreCase))
+                            else if (args[i].StartsWith("--newEyefinity", StringComparison.OrdinalIgnoreCase))
                             {
-                                SharedLogger.logger.Debug($"VideoInfo/Main: The oldEyefinity command was provided, so we will use ADL Eyefinity to apply the display settings rather than ADLX.");
-                                useADLEyefinity = true;
+                                SharedLogger.logger.Debug($"VideoInfo/Main: The newEyefinity command was provided, so we will use the newer ADLX Eyefinity to apply the display settings rather than ADL2.");
+                                useADLEyefinity = false;
                             }
                             else
                             {
@@ -347,6 +347,7 @@ namespace VideoInfo
             Console.WriteLine($"\t'VideoInfo save myfilename.cfg' will save your current display setting to the myfilename.cfg file.");
             Console.WriteLine($"\t'VideoInfo load myfilename.cfg' will load and apply the display setting in the myfilename.cfg file.");
             Console.WriteLine($"\t'VideoInfo load myfilename.cfg --delay:800' will load and apply the display setting in the myfilename.cfg file with a 800ms delay between steps.");
+            Console.WriteLine($"\t'VideoInfo load myfilename.cfg --delay:800 --newEyefinity' will load and apply the display setting in the myfilename.cfg file with a 800ms delay between steps, and will use the new ADLX API to create the Eyefinity Desktop.");
             Console.WriteLine($"\t'VideoInfo possible myfilename.cfg' will test the display setting in the myfilename.cfg file to see\n\t\tif it is possible to use that display profile now.");
             Console.WriteLine($"\t'VideoInfo equal myfilename.cfg' will test if the display setting in the myfilename.cfg is equal to\n\t\tthe one in use.");
             Console.WriteLine($"\t'VideoInfo equal myfilename.cfg myother.cfg' will test if the display setting in the myfilename.cfg\n\t\tis equal to the one in myother.cfg.");
