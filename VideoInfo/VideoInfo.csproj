@@ -36,6 +36,9 @@
     <Reference Include="ADLXWrapper">
       <HintPath>DLL\ADLXWrapper.dll</HintPath>
     </Reference>
+    <Reference Include="IGCLWrapper">
+      <HintPath>DLL\IGCLWrapper.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Update="ADLXWrapper.dll">

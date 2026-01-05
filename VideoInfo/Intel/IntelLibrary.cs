@@ -1,6 +1,6 @@
 using DisplayMagicianShared;
 using DisplayMagicianShared.Windows;
-using IGCLWrapper; // SWIG-generated bindings
+using IGCLWrapper;
 using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Reflection;
 
 namespace DisplayMagicianShared.Intel
 {
@@ -320,6 +321,7 @@ namespace DisplayMagicianShared.Intel
         
         // IGCL API Handle
         private SWIGTYPE_p__ctl_api_handle_t _igclApiHandle;
+        private IGCLApiHelper _igclApiHelper;
         
         private INTEL_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<string> _allConnectedDisplayIdentifiers;
@@ -337,143 +339,55 @@ namespace DisplayMagicianShared.Intel
         public IntelLibrary()
         {
             _activeDisplayConfig = CreateDefaultConfig();
-
-            // TODO: Disable the IGCL library use for now until we can properly test it
-            _initialised = false;
-            return;
-
+            _allConnectedDisplayIdentifiers = new List<string>();
+            
             try
             {
                 _initialised = false;
                 
                 // Check if there is Intel hardware installed
                 SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Looking for Intel PCI hardware...");
-                if (WinLibrary.IsPCIVideoCardVendorInstalled(PCIVendorIDs))
+                if (!WinLibrary.IsPCIVideoCardVendorInstalled(PCIVendorIDs))
                 {
-                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Intel hardware detected");
-                }
-                else
-                {
-                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: No Intel hardware detected");
-                    return;
-                }
-
-                try {
-                    // Attempt to load the Intel IGCL 64-bit DLL
-                    
-                    string system32Path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),"DriverStore","FileRepository");
-
-                    Console.WriteLine($"Searching for {Intel_IGCL_DLL} in {system32Path} and its subdirectories...");
-
-                    // Find all files matching the DLL name.
-                    string[] foundDlls = FindAllFiles(system32Path, Intel_IGCL_DLL);
-
-                    if (foundDlls.Length == 0)
-                    {
-                        Console.WriteLine($"{Intel_IGCL_DLL} not found in System32 or its subdirectories.");
-                        return;
-                    }
-
-                    // Find the newest version among the found DLLs.
-                    string newestDllPath = GetNewestDllPath(foundDlls);
-                    if (newestDllPath == null)
-                    {
-                        Console.WriteLine("Could not determine the newest DLL version.");
-                        return;
-                    }
-
-                    Console.WriteLine($"Found newest version of {Intel_IGCL_DLL} at: {newestDllPath}");
-
-                    hIGCLModule = LoadLibrary(newestDllPath);
-                    //hIGCLModule = LoadLibrary(intelDriverPath);
-                    if (hIGCLModule != IntPtr.Zero)
-                    {
-                        SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully loaded the Intel IGCL DLL which means the Intel Graphics driver software is installed.");
-                    }
-                    else
-                    {
-                        // LoadLibrary failed, DLL is not available
-                        _initialised = false;
-                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to load the Intel IGCL DLL. You need to download and install the Intel Graphics Driver software from the Intel support website in order to fully support Intel hardware.");
-                        return;
-                    }
-
-                    // Attempt to load the Custom ADLX Binding DLL
-                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to load the Intel IGCL CSharp Binding DLL {INTEL_IGCL_BINDING_DLL} so we can access the Intel IGCL DLL from C#");
-                    hIGCLBindingModule = LoadLibrary(INTEL_IGCL_BINDING_DLL);
-                    if (hIGCLBindingModule != IntPtr.Zero)
-                    {
-
-                        // Successfully loaded our custom ADLX Binding DLL, which means it's installed!
-                        _initialised = true;
-                        SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully loaded our custom Intel IGCL CSharp Binding DLL! We can use the Intel IGCL API");
-                    }
-                    else
-                    {
-                        // LoadLibrary failed, DLL is not available
-                        _initialised = false;
-                        SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to load the Intel IGCL CSharp Binding DLL.");
-                        return;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _initialised = false;
-                    SharedLogger.logger.Error(ex, "IntelLibrary/IntelLibrary: Exception while trying to load the Intel IGCL DLL or Intel IGCL CSharp Binding DLL. You may need to install the Intel Graphics driver.");
-                }
-
-                // Initialize ADLX with ADLXHelper
-                //_adlxHelper = new ADLXHelper();
-                SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: Intialising Intel IGCL Helper interface");
-
-                // Create a pointer to hold the API handle
-                var ppApiHandle = IGCL.new_apiHandleP();
-
-                /* CtlInitArgs.AppVersion = CTL_MAKE_VERSION(CTL_IMPL_MAJOR_VERSION, CTL_IMPL_MINOR_VERSION);
-                CtlInitArgs.flags = 0;
-                CtlInitArgs.Size = sizeof(CtlInitArgs);
-                CtlInitArgs.Version = 0;*/
-
-                ctl_init_args_t ctl_Init_Args = new ctl_init_args_t();
-                ctl_Init_Args.Version = 1;
-                ctl_Init_Args.flags = 0;
-                ctl_Init_Args.AppVersion = (uint)IGCL.CTL_MakeVersion((uint)IGCL.CTL_IMPL_MAJOR_VERSION, (uint)IGCL.CTL_IMPL_MINOR_VERSION);
-
-                
-                //ctl_Init_Args.Size = (uint)Marshal.SizeOf(typeof(ctl_init_args_t)); // or the alias type
-                //ctl_Init_Args.Version = (byte)1.1;  // or 0 if header says so
-                //ctl_Init_Args.flags = (uint)ctl_init_flag_t.CTL_INIT_FLAG_USE_LEVEL_ZERO; // or 0 if no special flags
-                // If there�s an ApplicationUID field:
-                //ctl_Init_Args.ApplicationUID = new ctl_application_id_t();
-                // zero it out if necessary
-                // Initialize IGCL with default settings
-                //ctl_result_t status = IGCL.IGCL_InitDefault(apiHandlePtr);
-                ctl_result_t status = IGCL.ctlInit(ctl_Init_Args, ppApiHandle);
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                {
-                    if (status == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_VERSION)
-                    {
-                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. This version of the IGCL API is not supported on your PC. IGCL is supported on Alderlake-P and later CPUs and select GPUs.");
-                    }
-                    else if (status == ctl_result_t.CTL_RESULT_ERROR_PLATFORM_NOT_SUPPORTED)
-                    {
-                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. The IGCL API Platform is not supported on your PC. IGCL is supported on Alderlake-P and later CPUs and select GPUs.");
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Error intialising Intel IGCL library. IGCL.ctlInit() returned error code {status.ToString("G")}");
-                    }
-                    _initialised = false;
+                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: No Intel GPU hardware detected.");
                     return;
                 }
                 else
                 {
-                    // Get the actual API handle from the pointer
-                    _igclApiHandle = IGCL.apiHandleP_value(ppApiHandle);
-                    Console.WriteLine("IGCL initialized successfully");
-                    SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Successfully intialised Intel IGCL library!");
-                    _initialised = true;
+                    SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Intel GPU hardware detected");
                 }
+
+                // Confirm the IGCL DLL is available before attempting to initialise
+                if (!IGCLApiHelper.IsIGCLDllAvailable(out string dllError))
+                {
+                    _initialised = false;
+                    SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Failed to load the Intel IGCL DLL. {dllError}");
+                    return;
+                }
+
+                SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: Intialising Intel IGCL facade helper");
+
+                _igclApiHelper = IGCLApiHelper.Initialize();
+                if (_igclApiHelper == null)
+                {
+                    _initialised = false;
+                    SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to initialise Intel IGCL helper.");
+                    return;
+                }
+
+                IntPtr apiHandlePtr = TryGetApiHandlePointer(_igclApiHelper);
+                if (apiHandlePtr != IntPtr.Zero)
+                {
+                    _igclApiHandle = new SWIGTYPE_p__ctl_api_handle_t(apiHandlePtr, false);
+                }
+                else
+                {
+                    _initialised = false;
+                    SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Unable to retrieve IGCL API handle from helper.");
+                    return;
+                }
+                _initialised = true;
+                SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: Successfully initialised Intel IGCL helper.");
             }
             catch (TypeInitializationException ex)
             {
@@ -902,6 +816,29 @@ namespace DisplayMagicianShared.Intel
             
             // Return the configuration
             return myDisplayConfig;
+        }
+
+        private IntPtr TryGetApiHandlePointer(IGCLApiHelper helper)
+        {
+            if (helper == null)
+            {
+                return IntPtr.Zero;
+            }
+
+            try
+            {
+                PropertyInfo handleProperty = helper.GetType().GetProperty("ApiHandle") ?? helper.GetType().GetProperty("Handle");
+                if (handleProperty != null && handleProperty.GetValue(helper) is SafeHandle safeHandle)
+                {
+                    return safeHandle.DangerousGetHandle();
+                }
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Trace(ex, "IntelLibrary/TryGetApiHandlePointer: Failed to extract IGCL API handle from helper.");
+            }
+
+            return IntPtr.Zero;
         }
 
         /// <summary>
@@ -1528,3 +1465,4 @@ namespace DisplayMagicianShared.Intel
         public IntelLibraryException(string message, Exception inner) : base(message, inner) { }
     }
 }
+
