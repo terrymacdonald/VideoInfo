@@ -592,59 +592,30 @@ namespace DisplayMagicianShared.Intel
 
             if (_initialised && _igclApiHandle != null)
             {
-                ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
+                
+                // Enumerate the Intel GPUs adapters in the sytem
+                var adapters = _igclApiHelper.EnumerateAdapters();
+                int adapterTotalCount = adapters.Count;
+                int adapterNum = 0;
 
-                // Enumerate Intel adapters
-                SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
-                IGCL.igcl_uint32P_assign(pAdapterCount, 0);
-                
-                // First call to get count
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
-                uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
-                
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS || adapterCount == 0)
+                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Found {adapterTotalCount} Intel GPU adapter(s)");
+
+
+                // Go through each adapter
+                foreach (var adapter in adapters)
                 {
-                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No Intel adapters found or error getting adapter count. Status: {status}");
-                    return myDisplayConfig;
-                }
-
-                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Found {adapterCount} Intel adapter(s)");
-
-                // Allocate array for adapter handles
-                SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
-                
-                // Second call to get actual adapters
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
-                
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                {
-                    SharedLogger.logger.Error($"IntelLibrary/GetIntelDisplayConfig: Error enumerating Intel adapters. Status: {status}");
-                    return myDisplayConfig;
-                }
-
-                IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
-
-                // Iterate through adapters
-                for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
-                {
-                    // Get adapter handle at this index
-                    IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
-
+                    adapterNum++;
                     // Get adapter properties
-                    ctl_device_adapter_properties_t adapterProps = IGCL.new_adapterPropertiesP();
-                    status = IGCL.IGCL_GetAdapterProperties(hAdapter, adapterProps);
+                    var adapterProperties = adapter.GetProperties();
+
+                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}}({adapterProperties.name}), PCI Device ID: 0x{adapterProperties.pci_device_id:X4}, device type {adapterProperties.device_type} ({adapterNum}/{adapterTotalCount}");
                     
-                    if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                    {
-                        SharedLogger.logger.Warn($"IntelLibrary/GetIntelDisplayConfig: Failed to get properties for adapter {adapterIdx}");
-                        continue;
-                    }
-
-                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing adapter {adapterIdx}: {adapterProps.name}");
-
                     //------------------------------------
                     // CHECK FOR COMBINED DISPLAY CONFIGURATION
                     //------------------------------------
+
+                    // TODO - Check for combined display configuration using Helpers
+
                     ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
                     combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_QUERY_CONFIG;
                     combinedDisplayArgs.IsSupported = false;
@@ -668,61 +639,27 @@ namespace DisplayMagicianShared.Intel
                     else
                     {
                         myDisplayConfig.IsCombinedDisplay = false;
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No Combined Display detected for adapter {adapterIdx}");
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No Combined Display detected for adapter {adapterNum}");
                     }
 
                     // Enumerate displays for this adapter
-                    SWIGTYPE_p_unsigned_int pDisplayCount = IGCL.new_igcl_uint32P();
-                    IGCL.igcl_uint32P_assign(pDisplayCount, 0);
+                    var displays = adapter.GetDisplays();
+                    int displayTotalCount = displays.Count;
+                    int displayCount = 0;
                     
-                    // First call to get display count
-                    status = IGCL.IGCL_EnumerateDisplays(hAdapter, pDisplayCount, null);
-                    uint displayCount = IGCL.igcl_uint32P_value(pDisplayCount);
-                    
-                    if (status != ctl_result_t.CTL_RESULT_SUCCESS || displayCount == 0)
+                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Found {displayTotalCount} display(s) on adapter {adapterNum}");
+
+                    foreach (var display in displays)
                     {
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No displays found for adapter {adapterIdx} or error. Status: {status}");
-                        continue;
-                    }
-
-                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Found {displayCount} display(s) on adapter {adapterIdx}");
-
-                    // Allocate array for display handles
-                    SWIGTYPE_p_p__ctl_display_output_handle_t ppDisplays = IGCL.new_displayOutputHandleP();
-                    
-                    // Second call to get actual displays
-                    status = IGCL.IGCL_EnumerateDisplays(hAdapter, pDisplayCount, ppDisplays);
-                    
-                    if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                    {
-                        SharedLogger.logger.Error($"IntelLibrary/GetIntelDisplayConfig: Error enumerating displays for adapter {adapterIdx}. Status: {status}");
-                        continue;
-                    }
-
-                    IntPtr displaysPtr = IGCL.displayOutputHandleP_value(ppDisplays);
-
-                    // Iterate through displays
-                    for (uint displayIdx = 0; displayIdx < displayCount; displayIdx++)
-                    {
-                        // Get display handle at this index
-                        IntPtr hDisplay = Marshal.ReadIntPtr(displaysPtr, (int)(displayIdx * IntPtr.Size));
-
-                        // Get display properties
-                        ctl_display_properties_t displayProps = IGCL.new_displayPropertiesP();
-                        status = IGCL.IGCL_GetDisplayProperties(hDisplay, displayProps);
-                        
-                        if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                        {
-                            SharedLogger.logger.Warn($"IntelLibrary/GetIntelDisplayConfig: Failed to get properties for display {displayIdx} on adapter {adapterIdx}");
-                            continue;
-                        }
+                        displayCount++;
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
 
                         // Create display with settings
                         INTEL_DISPLAY_WITH_SETTINGS displayWithSettings = new INTEL_DISPLAY_WITH_SETTINGS();
                         
                         // Get display name - using display index as identifier since name isn't directly available
-                        string displayName = $"Intel Display {displayIdx} on Adapter {adapterIdx}";
-                        string deviceId = $"IntelDisplay_{adapterIdx}_{displayIdx}";
+                        string displayName = $"Intel Display {displayCount} on Adapter {adapterNum}";
+                        string deviceId = $"IntelDisplay_{adapterNum}_{displayCount}";
                         
                         displayWithSettings.Display = new INTEL_DISPLAY
                         {
@@ -732,11 +669,16 @@ namespace DisplayMagicianShared.Intel
                             AdapterIndex = adapterIdx
                         };
 
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayIdx}: {displayName}");
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayCount}/{displayTotalCount} on adapter {adapterNum}: {displayName}");
 
                         //------------------------------------
                         // GET INTEGER SCALING (RETRO SCALING) SETTINGS
                         //------------------------------------
+                        ctl_retro_scaling_caps_t retroScalingCaps = new ctl_retro_scaling_caps_t();
+                        retroScalingCaps.
+                        retroScalingCaps = display.GetSupportedRetroScalingCapability(retroScalingCaps);
+
+
                         ctl_retro_scaling_caps_t retroScalingCaps = new ctl_retro_scaling_caps_t();
                         status = IGCL.ctlGetSupportedRetroScalingCapability(hAdapter, retroScalingCaps);
                         
@@ -799,9 +741,11 @@ namespace DisplayMagicianShared.Intel
                             }
                         }
 
+                        
                         // Add display to configuration
                         myDisplayConfig.Displays.Add(hDisplay, displayWithSettings);
                     }
+                    
                 }
 
                 // Get display identifiers
