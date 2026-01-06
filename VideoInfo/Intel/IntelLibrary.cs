@@ -702,6 +702,7 @@ namespace DisplayMagicianShared.Intel
                         // GET GPU SCALING SETTINGS
                         //------------------------------------
                         ctl_scaling_caps_t scalingCaps = new ctl_scaling_caps_t();
+                        display.GetSupportedScalingCapability(scalingCaps);
                         status = IGCL.ctlGetSupportedScalingCapability(hDisplay, scalingCaps);
                         
                         if (status == ctl_result_t.CTL_RESULT_SUCCESS)

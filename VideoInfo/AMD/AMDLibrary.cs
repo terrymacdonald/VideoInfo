@@ -2173,6 +2173,8 @@ namespace DisplayMagicianShared.AMD
 
                         // Store the desktop type
                         newDesktop.Type = desktop.Type;
+
+                        // TODO: Process Eyefinity and Cloned desktops
 /*
                         // The the desktop is an eyefinity desktop then set the eyefinity enabled flag
                         // and also process the EyefinityDesktop layout
