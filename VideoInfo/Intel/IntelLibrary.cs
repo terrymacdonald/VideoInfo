@@ -674,10 +674,33 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         // GET INTEGER SCALING (RETRO SCALING) SETTINGS
                         //------------------------------------
-                        ctl_retro_scaling_caps_t retroScalingCaps = new ctl_retro_scaling_caps_t();
-                        retroScalingCaps.
-                        retroScalingCaps = display.GetSupportedRetroScalingCapability(retroScalingCaps);
+                        ctl_retro_scaling_caps_t retroScalingCaps = display.GetSupportedRetroScalingCapability();
+                        if (retroScalingCaps.SupportedRetroScaling == 1)
+                        {
+                            displayWithSettings.IsSupportedIntegerScaling = true;
 
+                            ctl_retro_scaling_settings_t retroScalingSettings = new ctl_retro_scaling_settings_t();
+                            // Change this struct to 'Get' mode
+                            retroScalingSettings.Get = 1;
+                            // Get the current Integer Scaling settings
+                            var retroScalingSettingsAnswer = display.GetSetRetroScaling(retroScalingSettings);
+                            if (retroScalingSettingsAnswer.Enable == 0)
+                            {
+                                displayWithSettings.IsEnabledIntegerScaling = false;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Integer Scaling Settings for : Enabled={displayWithSettings.IsEnabledIntegerScaling}");
+                            }
+                            else
+                            {
+                                displayWithSettings.IsEnabledIntegerScaling = true;
+                                displayWithSettings.IntegerScalingType = (ctl_retro_scaling_type_flag_t)retroScalingSettingsAnswer.RetroScalingType;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Integer Scaling Settings for : Enabled={displayWithSettings.IsEnabledIntegerScaling}, Type={displayWithSettings.IntegerScalingType}");
+                            }
+                        }
+                        else
+                        {
+                            displayWithSettings.IsSupportedIntegerScaling = false;
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Integer Scaling not supported on this display");
+                        }
 
                         ctl_retro_scaling_caps_t retroScalingCaps = new ctl_retro_scaling_caps_t();
                         status = IGCL.ctlGetSupportedRetroScalingCapability(hAdapter, retroScalingCaps);
