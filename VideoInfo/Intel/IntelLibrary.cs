@@ -69,7 +69,10 @@ namespace DisplayMagicianShared.Intel
     [StructLayout(LayoutKind.Sequential)]
     public struct INTEL_DISPLAY_WITH_SETTINGS : IEquatable<INTEL_DISPLAY_WITH_SETTINGS>
     {
-        public INTEL_DISPLAY Display;
+        public string Name;
+        public string DeviceID;
+        public uint DisplayIndex;
+        public uint AdapterIndex;
         
         // Integer Scaling (Retro Scaling)
         public bool IsSupportedIntegerScaling;
@@ -89,7 +92,10 @@ namespace DisplayMagicianShared.Intel
 
         public INTEL_DISPLAY_WITH_SETTINGS()
         {
-            Display = new INTEL_DISPLAY();
+            Name = "";
+            DeviceID = "";
+            DisplayIndex = 0;
+            AdapterIndex = 0;
             IsSupportedIntegerScaling = false;
             IsEnabledIntegerScaling = false;
             IntegerScalingType = ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_INTEGER;
@@ -106,9 +112,24 @@ namespace DisplayMagicianShared.Intel
         
         public bool Equals(INTEL_DISPLAY_WITH_SETTINGS other)
         {
-            if (!Display.Equals(other.Display))
+            if (Name != other.Name)
             {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The Display values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The Name values don't equal each other");
+                return false;
+            }
+            if (DeviceID != other.DeviceID)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DeviceID values don't equal each other");
+                return false;
+            }
+            if (DisplayIndex != other.DisplayIndex)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayIndex values don't equal each other");
+                return false;
+            }
+            if (AdapterIndex != other.AdapterIndex)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The AdapterIndex values don't equal each other");
                 return false;
             }
             if (IsSupportedIntegerScaling != other.IsSupportedIntegerScaling)
@@ -166,7 +187,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (Display, IsSupportedIntegerScaling, IsEnabledIntegerScaling, IntegerScalingType, 
+            return (Name, DeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsEnabledIntegerScaling, IntegerScalingType, 
                     IsSupportedGPUScaling, IsEnabledGPUScaling, ScalingType,
                     IsSupportedImageSharpening, IsEnabledImageSharpening, SharpeningFilterType, SharpeningIntensity).GetHashCode();
         }
@@ -320,7 +341,6 @@ namespace DisplayMagicianShared.Intel
         private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
         
         // IGCL API Handle
-        private SWIGTYPE_p__ctl_api_handle_t _igclApiHandle;
         private IGCLApiHelper _igclApiHelper;
         
         private INTEL_DISPLAY_CONFIG? _activeDisplayConfig;
@@ -372,18 +392,6 @@ namespace DisplayMagicianShared.Intel
                 {
                     _initialised = false;
                     SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Failed to initialise Intel IGCL helper.");
-                    return;
-                }
-
-                IntPtr apiHandlePtr = TryGetApiHandlePointer(_igclApiHelper);
-                if (apiHandlePtr != IntPtr.Zero)
-                {
-                    _igclApiHandle = new SWIGTYPE_p__ctl_api_handle_t(apiHandlePtr, false);
-                }
-                else
-                {
-                    _initialised = false;
-                    SharedLogger.logger.Error("IntelLibrary/IntelLibrary: Unable to retrieve IGCL API handle from helper.");
                     return;
                 }
                 _initialised = true;
@@ -476,13 +484,13 @@ namespace DisplayMagicianShared.Intel
                 _safeHandle?.Dispose();
             }
 
-            if (_initialised && _igclApiHandle != null)
+            // Free unmanaged resources (unmanaged objects) and override finalizer.
+            if (_igclApiHelper != null)
             {
-                // Close the IGCL API to avoid memory leaks
-                SharedLogger.logger.Trace("IntelLibrary/Dispose: Closing the Intel IGCL API");
-                IGCL.IGCL_Close(_igclApiHandle);
-                _igclApiHandle = null;
+                _igclApiHelper.Dispose();
+                _igclApiHelper = null;
             }
+
 
             if (hIGCLModule != IntPtr.Zero)
             {
@@ -590,7 +598,7 @@ namespace DisplayMagicianShared.Intel
             // Create empty config struct so we know there are no nulls in there to break the json serializer
             INTEL_DISPLAY_CONFIG myDisplayConfig = CreateDefaultConfig();
 
-            if (_initialised && _igclApiHandle != null)
+            if (_initialised && _igclApiHelper != null)
             {
                 
                 // Enumerate the Intel GPUs adapters in the sytem
@@ -608,7 +616,7 @@ namespace DisplayMagicianShared.Intel
                     // Get adapter properties
                     var adapterProperties = adapter.GetProperties();
 
-                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}}({adapterProperties.name}), PCI Device ID: 0x{adapterProperties.pci_device_id:X4}, device type {adapterProperties.device_type} ({adapterNum}/{adapterTotalCount}");
+                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}({adapterProperties.name}), PCI Device ID: 0x{adapterProperties.pci_device_id:X4}, device type {adapterProperties.device_type} ({adapterNum}/{adapterTotalCount}");
                     
                     //------------------------------------
                     // CHECK FOR COMBINED DISPLAY CONFIGURATION
