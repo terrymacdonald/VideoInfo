@@ -1009,78 +1009,29 @@ namespace DisplayMagicianShared.Intel
                         SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
 
                         // Create display with settings
-                        INTEL_DISPLAY_WITH_SETTINGS displayWithSettings = new INTEL_DISPLAY_WITH_SETTINGS();
+                        INTEL_DISPLAY_WITH_SETTINGS newDisplay = new INTEL_DISPLAY_WITH_SETTINGS();
                         
                         var displayProps = display.GetProperties();
                         var displaySettings = display.GetDisplaySettings();
 
                         // Get display name - using display index as identifier since name isn't directly available
                         
-                        displayWithSettings.Display = new INTEL_DISPLAY
-                        {
-                            Name = displayProps.,
-                            DeviceID = deviceId,
-                            
-                            AdapterIndex = adapterIdx
-                        };
-
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayCount}/{displayTotalCount} on adapter {adapterNum}: {displayName}");
+                        newDisplay.Name = $"Intel Display {displayCount} on Adapter {adapterNum}";
+                        
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayCount}/{displayTotalCount} on adapter {adapterNum}: {newDisplay.Name}");
 
                         //------------------------------------
                         // GET INTEGER SCALING (RETRO SCALING) SETTINGS
                         //------------------------------------
-                        ctl_retro_scaling_caps_t retroScalingCaps = display.GetSupportedRetroScalingCapability();
-                        if (retroScalingCaps.SupportedRetroScaling == 1)
-                        {
-                            displayWithSettings.IsSupportedIntegerScaling = true;
-
-                            ctl_retro_scaling_settings_t retroScalingSettings = new ctl_retro_scaling_settings_t();
-                            // Change this struct to 'Get' mode
-                            retroScalingSettings.Get = 1;
-                            // Get the current Integer Scaling settings
-                            var retroScalingSettingsAnswer = display.GetSetRetroScaling(retroScalingSettings);
-                            if (retroScalingSettingsAnswer.Enable == 0)
-                            {
-                                displayWithSettings.IsEnabledIntegerScaling = false;
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Integer Scaling Settings for : Enabled={displayWithSettings.IsEnabledIntegerScaling}");
-                            }
-                            else
-                            {
-                                displayWithSettings.IsEnabledIntegerScaling = true;
-                                displayWithSettings.IntegerScalingType = (ctl_retro_scaling_type_flag_t)retroScalingSettingsAnswer.RetroScalingType;
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Integer Scaling Settings for : Enabled={displayWithSettings.IsEnabledIntegerScaling}, Type={displayWithSettings.IntegerScalingType}");
-                            }
-                        }
-                        else
-                        {
-                            displayWithSettings.IsSupportedIntegerScaling = false;
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Integer Scaling not supported on this display");
-                        }
-
-                        ctl_retro_scaling_caps_t retroScalingCaps = new ctl_retro_scaling_caps_t();
-                        status = IGCL.ctlGetSupportedRetroScalingCapability(hAdapter, retroScalingCaps);
-                        
-                        if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                        {
-                            displayWithSettings.IsSupportedIntegerScaling = true;
-                            
-                            ctl_retro_scaling_settings_t retroScalingSettings = new ctl_retro_scaling_settings_t();
-                            retroScalingSettings.Get = true;
-                            status = IGCL.ctlGetSetRetroScaling(hAdapter, retroScalingSettings);
-                            
-                            if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                displayWithSettings.IsEnabledIntegerScaling = retroScalingSettings.Enable;
-                                displayWithSettings.IntegerScalingType = (ctl_retro_scaling_type_flag_t)retroScalingSettings.RetroScalingType;
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Integer Scaling: Enabled={retroScalingSettings.Enable}, Type={retroScalingSettings.RetroScalingType}");
-                            }
-                        }
+                        newDisplay.RetroScalingCaps = display.GetSupportedRetroScalingCapability();
+                        newDisplay.RetroScalingSettings = display.GetRetroScalingSettings();
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Integer Scaling Settings for : Enabled={newDisplay.RetroScalingCaps.SupportedRetroScaling}, Type={newDisplay.RetroScalingSettings.RetroScalingType}");
 
                         //------------------------------------
                         // GET GPU SCALING SETTINGS
                         //------------------------------------
                         ctl_scaling_caps_t scalingCaps = new ctl_scaling_caps_t();
-                        display.GetSupportedScalingCapability(scalingCaps);
+                        display.GetSupportedScalingCapability();
                         status = IGCL.ctlGetSupportedScalingCapability(hDisplay, scalingCaps);
                         
                         if (status == ctl_result_t.CTL_RESULT_SUCCESS)
