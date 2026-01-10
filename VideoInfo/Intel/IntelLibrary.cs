@@ -90,6 +90,47 @@ namespace DisplayMagicianShared.Intel
         public ctl_sharpness_filter_type_flag_t SharpeningFilterType;
         public float SharpeningIntensity;
 
+        // Display-related DTOs
+        public DisplaySettingsDto DisplaySettings;
+        public ScalingSettingsDto ScalingSettings;
+        public SharpnessSettingsDto SharpnessSettings;
+        public RetroScalingSettingsDto RetroScalingSettings;
+        public DceArgsDto DynamicContrastEnhancement;
+        public uint[] DynamicContrastEnhancementHistogram;
+        public PowerOptimizationSettingsDto PowerOptimizationSettings;
+        public LaceConfigDto LaceConfig;
+        public SwPsrSettingsDto SoftwarePsrSettings;
+        public CombinedDisplayArgsDto CombinedDisplayArgs;
+        public GenlockArgsDto GenlockArgs;
+        public IntelArcSyncMonitorParamsDto IntelArcSyncMonitorParams;
+        public AdapterDisplayEncoderPropertiesDto AdapterDisplayEncoderProperties;
+
+        // Display getter outputs
+        public ctl_display_properties_t DisplayProperties;
+        public ctl_device_adapter_properties_t DeviceProperties;
+        public ctl_display_timing_t DisplayTiming;
+        public ctl_get_set_wire_format_config_t WireFormat;
+        public ctl_get_brightness_t Brightness;
+        public ctl_scaling_caps_t ScalingCaps;
+        public ctl_sharpness_caps_t SharpnessCaps;
+        public ctl_sharpness_filter_properties_t[] SharpnessFilterProperties;
+        public ctl_retro_scaling_caps_t RetroScalingCaps;
+        public ctl_power_optimization_caps_t PowerOptimizationCaps;
+        public ctl_intel_arc_sync_profile_params_t IntelArcSyncProfile;
+        public ctl_get_set_custom_mode_args_t CustomModeArgs;
+        public ctl_custom_src_mode_t[] CustomModes;
+        public ctl_lda_args_t LinkedDisplayAdaptersArgs;
+        public IntPtr[] LinkedDisplayAdapters;
+        public ctl_mux_properties_t MuxProperties;
+        public IntPtr[] MuxDisplayOutputs;
+        public ctl_vblank_ts_args_t VblankTimestamp;
+        public IntPtr ZeDeviceHandle;
+        public IntPtr ZeDriverHandle;
+        public double RefreshRateHz;
+        public uint ResolutionWidth;
+        public uint ResolutionHeight;
+        public bool IsActive;
+
         public INTEL_DISPLAY_WITH_SETTINGS()
         {
             Name = "";
@@ -106,6 +147,45 @@ namespace DisplayMagicianShared.Intel
             IsEnabledImageSharpening = false;
             SharpeningFilterType = ctl_sharpness_filter_type_flag_t.CTL_SHARPNESS_FILTER_TYPE_FLAG_NON_ADAPTIVE;
             SharpeningIntensity = 0.0f;
+
+            DisplaySettings = new DisplaySettingsDto();
+            ScalingSettings = new ScalingSettingsDto();
+            SharpnessSettings = new SharpnessSettingsDto();
+            RetroScalingSettings = new RetroScalingSettingsDto();
+            DynamicContrastEnhancement = new DceArgsDto();
+            DynamicContrastEnhancementHistogram = Array.Empty<uint>();
+            PowerOptimizationSettings = new PowerOptimizationSettingsDto();
+            LaceConfig = new LaceConfigDto();
+            SoftwarePsrSettings = new SwPsrSettingsDto();
+            CombinedDisplayArgs = new CombinedDisplayArgsDto();
+            GenlockArgs = new GenlockArgsDto();
+            IntelArcSyncMonitorParams = new IntelArcSyncMonitorParamsDto();
+            AdapterDisplayEncoderProperties = new AdapterDisplayEncoderPropertiesDto();
+
+            DisplayProperties = new ctl_display_properties_t();
+            DeviceProperties = new ctl_device_adapter_properties_t();
+            DisplayTiming = new ctl_display_timing_t();
+            WireFormat = new ctl_get_set_wire_format_config_t();
+            Brightness = new ctl_get_brightness_t();
+            ScalingCaps = new ctl_scaling_caps_t();
+            SharpnessCaps = new ctl_sharpness_caps_t();
+            SharpnessFilterProperties = Array.Empty<ctl_sharpness_filter_properties_t>();
+            RetroScalingCaps = new ctl_retro_scaling_caps_t();
+            PowerOptimizationCaps = new ctl_power_optimization_caps_t();
+            IntelArcSyncProfile = new ctl_intel_arc_sync_profile_params_t();
+            CustomModeArgs = new ctl_get_set_custom_mode_args_t();
+            CustomModes = Array.Empty<ctl_custom_src_mode_t>();
+            LinkedDisplayAdaptersArgs = new ctl_lda_args_t();
+            LinkedDisplayAdapters = Array.Empty<IntPtr>();
+            MuxProperties = new ctl_mux_properties_t();
+            MuxDisplayOutputs = Array.Empty<IntPtr>();
+            VblankTimestamp = new ctl_vblank_ts_args_t();
+            ZeDeviceHandle = IntPtr.Zero;
+            ZeDriverHandle = IntPtr.Zero;
+            RefreshRateHz = 0.0;
+            ResolutionWidth = 0;
+            ResolutionHeight = 0;
+            IsActive = false;
         }
 
         public override bool Equals(object obj) => obj is INTEL_DISPLAY_WITH_SETTINGS other && Equals(other);
@@ -182,14 +262,279 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SharpeningIntensity values don't equal each other");
                 return false;
             }
+            if (!EqualityComparer<DisplaySettingsDto>.Default.Equals(DisplaySettings, other.DisplaySettings))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplaySettings values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ScalingSettingsDto>.Default.Equals(ScalingSettings, other.ScalingSettings))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ScalingSettings values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<SharpnessSettingsDto>.Default.Equals(SharpnessSettings, other.SharpnessSettings))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SharpnessSettings values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<RetroScalingSettingsDto>.Default.Equals(RetroScalingSettings, other.RetroScalingSettings))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The RetroScalingSettings values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<DceArgsDto>.Default.Equals(DynamicContrastEnhancement, other.DynamicContrastEnhancement))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DynamicContrastEnhancement values don't equal each other");
+                return false;
+            }
+            if (!DynamicContrastEnhancementHistogram.SequenceEqual(other.DynamicContrastEnhancementHistogram))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DynamicContrastEnhancementHistogram values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<PowerOptimizationSettingsDto>.Default.Equals(PowerOptimizationSettings, other.PowerOptimizationSettings))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The PowerOptimizationSettings values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<LaceConfigDto>.Default.Equals(LaceConfig, other.LaceConfig))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The LaceConfig values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<SwPsrSettingsDto>.Default.Equals(SoftwarePsrSettings, other.SoftwarePsrSettings))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SoftwarePsrSettings values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<CombinedDisplayArgsDto>.Default.Equals(CombinedDisplayArgs, other.CombinedDisplayArgs))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The CombinedDisplayArgs values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<GenlockArgsDto>.Default.Equals(GenlockArgs, other.GenlockArgs))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The GenlockArgs values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<IntelArcSyncMonitorParamsDto>.Default.Equals(IntelArcSyncMonitorParams, other.IntelArcSyncMonitorParams))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IntelArcSyncMonitorParams values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<AdapterDisplayEncoderPropertiesDto>.Default.Equals(AdapterDisplayEncoderProperties, other.AdapterDisplayEncoderProperties))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The AdapterDisplayEncoderProperties values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_display_properties_t>.Default.Equals(DisplayProperties, other.DisplayProperties))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayProperties values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_device_adapter_properties_t>.Default.Equals(DeviceProperties, other.DeviceProperties))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DeviceProperties values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_display_timing_t>.Default.Equals(DisplayTiming, other.DisplayTiming))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayTiming values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_get_set_wire_format_config_t>.Default.Equals(WireFormat, other.WireFormat))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The WireFormat values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_get_brightness_t>.Default.Equals(Brightness, other.Brightness))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The Brightness values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_scaling_caps_t>.Default.Equals(ScalingCaps, other.ScalingCaps))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ScalingCaps values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_sharpness_caps_t>.Default.Equals(SharpnessCaps, other.SharpnessCaps))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SharpnessCaps values don't equal each other");
+                return false;
+            }
+            if (!SharpnessFilterProperties.SequenceEqual(other.SharpnessFilterProperties))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SharpnessFilterProperties values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_retro_scaling_caps_t>.Default.Equals(RetroScalingCaps, other.RetroScalingCaps))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The RetroScalingCaps values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_power_optimization_caps_t>.Default.Equals(PowerOptimizationCaps, other.PowerOptimizationCaps))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The PowerOptimizationCaps values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_intel_arc_sync_profile_params_t>.Default.Equals(IntelArcSyncProfile, other.IntelArcSyncProfile))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IntelArcSyncProfile values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_get_set_custom_mode_args_t>.Default.Equals(CustomModeArgs, other.CustomModeArgs))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The CustomModeArgs values don't equal each other");
+                return false;
+            }
+            if (!CustomModes.SequenceEqual(other.CustomModes))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The CustomModes values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_lda_args_t>.Default.Equals(LinkedDisplayAdaptersArgs, other.LinkedDisplayAdaptersArgs))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The LinkedDisplayAdaptersArgs values don't equal each other");
+                return false;
+            }
+            if (!LinkedDisplayAdapters.SequenceEqual(other.LinkedDisplayAdapters))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The LinkedDisplayAdapters values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_mux_properties_t>.Default.Equals(MuxProperties, other.MuxProperties))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The MuxProperties values don't equal each other");
+                return false;
+            }
+            if (!MuxDisplayOutputs.SequenceEqual(other.MuxDisplayOutputs))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The MuxDisplayOutputs values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_vblank_ts_args_t>.Default.Equals(VblankTimestamp, other.VblankTimestamp))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The VblankTimestamp values don't equal each other");
+                return false;
+            }
+            if (ZeDeviceHandle != other.ZeDeviceHandle)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ZeDeviceHandle values don't equal each other");
+                return false;
+            }
+            if (ZeDriverHandle != other.ZeDriverHandle)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ZeDriverHandle values don't equal each other");
+                return false;
+            }
+            if (Math.Abs(RefreshRateHz - other.RefreshRateHz) > 0.001)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The RefreshRateHz values don't equal each other");
+                return false;
+            }
+            if (ResolutionWidth != other.ResolutionWidth)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ResolutionWidth values don't equal each other");
+                return false;
+            }
+            if (ResolutionHeight != other.ResolutionHeight)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ResolutionHeight values don't equal each other");
+                return false;
+            }
+            if (IsActive != other.IsActive)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsActive values don't equal each other");
+                return false;
+            }
             return true;
         }
 
         public override int GetHashCode()
         {
-            return (Name, DeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsEnabledIntegerScaling, IntegerScalingType, 
-                    IsSupportedGPUScaling, IsEnabledGPUScaling, ScalingType,
-                    IsSupportedImageSharpening, IsEnabledImageSharpening, SharpeningFilterType, SharpeningIntensity).GetHashCode();
+            var hash = new HashCode();
+            hash.Add(Name);
+            hash.Add(DeviceID);
+            hash.Add(DisplayIndex);
+            hash.Add(AdapterIndex);
+            hash.Add(IsSupportedIntegerScaling);
+            hash.Add(IsEnabledIntegerScaling);
+            hash.Add(IntegerScalingType);
+            hash.Add(IsSupportedGPUScaling);
+            hash.Add(IsEnabledGPUScaling);
+            hash.Add(ScalingType);
+            hash.Add(IsSupportedImageSharpening);
+            hash.Add(IsEnabledImageSharpening);
+            hash.Add(SharpeningFilterType);
+            hash.Add(SharpeningIntensity);
+            hash.Add(DisplaySettings);
+            hash.Add(ScalingSettings);
+            hash.Add(SharpnessSettings);
+            hash.Add(RetroScalingSettings);
+            hash.Add(DynamicContrastEnhancement);
+            if (DynamicContrastEnhancementHistogram != null)
+            {
+                foreach (var value in DynamicContrastEnhancementHistogram)
+                {
+                    hash.Add(value);
+                }
+            }
+            hash.Add(PowerOptimizationSettings);
+            hash.Add(LaceConfig);
+            hash.Add(SoftwarePsrSettings);
+            hash.Add(CombinedDisplayArgs);
+            hash.Add(GenlockArgs);
+            hash.Add(IntelArcSyncMonitorParams);
+            hash.Add(AdapterDisplayEncoderProperties);
+            hash.Add(DisplayProperties);
+            hash.Add(DeviceProperties);
+            hash.Add(DisplayTiming);
+            hash.Add(WireFormat);
+            hash.Add(Brightness);
+            hash.Add(ScalingCaps);
+            hash.Add(SharpnessCaps);
+            if (SharpnessFilterProperties != null)
+            {
+                foreach (var value in SharpnessFilterProperties)
+                {
+                    hash.Add(value);
+                }
+            }
+            hash.Add(RetroScalingCaps);
+            hash.Add(PowerOptimizationCaps);
+            hash.Add(IntelArcSyncProfile);
+            hash.Add(CustomModeArgs);
+            if (CustomModes != null)
+            {
+                foreach (var value in CustomModes)
+                {
+                    hash.Add(value);
+                }
+            }
+            hash.Add(LinkedDisplayAdaptersArgs);
+            if (LinkedDisplayAdapters != null)
+            {
+                foreach (var value in LinkedDisplayAdapters)
+                {
+                    hash.Add(value);
+                }
+            }
+            hash.Add(MuxProperties);
+            if (MuxDisplayOutputs != null)
+            {
+                foreach (var value in MuxDisplayOutputs)
+                {
+                    hash.Add(value);
+                }
+            }
+            hash.Add(VblankTimestamp);
+            hash.Add(ZeDeviceHandle);
+            hash.Add(ZeDriverHandle);
+            hash.Add(RefreshRateHz);
+            hash.Add(ResolutionWidth);
+            hash.Add(ResolutionHeight);
+            hash.Add(IsActive);
+            return hash.ToHashCode();
         }
 
         public static bool operator ==(INTEL_DISPLAY_WITH_SETTINGS lhs, INTEL_DISPLAY_WITH_SETTINGS rhs) => lhs.Equals(rhs);
