@@ -623,6 +623,7 @@ namespace DisplayMagicianShared.Intel
                     //------------------------------------
 
                     // TODO - Check for combined display configuration using Helpers
+                    if (displa)
 
                     ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
                     combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_QUERY_CONFIG;
@@ -665,15 +666,16 @@ namespace DisplayMagicianShared.Intel
                         // Create display with settings
                         INTEL_DISPLAY_WITH_SETTINGS displayWithSettings = new INTEL_DISPLAY_WITH_SETTINGS();
                         
+                        var displayProps = display.GetProperties();
+                        var displaySettings = display.GetDisplaySettings();
+
                         // Get display name - using display index as identifier since name isn't directly available
-                        string displayName = $"Intel Display {displayCount} on Adapter {adapterNum}";
-                        string deviceId = $"IntelDisplay_{adapterNum}_{displayCount}";
                         
                         displayWithSettings.Display = new INTEL_DISPLAY
                         {
-                            Name = displayName,
+                            Name = displayProps.,
                             DeviceID = deviceId,
-                            DisplayIndex = displayIdx,
+                            
                             AdapterIndex = adapterIdx
                         };
 
