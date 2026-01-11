@@ -1039,53 +1039,51 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         // GET INTEGER SCALING (RETRO SCALING) SETTINGS
                         //------------------------------------
-                        newDisplay.RetroScalingCaps = display.GetSupportedRetroScalingCapability();
-                        newDisplay.RetroScalingSettings = display.GetRetroScalingSettings();
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Integer Scaling Settings for : Enabled={newDisplay.RetroScalingCaps.SupportedRetroScaling}, Type={newDisplay.RetroScalingSettings.RetroScalingType}");
+                        try
+                        {
+                            newDisplay.RetroScalingCaps = display.GetSupportedRetroScalingCapability();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+                            newDisplay.RetroScalingSettings = display.GetRetroScalingSettings();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Integer Scaling Settings for : Enabled={newDisplay.RetroScalingCaps.SupportedRetroScaling}, Type={newDisplay.RetroScalingSettings.RetroScalingType}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
+                        }
 
                         //------------------------------------
                         // GET GPU SCALING SETTINGS
                         //------------------------------------
-                        ctl_scaling_caps_t scalingCaps = new ctl_scaling_caps_t();
-                        display.GetSupportedScalingCapability();
-                        status = IGCL.ctlGetSupportedScalingCapability(hDisplay, scalingCaps);
-                        
-                        if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+                        try
                         {
-                            displayWithSettings.IsSupportedGPUScaling = true;
-                            
-                            ctl_scaling_settings_t scalingSettings = new ctl_scaling_settings_t();
-                            status = IGCL.ctlGetCurrentScaling(hDisplay, scalingSettings);
-                            
-                            if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                displayWithSettings.IsEnabledGPUScaling = scalingSettings.Enable;
-                                displayWithSettings.ScalingType = (ctl_scaling_type_flag_t)scalingSettings.ScalingType;
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: GPU Scaling: Enabled={scalingSettings.Enable}, Type={scalingSettings.ScalingType}");
-                            }
+                            newDisplay.ScalingCaps = display.GetSupportedScalingCapability();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+                            newDisplay.ScalingSettings = display.GetCurrentScaling();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get GPU Scaling Settings for : Enabled={newDisplay.ScalingCaps.SupportedScaling}, Type={newDisplay.ScalingSettings.ScalingType}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
                         }
 
                         //------------------------------------
                         // GET IMAGE SHARPENING SETTINGS
                         //------------------------------------
-                        ctl_sharpness_caps_t sharpnessCaps = new ctl_sharpness_caps_t();
-                        status = IGCL.ctlGetSharpnessCaps(hDisplay, sharpnessCaps);
-                        
-                        if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+
+                        try
                         {
-                            displayWithSettings.IsSupportedImageSharpening = true;
-                            
-                            ctl_sharpness_settings_t sharpnessSettings = new ctl_sharpness_settings_t();
-                            status = IGCL.ctlGetCurrentSharpness(hDisplay, sharpnessSettings);
-                            
-                            if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                displayWithSettings.IsEnabledImageSharpening = sharpnessSettings.Enable;
-                                displayWithSettings.SharpeningFilterType = (ctl_sharpness_filter_type_flag_t)sharpnessSettings.FilterType;
-                                displayWithSettings.SharpeningIntensity = sharpnessSettings.Intensity;
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Image Sharpening: Enabled={sharpnessSettings.Enable}, Intensity={sharpnessSettings.Intensity}");
-                            }
+                            (newDisplay.SharpnessCaps,newDisplay.SharpnessFilterProperties) = display.GetSharpnessCaps();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+                            newDisplay.SharpnessSettings = display.GetCurrentSharpness();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Image Sharpening Settings for : Enabled={newDisplay.SharpnessSettings.Enable}, Intensity={newDisplay.SharpnessSettings.Intensity}");
                         }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
+                        }
+
+                        // Add the other display settings here as needed...
+
 
                         
                         // Add display to configuration
