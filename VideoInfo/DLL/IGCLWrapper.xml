@@ -1191,6 +1191,11 @@
             Pointer to child info.
             </summary>
         </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.ChildInfos">
+            <summary>
+            Managed child display info list.
+            </summary>
+        </member>
         <member name="F:IGCLWrapper.CombinedDisplayArgsDto.CombinedDisplayOutput">
             <summary>
             Combined display output handle.
@@ -1208,6 +1213,49 @@
             Convert this DTO to a native struct.
             </summary>
             <returns>Combined display args struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.CombinedDisplayChildInfoDto">
+            <summary>
+            DTO for combined display child information.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.DisplayOutput">
+            <summary>
+            Display output handle.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.FbSrc">
+            <summary>
+            Framebuffer source rect.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.FbPos">
+            <summary>
+            Framebuffer target rect.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.DisplayOrientation">
+            <summary>
+            Display orientation.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.TargetMode">
+            <summary>
+            Target mode info.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.FromNative(IGCLWrapper.ctl_combined_display_child_info_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Child info DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Child info struct.</returns>
         </member>
         <member name="T:IGCLWrapper.DceArgsDto">
             <summary>
