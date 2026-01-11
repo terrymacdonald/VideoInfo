@@ -1011,15 +1011,31 @@ namespace DisplayMagicianShared.Intel
                         // Create display with settings
                         INTEL_DISPLAY_WITH_SETTINGS newDisplay = new INTEL_DISPLAY_WITH_SETTINGS();
                         
-                        var displayProps = display.GetProperties();
-                        var displaySettings = display.GetDisplaySettings();
-
-                        // Get display name - using display index as identifier since name isn't directly available
+                        // Set basic info
+                        newDisplay.Name = $"Display {displayCount} on Intel GPU Adapter {adapterNum}";
                         
-                        newDisplay.Name = $"Intel Display {displayCount} on Adapter {adapterNum}";
+                        // Get Display properties
+                        try
+                        {
+                            newDisplay.DisplayProperties = display.GetProperties();    
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display properties for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+\                       }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display properties for display {displayCount} on adapter {adapterNum}.");
+                        }                        
                         
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayCount}/{displayTotalCount} on adapter {adapterNum}: {newDisplay.Name}");
-
+                        // Get display settings
+                        try
+                        {
+                            newDisplay.DisplaySettings = display.GetDisplaySettings();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+\                       }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
+                        }
+                        
                         //------------------------------------
                         // GET INTEGER SCALING (RETRO SCALING) SETTINGS
                         //------------------------------------
