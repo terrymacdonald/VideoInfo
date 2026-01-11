@@ -542,13 +542,81 @@ namespace DisplayMagicianShared.Intel
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    
+    public struct INTEL_COMBINED_DISPLAY_CHILD
+    {
+        public string DisplayId;      // stable ID: EDID hash, PnP ID, IGCL display UID
+        public uint Width;
+        public uint Height;
+        public int OffsetX;
+        public int OffsetY;
+        public uint Rotation;
+
+        public INTEL_COMBINED_DISPLAY_CHILD()
+        {
+            DisplayId = "";
+            Width = 0;
+            Height = 0;
+            OffsetX = 0;
+            OffsetY = 0;
+            Rotation = 0;
+        }
+
+        public override bool Equals(object obj) => obj is INTEL_COMBINED_DISPLAY_CHILD other && Equals(other);
+        
+        public bool Equals(INTEL_COMBINED_DISPLAY_CHILD other)
+        {   
+            if (DisplayId != other.DisplayId)
+            {
+                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The DisplayId values don't equal each other");
+                return false;
+            }
+            if (Width != other.Width)
+            {
+                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Width values don't equal each other");
+                return false;
+            }
+            if (Height != other.Height)
+            {
+                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Height values don't equal each other");
+                return false;
+            }
+            if (OffsetX != other.OffsetX)
+            {
+                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The OffsetX values don't equal each other");
+                return false;
+            }
+            if (OffsetY != other.OffsetY)
+            {
+                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The OffsetY values don't equal each other");
+                return false;
+            }
+            if (Rotation != other.Rotation)
+            {
+                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Rotation values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return (DisplayId, Width, Height, OffsetX, OffsetY, Rotation).GetHashCode();
+        }
+
+        public static bool operator ==(INTEL_COMBINED_DISPLAY_CHILD lhs, INTEL_COMBINED_DISPLAY_CHILD rhs) => lhs.Equals(rhs);
+        public static bool operator !=(INTEL_COMBINED_DISPLAY_CHILD lhs, INTEL_COMBINED_DISPLAY_CHILD rhs) => !(lhs == rhs);
+
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     public struct INTEL_COMBINED_DISPLAY : IEquatable<INTEL_COMBINED_DISPLAY>
     {
         public bool IsCombinedDisplay;
         public uint NumOutputs;
         public uint CombinedDesktopWidth;
         public uint CombinedDesktopHeight;
-        public List<IntPtr> ChildDisplayHandles;  // Display handles that are part of the combined display
+        public List<INTEL_COMBINED_DISPLAY_CHILD> ChildDisplayHandles;  // Display handles that are part of the combined display
 
         public INTEL_COMBINED_DISPLAY()
         {
@@ -556,7 +624,7 @@ namespace DisplayMagicianShared.Intel
             NumOutputs = 0;
             CombinedDesktopWidth = 0;
             CombinedDesktopHeight = 0;
-            ChildDisplayHandles = new List<IntPtr>();
+            ChildDisplayHandles = new List<INTEL_COMBINED_DISPLAY_CHILD>();
         }
 
         public override bool Equals(object obj) => obj is INTEL_COMBINED_DISPLAY other && Equals(other);
@@ -963,39 +1031,6 @@ namespace DisplayMagicianShared.Intel
 
                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}({adapterProperties.name}), PCI Device ID: 0x{adapterProperties.pci_device_id:X4}, device type {adapterProperties.device_type} ({adapterNum}/{adapterTotalCount}");
                     
-                    //------------------------------------
-                    // CHECK FOR COMBINED DISPLAY CONFIGURATION
-                    //------------------------------------
-
-                    // TODO - Check for combined display configuration using Helpers
-                    if (displa)
-
-                    ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
-                    combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_QUERY_CONFIG;
-                    combinedDisplayArgs.IsSupported = false;
-                    
-                    status = IGCL.ctlGetSetCombinedDisplay(hAdapter, combinedDisplayArgs);
-                    
-                    if (status == ctl_result_t.CTL_RESULT_SUCCESS && combinedDisplayArgs.IsSupported && combinedDisplayArgs.NumOutputs > 1)
-                    {
-                        myDisplayConfig.IsCombinedDisplay = true;
-                        myDisplayConfig.CombinedDisplay.IsCombinedDisplay = true;
-                        myDisplayConfig.CombinedDisplay.NumOutputs = combinedDisplayArgs.NumOutputs;
-                        myDisplayConfig.CombinedDisplay.CombinedDesktopWidth = combinedDisplayArgs.CombinedDesktopWidth;
-                        myDisplayConfig.CombinedDisplay.CombinedDesktopHeight = combinedDisplayArgs.CombinedDesktopHeight;
-                        
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Combined Display detected: {combinedDisplayArgs.NumOutputs} outputs, {combinedDisplayArgs.CombinedDesktopWidth}x{combinedDisplayArgs.CombinedDesktopHeight}");
-                        
-                        // Store child display handles if available
-                        // Note: The actual child handles would need to be extracted from pChildInfo
-                        // This is a simplified version - full implementation would iterate through child info
-                    }
-                    else
-                    {
-                        myDisplayConfig.IsCombinedDisplay = false;
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No Combined Display detected for adapter {adapterNum}");
-                    }
-
                     // Enumerate displays for this adapter
                     var displays = adapter.GetDisplays();
                     int displayTotalCount = displays.Count;
@@ -1083,11 +1118,38 @@ namespace DisplayMagicianShared.Intel
                         }
 
                         // Add the other display settings here as needed...
-
-
                         
+                        //------------------------------------
+                        // CHECK FOR COMBINED DISPLAY CONFIGURATION
+                        //------------------------------------
+                        try
+                        {
+                            var combinedDisplay = display.GetCombinedDisplay();
+                            if (combinedDisplay.IsSupported)
+                            {
+                                if (combinedDisplay.NumOutputs > 1)
+                                {
+                                    myDisplayConfig.IsCombinedDisplay = true;
+                                }
+                                else
+                                {
+                                    myDisplayConfig.IsCombinedDisplay = false;
+                                }
+                               
+                                newDisplay.CombinedDisplayArgs = combinedDisplay;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Combined Display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+
+                            }
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Display {displayCount}/{displayTotalCount} on adapter {adapterNum} is part of a Combined Display with {combinedDisplay.NumOutputs} outputs, {combinedDisplay.CombinedDesktopWidth}x{combinedDisplay.CombinedDesktopHeight}");
+                            }                        
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Combined Display settings for display {displayCount} on adapter {adapterNum}.");
+                        }
                         // Add display to configuration
-                        myDisplayConfig.Displays.Add(hDisplay, displayWithSettings);
+                        myDisplayConfig.Displays.Add(hDisplay, newDisplay);
                     }
                     
                 }
