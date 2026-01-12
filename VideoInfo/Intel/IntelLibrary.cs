@@ -1174,385 +1174,391 @@ namespace DisplayMagicianShared.Intel
 
             stringToReturn += $"****** INTEL VIDEO CARDS *******\n";
 
-            if (_initialised && _igclApiHandle != null)
-            {
-                ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
-
-                // Enumerate Intel adapters
-                SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
-                IGCL.igcl_uint32P_assign(pAdapterCount, 0);
-                
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
-                uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
-                
-                if (status == ctl_result_t.CTL_RESULT_SUCCESS && adapterCount > 0)
-                {
-                    stringToReturn += $"Found {adapterCount} Intel adapter(s)\n\n";
-
-                    SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
-                    status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
-                    
-                    if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                    {
-                        IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
-
-                        for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
-                        {
-                            IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
-
-                            ctl_device_adapter_properties_t adapterProps = IGCL.new_adapterPropertiesP();
-                            status = IGCL.IGCL_GetAdapterProperties(hAdapter, adapterProps);
-                            
-                            if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                stringToReturn += $"Adapter #{adapterIdx}\n";
-                                stringToReturn += $"  Name: {adapterProps.name}\n";
-                                stringToReturn += $"  PCI Vendor ID: 0x{adapterProps.pci_vendor_id:X4}\n";
-                                stringToReturn += $"  PCI Device ID: 0x{adapterProps.pci_device_id:X4}\n";
-                                stringToReturn += $"  Driver Version: {adapterProps.driver_version}\n";
-                                stringToReturn += $"  Device Type: {adapterProps.device_type}\n";
-                                stringToReturn += $"  Graphics Properties: {adapterProps.graphics_adapter_properties}\n\n";
-                            }
-                        }
-                    }
-                }
-            }
-
-            stringToReturn += $"\n\n";
-
             return stringToReturn;
+
+            // if (_initialised && _igclApiHandle != null)
+            // {
+            //     ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
+
+            //     // Enumerate Intel adapters
+            //     SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
+            //     IGCL.igcl_uint32P_assign(pAdapterCount, 0);
+                
+            //     status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
+            //     uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
+                
+            //     if (status == ctl_result_t.CTL_RESULT_SUCCESS && adapterCount > 0)
+            //     {
+            //         stringToReturn += $"Found {adapterCount} Intel adapter(s)\n\n";
+
+            //         SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
+            //         status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
+                    
+            //         if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //         {
+            //             IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
+
+            //             for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
+            //             {
+            //                 IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
+
+            //                 ctl_device_adapter_properties_t adapterProps = IGCL.new_adapterPropertiesP();
+            //                 status = IGCL.IGCL_GetAdapterProperties(hAdapter, adapterProps);
+                            
+            //                 if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                 {
+            //                     stringToReturn += $"Adapter #{adapterIdx}\n";
+            //                     stringToReturn += $"  Name: {adapterProps.name}\n";
+            //                     stringToReturn += $"  PCI Vendor ID: 0x{adapterProps.pci_vendor_id:X4}\n";
+            //                     stringToReturn += $"  PCI Device ID: 0x{adapterProps.pci_device_id:X4}\n";
+            //                     stringToReturn += $"  Driver Version: {adapterProps.driver_version}\n";
+            //                     stringToReturn += $"  Device Type: {adapterProps.device_type}\n";
+            //                     stringToReturn += $"  Graphics Properties: {adapterProps.graphics_adapter_properties}\n\n";
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+
+            // stringToReturn += $"\n\n";
+
+            // return stringToReturn;
         }
 
         public bool SetActiveConfig(INTEL_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
-            if (_initialised && _igclApiHandle != null)
-            {
-                ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
-
-                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Managing Intel Combined Display configuration");
-
-                // Enumerate Intel adapters
-                SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
-                IGCL.igcl_uint32P_assign(pAdapterCount, 0);
-                
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
-                uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
-                
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS || adapterCount == 0)
-                {
-                    SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: No Intel adapters found or error getting adapter count. Status: {status}");
-                    return false;
-                }
-
-                SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
-                
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                {
-                    SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error enumerating Intel adapters. Status: {status}");
-                    return false;
-                }
-
-                IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
-
-                // Iterate through adapters
-                for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
-                {
-                    IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
-
-                    // If the display config needs a Combined Display then let's create one
-                    if (displayConfig.IsCombinedDisplay)
-                    {
-                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout requires a Combined Display");
-
-                        // Check if the Combined Display is already set exactly as we want it
-                        if (displayConfig.CombinedDisplay.Equals(ActiveDisplayConfig.CombinedDisplay))
-                        {
-                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is exactly the same as the one we want, so skipping setting up the Combined Display");
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Attempting to create the Intel Combined Display");
-                            
-                            ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
-                            combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_ENABLE;
-                            combinedDisplayArgs.NumOutputs = (byte)displayConfig.CombinedDisplay.NumOutputs;
-                            combinedDisplayArgs.CombinedDesktopWidth = displayConfig.CombinedDisplay.CombinedDesktopWidth;
-                            combinedDisplayArgs.CombinedDesktopHeight = displayConfig.CombinedDisplay.CombinedDesktopHeight;
-                            
-                            // Note: In a full implementation, you would need to populate pChildInfo with the
-                            // display handles and layout information from displayConfig.CombinedDisplay.ChildDisplayHandles
-                            
-                            status = IGCL.ctlGetSetCombinedDisplay(hAdapter, combinedDisplayArgs);
-                            
-                            if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error creating the Intel Combined Display. ctlGetSetCombinedDisplay() returned error code {status}");
-                                return false;
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully created the Intel Combined Display");
-                                
-                                // Verify the created display matches what we want
-                                ctl_combined_display_args_t queryArgs = new ctl_combined_display_args_t();
-                                queryArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_QUERY_CONFIG;
-                                
-                                status = IGCL.ctlGetSetCombinedDisplay(hAdapter, queryArgs);
-                                
-                                if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                                {
-                                    if (queryArgs.NumOutputs == displayConfig.CombinedDisplay.NumOutputs &&
-                                        queryArgs.CombinedDesktopWidth == displayConfig.CombinedDisplay.CombinedDesktopWidth &&
-                                        queryArgs.CombinedDesktopHeight == displayConfig.CombinedDisplay.CombinedDesktopHeight)
-                                    {
-                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: This new Combined Display layout matches the desired configuration.");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Warn($"IntelLibrary/SetActiveConfig: This new Combined Display layout is different from the one originally saved. You may need to update this desktop profile.");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout does NOT require a Combined Display");
-
-                        if (ActiveDisplayConfig.IsCombinedDisplay)
-                        {
-                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is currently in use but is NOT required, so we need to destroy the Combined Display");
-
-                            ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
-                            combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_DISABLE;
-                            
-                            status = IGCL.ctlGetSetCombinedDisplay(hAdapter, combinedDisplayArgs);
-                            
-                            if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error destroying the Intel Combined Display. ctlGetSetCombinedDisplay() returned error code {status}");
-                                return false;
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully destroyed the Intel Combined Display.");
-                            }
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is not currently in use and is NOT required, so leaving things as they are.");
-                        }
-                    }
-                }
-            }
-            else
-            {
-                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
-                throw new IntelLibraryException($"Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
-            }
-
             return true;
+
+            // if (_initialised && _igclApiHandle != null)
+            // {
+            //     ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
+
+            //     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Managing Intel Combined Display configuration");
+
+            //     // Enumerate Intel adapters
+            //     SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
+            //     IGCL.igcl_uint32P_assign(pAdapterCount, 0);
+                
+            //     status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
+            //     uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
+                
+            //     if (status != ctl_result_t.CTL_RESULT_SUCCESS || adapterCount == 0)
+            //     {
+            //         SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: No Intel adapters found or error getting adapter count. Status: {status}");
+            //         return false;
+            //     }
+
+            //     SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
+            //     status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
+                
+            //     if (status != ctl_result_t.CTL_RESULT_SUCCESS)
+            //     {
+            //         SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error enumerating Intel adapters. Status: {status}");
+            //         return false;
+            //     }
+
+            //     IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
+
+            //     // Iterate through adapters
+            //     for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
+            //     {
+            //         IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
+
+            //         // If the display config needs a Combined Display then let's create one
+            //         if (displayConfig.IsCombinedDisplay)
+            //         {
+            //             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout requires a Combined Display");
+
+            //             // Check if the Combined Display is already set exactly as we want it
+            //             if (displayConfig.CombinedDisplay.Equals(ActiveDisplayConfig.CombinedDisplay))
+            //             {
+            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is exactly the same as the one we want, so skipping setting up the Combined Display");
+            //             }
+            //             else
+            //             {
+            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Attempting to create the Intel Combined Display");
+                            
+            //                 ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
+            //                 combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_ENABLE;
+            //                 combinedDisplayArgs.NumOutputs = (byte)displayConfig.CombinedDisplay.NumOutputs;
+            //                 combinedDisplayArgs.CombinedDesktopWidth = displayConfig.CombinedDisplay.CombinedDesktopWidth;
+            //                 combinedDisplayArgs.CombinedDesktopHeight = displayConfig.CombinedDisplay.CombinedDesktopHeight;
+                            
+            //                 // Note: In a full implementation, you would need to populate pChildInfo with the
+            //                 // display handles and layout information from displayConfig.CombinedDisplay.ChildDisplayHandles
+                            
+            //                 status = IGCL.ctlGetSetCombinedDisplay(hAdapter, combinedDisplayArgs);
+                            
+            //                 if (status != ctl_result_t.CTL_RESULT_SUCCESS)
+            //                 {
+            //                     SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error creating the Intel Combined Display. ctlGetSetCombinedDisplay() returned error code {status}");
+            //                     return false;
+            //                 }
+            //                 else
+            //                 {
+            //                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully created the Intel Combined Display");
+                                
+            //                     // Verify the created display matches what we want
+            //                     ctl_combined_display_args_t queryArgs = new ctl_combined_display_args_t();
+            //                     queryArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_QUERY_CONFIG;
+                                
+            //                     status = IGCL.ctlGetSetCombinedDisplay(hAdapter, queryArgs);
+                                
+            //                     if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                     {
+            //                         if (queryArgs.NumOutputs == displayConfig.CombinedDisplay.NumOutputs &&
+            //                             queryArgs.CombinedDesktopWidth == displayConfig.CombinedDisplay.CombinedDesktopWidth &&
+            //                             queryArgs.CombinedDesktopHeight == displayConfig.CombinedDisplay.CombinedDesktopHeight)
+            //                         {
+            //                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: This new Combined Display layout matches the desired configuration.");
+            //                         }
+            //                         else
+            //                         {
+            //                             SharedLogger.logger.Warn($"IntelLibrary/SetActiveConfig: This new Combined Display layout is different from the one originally saved. You may need to update this desktop profile.");
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //         else
+            //         {
+            //             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout does NOT require a Combined Display");
+
+            //             if (ActiveDisplayConfig.IsCombinedDisplay)
+            //             {
+            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is currently in use but is NOT required, so we need to destroy the Combined Display");
+
+            //                 ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
+            //                 combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_DISABLE;
+                            
+            //                 status = IGCL.ctlGetSetCombinedDisplay(hAdapter, combinedDisplayArgs);
+                            
+            //                 if (status != ctl_result_t.CTL_RESULT_SUCCESS)
+            //                 {
+            //                     SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error destroying the Intel Combined Display. ctlGetSetCombinedDisplay() returned error code {status}");
+            //                     return false;
+            //                 }
+            //                 else
+            //                 {
+            //                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully destroyed the Intel Combined Display.");
+            //                 }
+            //             }
+            //             else
+            //             {
+            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is not currently in use and is NOT required, so leaving things as they are.");
+            //             }
+            //         }
+            //     }
+            // }
+            // else
+            // {
+            //     SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
+            //     throw new IntelLibraryException($"Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
+            // }
+
+            // return true;
         }
 
         public bool SetActiveConfigOverride(INTEL_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
-            if (_initialised && _igclApiHandle != null)
-            {
-                ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
-
-                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Applying display settings stored in the display configuration");
-
-                // Enumerate Intel adapters
-                SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
-                IGCL.igcl_uint32P_assign(pAdapterCount, 0);
-                
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
-                uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
-                
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS || adapterCount == 0)
-                {
-                    SharedLogger.logger.Error($"IntelLibrary/SetActiveConfigOverride: No Intel adapters found or error getting adapter count. Status: {status}");
-                    return false;
-                }
-
-                SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
-                
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                {
-                    SharedLogger.logger.Error($"IntelLibrary/SetActiveConfigOverride: Error enumerating Intel adapters. Status: {status}");
-                    return false;
-                }
-
-                IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
-
-                // Iterate through adapters
-                for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
-                {
-                    IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
-
-                    // Enumerate displays for this adapter
-                    SWIGTYPE_p_unsigned_int pDisplayCount = IGCL.new_igcl_uint32P();
-                    IGCL.igcl_uint32P_assign(pDisplayCount, 0);
-                    
-                    status = IGCL.IGCL_EnumerateDisplays(hAdapter, pDisplayCount, null);
-                    uint displayCount = IGCL.igcl_uint32P_value(pDisplayCount);
-                    
-                    if (status != ctl_result_t.CTL_RESULT_SUCCESS || displayCount == 0)
-                    {
-                        continue;
-                    }
-
-                    SWIGTYPE_p_p__ctl_display_output_handle_t ppDisplays = IGCL.new_displayOutputHandleP();
-                    status = IGCL.IGCL_EnumerateDisplays(hAdapter, pDisplayCount, ppDisplays);
-                    
-                    if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                    {
-                        continue;
-                    }
-
-                    IntPtr displaysPtr = IGCL.displayOutputHandleP_value(ppDisplays);
-
-                    // Iterate through displays
-                    for (uint displayIdx = 0; displayIdx < displayCount; displayIdx++)
-                    {
-                        IntPtr hDisplay = Marshal.ReadIntPtr(displaysPtr, (int)(displayIdx * IntPtr.Size));
-
-                        // Find the stored settings for this display
-                        if (!displayConfig.Displays.ContainsKey(hDisplay))
-                        {
-                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: No stored settings found for display handle {hDisplay}, skipping");
-                            continue;
-                        }
-
-                        INTEL_DISPLAY_WITH_SETTINGS displaySettingsWeStored = displayConfig.Displays[hDisplay];
-                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Applying settings for display: {displaySettingsWeStored.Display.Name}");
-
-                        //------------------------------------
-                        // SET INTEGER SCALING IF NEEDED
-                        //------------------------------------
-                        if (displaySettingsWeStored.IsSupportedIntegerScaling)
-                        {
-                            ctl_retro_scaling_caps_t retroScalingCaps = new ctl_retro_scaling_caps_t();
-                            status = IGCL.ctlGetSupportedRetroScalingCapability(hAdapter, retroScalingCaps);
-                            
-                            if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                ctl_retro_scaling_settings_t retroScalingSettings = new ctl_retro_scaling_settings_t();
-                                retroScalingSettings.Get = true;
-                                status = IGCL.ctlGetSetRetroScaling(hAdapter, retroScalingSettings);
-                                
-                                if (status == ctl_result_t.CTL_RESULT_SUCCESS && 
-                                    (retroScalingSettings.Enable != displaySettingsWeStored.IsEnabledIntegerScaling ||
-                                     (uint)retroScalingSettings.RetroScalingType != (uint)displaySettingsWeStored.IntegerScalingType))
-                                {
-                                    retroScalingSettings.Get = false;
-                                    retroScalingSettings.Enable = displaySettingsWeStored.IsEnabledIntegerScaling;
-                                    retroScalingSettings.RetroScalingType = (uint)displaySettingsWeStored.IntegerScalingType;
-                                    
-                                    status = IGCL.ctlGetSetRetroScaling(hAdapter, retroScalingSettings);
-                                    if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                                    {
-                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Integer Scaling to Enabled={displaySettingsWeStored.IsEnabledIntegerScaling}, Type={displaySettingsWeStored.IntegerScalingType}");
-                                    }
-                                }
-                                else if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Integer Scaling already set to desired values, skipping");
-                                }
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Integer Scaling not supported by current hardware, skipping");
-                            }
-                        }
-
-                        //------------------------------------
-                        // SET GPU SCALING IF NEEDED
-                        //------------------------------------
-                        if (displaySettingsWeStored.IsSupportedGPUScaling)
-                        {
-                            ctl_scaling_caps_t scalingCaps = new ctl_scaling_caps_t();
-                            status = IGCL.ctlGetSupportedScalingCapability(hDisplay, scalingCaps);
-                            
-                            if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                ctl_scaling_settings_t scalingSettings = new ctl_scaling_settings_t();
-                                status = IGCL.ctlGetCurrentScaling(hDisplay, scalingSettings);
-                                
-                                if (status == ctl_result_t.CTL_RESULT_SUCCESS &&
-                                    (scalingSettings.Enable != displaySettingsWeStored.IsEnabledGPUScaling ||
-                                     (uint)scalingSettings.ScalingType != (uint)displaySettingsWeStored.ScalingType))
-                                {
-                                    scalingSettings.Enable = displaySettingsWeStored.IsEnabledGPUScaling;
-                                    scalingSettings.ScalingType = (uint)displaySettingsWeStored.ScalingType;
-                                    
-                                    status = IGCL.ctlSetCurrentScaling(hDisplay, scalingSettings);
-                                    if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                                    {
-                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set GPU Scaling to Enabled={displaySettingsWeStored.IsEnabledGPUScaling}, Type={displaySettingsWeStored.ScalingType}");
-                                    }
-                                }
-                                else if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: GPU Scaling already set to desired values, skipping");
-                                }
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: GPU Scaling not supported by current hardware, skipping");
-                            }
-                        }
-
-                        //------------------------------------
-                        // SET IMAGE SHARPENING IF NEEDED
-                        //------------------------------------
-                        if (displaySettingsWeStored.IsSupportedImageSharpening)
-                        {
-                            ctl_sharpness_caps_t sharpnessCaps = new ctl_sharpness_caps_t();
-                            status = IGCL.ctlGetSharpnessCaps(hDisplay, sharpnessCaps);
-                            
-                            if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                            {
-                                ctl_sharpness_settings_t sharpnessSettings = new ctl_sharpness_settings_t();
-                                status = IGCL.ctlGetCurrentSharpness(hDisplay, sharpnessSettings);
-                                
-                                if (status == ctl_result_t.CTL_RESULT_SUCCESS &&
-                                    (sharpnessSettings.Enable != displaySettingsWeStored.IsEnabledImageSharpening ||
-                                     (uint)sharpnessSettings.FilterType != (uint)displaySettingsWeStored.SharpeningFilterType ||
-                                     Math.Abs(sharpnessSettings.Intensity - displaySettingsWeStored.SharpeningIntensity) > 0.001f))
-                                {
-                                    sharpnessSettings.Enable = displaySettingsWeStored.IsEnabledImageSharpening;
-                                    sharpnessSettings.FilterType = (uint)displaySettingsWeStored.SharpeningFilterType;
-                                    sharpnessSettings.Intensity = displaySettingsWeStored.SharpeningIntensity;
-                                    
-                                    status = IGCL.ctlSetCurrentSharpness(hDisplay, sharpnessSettings);
-                                    if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                                    {
-                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Image Sharpening to Enabled={displaySettingsWeStored.IsEnabledImageSharpening}, Intensity={displaySettingsWeStored.SharpeningIntensity}");
-                                    }
-                                }
-                                else if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Image Sharpening already set to desired values, skipping");
-                                }
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Image Sharpening not supported by current hardware, skipping");
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfigOverride: ERROR - Tried to run SetActiveConfigOverride but the Intel IGCL library isn't initialised!");
-                throw new IntelLibraryException($"Tried to run SetActiveConfigOverride but the Intel IGCL library isn't initialised!");
-            }
-
             return true;
+
+            // if (_initialised && _igclApiHandle != null)
+            // {
+            //     ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
+
+            //     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Applying display settings stored in the display configuration");
+
+            //     // Enumerate Intel adapters
+            //     SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
+            //     IGCL.igcl_uint32P_assign(pAdapterCount, 0);
+                
+            //     status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
+            //     uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
+                
+            //     if (status != ctl_result_t.CTL_RESULT_SUCCESS || adapterCount == 0)
+            //     {
+            //         SharedLogger.logger.Error($"IntelLibrary/SetActiveConfigOverride: No Intel adapters found or error getting adapter count. Status: {status}");
+            //         return false;
+            //     }
+
+            //     SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
+            //     status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
+                
+            //     if (status != ctl_result_t.CTL_RESULT_SUCCESS)
+            //     {
+            //         SharedLogger.logger.Error($"IntelLibrary/SetActiveConfigOverride: Error enumerating Intel adapters. Status: {status}");
+            //         return false;
+            //     }
+
+            //     IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
+
+            //     // Iterate through adapters
+            //     for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
+            //     {
+            //         IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
+
+            //         // Enumerate displays for this adapter
+            //         SWIGTYPE_p_unsigned_int pDisplayCount = IGCL.new_igcl_uint32P();
+            //         IGCL.igcl_uint32P_assign(pDisplayCount, 0);
+                    
+            //         status = IGCL.IGCL_EnumerateDisplays(hAdapter, pDisplayCount, null);
+            //         uint displayCount = IGCL.igcl_uint32P_value(pDisplayCount);
+                    
+            //         if (status != ctl_result_t.CTL_RESULT_SUCCESS || displayCount == 0)
+            //         {
+            //             continue;
+            //         }
+
+            //         SWIGTYPE_p_p__ctl_display_output_handle_t ppDisplays = IGCL.new_displayOutputHandleP();
+            //         status = IGCL.IGCL_EnumerateDisplays(hAdapter, pDisplayCount, ppDisplays);
+                    
+            //         if (status != ctl_result_t.CTL_RESULT_SUCCESS)
+            //         {
+            //             continue;
+            //         }
+
+            //         IntPtr displaysPtr = IGCL.displayOutputHandleP_value(ppDisplays);
+
+            //         // Iterate through displays
+            //         for (uint displayIdx = 0; displayIdx < displayCount; displayIdx++)
+            //         {
+            //             IntPtr hDisplay = Marshal.ReadIntPtr(displaysPtr, (int)(displayIdx * IntPtr.Size));
+
+            //             // Find the stored settings for this display
+            //             if (!displayConfig.Displays.ContainsKey(hDisplay))
+            //             {
+            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: No stored settings found for display handle {hDisplay}, skipping");
+            //                 continue;
+            //             }
+
+            //             INTEL_DISPLAY_WITH_SETTINGS displaySettingsWeStored = displayConfig.Displays[hDisplay];
+            //             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Applying settings for display: {displaySettingsWeStored.Display.Name}");
+
+            //             //------------------------------------
+            //             // SET INTEGER SCALING IF NEEDED
+            //             //------------------------------------
+            //             if (displaySettingsWeStored.IsSupportedIntegerScaling)
+            //             {
+            //                 ctl_retro_scaling_caps_t retroScalingCaps = new ctl_retro_scaling_caps_t();
+            //                 status = IGCL.ctlGetSupportedRetroScalingCapability(hAdapter, retroScalingCaps);
+                            
+            //                 if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                 {
+            //                     ctl_retro_scaling_settings_t retroScalingSettings = new ctl_retro_scaling_settings_t();
+            //                     retroScalingSettings.Get = true;
+            //                     status = IGCL.ctlGetSetRetroScaling(hAdapter, retroScalingSettings);
+                                
+            //                     if (status == ctl_result_t.CTL_RESULT_SUCCESS && 
+            //                         (retroScalingSettings.Enable != displaySettingsWeStored.IsEnabledIntegerScaling ||
+            //                          (uint)retroScalingSettings.RetroScalingType != (uint)displaySettingsWeStored.IntegerScalingType))
+            //                     {
+            //                         retroScalingSettings.Get = false;
+            //                         retroScalingSettings.Enable = displaySettingsWeStored.IsEnabledIntegerScaling;
+            //                         retroScalingSettings.RetroScalingType = (uint)displaySettingsWeStored.IntegerScalingType;
+                                    
+            //                         status = IGCL.ctlGetSetRetroScaling(hAdapter, retroScalingSettings);
+            //                         if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                         {
+            //                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Integer Scaling to Enabled={displaySettingsWeStored.IsEnabledIntegerScaling}, Type={displaySettingsWeStored.IntegerScalingType}");
+            //                         }
+            //                     }
+            //                     else if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                     {
+            //                         SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Integer Scaling already set to desired values, skipping");
+            //                     }
+            //                 }
+            //                 else
+            //                 {
+            //                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Integer Scaling not supported by current hardware, skipping");
+            //                 }
+            //             }
+
+            //             //------------------------------------
+            //             // SET GPU SCALING IF NEEDED
+            //             //------------------------------------
+            //             if (displaySettingsWeStored.IsSupportedGPUScaling)
+            //             {
+            //                 ctl_scaling_caps_t scalingCaps = new ctl_scaling_caps_t();
+            //                 status = IGCL.ctlGetSupportedScalingCapability(hDisplay, scalingCaps);
+                            
+            //                 if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                 {
+            //                     ctl_scaling_settings_t scalingSettings = new ctl_scaling_settings_t();
+            //                     status = IGCL.ctlGetCurrentScaling(hDisplay, scalingSettings);
+                                
+            //                     if (status == ctl_result_t.CTL_RESULT_SUCCESS &&
+            //                         (scalingSettings.Enable != displaySettingsWeStored.IsEnabledGPUScaling ||
+            //                          (uint)scalingSettings.ScalingType != (uint)displaySettingsWeStored.ScalingType))
+            //                     {
+            //                         scalingSettings.Enable = displaySettingsWeStored.IsEnabledGPUScaling;
+            //                         scalingSettings.ScalingType = (uint)displaySettingsWeStored.ScalingType;
+                                    
+            //                         status = IGCL.ctlSetCurrentScaling(hDisplay, scalingSettings);
+            //                         if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                         {
+            //                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set GPU Scaling to Enabled={displaySettingsWeStored.IsEnabledGPUScaling}, Type={displaySettingsWeStored.ScalingType}");
+            //                         }
+            //                     }
+            //                     else if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                     {
+            //                         SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: GPU Scaling already set to desired values, skipping");
+            //                     }
+            //                 }
+            //                 else
+            //                 {
+            //                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: GPU Scaling not supported by current hardware, skipping");
+            //                 }
+            //             }
+
+            //             //------------------------------------
+            //             // SET IMAGE SHARPENING IF NEEDED
+            //             //------------------------------------
+            //             if (displaySettingsWeStored.IsSupportedImageSharpening)
+            //             {
+            //                 ctl_sharpness_caps_t sharpnessCaps = new ctl_sharpness_caps_t();
+            //                 status = IGCL.ctlGetSharpnessCaps(hDisplay, sharpnessCaps);
+                            
+            //                 if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                 {
+            //                     ctl_sharpness_settings_t sharpnessSettings = new ctl_sharpness_settings_t();
+            //                     status = IGCL.ctlGetCurrentSharpness(hDisplay, sharpnessSettings);
+                                
+            //                     if (status == ctl_result_t.CTL_RESULT_SUCCESS &&
+            //                         (sharpnessSettings.Enable != displaySettingsWeStored.IsEnabledImageSharpening ||
+            //                          (uint)sharpnessSettings.FilterType != (uint)displaySettingsWeStored.SharpeningFilterType ||
+            //                          Math.Abs(sharpnessSettings.Intensity - displaySettingsWeStored.SharpeningIntensity) > 0.001f))
+            //                     {
+            //                         sharpnessSettings.Enable = displaySettingsWeStored.IsEnabledImageSharpening;
+            //                         sharpnessSettings.FilterType = (uint)displaySettingsWeStored.SharpeningFilterType;
+            //                         sharpnessSettings.Intensity = displaySettingsWeStored.SharpeningIntensity;
+                                    
+            //                         status = IGCL.ctlSetCurrentSharpness(hDisplay, sharpnessSettings);
+            //                         if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                         {
+            //                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Image Sharpening to Enabled={displaySettingsWeStored.IsEnabledImageSharpening}, Intensity={displaySettingsWeStored.SharpeningIntensity}");
+            //                         }
+            //                     }
+            //                     else if (status == ctl_result_t.CTL_RESULT_SUCCESS)
+            //                     {
+            //                         SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Image Sharpening already set to desired values, skipping");
+            //                     }
+            //                 }
+            //                 else
+            //                 {
+            //                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Image Sharpening not supported by current hardware, skipping");
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
+            // else
+            // {
+            //     SharedLogger.logger.Error($"IntelLibrary/SetActiveConfigOverride: ERROR - Tried to run SetActiveConfigOverride but the Intel IGCL library isn't initialised!");
+            //     throw new IntelLibraryException($"Tried to run SetActiveConfigOverride but the Intel IGCL library isn't initialised!");
+            // }
+
+            // return true;
         }
 
         public bool IsActiveConfig(INTEL_DISPLAY_CONFIG displayConfig)
