@@ -100,7 +100,6 @@ namespace DisplayMagicianShared.Intel
         public PowerOptimizationSettingsDto PowerOptimizationSettings;
         public LaceConfigDto LaceConfig;
         public SwPsrSettingsDto SoftwarePsrSettings;
-        public CombinedDisplayArgsDto CombinedDisplayArgs;
         public GenlockArgsDto GenlockArgs;
         public IntelArcSyncMonitorParamsDto IntelArcSyncMonitorParams;
         public AdapterDisplayEncoderPropertiesDto AdapterDisplayEncoderProperties;
@@ -157,7 +156,6 @@ namespace DisplayMagicianShared.Intel
             PowerOptimizationSettings = new PowerOptimizationSettingsDto();
             LaceConfig = new LaceConfigDto();
             SoftwarePsrSettings = new SwPsrSettingsDto();
-            CombinedDisplayArgs = new CombinedDisplayArgsDto();
             GenlockArgs = new GenlockArgsDto();
             IntelArcSyncMonitorParams = new IntelArcSyncMonitorParamsDto();
             AdapterDisplayEncoderProperties = new AdapterDisplayEncoderPropertiesDto();
@@ -307,11 +305,6 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SoftwarePsrSettings values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<CombinedDisplayArgsDto>.Default.Equals(CombinedDisplayArgs, other.CombinedDisplayArgs))
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The CombinedDisplayArgs values don't equal each other");
-                return false;
-            }
             if (!EqualityComparer<GenlockArgsDto>.Default.Equals(GenlockArgs, other.GenlockArgs))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The GenlockArgs values don't equal each other");
@@ -452,89 +445,11 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            var hash = new HashCode();
-            hash.Add(Name);
-            hash.Add(DeviceID);
-            hash.Add(DisplayIndex);
-            hash.Add(AdapterIndex);
-            hash.Add(IsSupportedIntegerScaling);
-            hash.Add(IsEnabledIntegerScaling);
-            hash.Add(IntegerScalingType);
-            hash.Add(IsSupportedGPUScaling);
-            hash.Add(IsEnabledGPUScaling);
-            hash.Add(ScalingType);
-            hash.Add(IsSupportedImageSharpening);
-            hash.Add(IsEnabledImageSharpening);
-            hash.Add(SharpeningFilterType);
-            hash.Add(SharpeningIntensity);
-            hash.Add(DisplaySettings);
-            hash.Add(ScalingSettings);
-            hash.Add(SharpnessSettings);
-            hash.Add(RetroScalingSettings);
-            hash.Add(DynamicContrastEnhancement);
-            if (DynamicContrastEnhancementHistogram != null)
-            {
-                foreach (var value in DynamicContrastEnhancementHistogram)
-                {
-                    hash.Add(value);
-                }
-            }
-            hash.Add(PowerOptimizationSettings);
-            hash.Add(LaceConfig);
-            hash.Add(SoftwarePsrSettings);
-            hash.Add(CombinedDisplayArgs);
-            hash.Add(GenlockArgs);
-            hash.Add(IntelArcSyncMonitorParams);
-            hash.Add(AdapterDisplayEncoderProperties);
-            hash.Add(DisplayProperties);
-            hash.Add(DeviceProperties);
-            hash.Add(DisplayTiming);
-            hash.Add(WireFormat);
-            hash.Add(Brightness);
-            hash.Add(ScalingCaps);
-            hash.Add(SharpnessCaps);
-            if (SharpnessFilterProperties != null)
-            {
-                foreach (var value in SharpnessFilterProperties)
-                {
-                    hash.Add(value);
-                }
-            }
-            hash.Add(RetroScalingCaps);
-            hash.Add(PowerOptimizationCaps);
-            hash.Add(IntelArcSyncProfile);
-            hash.Add(CustomModeArgs);
-            if (CustomModes != null)
-            {
-                foreach (var value in CustomModes)
-                {
-                    hash.Add(value);
-                }
-            }
-            hash.Add(LinkedDisplayAdaptersArgs);
-            if (LinkedDisplayAdapters != null)
-            {
-                foreach (var value in LinkedDisplayAdapters)
-                {
-                    hash.Add(value);
-                }
-            }
-            hash.Add(MuxProperties);
-            if (MuxDisplayOutputs != null)
-            {
-                foreach (var value in MuxDisplayOutputs)
-                {
-                    hash.Add(value);
-                }
-            }
-            hash.Add(VblankTimestamp);
-            hash.Add(ZeDeviceHandle);
-            hash.Add(ZeDriverHandle);
-            hash.Add(RefreshRateHz);
-            hash.Add(ResolutionWidth);
-            hash.Add(ResolutionHeight);
-            hash.Add(IsActive);
-            return hash.ToHashCode();
+
+            return (Name, DeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsEnabledIntegerScaling, IntegerScalingType, IsSupportedGPUScaling, IsEnabledGPUScaling, ScalingType, IsSupportedImageSharpening, IsEnabledImageSharpening, SharpeningFilterType, SharpeningIntensity, 
+                DisplaySettings, ScalingSettings, SharpnessSettings, RetroScalingSettings, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
+                DisplayProperties, DeviceProperties, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, SharpnessFilterProperties, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes, LinkedDisplayAdaptersArgs, LinkedDisplayAdapters, MuxProperties, MuxDisplayOutputs, 
+                VblankTimestamp, ZeDeviceHandle, ZeDriverHandle, RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
         }
 
         public static bool operator ==(INTEL_DISPLAY_WITH_SETTINGS lhs, INTEL_DISPLAY_WITH_SETTINGS rhs) => lhs.Equals(rhs);
@@ -674,7 +589,7 @@ namespace DisplayMagicianShared.Intel
         public bool IsInUse;
         public bool IsCombinedDisplay;
         public INTEL_COMBINED_DISPLAY CombinedDisplay;
-        public Dictionary<IntPtr, INTEL_DISPLAY_WITH_SETTINGS> Displays;  // Key is display handle
+        public Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS> Displays;  // Key is display ID
         public List<string> DisplayIdentifiers;
 
         public INTEL_DISPLAY_CONFIG()
@@ -682,7 +597,7 @@ namespace DisplayMagicianShared.Intel
             IsInUse = false;
             IsCombinedDisplay = false;
             CombinedDisplay = new INTEL_COMBINED_DISPLAY();
-            Displays = new Dictionary<IntPtr, INTEL_DISPLAY_WITH_SETTINGS>();
+            Displays = new Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS>();
             DisplayIdentifiers = new List<string>();
         }
 
@@ -1149,7 +1064,7 @@ namespace DisplayMagicianShared.Intel
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Combined Display settings for display {displayCount} on adapter {adapterNum}.");
                         }
                         // Add display to configuration
-                        myDisplayConfig.Displays.Add(hDisplay, newDisplay);
+                        myDisplayConfig.Displays.Add(newDisplay.DeviceID, newDisplay);
                     }
                     
                 }

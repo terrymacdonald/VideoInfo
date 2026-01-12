@@ -413,13 +413,61 @@
             Adapter handle.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.CreateCombinedDisplayArgs">
+            <summary>
+            Create a combined display args struct with Size and Version initialized.
+            </summary>
+            <returns>Initialized combined display args struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.CreateGenlockArgs">
+            <summary>
+            Create a genlock args struct with Size and Version initialized.
+            </summary>
+            <returns>Initialized genlock args struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.CreateLinkedDisplayAdaptersArgs">
+            <summary>
+            Create linked display adapters args with Size and Version initialized.
+            </summary>
+            <returns>Initialized linked display adapters args struct.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.GetProperties">
             <summary>
             Get adapter properties.
             </summary>
             <returns>Adapter properties struct.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetDisplays">
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateDevicesNative">
+            <summary>
+            Enumerate device adapter handles available to this API instance.
+            </summary>
+            <returns>Array of adapter handles.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateDisplayOutputsNative">
+            <summary>
+            Enumerate display output handles for this adapter.
+            </summary>
+            <returns>Array of display output handles.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateI2CPinPairsNative">
+            <summary>
+            Enumerate I2C pin pair handles for this adapter.
+            </summary>
+            <returns>Array of I2C pin pair handles.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetDeviceProperties">
+            <summary>
+            Get device adapter properties for this adapter.
+            </summary>
+            <returns>Adapter properties struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetZeDevice">
+            <summary>
+            Get the Level Zero device and instance for this adapter.
+            </summary>
+            <returns>Tuple containing zeDevice and instance handles.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateDisplayOutputs">
             <summary>
             Enumerate displays for this adapter.
             </summary>
@@ -434,6 +482,77 @@
             <summary>
             PCI vendor identifier as a hexadecimal string.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetSetCombinedDisplayNative(IGCLWrapper.ctl_combined_display_args_t)">
+            <summary>
+            Call the native get/set combined display API using the provided struct.
+            </summary>
+            <param name="args">Combined display args struct.</param>
+            <returns>Updated combined display args struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetCombinedDisplay">
+            <summary>
+            Get combined display settings as a DTO.
+            </summary>
+            <returns>Combined display args DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetCombinedDisplay(IGCLWrapper.CombinedDisplayArgsDto)">
+            <summary>
+            Get combined display settings using the provided DTO.
+            </summary>
+            <param name="args">Combined display args DTO.</param>
+            <returns>Updated combined display args DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.SetCombinedDisplay(IGCLWrapper.CombinedDisplayArgsDto)">
+            <summary>
+            Set combined display settings using the provided DTO.
+            </summary>
+            <param name="args">Combined display args DTO.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetSetDisplayGenlockNative(System.IntPtr[],IGCLWrapper.ctl_genlock_args_t,System.IntPtr@)">
+            <summary>
+            Call the native get/set display genlock API using the provided struct.
+            </summary>
+            <param name="adapters">Adapter handles.</param>
+            <param name="args">Genlock args struct.</param>
+            <param name="failureAdapter">Adapter handle that failed, if any.</param>
+            <returns>Updated genlock args struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetDisplayGenlock(System.IntPtr[],IGCLWrapper.ctl_genlock_operation_t,IGCLWrapper.GenlockArgsDto,System.IntPtr@)">
+            <summary>
+            Get display genlock settings using a DTO.
+            </summary>
+            <param name="adapters">Adapter handles.</param>
+            <param name="operation">Genlock operation.</param>
+            <param name="args">Genlock args DTO.</param>
+            <param name="failureAdapter">Adapter handle that failed, if any.</param>
+            <returns>Updated genlock args DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.SetDisplayGenlockNative(System.IntPtr[],IGCLWrapper.ctl_genlock_operation_t,IGCLWrapper.GenlockArgsDto,System.IntPtr@)">
+            <summary>
+            Set display genlock settings using a DTO.
+            </summary>
+            <param name="adapters">Adapter handles.</param>
+            <param name="operation">Genlock operation.</param>
+            <param name="args">Genlock args DTO.</param>
+            <param name="failureAdapter">Adapter handle that failed, if any.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.LinkDisplayAdapters(IGCLWrapper.ctl_lda_args_t)">
+            <summary>
+            Link display adapters using the provided args.
+            </summary>
+            <param name="args">Linked display adapters args.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.UnlinkDisplayAdapters">
+            <summary>
+            Unlink previously linked display adapters.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetLinkedDisplayAdapters">
+            <summary>
+            Get linked display adapter information.
+            </summary>
+            <returns>Tuple containing args and adapter handles.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.WaitForPropertyChange(IGCLWrapper.ctl_wait_property_change_args_t)">
             <summary>
@@ -451,6 +570,165 @@
             <summary>
             Mark the helper as disposed.
             </summary>
+        </member>
+        <member name="T:IGCLWrapper.CombinedDisplayArgsDto">
+            <summary>
+            DTO for combined display arguments.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.OpType">
+            <summary>
+            Operation type.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.IsSupported">
+            <summary>
+            Indicates whether the feature is supported.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.NumOutputs">
+            <summary>
+            Number of outputs in the combined display.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.CombinedDesktopWidth">
+            <summary>
+            Combined desktop width.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.CombinedDesktopHeight">
+            <summary>
+            Combined desktop height.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.ChildInfo">
+            <summary>
+            Pointer to child info.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.ChildInfos">
+            <summary>
+            Managed child display info list.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.CombinedDisplayOutput">
+            <summary>
+            Combined display output handle.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayArgsDto.FromNative(IGCLWrapper.ctl_combined_display_args_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Combined display args DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayArgsDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Combined display args struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.CombinedDisplayChildInfoDto">
+            <summary>
+            DTO for combined display child information.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.DisplayOutput">
+            <summary>
+            Display output handle.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.FbSrc">
+            <summary>
+            Framebuffer source rect.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.FbPos">
+            <summary>
+            Framebuffer target rect.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.DisplayOrientation">
+            <summary>
+            Display orientation.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.TargetMode">
+            <summary>
+            Target mode info.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.FromNative(IGCLWrapper.ctl_combined_display_child_info_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Child info DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Child info struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.GenlockArgsDto">
+            <summary>
+            DTO for genlock arguments.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.GenlockArgsDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.GenlockArgsDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.GenlockArgsDto.Operation">
+            <summary>
+            Genlock operation.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.GenlockArgsDto.GenlockTopology">
+            <summary>
+            Genlock topology.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.GenlockArgsDto.IsGenlockEnabled">
+            <summary>
+            Indicates whether genlock is enabled.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.GenlockArgsDto.IsGenlockPossible">
+            <summary>
+            Indicates whether genlock is possible.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.GenlockArgsDto.FromNative(IGCLWrapper.ctl_genlock_args_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Genlock args DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.GenlockArgsDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Genlock args struct.</returns>
         </member>
         <member name="T:IGCLWrapper.IGCLDisplayHelper">
             <summary>
@@ -499,18 +777,6 @@
             </summary>
             <returns>Initialized retro scaling settings struct.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.CreateCombinedDisplayArgs">
-            <summary>
-            Create a combined display args struct with Size and Version initialized.
-            </summary>
-            <returns>Initialized combined display args struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.CreateGenlockArgs">
-            <summary>
-            Create a genlock args struct with Size and Version initialized.
-            </summary>
-            <returns>Initialized genlock args struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.CreateSoftwarePsrSettings">
             <summary>
             Create a software PSR settings struct with Size and Version initialized.
@@ -552,12 +818,6 @@
             Create a pixel transformation pipe get config struct with Size and Version initialized.
             </summary>
             <returns>Initialized pipe get config struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.CreateLinkedDisplayAdaptersArgs">
-            <summary>
-            Create linked display adapters args with Size and Version initialized.
-            </summary>
-            <returns>Initialized linked display adapters args struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.CreateVblankTimestampArgs">
             <summary>
@@ -619,30 +879,6 @@
             <param name="versionInfo">Version info value.</param>
             <returns>IGCL result code.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.EnumerateDevices">
-            <summary>
-            Enumerate device adapter handles available to this API instance.
-            </summary>
-            <returns>Array of adapter handles.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.EnumerateDisplayOutputs">
-            <summary>
-            Enumerate display output handles for this adapter.
-            </summary>
-            <returns>Array of display output handles.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.EnumerateI2CPinPairs">
-            <summary>
-            Enumerate I2C pin pair handles for this adapter.
-            </summary>
-            <returns>Array of I2C pin pair handles.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetDeviceProperties">
-            <summary>
-            Get device adapter properties for this display's adapter.
-            </summary>
-            <returns>Adapter properties struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetAdapterDisplayEncoderPropertiesNative">
             <summary>
             Get adapter display encoder properties using the native struct.
@@ -654,12 +890,6 @@
             Get adapter display encoder properties as a DTO.
             </summary>
             <returns>Adapter display encoder properties DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetZeDevice">
-            <summary>
-            Get the Level Zero device and instance for this adapter.
-            </summary>
-            <returns>Tuple containing zeDevice and instance handles.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSharpnessCaps">
             <summary>
@@ -932,82 +1162,11 @@
             <param name="args">Custom mode args.</param>
             <param name="modes">Custom modes array.</param>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSetCombinedDisplayNative(IGCLWrapper.ctl_combined_display_args_t)">
-            <summary>
-            Call the native get/set combined display API using the provided struct.
-            </summary>
-            <param name="args">Combined display args struct.</param>
-            <returns>Updated combined display args struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCombinedDisplay">
-            <summary>
-            Get combined display settings as a DTO.
-            </summary>
-            <returns>Combined display args DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCombinedDisplay(IGCLWrapper.CombinedDisplayArgsDto)">
-            <summary>
-            Get combined display settings using the provided DTO.
-            </summary>
-            <param name="args">Combined display args DTO.</param>
-            <returns>Updated combined display args DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetCombinedDisplay(IGCLWrapper.CombinedDisplayArgsDto)">
-            <summary>
-            Set combined display settings using the provided DTO.
-            </summary>
-            <param name="args">Combined display args DTO.</param>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSetDisplayGenlockNative(System.IntPtr[],IGCLWrapper.ctl_genlock_args_t,System.IntPtr@)">
-            <summary>
-            Call the native get/set display genlock API using the provided struct.
-            </summary>
-            <param name="adapters">Adapter handles.</param>
-            <param name="args">Genlock args struct.</param>
-            <param name="failureAdapter">Adapter handle that failed, if any.</param>
-            <returns>Updated genlock args struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetDisplayGenlock(System.IntPtr[],IGCLWrapper.ctl_genlock_operation_t,IGCLWrapper.GenlockArgsDto,System.IntPtr@)">
-            <summary>
-            Get display genlock settings using a DTO.
-            </summary>
-            <param name="adapters">Adapter handles.</param>
-            <param name="operation">Genlock operation.</param>
-            <param name="args">Genlock args DTO.</param>
-            <param name="failureAdapter">Adapter handle that failed, if any.</param>
-            <returns>Updated genlock args DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetDisplayGenlock(System.IntPtr[],IGCLWrapper.ctl_genlock_operation_t,IGCLWrapper.GenlockArgsDto,System.IntPtr@)">
-            <summary>
-            Set display genlock settings using a DTO.
-            </summary>
-            <param name="adapters">Adapter handles.</param>
-            <param name="operation">Genlock operation.</param>
-            <param name="args">Genlock args DTO.</param>
-            <param name="failureAdapter">Adapter handle that failed, if any.</param>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetVblankTimestamp">
             <summary>
             Get vblank timestamp information.
             </summary>
             <returns>Vblank timestamp args struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.LinkDisplayAdapters(IGCLWrapper.ctl_lda_args_t)">
-            <summary>
-            Link display adapters using the provided args.
-            </summary>
-            <param name="args">Linked display adapters args.</param>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.UnlinkDisplayAdapters">
-            <summary>
-            Unlink previously linked display adapters.
-            </summary>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetLinkedDisplayAdapters">
-            <summary>
-            Get linked display adapter information.
-            </summary>
-            <returns>Tuple containing args and adapter handles.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSetDynamicContrastEnhancementNative(IGCLWrapper.ctl_dce_args_t,System.UInt32[])">
             <summary>
@@ -1145,117 +1304,6 @@
             Convert this DTO to a native struct.
             </summary>
             <returns>Adapter display encoder properties struct.</returns>
-        </member>
-        <member name="T:IGCLWrapper.CombinedDisplayArgsDto">
-            <summary>
-            DTO for combined display arguments.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.Size">
-            <summary>
-            Size of the native struct.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.Version">
-            <summary>
-            Version of the native struct.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.OpType">
-            <summary>
-            Operation type.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.IsSupported">
-            <summary>
-            Indicates whether the feature is supported.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.NumOutputs">
-            <summary>
-            Number of outputs in the combined display.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.CombinedDesktopWidth">
-            <summary>
-            Combined desktop width.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.CombinedDesktopHeight">
-            <summary>
-            Combined desktop height.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.ChildInfo">
-            <summary>
-            Pointer to child info.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.ChildInfos">
-            <summary>
-            Managed child display info list.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayArgsDto.CombinedDisplayOutput">
-            <summary>
-            Combined display output handle.
-            </summary>
-        </member>
-        <member name="M:IGCLWrapper.CombinedDisplayArgsDto.FromNative(IGCLWrapper.ctl_combined_display_args_t)">
-            <summary>
-            Create a DTO from a native struct.
-            </summary>
-            <param name="native">Native struct.</param>
-            <returns>Combined display args DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.CombinedDisplayArgsDto.ToNative">
-            <summary>
-            Convert this DTO to a native struct.
-            </summary>
-            <returns>Combined display args struct.</returns>
-        </member>
-        <member name="T:IGCLWrapper.CombinedDisplayChildInfoDto">
-            <summary>
-            DTO for combined display child information.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.DisplayOutput">
-            <summary>
-            Display output handle.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.FbSrc">
-            <summary>
-            Framebuffer source rect.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.FbPos">
-            <summary>
-            Framebuffer target rect.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.DisplayOrientation">
-            <summary>
-            Display orientation.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.CombinedDisplayChildInfoDto.TargetMode">
-            <summary>
-            Target mode info.
-            </summary>
-        </member>
-        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.FromNative(IGCLWrapper.ctl_combined_display_child_info_t)">
-            <summary>
-            Create a DTO from a native struct.
-            </summary>
-            <param name="native">Native struct.</param>
-            <returns>Child info DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.ToNative">
-            <summary>
-            Convert this DTO to a native struct.
-            </summary>
-            <returns>Child info struct.</returns>
         </member>
         <member name="T:IGCLWrapper.DceArgsDto">
             <summary>
@@ -1407,54 +1455,6 @@
             Convert this DTO to a native struct.
             </summary>
             <returns>Display settings struct.</returns>
-        </member>
-        <member name="T:IGCLWrapper.GenlockArgsDto">
-            <summary>
-            DTO for genlock arguments.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.GenlockArgsDto.Size">
-            <summary>
-            Size of the native struct.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.GenlockArgsDto.Version">
-            <summary>
-            Version of the native struct.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.GenlockArgsDto.Operation">
-            <summary>
-            Genlock operation.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.GenlockArgsDto.GenlockTopology">
-            <summary>
-            Genlock topology.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.GenlockArgsDto.IsGenlockEnabled">
-            <summary>
-            Indicates whether genlock is enabled.
-            </summary>
-        </member>
-        <member name="F:IGCLWrapper.GenlockArgsDto.IsGenlockPossible">
-            <summary>
-            Indicates whether genlock is possible.
-            </summary>
-        </member>
-        <member name="M:IGCLWrapper.GenlockArgsDto.FromNative(IGCLWrapper.ctl_genlock_args_t)">
-            <summary>
-            Create a DTO from a native struct.
-            </summary>
-            <param name="native">Native struct.</param>
-            <returns>Genlock args DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.GenlockArgsDto.ToNative">
-            <summary>
-            Convert this DTO to a native struct.
-            </summary>
-            <returns>Genlock args struct.</returns>
         </member>
         <member name="T:IGCLWrapper.IntelArcSyncMonitorParamsDto">
             <summary>
