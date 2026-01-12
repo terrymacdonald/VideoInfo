@@ -588,7 +588,8 @@ namespace DisplayMagicianShared.Intel
     {
         public bool IsInUse;
         public bool IsCombinedDisplay;
-        public INTEL_COMBINED_DISPLAY CombinedDisplay;
+        //public INTEL_COMBINED_DISPLAY CombinedDisplay;
+        public CombinedDisplayArgsDto CombinedDisplay;
         public Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS> Displays;  // Key is display ID
         public List<string> DisplayIdentifiers;
 
@@ -596,7 +597,8 @@ namespace DisplayMagicianShared.Intel
         {
             IsInUse = false;
             IsCombinedDisplay = false;
-            CombinedDisplay = new INTEL_COMBINED_DISPLAY();
+            //CombinedDisplay = new INTEL_COMBINED_DISPLAY();
+            CombinedDisplay = new CombinedDisplayArgsDto();
             Displays = new Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS>();
             DisplayIdentifiers = new List<string>();
         }
@@ -946,8 +948,44 @@ namespace DisplayMagicianShared.Intel
 
                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}({adapterProperties.name}), PCI Device ID: 0x{adapterProperties.pci_device_id:X4}, device type {adapterProperties.device_type} ({adapterNum}/{adapterTotalCount}");
                     
+                    //------------------------------------
+                    // CHECK FOR COMBINED DISPLAY CONFIGURATION
+                    //------------------------------------
+                    try
+                    {
+                        var combinedDisplay = adapter.GetCombinedDisplay();
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Combined Display settings for adapter {adapterNum}");
+
+                        if (combinedDisplay.IsSupported)
+                        {
+                            if (combinedDisplay.NumOutputs > 1)
+                            {
+                                myDisplayConfig.IsCombinedDisplay = true;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} has a Combined Display with {combinedDisplay.NumOutputs} outputs, {combinedDisplay.CombinedDesktopWidth}x{combinedDisplay.CombinedDesktopHeight}");
+                            }
+                            else
+                            {
+                                myDisplayConfig.IsCombinedDisplay = false;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not currently have a Combined Display.");
+                            }                            
+                            myDisplayConfig.CombinedDisplay= combinedDisplay;
+                        }                        
+                        else
+                        {
+                            myDisplayConfig.IsCombinedDisplay = false;
+                            myDisplayConfig.CombinedDisplay = new CombinedDisplayArgsDto();
+                            myDisplayConfig.CombinedDisplay.IsSupported = false;
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not support a Combined Display.");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Combined Display settings for adapter {adapterNum}.");
+                    }
+
+
                     // Enumerate displays for this adapter
-                    var displays = adapter.GetDisplays();
+                    var displays = adapter.EnumerateDisplayOutputs();
                     int displayTotalCount = displays.Count;
                     int displayCount = 0;
                     
@@ -969,7 +1007,7 @@ namespace DisplayMagicianShared.Intel
                         {
                             newDisplay.DisplayProperties = display.GetProperties();    
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display properties for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
-\                       }
+                        }
                         catch (Exception ex)
                         {
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display properties for display {displayCount} on adapter {adapterNum}.");
@@ -980,7 +1018,7 @@ namespace DisplayMagicianShared.Intel
                         {
                             newDisplay.DisplaySettings = display.GetDisplaySettings();
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
-\                       }
+                        }
                         catch (Exception ex)
                         {
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
@@ -1034,35 +1072,7 @@ namespace DisplayMagicianShared.Intel
 
                         // Add the other display settings here as needed...
                         
-                        //------------------------------------
-                        // CHECK FOR COMBINED DISPLAY CONFIGURATION
-                        //------------------------------------
-                        try
-                        {
-                            var combinedDisplay = display.GetCombinedDisplay();
-                            if (combinedDisplay.IsSupported)
-                            {
-                                if (combinedDisplay.NumOutputs > 1)
-                                {
-                                    myDisplayConfig.IsCombinedDisplay = true;
-                                }
-                                else
-                                {
-                                    myDisplayConfig.IsCombinedDisplay = false;
-                                }
-                               
-                                newDisplay.CombinedDisplayArgs = combinedDisplay;
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Combined Display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
-
-                            }
-                            {
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Display {displayCount}/{displayTotalCount} on adapter {adapterNum} is part of a Combined Display with {combinedDisplay.NumOutputs} outputs, {combinedDisplay.CombinedDesktopWidth}x{combinedDisplay.CombinedDesktopHeight}");
-                            }                        
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Combined Display settings for display {displayCount} on adapter {adapterNum}.");
-                        }
+                        
                         // Add display to configuration
                         myDisplayConfig.Displays.Add(newDisplay.DeviceID, newDisplay);
                     }
