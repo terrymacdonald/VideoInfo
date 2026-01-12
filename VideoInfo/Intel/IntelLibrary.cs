@@ -1624,87 +1624,31 @@ namespace DisplayMagicianShared.Intel
             List<string> displayIdentifiers = new List<string>();
             failure = false;
 
-            if (_initialised && _igclApiHandle != null)
+            if (_initialised && _igclApiHelper != null)
             {
-                ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
-
-                // Enumerate Intel adapters
-                SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
-                IGCL.igcl_uint32P_assign(pAdapterCount, 0);
                 
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
-                uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
-                
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS || adapterCount == 0)
+                // Enumerate the Intel GPUs adapters in the sytem
+                var adapters = _igclApiHelper.EnumerateAdapters();
+                int adapterTotalCount = adapters.Count;
+                int adapterNum = 0;
+
+                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Found {adapterTotalCount} Intel GPU adapter(s)");
+
+
+                // Go through each adapter
+                foreach (var adapter in adapters)
                 {
-                    failure = true;
-                    return displayIdentifiers;
-                }
-
-                SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
-                status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
-                
-                if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                {
-                    failure = true;
-                    return displayIdentifiers;
-                }
-
-                IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
-
-                for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
-                {
-                    IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
-
-                    ctl_device_adapter_properties_t adapterProps = IGCL.new_adapterPropertiesP();
-                    status = IGCL.IGCL_GetAdapterProperties(hAdapter, adapterProps);
-                    
-                    if (status != ctl_result_t.CTL_RESULT_SUCCESS)
+                    var displays = adapter.EnumerateDisplayOutputs();
+                    int displayTotalCount = displays.Count;
+                    foreach (var display in displays)
                     {
-                        continue;
-                    }
-
-                    // Enumerate displays for this adapter
-                    SWIGTYPE_p_unsigned_int pDisplayCount = IGCL.new_igcl_uint32P();
-                    IGCL.igcl_uint32P_assign(pDisplayCount, 0);
-                    
-                    status = IGCL.IGCL_EnumerateDisplays(hAdapter, pDisplayCount, null);
-                    uint displayCount = IGCL.igcl_uint32P_value(pDisplayCount);
-                    
-                    if (status != ctl_result_t.CTL_RESULT_SUCCESS || displayCount == 0)
-                    {
-                        continue;
-                    }
-
-                    SWIGTYPE_p_p__ctl_display_output_handle_t ppDisplays = IGCL.new_displayOutputHandleP();
-                    status = IGCL.IGCL_EnumerateDisplays(hAdapter, pDisplayCount, ppDisplays);
-                    
-                    if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                    {
-                        continue;
-                    }
-
-                    IntPtr displaysPtr = IGCL.displayOutputHandleP_value(ppDisplays);
-
-                    for (uint displayIdx = 0; displayIdx < displayCount; displayIdx++)
-                    {
-                        IntPtr hDisplay = Marshal.ReadIntPtr(displaysPtr, (int)(displayIdx * IntPtr.Size));
-
-                        ctl_display_properties_t displayProps = IGCL.new_displayPropertiesP();
-                        status = IGCL.IGCL_GetDisplayProperties(hDisplay, displayProps);
-                        
-                        if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-                        {
-                            continue;
-                        }
-
                         // Create display identifier: IntelIGCL|AdapterName|DisplayIndex|AdapterIndex
                         List<string> displayInfo = new List<string>
                         {
                             "IntelIGCL",
-                            adapterProps.name,
-                            displayIdx.ToString(),
-                            adapterIdx.ToString()
+                            adapter.Properties.Name,
+                            display.Index.ToString(),
+                            adapterNum.ToString()
                         };
                         
                         string displayIdentifier = String.Join("|", displayInfo);
