@@ -7,8 +7,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using Windows.Graphics.Display;
 
 namespace DisplayMagicianShared.Intel
 {
@@ -747,6 +748,10 @@ namespace DisplayMagicianShared.Intel
                 return;
             }
 
+            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Display Configuration");
+            _activeDisplayConfig = GetActiveConfig();
+            SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Connected Display Identifiers");
+            _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
 
             /*SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initialise the Intel IGCL API");
                 try
@@ -777,10 +782,7 @@ namespace DisplayMagicianShared.Intel
                     return;
                 }
 
-                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Display Configuration");
-                _activeDisplayConfig = GetActiveConfig();
-                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Connected Display Identifiers");
-                _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
+                
 
             }
             catch (Exception ex)
@@ -946,8 +948,8 @@ namespace DisplayMagicianShared.Intel
                     // Get adapter properties
                     var adapterProperties = adapter.GetProperties();
 
-                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}({adapterProperties.name}), PCI Device ID: 0x{adapterProperties.pci_device_id:X4}, device type {adapterProperties.device_type} ({adapterNum}/{adapterTotalCount}");
-                    
+                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}({adapterProperties.name}), PCI Device ID: 0x{adapterProperties.pci_device_id:X4}, device type {adapterProperties.device_type} ({adapterNum}/{adapterTotalCount}");                    
+
                     //------------------------------------
                     // CHECK FOR COMBINED DISPLAY CONFIGURATION
                     //------------------------------------
@@ -993,6 +995,16 @@ namespace DisplayMagicianShared.Intel
 
                     foreach (var display in displays)
                     {
+
+                        var displayProperties = display.GetProperties();
+
+                        // Skip inactive displays (inactive displays are not part of the current desktop so are not in use now)
+                        if (((uint)displayProperties.DisplayConfigFlags & (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE) != (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE)
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/GetCurrentDisplayIdentifiers: Skipping inactive display on Adapter {adapterNum}");
+                            continue;
+                        }
+
                         displayCount++;
                         SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
 
@@ -1000,18 +1012,9 @@ namespace DisplayMagicianShared.Intel
                         INTEL_DISPLAY_WITH_SETTINGS newDisplay = new INTEL_DISPLAY_WITH_SETTINGS();
                         
                         // Set basic info
-                        newDisplay.Name = $"Display {displayCount} on Intel GPU Adapter {adapterNum}";
-                        
-                        // Get Display properties
-                        try
-                        {
-                            newDisplay.DisplayProperties = display.GetProperties();    
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display properties for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display properties for display {displayCount} on adapter {adapterNum}.");
-                        }                        
+                        newDisplay.Name = display.Name;                        
+
+                        // Get Display properties                   
                         
                         // Get display settings
                         try
@@ -1070,9 +1073,12 @@ namespace DisplayMagicianShared.Intel
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
                         }
 
-                        // Add the other display settings here as needed...
+
+                        // 3. Create a unique Hardware PCI ID + Target ID
+                        // Format: VEN_8086&DEV_XXXX&REV_XX-PORT_X
                         
-                        
+                        newDisplay.DeviceID = $"VEN_{adapterProperties.pci_vendor_id:X4}&DEV_{adapterProperties.pci_device_id:X4}&REV_{adapterProperties.rev_id:X2}-PORT_{displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID}";
+
                         // Add display to configuration
                         myDisplayConfig.Displays.Add(newDisplay.DeviceID, newDisplay);
                     }
@@ -1632,7 +1638,7 @@ namespace DisplayMagicianShared.Intel
                 int adapterTotalCount = adapters.Count;
                 int adapterNum = 0;
 
-                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Found {adapterTotalCount} Intel GPU adapter(s)");
+                SharedLogger.logger.Trace($"IntelLibrary/GetCurrentDisplayIdentifiers: Found {adapterTotalCount} Intel GPU adapter(s)");
 
 
                 // Go through each adapter
@@ -1640,15 +1646,34 @@ namespace DisplayMagicianShared.Intel
                 {
                     var displays = adapter.EnumerateDisplayOutputs();
                     int displayTotalCount = displays.Count;
+                    int displayNum = 0;
+
+                    var adapterDeviceProperties = adapter.GetDeviceProperties();
+
                     foreach (var display in displays)
                     {
+                        displayNum++;
+                        var displayProperties = display.GetProperties();
+
+                        // Skip inactive displays (inactive displays are not part of the current desktop so are not in use now)
+                        if (((uint)displayProperties.DisplayConfigFlags & (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE) != (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE)
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/GetCurrentDisplayIdentifiers: Skipping inactive display Index {displayNum} on Adapter {adapterNum}");
+                            continue;
+                        }
+
+                        var displayDeviceProperties = display.GetProperties();
+
                         // Create display identifier: IntelIGCL|AdapterName|DisplayIndex|AdapterIndex
                         List<string> displayInfo = new List<string>
                         {
                             "IntelIGCL",
-                            adapter.Properties.Name,
-                            display.Index.ToString(),
-                            adapterNum.ToString()
+                            adapter.Name,
+                            adapterDeviceProperties.pci_device_id.ToString("G"),
+                            adapterDeviceProperties.pci_subsys_id.ToString("G"),
+                            display.Name,
+                            displayProperties.Type.ToString(),
+                            displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID.ToString()
                         };
                         
                         string displayIdentifier = String.Join("|", displayInfo);
@@ -1675,11 +1700,78 @@ namespace DisplayMagicianShared.Intel
         public List<string> GetAllConnectedDisplayIdentifiers(out bool failure)
         {
             SharedLogger.logger.Trace($"IntelLibrary/GetAllConnectedDisplayIdentifiers: Getting all the display identifiers that can possibly be used");
-            
-            // For Intel, all connected displays are the same as current displays
-            // since Intel doesn't have the concept of "dormant" displays like AMD Eyefinity
-            return GetCurrentDisplayIdentifiers(out failure);
+
+            List<string> displayIdentifiers = new List<string>();
+            failure = false;
+
+            if (_initialised && _igclApiHelper != null)
+            {
+                
+                // Enumerate the Intel GPUs adapters in the sytem
+                var adapters = _igclApiHelper.EnumerateAdapters();
+                int adapterTotalCount = adapters.Count;
+                int adapterNum = 0;
+
+                SharedLogger.logger.Trace($"IntelLibrary/GetAllConnectedDisplayIdentifiers: Found {adapterTotalCount} Intel GPU adapter(s)");
+
+
+                // Go through each adapter
+                foreach (var adapter in adapters)
+                {
+                    var displays = adapter.EnumerateDisplayOutputs();
+                    int displayTotalCount = displays.Count;
+                    int displayNum = 0;
+
+                    var adapterDeviceProperties = adapter.GetDeviceProperties();
+
+                    foreach (var display in displays)
+                    {
+                        displayNum++;
+                        var displayProperties = display.GetProperties();
+
+                        // Skip displays unless they are attached and windows knows about them (these displays could be attached to the desktop if we wanted to use them)
+                        if (((uint)displayProperties.DisplayConfigFlags & (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ATTACHED) != (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ATTACHED)
+
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/GetCurrentDisplayIdentifiers: Skipping inactive display Index {displayNum} on Adapter {adapterNum}");
+                            continue;
+                        }                        
+
+                        var displayDeviceProperties = display.GetProperties();
+
+                        // Create display identifier: IntelIGCL|AdapterName|DisplayIndex|AdapterIndex
+                        List<string> displayInfo = new List<string>
+                        {
+                            "IntelIGCL",
+                            adapter.Name,
+                            adapterDeviceProperties.pci_device_id.ToString("G"),
+                            adapterDeviceProperties.pci_subsys_id.ToString("G"),
+                            display.Name,
+                            displayProperties.Type.ToString(),
+                            displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID.ToString()
+                        };
+                        
+                        string displayIdentifier = String.Join("|", displayInfo);
+                        if (!displayIdentifiers.Contains(displayIdentifier))
+                        {
+                            displayIdentifiers.Add(displayIdentifier);
+                            SharedLogger.logger.Debug($"IntelLibrary/GetAllConnectedDisplayIdentifiers: DisplayIdentifier detected: {displayIdentifier}");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                SharedLogger.logger.Error($"IntelLibrary/GetCurrentDisplaGetAllConnectedDisplayIdentifiersyIdentifiers: ERROR - Tried to get Displays but the Intel IGCL library isn't initialised!");
+                throw new IntelLibraryException($"Tried to get Displays but the Intel IGCL library isn't initialised!");
+            }
+
+            // Sort the display identifiers
+            displayIdentifiers.Sort();
+
+            return displayIdentifiers;
         }
+
     }
 
     [Serializable]
