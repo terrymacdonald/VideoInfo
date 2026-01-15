@@ -4,6 +4,7 @@ using DisplayMagicianShared.Intel;
 using DisplayMagicianShared.NVIDIA;
 using DisplayMagicianShared.Windows;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NLog.Config;
 using System;
 using System.Collections.Generic;
@@ -419,7 +420,13 @@ namespace VideoInfo
                 {
                     NullValueHandling = NullValueHandling.Include,
                     DefaultValueHandling = DefaultValueHandling.Populate,
-                    TypeNameHandling = TypeNameHandling.Auto
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    ContractResolver = new PointerOmittingContractResolver(),
+                    Error = (sender, args) =>
+                    {
+                        SharedLogger.logger.Debug($"VideoInfo/saveToFile: Skipping member '{args.ErrorContext.Member}' on '{args.ErrorContext.OriginalObject?.GetType().FullName}' due to serialization error: {args.ErrorContext.Error.Message}");
+                        args.ErrorContext.Handled = true;
+                    }
 
                 });
 
@@ -1090,6 +1097,28 @@ namespace VideoInfo
             {
                 SharedLogger.logger.Error($"VideoInfo/equalFromFile: The {filename} JSON file exists but is empty! Cannot continue.");
                 Console.WriteLine($"VideoInfo/equalFromFile: The {filename} JSON file exists but is empty! Cannot continue.");
+            }
+        }
+
+        private sealed class PointerOmittingContractResolver : DefaultContractResolver
+        {
+            protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+            {
+                var properties = base.CreateProperties(type, memberSerialization);
+                for (int i = properties.Count - 1; i >= 0; i--)
+                {
+                    var property = properties[i];
+                    if (IsPointerType(property.PropertyType))
+                    {
+                        properties.RemoveAt(i);
+                    }
+                }
+                return properties;
+            }
+
+            private static bool IsPointerType(Type type)
+            {
+                return type.IsPointer || type.IsByRef;
             }
         }
 
