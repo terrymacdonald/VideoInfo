@@ -1273,9 +1273,7 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            newDisplay.CustomModeArgs = IGCLDisplayHelper.CreateCustomModeArgs();
-                            newDisplay.CustomModeArgs.CustomModeOpType = ctl_custom_mode_operation_types_t.CTL_CUSTOM_MODE_OPERATION_TYPES_GET_CUSTOM_SOURCE_MODES;
-                            (newDisplay.CustomModeArgs, newDisplay.CustomModes) = display.GetCustomModes(newDisplay.CustomModeArgs);
+                            (newDisplay.CustomModeArgs, newDisplay.CustomModes) = display.GetCustomModes();
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got custom modes for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
