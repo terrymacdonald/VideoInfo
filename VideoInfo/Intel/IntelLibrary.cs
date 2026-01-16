@@ -15,63 +15,63 @@ namespace DisplayMagicianShared.Intel
 {
     #region Data Structures
 
-    [StructLayout(LayoutKind.Sequential)]
-    public struct INTEL_DISPLAY : IEquatable<INTEL_DISPLAY>
-    {
-        public string Name;
-        public string DeviceID;
-        public uint DisplayIndex;
-        public uint AdapterIndex;
+    // [StructLayout(LayoutKind.Sequential)]
+    // public struct INTEL_DISPLAY : IEquatable<INTEL_DISPLAY>
+    // {
+    //     public string Name;
+    //     public string DeviceID;
+    //     public uint DisplayIndex;
+    //     public uint AdapterIndex;
 
-        public INTEL_DISPLAY()
-        {
-            Name = "";
-            DeviceID = "";
-            DisplayIndex = 0;
-            AdapterIndex = 0;
-        }
+    //     public INTEL_DISPLAY()
+    //     {
+    //         Name = "";
+    //         DeviceID = "";
+    //         DisplayIndex = 0;
+    //         AdapterIndex = 0;
+    //     }
 
-        public override bool Equals(object obj) => obj is INTEL_DISPLAY other && Equals(other);
+    //     public override bool Equals(object obj) => obj is INTEL_DISPLAY other && Equals(other);
         
-        public bool Equals(INTEL_DISPLAY other)
-        {
-            if (Name != other.Name)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The Name values don't equal each other");
-                return false;
-            }
-            if (DeviceID != other.DeviceID)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The DeviceID values don't equal each other");
-                return false;
-            }
-            if (DisplayIndex != other.DisplayIndex)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The DisplayIndex values don't equal each other");
-                return false;
-            }
-            if (AdapterIndex != other.AdapterIndex)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The AdapterIndex values don't equal each other");
-                return false;
-            }
-            return true;
-        }
+    //     public bool Equals(INTEL_DISPLAY other)
+    //     {
+    //         if (Name != other.Name)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The Name values don't equal each other");
+    //             return false;
+    //         }
+    //         if (DeviceID != other.DeviceID)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The DeviceID values don't equal each other");
+    //             return false;
+    //         }
+    //         if (DisplayIndex != other.DisplayIndex)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The DisplayIndex values don't equal each other");
+    //             return false;
+    //         }
+    //         if (AdapterIndex != other.AdapterIndex)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The AdapterIndex values don't equal each other");
+    //             return false;
+    //         }
+    //         return true;
+    //     }
 
-        public override int GetHashCode()
-        {
-            return (Name, DeviceID, DisplayIndex, AdapterIndex).GetHashCode();
-        }
+    //     public override int GetHashCode()
+    //     {
+    //         return (Name, DeviceID, DisplayIndex, AdapterIndex).GetHashCode();
+    //     }
 
-        public static bool operator ==(INTEL_DISPLAY lhs, INTEL_DISPLAY rhs) => lhs.Equals(rhs);
-        public static bool operator !=(INTEL_DISPLAY lhs, INTEL_DISPLAY rhs) => !(lhs == rhs);
-    }
+    //     public static bool operator ==(INTEL_DISPLAY lhs, INTEL_DISPLAY rhs) => lhs.Equals(rhs);
+    //     public static bool operator !=(INTEL_DISPLAY lhs, INTEL_DISPLAY rhs) => !(lhs == rhs);
+    // }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct INTEL_DISPLAY_WITH_SETTINGS : IEquatable<INTEL_DISPLAY_WITH_SETTINGS>
     {
         public string Name;
-        public string DeviceID;
+        public string DisplayDeviceID;
         public uint DisplayIndex;
         public uint AdapterIndex;
         
@@ -107,7 +107,8 @@ namespace DisplayMagicianShared.Intel
 
         // Display getter outputs
         public ctl_display_properties_t DisplayProperties;
-        public ctl_device_adapter_properties_t DeviceProperties;
+        //public ctl_device_adapter_properties_t DeviceProperties;
+        public string DeviceID;
         public ctl_display_timing_t DisplayTiming;
         public ctl_get_set_wire_format_config_t WireFormat;
         public ctl_get_brightness_t Brightness;
@@ -124,8 +125,8 @@ namespace DisplayMagicianShared.Intel
         public ctl_mux_properties_t MuxProperties;
         public IntPtr[] MuxDisplayOutputs;
         public ctl_vblank_ts_args_t VblankTimestamp;
-        public IntPtr ZeDeviceHandle;
-        public IntPtr ZeDriverHandle;
+        //public IntPtr ZeDeviceHandle;
+        //public IntPtr ZeDriverHandle;
         public double RefreshRateHz;
         public uint ResolutionWidth;
         public uint ResolutionHeight;
@@ -134,7 +135,7 @@ namespace DisplayMagicianShared.Intel
         public INTEL_DISPLAY_WITH_SETTINGS()
         {
             Name = "";
-            DeviceID = "";
+            DisplayDeviceID = "";
             DisplayIndex = 0;
             AdapterIndex = 0;
             IsSupportedIntegerScaling = false;
@@ -162,7 +163,8 @@ namespace DisplayMagicianShared.Intel
             AdapterDisplayEncoderProperties = new AdapterDisplayEncoderPropertiesDto();
 
             DisplayProperties = new ctl_display_properties_t();
-            DeviceProperties = new ctl_device_adapter_properties_t();
+            //DeviceProperties = new ctl_device_adapter_properties_t();
+            DeviceID = "";
             DisplayTiming = new ctl_display_timing_t();
             WireFormat = new ctl_get_set_wire_format_config_t();
             Brightness = new ctl_get_brightness_t();
@@ -179,8 +181,8 @@ namespace DisplayMagicianShared.Intel
             MuxProperties = new ctl_mux_properties_t();
             MuxDisplayOutputs = Array.Empty<IntPtr>();
             VblankTimestamp = new ctl_vblank_ts_args_t();
-            ZeDeviceHandle = IntPtr.Zero;
-            ZeDriverHandle = IntPtr.Zero;
+            //ZeDeviceHandle = IntPtr.Zero;
+            //ZeDriverHandle = IntPtr.Zero;
             RefreshRateHz = 0.0;
             ResolutionWidth = 0;
             ResolutionHeight = 0;
@@ -196,9 +198,9 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The Name values don't equal each other");
                 return false;
             }
-            if (DeviceID != other.DeviceID)
+            if (DisplayDeviceID != other.DisplayDeviceID)
             {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DeviceID values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayDeviceID values don't equal each other");
                 return false;
             }
             if (DisplayIndex != other.DisplayIndex)
@@ -326,9 +328,14 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayProperties values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_device_adapter_properties_t>.Default.Equals(DeviceProperties, other.DeviceProperties))
+            // if (!EqualityComparer<ctl_device_adapter_properties_t>.Default.Equals(DeviceProperties, other.DeviceProperties))
+            // {
+            //     SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DeviceProperties values don't equal each other");
+            //     return false;
+            // }
+            if (DeviceID != other.DeviceID)
             {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DeviceProperties values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DeviceID values don't equal each other");
                 return false;
             }
             if (!EqualityComparer<ctl_display_timing_t>.Default.Equals(DisplayTiming, other.DisplayTiming))
@@ -411,16 +418,16 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The VblankTimestamp values don't equal each other");
                 return false;
             }
-            if (ZeDeviceHandle != other.ZeDeviceHandle)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ZeDeviceHandle values don't equal each other");
-                return false;
-            }
-            if (ZeDriverHandle != other.ZeDriverHandle)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ZeDriverHandle values don't equal each other");
-                return false;
-            }
+            // if (ZeDeviceHandle != other.ZeDeviceHandle)
+            // {
+            //     SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ZeDeviceHandle values don't equal each other");
+            //     return false;
+            // }
+            // if (ZeDriverHandle != other.ZeDriverHandle)
+            // {
+            //     SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ZeDriverHandle values don't equal each other");
+            //     return false;
+            // }
             if (Math.Abs(RefreshRateHz - other.RefreshRateHz) > 0.001)
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The RefreshRateHz values don't equal each other");
@@ -447,129 +454,197 @@ namespace DisplayMagicianShared.Intel
         public override int GetHashCode()
         {
 
-            return (Name, DeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsEnabledIntegerScaling, IntegerScalingType, IsSupportedGPUScaling, IsEnabledGPUScaling, ScalingType, IsSupportedImageSharpening, IsEnabledImageSharpening, SharpeningFilterType, SharpeningIntensity, 
+            return (Name, DisplayDeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsEnabledIntegerScaling, IntegerScalingType, IsSupportedGPUScaling, IsEnabledGPUScaling, ScalingType, IsSupportedImageSharpening, IsEnabledImageSharpening, SharpeningFilterType, SharpeningIntensity, 
                 DisplaySettings, ScalingSettings, SharpnessSettings, RetroScalingSettings, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
-                DisplayProperties, DeviceProperties, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, SharpnessFilterProperties, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes, LinkedDisplayAdaptersArgs, LinkedDisplayAdapters, MuxProperties, MuxDisplayOutputs, 
-                VblankTimestamp, ZeDeviceHandle, ZeDriverHandle, RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
+                DisplayProperties, /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, SharpnessFilterProperties, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes, LinkedDisplayAdaptersArgs, LinkedDisplayAdapters, MuxProperties, MuxDisplayOutputs, 
+                VblankTimestamp, /*ZeDeviceHandle, ZeDriverHandle,*/ RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
         }
 
         public static bool operator ==(INTEL_DISPLAY_WITH_SETTINGS lhs, INTEL_DISPLAY_WITH_SETTINGS rhs) => lhs.Equals(rhs);
         public static bool operator !=(INTEL_DISPLAY_WITH_SETTINGS lhs, INTEL_DISPLAY_WITH_SETTINGS rhs) => !(lhs == rhs);
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    // [StructLayout(LayoutKind.Sequential)]
     
-    public struct INTEL_COMBINED_DISPLAY_CHILD
-    {
-        public string DisplayId;      // stable ID: EDID hash, PnP ID, IGCL display UID
-        public uint Width;
-        public uint Height;
-        public int OffsetX;
-        public int OffsetY;
-        public uint Rotation;
+    // public struct INTEL_COMBINED_DISPLAY_CHILD
+    // {
+    //     public string DisplayId;      // stable ID: EDID hash, PnP ID, IGCL display UID
+    //     public uint Width;
+    //     public uint Height;
+    //     public int OffsetX;
+    //     public int OffsetY;
+    //     public uint Rotation;
 
-        public INTEL_COMBINED_DISPLAY_CHILD()
-        {
-            DisplayId = "";
-            Width = 0;
-            Height = 0;
-            OffsetX = 0;
-            OffsetY = 0;
-            Rotation = 0;
-        }
+    //     public INTEL_COMBINED_DISPLAY_CHILD()
+    //     {
+    //         DisplayId = "";
+    //         Width = 0;
+    //         Height = 0;
+    //         OffsetX = 0;
+    //         OffsetY = 0;
+    //         Rotation = 0;
+    //     }
 
-        public override bool Equals(object obj) => obj is INTEL_COMBINED_DISPLAY_CHILD other && Equals(other);
+    //     public override bool Equals(object obj) => obj is INTEL_COMBINED_DISPLAY_CHILD other && Equals(other);
         
-        public bool Equals(INTEL_COMBINED_DISPLAY_CHILD other)
-        {   
-            if (DisplayId != other.DisplayId)
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The DisplayId values don't equal each other");
-                return false;
-            }
-            if (Width != other.Width)
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Width values don't equal each other");
-                return false;
-            }
-            if (Height != other.Height)
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Height values don't equal each other");
-                return false;
-            }
-            if (OffsetX != other.OffsetX)
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The OffsetX values don't equal each other");
-                return false;
-            }
-            if (OffsetY != other.OffsetY)
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The OffsetY values don't equal each other");
-                return false;
-            }
-            if (Rotation != other.Rotation)
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Rotation values don't equal each other");
-                return false;
-            }
-            return true;
-        }
+    //     public bool Equals(INTEL_COMBINED_DISPLAY_CHILD other)
+    //     {   
+    //         if (DisplayId != other.DisplayId)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The DisplayId values don't equal each other");
+    //             return false;
+    //         }
+    //         if (Width != other.Width)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Width values don't equal each other");
+    //             return false;
+    //         }
+    //         if (Height != other.Height)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Height values don't equal each other");
+    //             return false;
+    //         }
+    //         if (OffsetX != other.OffsetX)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The OffsetX values don't equal each other");
+    //             return false;
+    //         }
+    //         if (OffsetY != other.OffsetY)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The OffsetY values don't equal each other");
+    //             return false;
+    //         }
+    //         if (Rotation != other.Rotation)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY_CHILD/Equals: The Rotation values don't equal each other");
+    //             return false;
+    //         }
+    //         return true;
+    //     }
 
-        public override int GetHashCode()
-        {
-            return (DisplayId, Width, Height, OffsetX, OffsetY, Rotation).GetHashCode();
-        }
+    //     public override int GetHashCode()
+    //     {
+    //         return (DisplayId, Width, Height, OffsetX, OffsetY, Rotation).GetHashCode();
+    //     }
 
-        public static bool operator ==(INTEL_COMBINED_DISPLAY_CHILD lhs, INTEL_COMBINED_DISPLAY_CHILD rhs) => lhs.Equals(rhs);
-        public static bool operator !=(INTEL_COMBINED_DISPLAY_CHILD lhs, INTEL_COMBINED_DISPLAY_CHILD rhs) => !(lhs == rhs);
+    //     public static bool operator ==(INTEL_COMBINED_DISPLAY_CHILD lhs, INTEL_COMBINED_DISPLAY_CHILD rhs) => lhs.Equals(rhs);
+    //     public static bool operator !=(INTEL_COMBINED_DISPLAY_CHILD lhs, INTEL_COMBINED_DISPLAY_CHILD rhs) => !(lhs == rhs);
 
-    }
+    // }
+
+    // [StructLayout(LayoutKind.Sequential)]
+    // public struct INTEL_COMBINED_DISPLAY : IEquatable<INTEL_COMBINED_DISPLAY>
+    // {
+    //     public bool IsCombinedDisplay;
+    //     public uint NumOutputs;
+    //     public uint CombinedDesktopWidth;
+    //     public uint CombinedDesktopHeight;
+    //     public List<INTEL_COMBINED_DISPLAY_CHILD> ChildDisplayHandles;  // Display handles that are part of the combined display
+
+    //     public INTEL_COMBINED_DISPLAY()
+    //     {
+    //         IsCombinedDisplay = false;
+    //         NumOutputs = 0;
+    //         CombinedDesktopWidth = 0;
+    //         CombinedDesktopHeight = 0;
+    //         ChildDisplayHandles = new List<INTEL_COMBINED_DISPLAY_CHILD>();
+    //     }
+
+    //     public override bool Equals(object obj) => obj is INTEL_COMBINED_DISPLAY other && Equals(other);
+        
+    //     public bool Equals(INTEL_COMBINED_DISPLAY other)
+    //     {
+    //         if (IsCombinedDisplay != other.IsCombinedDisplay)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The IsCombinedDisplay values don't equal each other");
+    //             return false;
+    //         }
+    //         if (NumOutputs != other.NumOutputs)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The NumOutputs values don't equal each other");
+    //             return false;
+    //         }
+    //         if (CombinedDesktopWidth != other.CombinedDesktopWidth)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The CombinedDesktopWidth values don't equal each other");
+    //             return false;
+    //         }
+    //         if (CombinedDesktopHeight != other.CombinedDesktopHeight)
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The CombinedDesktopHeight values don't equal each other");
+    //             return false;
+    //         }
+    //         if (!ChildDisplayHandles.SequenceEqual(other.ChildDisplayHandles))
+    //         {
+    //             SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The ChildDisplayHandles values don't equal each other");
+    //             return false;
+    //         }
+    //         return true;
+    //     }
+
+    //     public override int GetHashCode()
+    //     {
+    //         return (IsCombinedDisplay, NumOutputs, CombinedDesktopWidth, CombinedDesktopHeight, ChildDisplayHandles).GetHashCode();
+    //     }
+
+    //     public static bool operator ==(INTEL_COMBINED_DISPLAY lhs, INTEL_COMBINED_DISPLAY rhs) => lhs.Equals(rhs);
+    //     public static bool operator !=(INTEL_COMBINED_DISPLAY lhs, INTEL_COMBINED_DISPLAY rhs) => !(lhs == rhs);
+    // }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct INTEL_COMBINED_DISPLAY : IEquatable<INTEL_COMBINED_DISPLAY>
+    public struct INTEL_ADAPTER : IEquatable<INTEL_ADAPTER>
     {
+        public string AdapterID;
+        public string Name;
+        public uint AdapterIndex;
+        public ctl_device_adapter_properties_t AdapterProperties;
         public bool IsCombinedDisplay;
-        public uint NumOutputs;
-        public uint CombinedDesktopWidth;
-        public uint CombinedDesktopHeight;
-        public List<INTEL_COMBINED_DISPLAY_CHILD> ChildDisplayHandles;  // Display handles that are part of the combined display
+        //public INTEL_COMBINED_DISPLAY CombinedDisplay;
+        public CombinedDisplayArgsDto CombinedDisplay;
 
-        public INTEL_COMBINED_DISPLAY()
+        public INTEL_ADAPTER()
         {
+            AdapterID = "";
+            Name = "";
+            AdapterIndex = 0;
+            AdapterProperties = new ctl_device_adapter_properties_t();
             IsCombinedDisplay = false;
-            NumOutputs = 0;
-            CombinedDesktopWidth = 0;
-            CombinedDesktopHeight = 0;
-            ChildDisplayHandles = new List<INTEL_COMBINED_DISPLAY_CHILD>();
+            //CombinedDisplay = new INTEL_COMBINED_DISPLAY();
+            CombinedDisplay = new CombinedDisplayArgsDto();
+            CombinedDisplay.IsSupported = false;
         }
-
-        public override bool Equals(object obj) => obj is INTEL_COMBINED_DISPLAY other && Equals(other);
+        public override bool Equals(object obj) => obj is INTEL_ADAPTER other && Equals(other);
         
-        public bool Equals(INTEL_COMBINED_DISPLAY other)
+        public  bool Equals(INTEL_ADAPTER other)
         {
+            if (AdapterID != other.AdapterID)
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The AdapterID values don't equal each other");
+                return false;
+            }
+            if (Name != other.Name)
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The Name values don't equal each other");
+                return false;
+            }   
+            if (AdapterIndex != other.AdapterIndex)
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The AdapterIndex values don't equal each other");
+                return false;
+            }
+            if (!EqualityComparer<ctl_device_adapter_properties_t>.Default.Equals(AdapterProperties, other.AdapterProperties))
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The AdapterProperties values don't equal each other");
+                return false;
+            }
             if (IsCombinedDisplay != other.IsCombinedDisplay)
             {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The IsCombinedDisplay values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The IsCombinedDisplay values don't equal each other");
                 return false;
             }
-            if (NumOutputs != other.NumOutputs)
+            if (!CombinedDisplay.Equals(other.CombinedDisplay))
             {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The NumOutputs values don't equal each other");
-                return false;
-            }
-            if (CombinedDesktopWidth != other.CombinedDesktopWidth)
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The CombinedDesktopWidth values don't equal each other");
-                return false;
-            }
-            if (CombinedDesktopHeight != other.CombinedDesktopHeight)
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The CombinedDesktopHeight values don't equal each other");
-                return false;
-            }
-            if (!ChildDisplayHandles.SequenceEqual(other.ChildDisplayHandles))
-            {
-                SharedLogger.logger.Trace($"INTEL_COMBINED_DISPLAY/Equals: The ChildDisplayHandles values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The CombinedDisplay values don't equal each other");
                 return false;
             }
             return true;
@@ -577,29 +652,28 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (IsCombinedDisplay, NumOutputs, CombinedDesktopWidth, CombinedDesktopHeight, ChildDisplayHandles).GetHashCode();
+            return (AdapterID, Name, AdapterIndex, AdapterProperties, IsCombinedDisplay, CombinedDisplay).GetHashCode();
         }
 
-        public static bool operator ==(INTEL_COMBINED_DISPLAY lhs, INTEL_COMBINED_DISPLAY rhs) => lhs.Equals(rhs);
-        public static bool operator !=(INTEL_COMBINED_DISPLAY lhs, INTEL_COMBINED_DISPLAY rhs) => !(lhs == rhs);
+        public static bool operator ==(INTEL_ADAPTER lhs, INTEL_ADAPTER rhs) => lhs.Equals(rhs);
+        public static bool operator !=(INTEL_ADAPTER lhs, INTEL_ADAPTER rhs) => !(lhs == rhs);
     }
+
 
     [StructLayout(LayoutKind.Sequential)]
     public struct INTEL_DISPLAY_CONFIG : IEquatable<INTEL_DISPLAY_CONFIG>
     {
         public bool IsInUse;
-        public bool IsCombinedDisplay;
-        //public INTEL_COMBINED_DISPLAY CombinedDisplay;
-        public CombinedDisplayArgsDto CombinedDisplay;
+        public bool CombinedDisplayIsInUse;
+        public Dictionary<string, INTEL_ADAPTER> PhysicalAdapters;  // Key is adapter ID
         public Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS> Displays;  // Key is display ID
         public List<string> DisplayIdentifiers;
 
         public INTEL_DISPLAY_CONFIG()
         {
             IsInUse = false;
-            IsCombinedDisplay = false;
-            //CombinedDisplay = new INTEL_COMBINED_DISPLAY();
-            CombinedDisplay = new CombinedDisplayArgsDto();
+            CombinedDisplayIsInUse = false;
+            PhysicalAdapters = new Dictionary<string, INTEL_ADAPTER>();
             Displays = new Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS>();
             DisplayIdentifiers = new List<string>();
         }
@@ -613,14 +687,14 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsInUse values don't equal each other");
                 return false;
             }
-            if (IsCombinedDisplay != other.IsCombinedDisplay)
+            if (CombinedDisplayIsInUse != other.CombinedDisplayIsInUse)
             {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsCombinedDisplay values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The CombinedDisplayIsInUse values don't equal each other");
                 return false;
-            }
-            if (!CombinedDisplay.Equals(other.CombinedDisplay))
+            }            
+            if (!PhysicalAdapters.SequenceEqual(other.PhysicalAdapters))
             {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The CombinedDisplay values don't equal each other");
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The PhysicalAdapters values don't equal each other");
                 return false;
             }
             if (!Displays.SequenceEqual(other.Displays))
@@ -638,7 +712,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCombinedDisplay, CombinedDisplay, Displays, DisplayIdentifiers).GetHashCode();
+            return (IsInUse, CombinedDisplayIsInUse, PhysicalAdapters, Displays, DisplayIdentifiers).GetHashCode();
         }
 
         public static bool operator ==(INTEL_DISPLAY_CONFIG lhs, INTEL_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
@@ -909,12 +983,25 @@ namespace DisplayMagicianShared.Intel
                     adapterNum++;
                     // Get adapter properties
                     var adapterProperties = adapter.GetProperties();
+                    var adapterDeviceID = $"{adapter.Name}|{adapterProperties.pci_device_id.ToString("G")}|{adapterProperties.pci_subsys_id.ToString("G")}";
 
                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}({adapterProperties.name}), PCI Device ID: 0x{adapterProperties.pci_device_id:X4}, device type {adapterProperties.device_type} ({adapterNum}/{adapterTotalCount}");                    
 
+
+                    // Create adapter storage struct
+                    INTEL_ADAPTER newAdapter = new INTEL_ADAPTER();
+                    newAdapter.AdapterID = adapterDeviceID;
+                    newAdapter.Name = adapter.Name;
+                    newAdapter.AdapterProperties = adapterProperties;
+
+                    // Add adapter to config
+                    myDisplayConfig.PhysicalAdapters.Add(adapterDeviceID, newAdapter);
+
                     //------------------------------------
-                    // CHECK FOR COMBINED DISPLAY CONFIGURATION
+                    // CHECK FOR COMBINED DISPLAY CONFIGURATION PER ADAPTER
                     //------------------------------------
+                    
+
                     try
                     {
                         var combinedDisplay = adapter.GetCombinedDisplay();
@@ -924,21 +1011,23 @@ namespace DisplayMagicianShared.Intel
                         {
                             if (combinedDisplay.NumOutputs > 1)
                             {
-                                myDisplayConfig.IsCombinedDisplay = true;
+                                newAdapter.IsCombinedDisplay = true;
+                                myDisplayConfig.CombinedDisplayIsInUse = true;
                                 SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} has a Combined Display with {combinedDisplay.NumOutputs} outputs, {combinedDisplay.CombinedDesktopWidth}x{combinedDisplay.CombinedDesktopHeight}");
                             }
                             else
                             {
-                                myDisplayConfig.IsCombinedDisplay = false;
+                                newAdapter.IsCombinedDisplay = false;
                                 SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not currently have a Combined Display.");
                             }                            
-                            myDisplayConfig.CombinedDisplay= combinedDisplay;
+                            newAdapter.CombinedDisplay= combinedDisplay;
                         }                        
                         else
                         {
-                            myDisplayConfig.IsCombinedDisplay = false;
-                            myDisplayConfig.CombinedDisplay = new CombinedDisplayArgsDto();
-                            myDisplayConfig.CombinedDisplay.IsSupported = false;
+                            // This adapter doesn't support Combined Displays, so we force things to false
+                            newAdapter.IsCombinedDisplay = false;
+                            newAdapter.CombinedDisplay = new CombinedDisplayArgsDto();
+                            newAdapter.CombinedDisplay.IsSupported = false;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not support a Combined Display.");
                         }
                     }
@@ -987,6 +1076,8 @@ namespace DisplayMagicianShared.Intel
                         // Set basic info
                         newDisplay.Name = display.Name;                                    
                         newDisplay.DisplayProperties = displayProperties;
+                        // make up a adapter DeviceID that includes the PCI device and subsystem IDs that we can match on.
+                        newDisplay.DeviceID = adapterDeviceID;
                         
                         // Get display settings
                         try
@@ -1230,10 +1321,10 @@ namespace DisplayMagicianShared.Intel
                         // 3. Create a unique Hardware PCI ID + Target ID
                         // Format: VEN_8086&DEV_XXXX&REV_XX-PORT_X
                         
-                        newDisplay.DeviceID = $"VEN_{adapterProperties.pci_vendor_id:X4}&DEV_{adapterProperties.pci_device_id:X4}&REV_{adapterProperties.rev_id:X2}-PORT_{displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID}";
+                        newDisplay.DisplayDeviceID = $"VEN_{adapterProperties.pci_vendor_id:X4}&DEV_{adapterProperties.pci_device_id:X4}&REV_{adapterProperties.rev_id:X2}-PORT_{displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID}";
 
                         // Add display to configuration
-                        myDisplayConfig.Displays.Add(newDisplay.DeviceID, newDisplay);
+                        myDisplayConfig.Displays.Add(newDisplay.DisplayDeviceID, newDisplay);
                     }
                     
                 }
