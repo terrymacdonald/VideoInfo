@@ -2079,17 +2079,11 @@ namespace DisplayMagicianShared.AMD
 
             if (_initialised)
             {
-                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;
                 // Get the desktop services
                 // This is how we get and iterate through the various desktops. 
                 // - A single desktop is associated with one display.
                 // - A duplicate desktop is associated with two or more displays.
                 // - An AMD Eyefinity desktop is associated with two or more displays.
-                IADLXDesktopServices desktopService;
-                IADLXDesktopList desktopList;
-
-                bool isEyefinityEnabled = false;
-                bool isCloned = false;
                 List<AMD_DESKTOP> desktopsToStore = new List<AMD_DESKTOP>();
                 List<AMD_DISPLAY_WITH_SETTINGS> displaysToStore = new List<AMD_DISPLAY_WITH_SETTINGS>();
                 AMD_EYEFINITY_DESKTOP eyefinityDesktopToStore = new AMD_EYEFINITY_DESKTOP();
@@ -2809,7 +2803,6 @@ namespace DisplayMagicianShared.AMD
                                             // First check the native SLS mode list
                                             // Process the slsOffsetBuffer
                                             bool isSlsEnabled = false;
-                                            bool isBezelCompensatedDisplay = false;
                                             foreach (var displayMode in displayModeArray)
                                             {
                                                 foreach (var nativeMode in nativeModeArray)
@@ -2830,7 +2823,6 @@ namespace DisplayMagicianShared.AMD
                                                         if (bezelMode.DisplayMode.XRes == displayMode.XRes && bezelMode.DisplayMode.YRes == displayMode.YRes)
                                                         {
                                                             isSlsEnabled = true;
-                                                            isBezelCompensatedDisplay = true;
                                                             break;
                                                         }
                                                     }
@@ -3725,8 +3717,6 @@ namespace DisplayMagicianShared.AMD
 
             if (_initialised)
             {
-                ADLX_RESULT status = ADLX_RESULT.ADLX_OK;
-
                 // Get the desktop services
                 // This is how we get and iterate through the various desktops. 
                 // - A single desktop is associated with one display.

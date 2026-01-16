@@ -958,12 +958,23 @@ namespace DisplayMagicianShared.Intel
                     foreach (var display in displays)
                     {
 
-                        var displayProperties = display.GetProperties();
+                        ctl_display_properties_t displayProperties;
+                        try
+                        {
+                            displayProperties = display.GetProperties();
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display properties for display {display.Name} on adapter {adapterNum}. Skipping display.");
+                            continue;
+                        }
+
+                        string logDisplayId = $"{display.Name}|{displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID}";
 
                         // Skip inactive displays (inactive displays are not part of the current desktop so are not in use now)
                         if (((uint)displayProperties.DisplayConfigFlags & (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE) != (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE)
                         {
-                            SharedLogger.logger.Trace($"IntelLibrary/GetCurrentDisplayIdentifiers: Skipping inactive display on Adapter {adapterNum}");
+                            SharedLogger.logger.Trace($"IntelLibrary/GetCurrentDisplayIdentifiers: Skipping inactive display {logDisplayId} on Adapter {adapterNum}");
                             continue;
                         }
 
@@ -975,16 +986,46 @@ namespace DisplayMagicianShared.Intel
                         
                         // Set basic info
                         newDisplay.Name = display.Name;                                    
+                        newDisplay.DisplayProperties = displayProperties;
                         
                         // Get display settings
                         try
                         {
                             newDisplay.DisplaySettings = display.GetDisplaySettings();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
                         {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET DISPLAY TIMING / RESOLUTION / REFRESH / ACTIVE STATE
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.DisplayTiming = display.GetTiming();
+                            (newDisplay.ResolutionWidth, newDisplay.ResolutionHeight) = display.GetResolution();
+                            newDisplay.RefreshRateHz = display.GetRefreshRateHz();
+                            newDisplay.IsActive = display.IsActive();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got timing/resolution/refresh/active for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting timing/resolution/refresh/active for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET DISPLAY ENCODER PROPERTIES
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.AdapterDisplayEncoderProperties = display.GetAdapterDisplayEncoderProperties();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got adapter display encoder properties for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting adapter display encoder properties for display {logDisplayId} on adapter {adapterNum}.");
                         }
                         
                         //------------------------------------
@@ -993,13 +1034,16 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             newDisplay.RetroScalingCaps = display.GetSupportedRetroScalingCapability();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got retro scaling caps for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                             newDisplay.RetroScalingSettings = display.GetRetroScalingSettings();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Integer Scaling Settings for : Enabled={newDisplay.RetroScalingCaps.SupportedRetroScaling}, Type={newDisplay.RetroScalingSettings.RetroScalingType}");
+                            newDisplay.IsSupportedIntegerScaling = newDisplay.RetroScalingCaps.SupportedRetroScaling == 1 ? true : false;
+                            newDisplay.IsEnabledIntegerScaling = newDisplay.RetroScalingSettings.Enable;
+                            newDisplay.IntegerScalingType = (ctl_retro_scaling_type_flag_t)newDisplay.RetroScalingSettings.RetroScalingType;
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Integer scaling settings for display {logDisplayId}: Supported={newDisplay.RetroScalingCaps.SupportedRetroScaling}, Enabled={newDisplay.RetroScalingSettings.Enable}, Type={newDisplay.RetroScalingSettings.RetroScalingType}");
                         }
                         catch (Exception ex)
                         {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting retro scaling settings for display {logDisplayId} on adapter {adapterNum}.");
                         }
 
                         //------------------------------------
@@ -1008,13 +1052,16 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             newDisplay.ScalingCaps = display.GetSupportedScalingCapability();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got scaling caps for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                             newDisplay.ScalingSettings = display.GetCurrentScaling();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get GPU Scaling Settings for : Enabled={newDisplay.ScalingCaps.SupportedScaling}, Type={newDisplay.ScalingSettings.ScalingType}");
+                            newDisplay.IsSupportedGPUScaling = newDisplay.ScalingCaps.SupportedScaling == 1 ? true : false;
+                            newDisplay.IsEnabledGPUScaling = newDisplay.ScalingSettings.Enable;
+                            newDisplay.ScalingType = (ctl_scaling_type_flag_t)newDisplay.ScalingSettings.ScalingType;
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: GPU scaling settings for display {logDisplayId}: Supported={newDisplay.ScalingCaps.SupportedScaling}, Enabled={newDisplay.ScalingSettings.Enable}, Type={newDisplay.ScalingSettings.ScalingType}");
                         }
                         catch (Exception ex)
                         {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting scaling settings for display {logDisplayId} on adapter {adapterNum}.");
                         }
 
                         //------------------------------------
@@ -1024,13 +1071,159 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             (newDisplay.SharpnessCaps,newDisplay.SharpnessFilterProperties) = display.GetSharpnessCaps();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got sharpness caps for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                             newDisplay.SharpnessSettings = display.GetCurrentSharpness();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Get Image Sharpening Settings for : Enabled={newDisplay.SharpnessSettings.Enable}, Intensity={newDisplay.SharpnessSettings.Intensity}");
+                            newDisplay.IsSupportedImageSharpening = newDisplay.SharpnessCaps.SupportedFilterFlags != 0;
+                            newDisplay.IsEnabledImageSharpening = newDisplay.SharpnessSettings.Enable;
+                            newDisplay.SharpeningFilterType = (ctl_sharpness_filter_type_flag_t)newDisplay.SharpnessSettings.FilterType;
+                            newDisplay.SharpeningIntensity = newDisplay.SharpnessSettings.Intensity;
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Image sharpening settings for display {logDisplayId}: Enabled={newDisplay.SharpnessSettings.Enable}, FilterType={newDisplay.SharpnessSettings.FilterType}, Intensity={newDisplay.SharpnessSettings.Intensity}");
                         }
                         catch (Exception ex)
                         {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {displayCount} on adapter {adapterNum}.");
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting image sharpening settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET POWER OPTIMIZATION SETTINGS
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.PowerOptimizationCaps = display.GetPowerOptimizationCaps();
+                            newDisplay.PowerOptimizationSettings = display.GetPowerOptimizationSetting(newDisplay.PowerOptimizationSettings);
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got power optimization settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting power optimization settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET BRIGHTNESS SETTINGS
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.Brightness = display.GetBrightnessSetting();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got brightness settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting brightness settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET LACE CONFIG
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.LaceConfig = display.GetLACEConfig();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got LACE config for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting LACE config for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET SOFTWARE PSR SETTINGS
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.SoftwarePsrSettings = display.SoftwarePSR(newDisplay.SoftwarePsrSettings);
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Software PSR settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Software PSR settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET INTEL ARC SYNC SETTINGS
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.IntelArcSyncMonitorParams = display.GetIntelArcSyncInfoForMonitor();
+                            newDisplay.IntelArcSyncProfile = display.GetIntelArcSyncProfile();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Intel Arc Sync settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Intel Arc Sync settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET WIRE FORMAT SETTINGS
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.WireFormat = display.GetWireFormat();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got wire format settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting wire format settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET DYNAMIC CONTRAST ENHANCEMENT SETTINGS
+                        //------------------------------------
+                        try
+                        {
+                            (newDisplay.DynamicContrastEnhancement, newDisplay.DynamicContrastEnhancementHistogram) = display.GetDynamicContrastEnhancement();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got dynamic contrast enhancement settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting dynamic contrast enhancement settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET CUSTOM MODES
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.CustomModeArgs = IGCLDisplayHelper.CreateCustomModeArgs();
+                            newDisplay.CustomModeArgs.CustomModeOpType = ctl_custom_mode_operation_types_t.CTL_CUSTOM_MODE_OPERATION_TYPES_GET_CUSTOM_SOURCE_MODES;
+                            (newDisplay.CustomModeArgs, newDisplay.CustomModes) = display.GetCustomModes(newDisplay.CustomModeArgs);
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got custom modes for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting custom modes for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET VBLANK TIMESTAMP
+                        //------------------------------------
+                        try
+                        {
+                            newDisplay.VblankTimestamp = display.GetVblankTimestamp();
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got vblank timestamp for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting vblank timestamp for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET MUX PROPERTIES
+                        //------------------------------------
+                        try
+                        {
+                            var muxHandles = display.EnumerateMuxDevices();
+                            if (muxHandles != null && muxHandles.Length > 0)
+                            {
+                                (newDisplay.MuxProperties, newDisplay.MuxDisplayOutputs) = display.GetMuxProperties(muxHandles[0]);
+                                if (muxHandles.Length > 1)
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Multiple mux devices detected ({muxHandles.Length}); storing properties for the first one only.");
+                                }
+                            }
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got mux properties for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting mux properties for display {logDisplayId} on adapter {adapterNum}.");
                         }
 
 

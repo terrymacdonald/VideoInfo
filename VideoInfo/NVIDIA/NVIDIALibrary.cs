@@ -540,7 +540,6 @@ namespace DisplayMagicianShared.NVIDIA
         private static NVIDIALibrary _instance = new NVIDIALibrary();
 
         private bool _initialised = false;
-        private bool _inUse = false;
         private NVIDIA_DISPLAY_CONFIG? _activeDisplayConfig;
         public List<MonitorConnectionType> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
@@ -1913,9 +1912,6 @@ namespace DisplayMagicianShared.NVIDIA
 
             if (_initialised)
             {
-
-                bool logicalGPURefreshNeeded = false;
-
                 // Remove any custom NVIDIA Colour settings
                 SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want to turn off colour if it's default set colour.");
                 foreach (var physicalGPU in displayConfig.PhysicalAdapters)
@@ -2213,7 +2209,6 @@ namespace DisplayMagicianShared.NVIDIA
                             SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids returned OK.");
                             SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
                             Thread.Sleep(delayInMs * 3);
-                            logicalGPURefreshNeeded = true;
                         }
                         catch (NVIDIAApiException nex)
                         {
