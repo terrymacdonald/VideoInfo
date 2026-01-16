@@ -752,45 +752,7 @@ namespace DisplayMagicianShared.Intel
             _activeDisplayConfig = GetActiveConfig();
             SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Connected Display Identifiers");
             _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
-
-            /*SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Attempting to initialise the Intel IGCL API");
-                try
-                {
-                    // Initialize IGCL - using the helper pointer functions
-                    SWIGTYPE_p_p__ctl_api_handle_t ppApiHandle = IGCL.new_deviceAdapterHandleP();
-                    ctl_result_t result = IGCL.IGCL_InitDefault(ppApiHandle);
-                    
-                    if (result == ctl_result_t.CTL_RESULT_SUCCESS)
-                    {
-                        // Extract the actual API handle from the pointer-to-pointer
-                        IntPtr apiHandlePtr = IGCL.deviceAdapterHandleP_value(ppApiHandle);
-                        _igclApiHandle = new SWIGTYPE_p__ctl_api_handle_t(apiHandlePtr, false);
-                        _initialised = true;
-                        SharedLogger.logger.Trace("IntelLibrary/IntelLibrary: We successfully initialised the Intel IGCL API which means that the Intel Graphics driver software is installed and working.");
-                    }
-                    else
-                    {
-                        _initialised = false;
-                        SharedLogger.logger.Error($"IntelLibrary/IntelLibrary: Failed to initialise the Intel IGCL API. IGCL_InitDefault() returned error code {result}");
-                        return;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _initialised = false;
-                    SharedLogger.logger.Error(ex, "IntelLibrary/IntelLibrary: Exception while trying to initialise the Intel IGCL API. You may need to install the Intel Graphics driver.");
-                    return;
-                }
-
-                
-
-            }
-            catch (Exception ex)
-            {
-                SharedLogger.logger.Info(ex, $"IntelLibrary/IntelLibrary: A general exception trying to load the Intel IGCL DLL {Intel_IGCL_DLL}.");
-                _initialised = false; 
-                return;
-            }*/
+        
         }
 
         ~IntelLibrary()
@@ -1012,9 +974,7 @@ namespace DisplayMagicianShared.Intel
                         INTEL_DISPLAY_WITH_SETTINGS newDisplay = new INTEL_DISPLAY_WITH_SETTINGS();
                         
                         // Set basic info
-                        newDisplay.Name = display.Name;                        
-
-                        // Get Display properties                   
+                        newDisplay.Name = display.Name;                                    
                         
                         // Get display settings
                         try
