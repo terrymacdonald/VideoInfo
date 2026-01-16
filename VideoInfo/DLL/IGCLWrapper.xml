@@ -1148,11 +1148,31 @@
             <param name="args">EDID management arguments.</param>
             <returns>Updated EDID management arguments.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCustomModes(IGCLWrapper.ctl_get_set_custom_mode_args_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetEdid(IGCLWrapper.ctl_edid_type_t)">
             <summary>
-            Get custom display modes using the provided arguments.
+            Read the EDID bytes for this display output.
+            </summary>
+            <param name="edidType">EDID type to read.</param>
+            <returns>EDID bytes.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetEdidWithFlags(IGCLWrapper.ctl_edid_type_t)">
+            <summary>
+            Read the EDID bytes for this display output and return EDID management output flags.
+            </summary>
+            <param name="edidType">EDID type to read.</param>
+            <returns>Tuple containing EDID bytes and output flags.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCustomModesNative(IGCLWrapper.ctl_get_set_custom_mode_args_t)">
+            <summary>
+            Get custom display modes using the provided native arguments.
             </summary>
             <param name="args">Custom mode args.</param>
+            <returns>Tuple containing updated args and modes.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCustomModes">
+            <summary>
+            Get custom display modes.
+            </summary>
             <returns>Tuple containing updated args and modes.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SetCustomModes(IGCLWrapper.ctl_get_set_custom_mode_args_t,IGCLWrapper.ctl_custom_src_mode_t[])">
