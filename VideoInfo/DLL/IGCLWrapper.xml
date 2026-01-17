@@ -492,15 +492,8 @@
         </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.GetCombinedDisplay">
             <summary>
-            Get combined display settings as a DTO.
-            </summary>
-            <returns>Combined display args DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetCombinedDisplay(IGCLWrapper.CombinedDisplayArgsDto)">
-            <summary>
             Get combined display settings using the provided DTO.
             </summary>
-            <param name="args">Combined display args DTO.</param>
             <returns>Updated combined display args DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.SetCombinedDisplay(IGCLWrapper.CombinedDisplayArgsDto)">
