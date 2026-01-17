@@ -867,6 +867,7 @@ namespace DisplayMagicianShared.Intel
                 hIGCLModule = IntPtr.Zero;
             }
 
+            _initialised = false;
             _disposed = true;
         }
 
@@ -925,6 +926,17 @@ namespace DisplayMagicianShared.Intel
             }
 
             return _instance;
+        }
+
+        public static void Shutdown()
+        {
+            if (_instance == null)
+            {
+                return;
+            }
+
+            _instance.Dispose();
+            _instance = null;
         }
 
         public INTEL_DISPLAY_CONFIG CreateDefaultConfig()

@@ -126,6 +126,7 @@ namespace VideoInfo
             amdLibrary = AMDLibrary.GetLibrary();
             intelLibrary = IntelLibrary.GetLibrary();
             winLibrary = WinLibrary.GetLibrary();
+            RegisterCleanupHandlers();
 
             if (args.Length > 0)
             {
@@ -325,6 +326,24 @@ namespace VideoInfo
             }
             Console.WriteLine();
             Environment.Exit(0);
+        }
+
+        static void RegisterCleanupHandlers()
+        {
+            AppDomain.CurrentDomain.ProcessExit += (_, __) => CleanupLibraries();
+            Console.CancelKeyPress += (_, __) => CleanupLibraries();
+        }
+
+        static void CleanupLibraries()
+        {
+            try
+            {
+                IntelLibrary.Shutdown();
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger?.Trace(ex, "VideoInfo/CleanupLibraries: Exception while shutting down Intel library.");
+            }
         }
 
         static void showHelp()
