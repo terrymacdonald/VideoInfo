@@ -586,7 +586,7 @@
         </member>
         <member name="F:IGCLWrapper.CombinedDisplayArgsDto.IsSupported">
             <summary>
-            Indicates whether the feature is supported.
+            Indicates whether the combined display configuration is supported for IS_SUPPORTED_CONFIG.
             </summary>
         </member>
         <member name="F:IGCLWrapper.CombinedDisplayArgsDto.NumOutputs">
