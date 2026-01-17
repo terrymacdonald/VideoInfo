@@ -611,6 +611,7 @@ namespace DisplayMagicianShared.Intel
             IsCombinedDisplay = false;
             //CombinedDisplay = new INTEL_COMBINED_DISPLAY();
             CombinedDisplay = new CombinedDisplayArgsDto();
+            CombinedDisplay.ChildInfos = Array.Empty<CombinedDisplayChildInfoDto>();
             CombinedDisplay.IsSupported = false;
         }
         public override bool Equals(object obj) => obj is INTEL_ADAPTER other && Equals(other);
