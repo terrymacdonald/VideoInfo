@@ -665,7 +665,6 @@ namespace DisplayMagicianShared.Intel
     public struct INTEL_DISPLAY_CONFIG : IEquatable<INTEL_DISPLAY_CONFIG>
     {
         public bool IsInUse;
-        public bool IsCloned;
         public bool CombinedDisplayIsInUse;
         public Dictionary<string, INTEL_ADAPTER> PhysicalAdapters;  // Key is adapter ID
         public Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS> Displays;  // Key is display ID
@@ -674,7 +673,6 @@ namespace DisplayMagicianShared.Intel
         public INTEL_DISPLAY_CONFIG()
         {
             IsInUse = false;
-            IsCloned = false;
             CombinedDisplayIsInUse = false;
             PhysicalAdapters = new Dictionary<string, INTEL_ADAPTER>();
             Displays = new Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS>();
@@ -688,11 +686,6 @@ namespace DisplayMagicianShared.Intel
             if (IsInUse != other.IsInUse)
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsInUse values don't equal each other");
-                return false;
-            }
-            if (IsCloned != other.IsCloned)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsCloned values don't equal each other");
                 return false;
             }
             if (CombinedDisplayIsInUse != other.CombinedDisplayIsInUse)
