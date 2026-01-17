@@ -713,7 +713,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCloned, CombinedDisplayIsInUse, PhysicalAdapters, Displays, DisplayIdentifiers).GetHashCode();
+            return (IsInUse, CombinedDisplayIsInUse, PhysicalAdapters, Displays, DisplayIdentifiers).GetHashCode();
         }
 
         public static bool operator ==(INTEL_DISPLAY_CONFIG lhs, INTEL_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
