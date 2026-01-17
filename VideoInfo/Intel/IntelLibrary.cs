@@ -1488,6 +1488,135 @@ namespace DisplayMagicianShared.Intel
 
         public bool SetActiveConfig(INTEL_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
+            if (_initialised && _igclApiHelper != null)
+            {
+                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Managing Intel Combined Display configuration");
+
+                var adapters = _igclApiHelper.EnumerateAdapters();
+                if (adapters == null || adapters.Count == 0)
+                {
+                    SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: No Intel adapters found or error getting adapter count.");
+                    return false;
+                }
+
+                int adapterNum = 0;
+                foreach (var adapter in adapters)
+                {
+                    adapterNum++;
+
+                    var adapterProperties = adapter.GetProperties();
+                    string adapterDeviceID = $"{adapter.Name}|{adapterProperties.pci_device_id.ToString("G")}|{adapterProperties.pci_subsys_id.ToString("G")}";
+
+                    if (!displayConfig.PhysicalAdapters.TryGetValue(adapterDeviceID, out INTEL_ADAPTER desiredAdapter))
+                    {
+                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: No stored settings found for adapter {adapterDeviceID}, skipping");
+                        continue;
+                    }
+
+                    CombinedDisplayArgsDto currentCombinedDisplay;
+                    try
+                    {
+                        currentCombinedDisplay = adapter.GetCombinedDisplay();
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfig: Exception getting Combined Display settings for adapter {adapterNum}.");
+                        continue;
+                    }
+
+                    if (!currentCombinedDisplay.IsSupported)
+                    {
+                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display not supported by adapter {adapterNum}, skipping");
+                        continue;
+                    }
+
+                    bool currentCombinedDisplayInUse = currentCombinedDisplay.NumOutputs > 1;
+                    bool desiredCombinedDisplayInUse = desiredAdapter.IsCombinedDisplay;
+
+                    if (desiredCombinedDisplayInUse)
+                    {
+                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout requires a Combined Display on adapter {adapterNum}");
+
+                        if (currentCombinedDisplay.Equals(desiredAdapter.CombinedDisplay))
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout matches desired configuration, skipping");
+                            continue;
+                        }
+
+                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Attempting to create the Intel Combined Display on adapter {adapterNum}");
+
+                        CombinedDisplayArgsDto combinedDisplayArgs = desiredAdapter.CombinedDisplay;
+                        combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_ENABLE;
+                        if (combinedDisplayArgs.ChildInfos == null)
+                        {
+                            combinedDisplayArgs.ChildInfos = Array.Empty<CombinedDisplayChildInfoDto>();
+                        }
+
+                        try
+                        {
+                            adapter.SetCombinedDisplay(combinedDisplayArgs);
+                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully created the Intel Combined Display on adapter {adapterNum}");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfig: Error creating the Intel Combined Display on adapter {adapterNum}");
+                            return false;
+                        }
+
+                        try
+                        {
+                            var updatedCombinedDisplay = adapter.GetCombinedDisplay();
+                            if (updatedCombinedDisplay.NumOutputs == desiredAdapter.CombinedDisplay.NumOutputs &&
+                                updatedCombinedDisplay.CombinedDesktopWidth == desiredAdapter.CombinedDisplay.CombinedDesktopWidth &&
+                                updatedCombinedDisplay.CombinedDesktopHeight == desiredAdapter.CombinedDisplay.CombinedDesktopHeight)
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: This new Combined Display layout matches the desired configuration.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Warn($"IntelLibrary/SetActiveConfig: This new Combined Display layout is different from the one originally saved. You may need to update this desktop profile.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfig: Exception verifying Combined Display settings for adapter {adapterNum}.");
+                        }
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout does NOT require a Combined Display on adapter {adapterNum}");
+
+                        if (currentCombinedDisplayInUse)
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is currently in use but is NOT required, so we need to destroy the Combined Display on adapter {adapterNum}");
+
+                            CombinedDisplayArgsDto combinedDisplayArgs = currentCombinedDisplay;
+                            combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_DISABLE;
+
+                            try
+                            {
+                                adapter.SetCombinedDisplay(combinedDisplayArgs);
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully destroyed the Intel Combined Display on adapter {adapterNum}.");
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfig: Error destroying the Intel Combined Display on adapter {adapterNum}");
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is not currently in use and is NOT required, so leaving things as they are.");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
+                throw new IntelLibraryException($"Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
+            }
+
             return true;
 
             // if (_initialised && _igclApiHandle != null)
