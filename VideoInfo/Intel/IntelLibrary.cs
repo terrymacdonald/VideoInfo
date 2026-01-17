@@ -1535,11 +1535,6 @@ namespace DisplayMagicianShared.Intel
                         continue;
                     }
 
-                    if (!currentCombinedDisplay.IsSupported)
-                    {
-                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display not supported by adapter {adapterNum}, skipping");
-                        continue;
-                    }
 
                     bool currentCombinedDisplayInUse = currentCombinedDisplay.NumOutputs > 1;
                     bool desiredCombinedDisplayInUse = desiredAdapter.IsCombinedDisplay;
@@ -1558,6 +1553,10 @@ namespace DisplayMagicianShared.Intel
 
                         CombinedDisplayArgsDto combinedDisplayArgs = desiredAdapter.CombinedDisplay;
                         combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_ENABLE;
+
+                        // TODO: Copy the child info from the desiredAdapter.CombinedDisplay to combinedDisplayArgs
+                        // while checking to make sure that the ChildInfos match the currently connected displays.
+
                         if (combinedDisplayArgs.ChildInfos == null)
                         {
                             combinedDisplayArgs.ChildInfos = Array.Empty<CombinedDisplayChildInfoDto>();
@@ -2005,6 +2004,15 @@ namespace DisplayMagicianShared.Intel
                 return false;
             }
 
+            // IGCL does not support identifying the displays that are part of a combined display. We have no way of knowing this,
+            // so we will just assume that if any of the display identifiers in the config are part of a combined display,
+            // then they are available now. This is not ideal, but there is no other way to do this with IGCL.
+            // TODO: Find a way to use the Windows IDs to identify combined displays in IGCL.
+            if (displayConfig.CombinedDisplayIsInUse || _activeDisplayConfig.Value.CombinedDisplayIsInUse)
+            {
+                return true;
+            }
+
             // Check that we have all the displayConfig DisplayIdentifiers we need available now            
             if (displayConfig.DisplayIdentifiers.All(value => _allConnectedDisplayIdentifiers.Contains(value)))
             {
@@ -2059,19 +2067,20 @@ namespace DisplayMagicianShared.Intel
 
                         var displayDeviceProperties = display.GetProperties();
 
-                        // Create display identifier: IntelIGCL|AdapterName|DisplayIndex|AdapterIndex
                         List<string> displayInfo = new List<string>
                         {
                             "IntelIGCL",
                             adapter.Name,
                             adapterDeviceProperties.pci_device_id.ToString("G"),
                             adapterDeviceProperties.pci_subsys_id.ToString("G"),
-                            display.Name,
                             displayProperties.Type.ToString(),
-                            displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID.ToString()
+                            displayProperties.AttachedDisplayMuxType.ToString(),
+                            displayProperties.ProtocolConverterOutput.ToString(),
+                            displayProperties.ProtocolConverterType.ToString(),
+                            displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID.ToString("G")
                         };
                         
-                        string displayIdentifier = String.Join("|", displayInfo);
+                        string displayIdentifier = String.Join("#", displayInfo);
                         if (!displayIdentifiers.Contains(displayIdentifier))
                         {
                             displayIdentifiers.Add(displayIdentifier);
@@ -2134,19 +2143,21 @@ namespace DisplayMagicianShared.Intel
 
                         var displayDeviceProperties = display.GetProperties();
 
-                        // Create display identifier: IntelIGCL|AdapterName|DisplayIndex|AdapterIndex
+                        
                         List<string> displayInfo = new List<string>
                         {
                             "IntelIGCL",
                             adapter.Name,
                             adapterDeviceProperties.pci_device_id.ToString("G"),
                             adapterDeviceProperties.pci_subsys_id.ToString("G"),
-                            display.Name,
                             displayProperties.Type.ToString(),
-                            displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID.ToString()
+                            displayProperties.AttachedDisplayMuxType.ToString(),
+                            displayProperties.ProtocolConverterOutput.ToString(),
+                            displayProperties.ProtocolConverterType.ToString(),
+                            displayProperties.Os_display_encoder_handle.WindowsDisplayEncoderID.ToString("G")                          
                         };
                         
-                        string displayIdentifier = String.Join("|", displayInfo);
+                        string displayIdentifier = String.Join("#", displayInfo);
                         if (!displayIdentifiers.Contains(displayIdentifier))
                         {
                             displayIdentifiers.Add(displayIdentifier);
