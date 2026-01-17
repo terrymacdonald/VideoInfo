@@ -598,6 +598,7 @@ namespace DisplayMagicianShared.Intel
         public string Name;
         public uint AdapterIndex;
         public ctl_device_adapter_properties_t AdapterProperties;
+        public bool CombinedDisplayIsSupported;
         public bool IsCombinedDisplay;
         //public INTEL_COMBINED_DISPLAY CombinedDisplay;
         public CombinedDisplayArgsDto CombinedDisplay;
@@ -608,6 +609,7 @@ namespace DisplayMagicianShared.Intel
             Name = "";
             AdapterIndex = 0;
             AdapterProperties = new ctl_device_adapter_properties_t();
+            CombinedDisplayIsSupported = false;
             IsCombinedDisplay = false;
             //CombinedDisplay = new INTEL_COMBINED_DISPLAY();
             CombinedDisplay = new CombinedDisplayArgsDto();
@@ -638,6 +640,11 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The AdapterProperties values don't equal each other");
                 return false;
             }
+            if (CombinedDisplayIsSupported != other.CombinedDisplayIsSupported)
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The CombinedDisplayIsSupported values don't equal each other");
+                return false;
+            }
             if (IsCombinedDisplay != other.IsCombinedDisplay)
             {
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The IsCombinedDisplay values don't equal each other");
@@ -653,7 +660,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (AdapterID, Name, AdapterIndex, AdapterProperties, IsCombinedDisplay, CombinedDisplay).GetHashCode();
+            return (AdapterID, Name, AdapterIndex, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, CombinedDisplay).GetHashCode();
         }
 
         public static bool operator ==(INTEL_ADAPTER lhs, INTEL_ADAPTER rhs) => lhs.Equals(rhs);
@@ -1017,29 +1024,33 @@ namespace DisplayMagicianShared.Intel
                         var combinedDisplay = adapter.GetCombinedDisplay();
                         SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Combined Display settings for adapter {adapterNum}");
 
-                        if (combinedDisplay.IsSupported)
+                        if (combinedDisplay.NumOutputs > 1)
                         {
-                            if (combinedDisplay.NumOutputs > 1)
-                            {
-                                newAdapter.IsCombinedDisplay = true;
-                                myDisplayConfig.CombinedDisplayIsInUse = true;
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} has a Combined Display with {combinedDisplay.NumOutputs} outputs, {combinedDisplay.CombinedDesktopWidth}x{combinedDisplay.CombinedDesktopHeight}");
-                            }
-                            else
-                            {
-                                newAdapter.IsCombinedDisplay = false;
-                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not currently have a Combined Display.");
-                            }                            
-                            newAdapter.CombinedDisplay= combinedDisplay;
-                            
-                        }                        
+                            newAdapter.IsCombinedDisplay = true;
+                            myDisplayConfig.CombinedDisplayIsInUse = true;
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} has a Combined Display with {combinedDisplay.NumOutputs} outputs, {combinedDisplay.CombinedDesktopWidth}x{combinedDisplay.CombinedDesktopHeight}");
+                        }
                         else
                         {
-                            // This adapter doesn't support Combined Displays, so we force things to false
                             newAdapter.IsCombinedDisplay = false;
-                            newAdapter.CombinedDisplay = new CombinedDisplayArgsDto();
-                            newAdapter.CombinedDisplay.IsSupported = false;
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not support a Combined Display.");
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not currently have a Combined Display.");
+                        }                            
+                        newAdapter.CombinedDisplay= combinedDisplay;     
+                        newAdapter.CombinedDisplayIsSupported = true;                    
+                    }
+                    catch (IGCLException ex)
+                    {
+                         if (ex.Result == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_FEATURE ||
+                                               ex.Result == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_VERSION ||
+                                               ex.Result == ctl_result_t.CTL_RESULT_ERROR_INVALID_OPERATION_TYPE ||
+                                               ex.Result == ctl_result_t.CTL_RESULT_ERROR_INVALID_ARGUMENT)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: IGCLException: Combined Display not supported for adapter {adapterNum}. Skipping adapter.");
+                            newAdapter.CombinedDisplayIsSupported = false;                            
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: IGCLException getting Combined Display settings for adapter {adapterNum}.");                        
                         }
                     }
                     catch (Exception ex)
