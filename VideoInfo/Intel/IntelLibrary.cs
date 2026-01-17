@@ -665,6 +665,7 @@ namespace DisplayMagicianShared.Intel
     public struct INTEL_DISPLAY_CONFIG : IEquatable<INTEL_DISPLAY_CONFIG>
     {
         public bool IsInUse;
+        public bool IsCloned;
         public bool CombinedDisplayIsInUse;
         public Dictionary<string, INTEL_ADAPTER> PhysicalAdapters;  // Key is adapter ID
         public Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS> Displays;  // Key is display ID
@@ -673,6 +674,7 @@ namespace DisplayMagicianShared.Intel
         public INTEL_DISPLAY_CONFIG()
         {
             IsInUse = false;
+            IsCloned = false;
             CombinedDisplayIsInUse = false;
             PhysicalAdapters = new Dictionary<string, INTEL_ADAPTER>();
             Displays = new Dictionary<string, INTEL_DISPLAY_WITH_SETTINGS>();
@@ -686,6 +688,11 @@ namespace DisplayMagicianShared.Intel
             if (IsInUse != other.IsInUse)
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsInUse values don't equal each other");
+                return false;
+            }
+            if (IsCloned != other.IsCloned)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_CONFIG/Equals: The IsCloned values don't equal each other");
                 return false;
             }
             if (CombinedDisplayIsInUse != other.CombinedDisplayIsInUse)
@@ -713,7 +720,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (IsInUse, CombinedDisplayIsInUse, PhysicalAdapters, Displays, DisplayIdentifiers).GetHashCode();
+            return (IsInUse, IsCloned, CombinedDisplayIsInUse, PhysicalAdapters, Displays, DisplayIdentifiers).GetHashCode();
         }
 
         public static bool operator ==(INTEL_DISPLAY_CONFIG lhs, INTEL_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
@@ -1005,10 +1012,7 @@ namespace DisplayMagicianShared.Intel
                     INTEL_ADAPTER newAdapter = new INTEL_ADAPTER();
                     newAdapter.AdapterID = adapterDeviceID;
                     newAdapter.Name = adapter.Name;
-                    newAdapter.AdapterProperties = adapterProperties;
-
-                    // Add adapter to config
-                    myDisplayConfig.PhysicalAdapters.Add(adapterDeviceID, newAdapter);
+                    newAdapter.AdapterProperties = adapterProperties;                    
 
                     //------------------------------------
                     // CHECK FOR COMBINED DISPLAY CONFIGURATION PER ADAPTER
@@ -1034,6 +1038,7 @@ namespace DisplayMagicianShared.Intel
                                 SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not currently have a Combined Display.");
                             }                            
                             newAdapter.CombinedDisplay= combinedDisplay;
+                            
                         }                        
                         else
                         {
@@ -1049,6 +1054,8 @@ namespace DisplayMagicianShared.Intel
                         SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Combined Display settings for adapter {adapterNum}.");
                     }
 
+                    // Add adapter to config
+                    myDisplayConfig.PhysicalAdapters.Add(adapterDeviceID, newAdapter);
 
                     // Enumerate displays for this adapter
                     var displays = adapter.EnumerateDisplayOutputs();
