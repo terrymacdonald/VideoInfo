@@ -635,7 +635,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The AdapterIndex values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_device_adapter_properties_t>.Default.Equals(AdapterProperties, other.AdapterProperties))
+            if (!AdapterProperties.Equals(other.AdapterProperties))
             {
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The AdapterProperties values don't equal each other");
                 return false;
