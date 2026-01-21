@@ -997,6 +997,12 @@
             <param name="args">Panel descriptor access arguments.</param>
             <returns>Updated panel descriptor access arguments.</returns>
         </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPanelDescriptorData">
+            <summary>
+            Read the panel descriptor data (EDID) as a single concatenated byte array.
+            </summary>
+            <returns>Concatenated panel descriptor bytes.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSupportedRetroScalingCapability">
             <summary>
             Get supported retro scaling capabilities.
