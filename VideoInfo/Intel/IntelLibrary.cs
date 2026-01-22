@@ -10,63 +10,12 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
+using EDIDParser;
 using Windows.Graphics.Display;
 
 namespace DisplayMagicianShared.Intel
 {
     #region Data Structures
-
-    // [StructLayout(LayoutKind.Sequential)]
-    // public struct INTEL_DISPLAY : IEquatable<INTEL_DISPLAY>
-    // {
-    //     public string Name;
-    //     public string DeviceID;
-    //     public uint DisplayIndex;
-    //     public uint AdapterIndex;
-
-    //     public INTEL_DISPLAY()
-    //     {
-    //         Name = "";
-    //         DeviceID = "";
-    //         DisplayIndex = 0;
-    //         AdapterIndex = 0;
-    //     }
-
-    //     public override bool Equals(object obj) => obj is INTEL_DISPLAY other && Equals(other);
-        
-    //     public bool Equals(INTEL_DISPLAY other)
-    //     {
-    //         if (Name != other.Name)
-    //         {
-    //             SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The Name values don't equal each other");
-    //             return false;
-    //         }
-    //         if (DeviceID != other.DeviceID)
-    //         {
-    //             SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The DeviceID values don't equal each other");
-    //             return false;
-    //         }
-    //         if (DisplayIndex != other.DisplayIndex)
-    //         {
-    //             SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The DisplayIndex values don't equal each other");
-    //             return false;
-    //         }
-    //         if (AdapterIndex != other.AdapterIndex)
-    //         {
-    //             SharedLogger.logger.Trace($"INTEL_DISPLAY/Equals: The AdapterIndex values don't equal each other");
-    //             return false;
-    //         }
-    //         return true;
-    //     }
-
-    //     public override int GetHashCode()
-    //     {
-    //         return (Name, DeviceID, DisplayIndex, AdapterIndex).GetHashCode();
-    //     }
-
-    //     public static bool operator ==(INTEL_DISPLAY lhs, INTEL_DISPLAY rhs) => lhs.Equals(rhs);
-    //     public static bool operator !=(INTEL_DISPLAY lhs, INTEL_DISPLAY rhs) => !(lhs == rhs);
-    // }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct INTEL_DISPLAY_WITH_SETTINGS : IEquatable<INTEL_DISPLAY_WITH_SETTINGS>
@@ -1952,8 +1901,18 @@ namespace DisplayMagicianShared.Intel
                             continue;
                         }
 
-                        var displayDeviceProperties = display.GetProperties();
-
+                        var manufacturerCode = "";
+                        var productCode = "";
+                        try {
+                            var edidBytes = display.GetEdid();
+                            var edid = new EDID(edidBytes);
+                            manufacturerCode = edid.ManufacturerCode.ToString();
+                            productCode = edid.ProductCode.ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error($"IntelLibrary/GetAllConnectedDisplayIdentifiers: ERROR - Failed to get EDID for display Index {displayNum} on Adapter {adapterNum}: {ex.Message}");
+                        }
                         List<string> displayInfo = new List<string>
                         {
                             "IntelIGCL",
@@ -1964,7 +1923,9 @@ namespace DisplayMagicianShared.Intel
                             displayProperties.AttachedDisplayMuxType.ToString(),
                             displayProperties.ProtocolConverterOutput.ToString(),
                             displayProperties.ProtocolConverterType.ToString(),
-                            displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID.ToString("G")
+                            manufacturerCode,
+                            productCode,
+                            displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID.ToString("G")                          
                         };
                         
                         string displayIdentifier = String.Join("#", displayInfo);
@@ -2028,9 +1989,19 @@ namespace DisplayMagicianShared.Intel
                             continue;
                         }                        
 
-                        var displayDeviceProperties = display.GetProperties();
+                        var manufacturerCode = "";
+                        var productCode = "";
 
-                        
+                        try {
+                            var edidBytes = display.GetEdid();
+                            var edid = new EDID(edidBytes);
+                            manufacturerCode = edid.ManufacturerCode.ToString();
+                            productCode = edid.ProductCode.ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error($"IntelLibrary/GetAllConnectedDisplayIdentifiers: ERROR - Failed to get EDID for display Index {displayNum} on Adapter {adapterNum}: {ex.Message}");
+                        }
                         List<string> displayInfo = new List<string>
                         {
                             "IntelIGCL",
@@ -2041,6 +2012,8 @@ namespace DisplayMagicianShared.Intel
                             displayProperties.AttachedDisplayMuxType.ToString(),
                             displayProperties.ProtocolConverterOutput.ToString(),
                             displayProperties.ProtocolConverterType.ToString(),
+                            manufacturerCode,
+                            productCode,
                             displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID.ToString("G")                          
                         };
                         
