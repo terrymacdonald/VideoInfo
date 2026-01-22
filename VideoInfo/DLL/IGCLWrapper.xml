@@ -431,11 +431,17 @@
             </summary>
             <returns>Initialized linked display adapters args struct.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetProperties">
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetPropertiesNative">
             <summary>
             Get adapter properties.
             </summary>
             <returns>Adapter properties struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetProperties">
+            <summary>
+            Get adapter properties as a DTO.
+            </summary>
+            <returns>Adapter properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateDevicesNative">
             <summary>
@@ -455,11 +461,17 @@
             </summary>
             <returns>Array of I2C pin pair handles.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetDeviceProperties">
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetDevicePropertiesNative">
             <summary>
             Get device adapter properties for this adapter.
             </summary>
             <returns>Adapter properties struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetDeviceProperties">
+            <summary>
+            Get device adapter properties for this adapter as a DTO.
+            </summary>
+            <returns>Adapter properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.GetZeDevice">
             <summary>
@@ -563,6 +575,129 @@
             <summary>
             Mark the helper as disposed.
             </summary>
+        </member>
+        <member name="T:IGCLWrapper.DeviceAdapterPropertiesDto">
+            <summary>
+            DTO for adapter properties.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.DeviceIdSize">
+            <summary>
+            Size of the device ID buffer reported by native calls.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.DeviceType">
+            <summary>
+            Device type.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.SupportedSubfunctionFlags">
+            <summary>
+            Supported functions bitmask.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.DriverVersion">
+            <summary>
+            Driver version value.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.FirmwareVersion">
+            <summary>
+            Firmware version info.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.PciVendorId">
+            <summary>
+            PCI vendor ID.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.PciDeviceId">
+            <summary>
+            PCI device ID.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.RevId">
+            <summary>
+            PCI revision ID.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.NumEusPerSubSlice">
+            <summary>
+            Number of EUs per sub-slice.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.NumSubSlicesPerSlice">
+            <summary>
+            Number of sub-slices per slice.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.NumSlices">
+            <summary>
+            Number of slices.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.Name">
+            <summary>
+            Adapter name.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.GraphicsAdapterProperties">
+            <summary>
+            Graphics adapter properties flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.Frequency">
+            <summary>
+            Average graphics clock (MHz).
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.PciSubsysId">
+            <summary>
+            PCI sub-system ID.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.PciSubsysVendorId">
+            <summary>
+            PCI sub-system vendor ID.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.AdapterBdf">
+            <summary>
+            Adapter BDF.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.NumXeCores">
+            <summary>
+            Number of Xe cores.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.Reserved">
+            <summary>
+            Reserved native fields.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.DeviceAdapterPropertiesDto.FromNative(IGCLWrapper.ctl_device_adapter_properties_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Adapter properties DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DeviceAdapterPropertiesDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Adapter properties struct.</returns>
         </member>
         <member name="T:IGCLWrapper.CombinedDisplayArgsDto">
             <summary>
@@ -830,11 +965,17 @@
             </summary>
             <returns>Initialized DCE args struct.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetProperties">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPropertiesNative">
             <summary>
             Get display properties for this display handle.
             </summary>
             <returns>Display properties struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetProperties">
+            <summary>
+            Get display properties for this display handle as a DTO.
+            </summary>
+            <returns>Display properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetTiming">
             <summary>
@@ -1215,17 +1356,29 @@
             <param name="args">Wire format args struct.</param>
             <returns>Updated wire format args struct.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetWireFormat">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetWireFormatNative">
             <summary>
             Get wire format settings.
             </summary>
             <returns>Wire format args struct.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetWireFormat(IGCLWrapper.ctl_get_set_wire_format_config_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetWireFormat">
             <summary>
-            Set wire format settings.
+            Get wire format settings as a DTO.
+            </summary>
+            <returns>Wire format settings DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetWireFormatNative(IGCLWrapper.ctl_get_set_wire_format_config_t)">
+            <summary>
+            Set wire format settings using a native struct.
             </summary>
             <param name="args">Wire format args struct.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetWireFormat(IGCLWrapper.WireFormatConfigDto)">
+            <summary>
+            Set wire format settings using a DTO.
+            </summary>
+            <param name="args">Wire format settings DTO.</param>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSetDisplaySettingsNative(IGCLWrapper.ctl_display_settings_t)">
             <summary>
@@ -1250,6 +1403,147 @@
             <summary>
             Mark the helper as disposed.
             </summary>
+        </member>
+        <member name="T:IGCLWrapper.DisplayPropertiesDto">
+            <summary>
+            DTO for display properties.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.OsDisplayEncoderHandle">
+            <summary>
+            OS display encoder handle.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.Type">
+            <summary>
+            Display output type.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.AttachedDisplayMuxType">
+            <summary>
+            Attached display mux type.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.ProtocolConverterOutput">
+            <summary>
+            Protocol converter output type.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.SupportedSpec">
+            <summary>
+            Supported specification version.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.SupportedOutputBpcFlags">
+            <summary>
+            Supported output BPC flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.ProtocolConverterType">
+            <summary>
+            Protocol converter type flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.DisplayConfigFlags">
+            <summary>
+            Display configuration flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.FeatureEnabledFlags">
+            <summary>
+            Feature enabled flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.FeatureSupportedFlags">
+            <summary>
+            Feature supported flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.AdvancedFeatureEnabledFlags">
+            <summary>
+            Advanced feature enabled flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.AdvancedFeatureSupportedFlags">
+            <summary>
+            Advanced feature supported flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.DisplayTimingInfo">
+            <summary>
+            Display timing info.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.DisplayPropertiesDto.ReservedFields">
+            <summary>
+            Reserved native fields.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.DisplayPropertiesDto.FromNative(IGCLWrapper.ctl_display_properties_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Display properties DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DisplayPropertiesDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Display properties struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.WireFormatConfigDto">
+            <summary>
+            DTO for wire format settings.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.WireFormatConfigDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.WireFormatConfigDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.WireFormatConfigDto.Operation">
+            <summary>
+            Wire format operation type.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.WireFormatConfigDto.SupportedWireFormat">
+            <summary>
+            Supported wire format values.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.WireFormatConfigDto.WireFormat">
+            <summary>
+            Selected wire format.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.WireFormatConfigDto.FromNative(IGCLWrapper.ctl_get_set_wire_format_config_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Wire format settings DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.WireFormatConfigDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Wire format settings struct.</returns>
         </member>
         <member name="T:IGCLWrapper.AdapterDisplayEncoderPropertiesDto">
             <summary>
@@ -2058,11 +2352,17 @@
             Firmware helper: base and component firmware queries, PCIe link speed control.
             </summary>
         </member>
-        <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwareProperties">
+        <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwarePropertiesNative">
             <summary>
             Get firmware properties for the adapter.
             </summary>
             <returns>Firmware properties struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwareProperties">
+            <summary>
+            Get firmware properties for the adapter as a DTO.
+            </summary>
+            <returns>Firmware properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLFirmwareHelper.EnumerateFirmwareComponents">
             <summary>
@@ -2070,12 +2370,19 @@
             </summary>
             <returns>Read-only list of firmware component handles.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwareComponentProperties(System.IntPtr)">
+        <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwareComponentPropertiesNative(System.IntPtr)">
             <summary>
             Get firmware component properties.
             </summary>
             <param name="firmwareHandle">Firmware component handle.</param>
             <returns>Firmware component properties struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwareComponentProperties(System.IntPtr)">
+            <summary>
+            Get firmware component properties as a DTO.
+            </summary>
+            <param name="firmwareHandle">Firmware component handle.</param>
+            <returns>Firmware component properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLFirmwareHelper.AllowPCIeLinkSpeedUpdate(System.Boolean)">
             <summary>
@@ -2087,6 +2394,97 @@
             <summary>
             Mark the helper as disposed.
             </summary>
+        </member>
+        <member name="T:IGCLWrapper.FirmwarePropertiesDto">
+            <summary>
+            DTO for firmware properties.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwarePropertiesDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwarePropertiesDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwarePropertiesDto.Name">
+            <summary>
+            Firmware name.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwarePropertiesDto.FirmwareVersion">
+            <summary>
+            Firmware version string.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwarePropertiesDto.FirmwareConfig">
+            <summary>
+            Firmware config flags.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwarePropertiesDto.Reserved">
+            <summary>
+            Reserved native fields.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FirmwarePropertiesDto.FromNative(IGCLWrapper.ctl_firmware_properties_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Firmware properties DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FirmwarePropertiesDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Firmware properties struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.FirmwareComponentPropertiesDto">
+            <summary>
+            DTO for firmware component properties.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwareComponentPropertiesDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwareComponentPropertiesDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwareComponentPropertiesDto.Name">
+            <summary>
+            Component name.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwareComponentPropertiesDto.ComponentVersion">
+            <summary>
+            Component version string.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FirmwareComponentPropertiesDto.Reserved">
+            <summary>
+            Reserved native fields.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FirmwareComponentPropertiesDto.FromNative(IGCLWrapper.ctl_firmware_component_properties_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Firmware component properties DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FirmwareComponentPropertiesDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Firmware component properties struct.</returns>
         </member>
         <member name="T:IGCLWrapper.IGCLFrequencyHelper">
             <summary>

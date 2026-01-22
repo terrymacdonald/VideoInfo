@@ -597,7 +597,7 @@ namespace DisplayMagicianShared.Intel
         public string AdapterID;
         public string Name;
         public uint AdapterIndex;
-        public ctl_device_adapter_properties_t AdapterProperties;
+        public DeviceAdapterPropertiesDto AdapterProperties;
         public bool CombinedDisplayIsSupported;
         public bool IsCombinedDisplay;
         //public INTEL_COMBINED_DISPLAY CombinedDisplay;
@@ -608,7 +608,7 @@ namespace DisplayMagicianShared.Intel
             AdapterID = "";
             Name = "";
             AdapterIndex = 0;
-            AdapterProperties = new ctl_device_adapter_properties_t();
+            AdapterProperties = new DeviceAdapterPropertiesDto();
             CombinedDisplayIsSupported = false;
             IsCombinedDisplay = false;
             //CombinedDisplay = new INTEL_COMBINED_DISPLAY();
@@ -1035,7 +1035,7 @@ namespace DisplayMagicianShared.Intel
                             newAdapter.IsCombinedDisplay = false;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Adapter {adapterNum} does not currently have a Combined Display.");
                         }                            
-                        newAdapter.CombinedDisplay= combinedDisplay;     
+                        newAdapter.CombinedDisplay= combinedDisplay;   
                         newAdapter.CombinedDisplayIsSupported = true;                    
                     }
                     catch (IGCLException ex)
@@ -1571,93 +1571,10 @@ namespace DisplayMagicianShared.Intel
                         CombinedDisplayArgsDto combinedDisplayArgs = desiredAdapter.CombinedDisplay;
                         combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_ENABLE;
 
-                        var desiredChildInfos = desiredAdapter.CombinedDisplay.ChildInfos;
-                        if (desiredChildInfos != null && desiredChildInfos.Length > 0)
+                        if (combinedDisplayArgs.ChildInfos == null || combinedDisplayArgs.ChildInfos.Length == 0)
                         {
-                            var displayHandles = adapter.EnumerateDisplayOutputsNative();
-                            var displays = adapter.EnumerateDisplayOutputs();
-                            int displayCount = Math.Min(displayHandles?.Length ?? 0, displays?.Count ?? 0);
-                            var activeDisplayOutputs = new List<IntPtr>(displayCount);
-
-                            if (displayCount > 0)
-                            {
-                                uint combinedAllowedEncoderTypes =
-                                    (uint)ctl_encoder_config_flag_t.CTL_ENCODER_CONFIG_FLAG_TYPEC_CAPABLE |
-                                    (uint)ctl_encoder_config_flag_t.CTL_ENCODER_CONFIG_FLAG_TBT_CAPABLE |
-                                    (uint)ctl_encoder_config_flag_t.CTL_ENCODER_CONFIG_FLAG_DITHERING_SUPPORTED |
-                                    (uint)ctl_encoder_config_flag_t.CTL_ENCODER_CONFIG_FLAG_INTERNAL_DISPLAY;
-
-                                for (int displayIndex = 0; displayIndex < displayCount; displayIndex++)
-                                {
-                                    ctl_display_properties_t displayProperties;
-                                    AdapterDisplayEncoderPropertiesDto displayEncoderProperties;
-                                    try
-                                    {
-                                        displayProperties = displays[displayIndex].GetProperties();
-                                        displayEncoderProperties = displays[displayIndex].GetAdapterDisplayEncoderProperties();
-                                    }
-                                    catch
-                                    {
-                                        continue;
-                                    }
-
-                                    bool isDisplayActive = ((uint)displayProperties.DisplayConfigFlags & (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE) != 0;
-                                    bool isDisplayAttached = ((uint)displayProperties.DisplayConfigFlags & (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ATTACHED) != 0;
-                                    uint encoderFlags = (uint)displayEncoderProperties.EncoderConfigFlags;
-                                    bool isCombinedAvailable = encoderFlags == 0 || (encoderFlags & combinedAllowedEncoderTypes) != 0;
-
-                                    if (isDisplayActive && isDisplayAttached && isCombinedAvailable)
-                                    {
-                                        activeDisplayOutputs.Add(displayHandles[displayIndex]);
-                                    }
-                                }
-                            }
-
-                            if (activeDisplayOutputs.Count < desiredAdapter.CombinedDisplay.NumOutputs)
-                            {
-                                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: The desired combined display requires {desiredAdapter.CombinedDisplay.NumOutputs} outputs but only {activeDisplayOutputs.Count} active output(s) are available on adapter {adapterNum}.");
-                                return false;
-                            }
-
-                            if (activeDisplayOutputs.Count >= desiredAdapter.CombinedDisplay.NumOutputs)
-                            {
-                                var activeDisplayOutputSet = new HashSet<IntPtr>(activeDisplayOutputs);
-                                bool allChildInfosConnected = true;
-                                int childInfoCount = Math.Min(desiredChildInfos.Length, (int)desiredAdapter.CombinedDisplay.NumOutputs);
-
-                                for (int childIndex = 0; childIndex < childInfoCount; childIndex++)
-                                {
-                                    if (!activeDisplayOutputSet.Contains(desiredChildInfos[childIndex].DisplayOutput))
-                                    {
-                                        allChildInfosConnected = false;
-                                        break;
-                                    }
-                                }
-
-                                if (allChildInfosConnected)
-                                {
-                                    combinedDisplayArgs.ChildInfos = desiredChildInfos;
-                                }
-                                else
-                                {
-                                    int outputCount = (int)desiredAdapter.CombinedDisplay.NumOutputs;
-                                    var remappedChildInfos = new CombinedDisplayChildInfoDto[outputCount];
-                                    int copyCount = Math.Min(desiredChildInfos.Length, outputCount);
-                                    Array.Copy(desiredChildInfos, remappedChildInfos, copyCount);
-
-                                    for (int childIndex = 0; childIndex < outputCount; childIndex++)
-                                    {
-                                        remappedChildInfos[childIndex].DisplayOutput = activeDisplayOutputs[childIndex];
-                                    }
-
-                                    combinedDisplayArgs.ChildInfos = remappedChildInfos;
-                                }
-                            }
-                        }
-
-                        if (combinedDisplayArgs.ChildInfos == null)
-                        {
-                            combinedDisplayArgs.ChildInfos = Array.Empty<CombinedDisplayChildInfoDto>();
+                            SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: The desired combined display on adapter {adapterNum} is missing ChildInfos.");
+                            return false;
                         }
 
                         try
@@ -1692,30 +1609,28 @@ namespace DisplayMagicianShared.Intel
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout does NOT require a Combined Display on adapter {adapterNum}");
+                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display in use but new display layout does NOT require a Combined Display on adapter {adapterNum}");
 
-                        // if (currentCombinedDisplayInUse)
-                        // {
-                        //     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is currently in use but is NOT required, so we need to destroy the Combined Display on adapter {adapterNum}");
+                        if (currentCombinedDisplayInUse)
+                        {
+                            CombinedDisplayArgsDto disableCombinedDisplayArgs = currentCombinedDisplay;
+                            disableCombinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_DISABLE;
 
-                        //     CombinedDisplayArgsDto combinedDisplayArgs = currentCombinedDisplay;
-                        //     combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_DISABLE;
-
-                        //     try
-                        //     {
-                        //         adapter.SetCombinedDisplay(combinedDisplayArgs);
-                        //         SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully destroyed the Intel Combined Display on adapter {adapterNum}.");
-                        //     }
-                        //     catch (Exception ex)
-                        //     {
-                        //         SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfig: Error destroying the Intel Combined Display on adapter {adapterNum}");
-                        //         return false;
-                        //     }
-                        // }
-                        // else
-                        // {
-                        //     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is not currently in use and is NOT required, so leaving things as they are.");
-                        // }
+                            try
+                            {
+                                adapter.SetCombinedDisplay(disableCombinedDisplayArgs);
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Disabled the current Intel Combined Display on adapter {adapterNum} as it is not needed in the new display layout");
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfig: Error disabling the current Intel Combined Display on adapter {adapterNum}");
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is not currently in use and is NOT required, so leaving things as they are.");
+                        }
                     }
                 }
             }
