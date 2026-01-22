@@ -24,6 +24,8 @@ namespace DisplayMagicianShared.Intel
         public string DisplayDeviceID;
         public uint DisplayIndex;
         public uint AdapterIndex;
+
+        public byte[] Edid; // EDID data for the display
         
         // Integer Scaling (Retro Scaling)
         public bool IsSupportedIntegerScaling;
@@ -88,6 +90,7 @@ namespace DisplayMagicianShared.Intel
             DisplayDeviceID = "";
             DisplayIndex = 0;
             AdapterIndex = 0;
+            Edid = Array.Empty<byte>();
             IsSupportedIntegerScaling = false;
             IsEnabledIntegerScaling = false;
             IntegerScalingType = ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_INTEGER;
@@ -161,6 +164,11 @@ namespace DisplayMagicianShared.Intel
             if (AdapterIndex != other.AdapterIndex)
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The AdapterIndex values don't equal each other");
+                return false;
+            }
+            if (Edid.Length != other.Edid.Length || !Edid.SequenceEqual(other.Edid))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The Edid values don't equal each other");
                 return false;
             }
             if (IsSupportedIntegerScaling != other.IsSupportedIntegerScaling)
@@ -1021,6 +1029,8 @@ namespace DisplayMagicianShared.Intel
                     foreach (var display in displays)
                     {
 
+                        displayCount++;
+
                         DisplayPropertiesDto displayProperties;
                         try
                         {
@@ -1047,8 +1057,10 @@ namespace DisplayMagicianShared.Intel
                         // Create display with settings
                         INTEL_DISPLAY_WITH_SETTINGS newDisplay = new INTEL_DISPLAY_WITH_SETTINGS();
                         
-                        // Set basic info
-                        newDisplay.Name = display.Name;                                    
+
+
+
+                        // Set basic info                     
                         newDisplay.DisplayProperties = displayProperties;
                         // make up a adapter DeviceID that includes the PCI device and subsystem IDs that we can match on.
                         newDisplay.DeviceID = adapterDeviceID;
@@ -1063,6 +1075,34 @@ namespace DisplayMagicianShared.Intel
                         {
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {logDisplayId} on adapter {adapterNum}.");
                         }
+
+                        // Make a display name that works across reboots
+                        try
+                        {
+                            
+                            var manufacturerCode = "";
+                            var productCode = "";
+                            try {
+                                var edidBytes = display.GetPanelDescriptorData();
+                                var edid = new EDID(edidBytes);
+                                newDisplay.Edid = edidBytes;
+                                manufacturerCode = edid.ManufacturerCode.ToString();
+                                productCode = edid.ProductCode.ToString();
+                                SharedLogger.logger.Trace($"IntelLibrary/GetAllConnectedDisplayIdentifiers: Successfully got EDID for display Index {displayCount} on Adapter {adapterNum}");                            
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error($"IntelLibrary/GetAllConnectedDisplayIdentifiers: ERROR - Failed to get EDID for display Index {displayCount} on Adapter {adapterNum}: {ex.Message}");
+                            }
+                            newDisplay.Name = $"Display_{manufacturerCode}_{productCode}_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {logDisplayId} on adapter {adapterNum}.");
+                            // Backup Display name if EDID lookup fails
+                            newDisplay.Name = $"Display_{logDisplayId}_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                        }
+
 
                         //------------------------------------
                         // GET DISPLAY TIMING / RESOLUTION / REFRESH / ACTIVE STATE
@@ -1610,6 +1650,13 @@ namespace DisplayMagicianShared.Intel
 
                 bool success = true;
                 int adapterNum = 0;
+                bool IsUnsupportedResult(ctl_result_t result)
+                {
+                    return result == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_FEATURE ||
+                        result == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_VERSION ||
+                        result == ctl_result_t.CTL_RESULT_ERROR_INVALID_OPERATION_TYPE ||
+                        result == ctl_result_t.CTL_RESULT_ERROR_INVALID_ARGUMENT;
+                }
 
                 foreach (var adapter in adapters)
                 {
@@ -1657,13 +1704,17 @@ namespace DisplayMagicianShared.Intel
                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Skipping inactive display {logDisplayId} on adapter {adapterNum}");
                             continue;
                         }
-
+                    
                         string displayDeviceId = $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
 
                         if (!displayConfig.Displays.TryGetValue(displayDeviceId, out INTEL_DISPLAY_WITH_SETTINGS storedSettings))
                         {
                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: No stored settings found for display {logDisplayId} (ID {displayDeviceId}), skipping");
                             continue;
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Found stored settings for display {logDisplayId} (ID {displayDeviceId})");
                         }
 
                         SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Applying settings for display {logDisplayId}");
@@ -1777,6 +1828,427 @@ namespace DisplayMagicianShared.Intel
                                 SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Image Sharpening for display {logDisplayId}");
                                 success = false;
                             }
+                        }
+
+                        //------------------------------------
+                        // SET DISPLAY SETTINGS IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            var currentDisplaySettings = display.GetDisplaySettings();
+                            bool displaySettingsSupported = Convert.ToUInt64((object)currentDisplaySettings.ValidFlags) != 0 ||
+                                Convert.ToUInt64((object)currentDisplaySettings.ControllableFlags) != 0;
+
+                            if (displaySettingsSupported)
+                            {
+                                if (!EqualityComparer<DisplaySettingsDto>.Default.Equals(currentDisplaySettings, storedSettings.DisplaySettings))
+                                {
+                                    var desiredDisplaySettings = storedSettings.DisplaySettings;
+                                    desiredDisplaySettings.Set = true;
+                                    display.SetDisplaySettings(desiredDisplaySettings);
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set DisplaySettings for display {logDisplayId}");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: DisplaySettings already set to desired values, skipping");
+                                }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: DisplaySettings not supported by current hardware, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: DisplaySettings not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying DisplaySettings for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying DisplaySettings for display {logDisplayId}");
+                            success = false;
+                        }
+
+                        //------------------------------------
+                        // SET WIRE FORMAT IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            var currentWireFormat = display.GetWireFormat();
+                            object supportedWireFormatValue = currentWireFormat.SupportedWireFormat;
+                            bool wireFormatSupported = false;
+
+                            if (supportedWireFormatValue == null)
+                            {
+                                wireFormatSupported = false;
+                            }
+                            else if (supportedWireFormatValue is Array supportedWireFormatArray)
+                            {
+                                wireFormatSupported = supportedWireFormatArray.Length > 0;
+                            }
+                            else if (supportedWireFormatValue is System.Collections.IEnumerable supportedWireFormatEnumerable)
+                            {
+                                var enumerator = supportedWireFormatEnumerable.GetEnumerator();
+                                wireFormatSupported = enumerator.MoveNext();
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    wireFormatSupported = Convert.ToUInt64(supportedWireFormatValue) != 0;
+                                }
+                                catch
+                                {
+                                    wireFormatSupported = false;
+                                }
+                            }
+
+                            if (wireFormatSupported)
+                            {
+                                if (!EqualityComparer<ctl_wire_format_t>.Default.Equals(currentWireFormat.WireFormat, storedSettings.WireFormat.WireFormat))
+                                {
+                                    var desiredWireFormat = storedSettings.WireFormat;
+                                    desiredWireFormat.Operation = ctl_wire_format_operation_type_t.CTL_WIRE_FORMAT_OPERATION_TYPE_SET;
+                                    display.SetWireFormat(desiredWireFormat);
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set WireFormat for display {logDisplayId}");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: WireFormat already set to desired values, skipping");
+                                }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: WireFormat not supported by current hardware, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: WireFormat not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying WireFormat for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying WireFormat for display {logDisplayId}");
+                            success = false;
+                        }
+
+                        //------------------------------------
+                        // SET BRIGHTNESS IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            var currentBrightness = display.GetBrightnessSetting();
+                            if (currentBrightness.TargetBrightness != storedSettings.Brightness.TargetBrightness)
+                            {
+                                var brightnessToSet = IGCLDisplayHelper.CreateSetBrightness();
+                                brightnessToSet.TargetBrightness = storedSettings.Brightness.TargetBrightness;
+                                brightnessToSet.SmoothTransitionTimeInMs = 0;
+                                display.SetBrightnessSetting(brightnessToSet);
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Brightness to {storedSettings.Brightness.TargetBrightness} for display {logDisplayId}");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Brightness already set to desired values, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Brightness not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Brightness for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Brightness for display {logDisplayId}");
+                            success = false;
+                        }
+
+                        //------------------------------------
+                        // SET POWER OPTIMIZATION IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            var powerCaps = display.GetPowerOptimizationCaps();
+                            bool powerOptimizationSupported = Convert.ToUInt64((object)powerCaps.SupportedFeatures) != 0;
+
+                            if (powerOptimizationSupported)
+                            {
+                                var currentPowerOptimization = display.GetPowerOptimizationSetting(storedSettings.PowerOptimizationSettings);
+                                if (!EqualityComparer<PowerOptimizationSettingsDto>.Default.Equals(currentPowerOptimization, storedSettings.PowerOptimizationSettings))
+                                {
+                                    display.SetPowerOptimizationSetting(storedSettings.PowerOptimizationSettings);
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set PowerOptimization settings for display {logDisplayId}");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: PowerOptimization settings already set to desired values, skipping");
+                                }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: PowerOptimization not supported by current hardware, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: PowerOptimization not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying PowerOptimization settings for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying PowerOptimization settings for display {logDisplayId}");
+                            success = false;
+                        }
+
+                        //------------------------------------
+                        // SET LACE CONFIG IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            var currentLaceConfig = display.GetLACEConfig();
+                            if (!EqualityComparer<LaceConfigDto>.Default.Equals(currentLaceConfig, storedSettings.LaceConfig))
+                            {
+                                display.SetLACEConfig(storedSettings.LaceConfig);
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set LACE config for display {logDisplayId}");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: LACE config already set to desired values, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: LACE not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying LACE config for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying LACE config for display {logDisplayId}");
+                            success = false;
+                        }
+
+                        //------------------------------------
+                        // SET SOFTWARE PSR IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            var currentPsrSettings = display.SoftwarePSR(new SwPsrSettingsDto());
+                            bool psrSupported = Convert.ToUInt64((object)currentPsrSettings.Supported) != 0;
+
+                            if (psrSupported)
+                            {
+                                if (!EqualityComparer<SwPsrSettingsDto>.Default.Equals(currentPsrSettings, storedSettings.SoftwarePsrSettings))
+                                {
+                                    var desiredPsrSettings = storedSettings.SoftwarePsrSettings;
+                                    desiredPsrSettings.Set = true;
+                                    display.SoftwarePSR(desiredPsrSettings);
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Software PSR settings for display {logDisplayId}");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Software PSR settings already set to desired values, skipping");
+                                }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Software PSR not supported by current hardware, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Software PSR not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Software PSR settings for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Software PSR settings for display {logDisplayId}");
+                            success = false;
+                        }
+
+                        //------------------------------------
+                        // SET DYNAMIC CONTRAST ENHANCEMENT IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            var (currentDceArgs, _) = display.GetDynamicContrastEnhancement();
+                            bool dceSupported = Convert.ToUInt64((object)currentDceArgs.IsSupported) != 0;
+
+                            if (dceSupported)
+                            {
+                                bool dceDifferent =
+                                    currentDceArgs.Enable != storedSettings.DynamicContrastEnhancement.Enable ||
+                                    currentDceArgs.TargetBrightnessPercent != storedSettings.DynamicContrastEnhancement.TargetBrightnessPercent ||
+                                    currentDceArgs.PhaseinSpeedMultiplier != storedSettings.DynamicContrastEnhancement.PhaseinSpeedMultiplier ||
+                                    currentDceArgs.NumBins != storedSettings.DynamicContrastEnhancement.NumBins;
+
+                                if (dceDifferent)
+                                {
+                                    var desiredDceArgs = storedSettings.DynamicContrastEnhancement;
+                                    desiredDceArgs.Set = true;
+                                    var desiredHistogram = storedSettings.DynamicContrastEnhancementHistogram ?? Array.Empty<uint>();
+                                    display.SetDynamicContrastEnhancement(desiredDceArgs, desiredHistogram);
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Dynamic Contrast Enhancement for display {logDisplayId}");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Dynamic Contrast Enhancement already set to desired values, skipping");
+                                }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Dynamic Contrast Enhancement not supported by current hardware, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Dynamic Contrast Enhancement not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Dynamic Contrast Enhancement for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Dynamic Contrast Enhancement for display {logDisplayId}");
+                            success = false;
+                        }
+
+                        //------------------------------------
+                        // SET INTEL ARC SYNC PROFILE IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            var currentArcSyncMonitorParams = display.GetIntelArcSyncInfoForMonitor();
+                            bool arcSyncSupported = Convert.ToUInt64((object)currentArcSyncMonitorParams.IsIntelArcSyncSupported) != 0;
+
+                            if (arcSyncSupported)
+                            {
+                                var currentArcSyncProfile = display.GetIntelArcSyncProfile();
+                                if (!EqualityComparer<ctl_intel_arc_sync_profile_params_t>.Default.Equals(currentArcSyncProfile, storedSettings.IntelArcSyncProfile))
+                                {
+                                    display.SetIntelArcSyncProfile(storedSettings.IntelArcSyncProfile);
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Intel Arc Sync profile for display {logDisplayId}");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Intel Arc Sync profile already set to desired values, skipping");
+                                }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Intel Arc Sync not supported by current hardware, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Intel Arc Sync not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Intel Arc Sync profile for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Intel Arc Sync profile for display {logDisplayId}");
+                            success = false;
+                        }
+
+                        //------------------------------------
+                        // SET CUSTOM MODES IF NEEDED
+                        //------------------------------------
+                        try
+                        {
+                            if (storedSettings.CustomModes != null && storedSettings.CustomModes.Length > 0)
+                            {
+                                var (_, currentCustomModes) = display.GetCustomModes();
+                                bool customModesDifferent = currentCustomModes == null ||
+                                    currentCustomModes.Length != storedSettings.CustomModes.Length ||
+                                    !currentCustomModes.SequenceEqual(storedSettings.CustomModes);
+
+                                if (customModesDifferent)
+                                {
+                                    var desiredCustomModeArgs = storedSettings.CustomModeArgs;
+                                    desiredCustomModeArgs.CustomModeOpType = ctl_custom_mode_operation_types_t.CTL_CUSTOM_MODE_OPERATION_TYPES_ADD_CUSTOM_SOURCE_MODE;
+                                    desiredCustomModeArgs.NumOfModes = (uint)storedSettings.CustomModes.Length;
+                                    display.SetCustomModes(desiredCustomModeArgs, storedSettings.CustomModes);
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Custom Modes for display {logDisplayId}");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Custom Modes already set to desired values, skipping");
+                                }
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: No Custom Modes stored for display {logDisplayId}, skipping");
+                            }
+                        }
+                        catch (IGCLException ex)
+                        {
+                            if (IsUnsupportedResult(ex.Result))
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Custom Modes not supported by current hardware, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Custom Modes for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Custom Modes for display {logDisplayId}");
+                            success = false;
                         }
 
                         if (delayInMs > 0)
