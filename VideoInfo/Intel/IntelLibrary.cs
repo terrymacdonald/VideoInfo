@@ -44,17 +44,25 @@ namespace DisplayMagicianShared.Intel
         public float SharpeningIntensity;
 
         // Display-related DTOs
+        public bool IsSupportedDisplaySettings;
         public DisplaySettingsDto DisplaySettings;
         public ScalingSettingsDto ScalingSettings;
         public SharpnessSettingsDto SharpnessSettings;
         public RetroScalingSettingsDto RetroScalingSettings;
         public DceArgsDto DynamicContrastEnhancement;
+        public bool IsSupportedDynamicContrastEnhancement;
         public uint[] DynamicContrastEnhancementHistogram;
+        public bool IsSupportedPowerOptimization;
+        public bool IsEnabledPowerOptimization;
         public PowerOptimizationSettingsDto PowerOptimizationSettings;
+        public bool IsEnabledLaceConfig;
         public LaceConfigDto LaceConfig;
+
+        public bool IsEnabledSoftwarePsrSettings;
         public SwPsrSettingsDto SoftwarePsrSettings;
         public GenlockArgsDto GenlockArgs;
         public IntelArcSyncMonitorParamsDto IntelArcSyncMonitorParams;
+        public bool IsSupportedIntelArcSync;
         public AdapterDisplayEncoderPropertiesDto AdapterDisplayEncoderProperties;
 
         // Display getter outputs
@@ -62,6 +70,7 @@ namespace DisplayMagicianShared.Intel
         //public ctl_device_adapter_properties_t DeviceProperties;
         public string DeviceID;
         public ctl_display_timing_t DisplayTiming;
+        public bool IsSupportedWireFormat;
         public WireFormatConfigDto WireFormat;
         public ctl_get_brightness_t Brightness;
         public ctl_scaling_caps_t ScalingCaps;
@@ -102,23 +111,31 @@ namespace DisplayMagicianShared.Intel
             SharpeningFilterType = ctl_sharpness_filter_type_flag_t.CTL_SHARPNESS_FILTER_TYPE_FLAG_NON_ADAPTIVE;
             SharpeningIntensity = 0.0f;
 
+            IsSupportedDisplaySettings = false;
             DisplaySettings = new DisplaySettingsDto();
             ScalingSettings = new ScalingSettingsDto();
             SharpnessSettings = new SharpnessSettingsDto();
             RetroScalingSettings = new RetroScalingSettingsDto();
             DynamicContrastEnhancement = new DceArgsDto();
+            IsSupportedDynamicContrastEnhancement = false;
             DynamicContrastEnhancementHistogram = Array.Empty<uint>();
+            IsSupportedPowerOptimization = false;
+            IsEnabledPowerOptimization = false;
             PowerOptimizationSettings = new PowerOptimizationSettingsDto();
+            IsEnabledLaceConfig = false;
             LaceConfig = new LaceConfigDto();
+            IsEnabledSoftwarePsrSettings = false;
             SoftwarePsrSettings = new SwPsrSettingsDto();
             GenlockArgs = new GenlockArgsDto();
             IntelArcSyncMonitorParams = new IntelArcSyncMonitorParamsDto();
+            IsSupportedIntelArcSync = false;
             AdapterDisplayEncoderProperties = new AdapterDisplayEncoderPropertiesDto();
 
             DisplayProperties = new DisplayPropertiesDto();
             //DeviceProperties = new ctl_device_adapter_properties_t();
             DeviceID = "";
             DisplayTiming = new ctl_display_timing_t();
+            IsSupportedWireFormat = false;
             WireFormat = new WireFormatConfigDto();
             Brightness = new ctl_get_brightness_t();
             ScalingCaps = new ctl_scaling_caps_t();
@@ -221,6 +238,11 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SharpeningIntensity values don't equal each other");
                 return false;
             }
+            if (IsSupportedDisplaySettings != other.IsSupportedDisplaySettings)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedDisplaySettings values don't equal each other");
+                return false;
+            }
             if (!EqualityComparer<DisplaySettingsDto>.Default.Equals(DisplaySettings, other.DisplaySettings))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplaySettings values don't equal each other");
@@ -241,6 +263,11 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The RetroScalingSettings values don't equal each other");
                 return false;
             }
+            if (IsSupportedDynamicContrastEnhancement != other.IsSupportedDynamicContrastEnhancement)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedDynamicContrastEnhancement values don't equal each other");
+                return false;
+            }
             if (!EqualityComparer<DceArgsDto>.Default.Equals(DynamicContrastEnhancement, other.DynamicContrastEnhancement))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DynamicContrastEnhancement values don't equal each other");
@@ -251,14 +278,34 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DynamicContrastEnhancementHistogram values don't equal each other");
                 return false;
             }
+            if (IsSupportedPowerOptimization != other.IsSupportedPowerOptimization)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedPowerOptimization values don't equal each other");
+                return false;
+            }
+            if (IsEnabledPowerOptimization != other.IsEnabledPowerOptimization)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsEnabledPowerOptimization values don't equal each other");
+                return false;
+            }
             if (!EqualityComparer<PowerOptimizationSettingsDto>.Default.Equals(PowerOptimizationSettings, other.PowerOptimizationSettings))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The PowerOptimizationSettings values don't equal each other");
                 return false;
             }
+            if (IsEnabledLaceConfig != other.IsEnabledLaceConfig)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedLaceConfig values don't equal each other");
+                return false;
+            }
             if (!EqualityComparer<LaceConfigDto>.Default.Equals(LaceConfig, other.LaceConfig))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The LaceConfig values don't equal each other");
+                return false;
+            }
+            if (IsEnabledSoftwarePsrSettings != other.IsEnabledSoftwarePsrSettings)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsEnabledSoftwarePsrSettings values don't equal each other");
                 return false;
             }
             if (!EqualityComparer<SwPsrSettingsDto>.Default.Equals(SoftwarePsrSettings, other.SoftwarePsrSettings))
@@ -269,6 +316,11 @@ namespace DisplayMagicianShared.Intel
             if (!EqualityComparer<GenlockArgsDto>.Default.Equals(GenlockArgs, other.GenlockArgs))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The GenlockArgs values don't equal each other");
+                return false;
+            }
+            if (IsSupportedIntelArcSync != other.IsSupportedIntelArcSync)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedIntelArcSync values don't equal each other");
                 return false;
             }
             if (!EqualityComparer<IntelArcSyncMonitorParamsDto>.Default.Equals(IntelArcSyncMonitorParams, other.IntelArcSyncMonitorParams))
@@ -299,6 +351,11 @@ namespace DisplayMagicianShared.Intel
             if (!EqualityComparer<ctl_display_timing_t>.Default.Equals(DisplayTiming, other.DisplayTiming))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayTiming values don't equal each other");
+                return false;
+            }
+            if (IsSupportedWireFormat != other.IsSupportedWireFormat)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedWireFormat values don't equal each other");
                 return false;
             }
             if (!WireFormat.Equals(other.WireFormat))
@@ -413,7 +470,7 @@ namespace DisplayMagicianShared.Intel
         {
 
             return (Name, DisplayDeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsEnabledIntegerScaling, IntegerScalingType, IsSupportedGPUScaling, IsEnabledGPUScaling, ScalingType, IsSupportedImageSharpening, IsEnabledImageSharpening, SharpeningFilterType, SharpeningIntensity, 
-                DisplaySettings, ScalingSettings, SharpnessSettings, RetroScalingSettings, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
+                IsSupportedDisplaySettings, DisplaySettings, ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
                 DisplayProperties, /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, SharpnessFilterProperties, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes, LinkedDisplayAdaptersArgs, LinkedDisplayAdapters, MuxProperties, MuxDisplayOutputs, 
                 VblankTimestamp, /*ZeDeviceHandle, ZeDriverHandle,*/ RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
         }
@@ -1069,6 +1126,8 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             newDisplay.DisplaySettings = display.GetDisplaySettings();
+                            newDisplay.IsSupportedDisplaySettings = Convert.ToUInt64((object)newDisplay.DisplaySettings.ValidFlags) != 0 ||
+                                Convert.ToUInt64((object)newDisplay.DisplaySettings.ControllableFlags) != 0;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got display settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
@@ -1141,7 +1200,11 @@ namespace DisplayMagicianShared.Intel
                             newDisplay.RetroScalingCaps = display.GetSupportedRetroScalingCapability();
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got retro scaling caps for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                             newDisplay.RetroScalingSettings = display.GetRetroScalingSettings();
-                            newDisplay.IsSupportedIntegerScaling = newDisplay.RetroScalingCaps.SupportedRetroScaling == 1 ? true : false;
+                            uint retroScalingMask =
+                                (uint)(ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_INTEGER |
+                                    ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_NEAREST_NEIGHBOUR);
+
+                            newDisplay.IsSupportedIntegerScaling = (newDisplay.RetroScalingCaps.SupportedRetroScaling & retroScalingMask) != 0;
                             newDisplay.IsEnabledIntegerScaling = newDisplay.RetroScalingSettings.Enable;
                             newDisplay.IntegerScalingType = (ctl_retro_scaling_type_flag_t)newDisplay.RetroScalingSettings.RetroScalingType;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Integer scaling settings for display {logDisplayId}: Supported={newDisplay.RetroScalingCaps.SupportedRetroScaling}, Enabled={newDisplay.RetroScalingSettings.Enable}, Type={newDisplay.RetroScalingSettings.RetroScalingType}");
@@ -1159,7 +1222,13 @@ namespace DisplayMagicianShared.Intel
                             newDisplay.ScalingCaps = display.GetSupportedScalingCapability();
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got scaling caps for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                             newDisplay.ScalingSettings = display.GetCurrentScaling();
-                            newDisplay.IsSupportedGPUScaling = newDisplay.ScalingCaps.SupportedScaling == 1 ? true : false;
+                            uint gpuScalingMask =
+                                (uint)(ctl_scaling_type_flag_t.CTL_SCALING_TYPE_FLAG_CENTERED |
+                                    ctl_scaling_type_flag_t.CTL_SCALING_TYPE_FLAG_STRETCHED |
+                                    ctl_scaling_type_flag_t.CTL_SCALING_TYPE_FLAG_ASPECT_RATIO_CENTERED_MAX |
+                                    ctl_scaling_type_flag_t.CTL_SCALING_TYPE_FLAG_CUSTOM);
+
+                            newDisplay.IsSupportedGPUScaling = (newDisplay.ScalingCaps.SupportedScaling & gpuScalingMask) != 0;
                             newDisplay.IsEnabledGPUScaling = newDisplay.ScalingSettings.Enable;
                             newDisplay.ScalingType = (ctl_scaling_type_flag_t)newDisplay.ScalingSettings.ScalingType;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: GPU scaling settings for display {logDisplayId}: Supported={newDisplay.ScalingCaps.SupportedScaling}, Enabled={newDisplay.ScalingSettings.Enable}, Type={newDisplay.ScalingSettings.ScalingType}");
@@ -1196,6 +1265,8 @@ namespace DisplayMagicianShared.Intel
                         {
                             newDisplay.PowerOptimizationCaps = display.GetPowerOptimizationCaps();
                             newDisplay.PowerOptimizationSettings = display.GetPowerOptimizationSetting(newDisplay.PowerOptimizationSettings);
+                            newDisplay.IsSupportedPowerOptimization = newDisplay.PowerOptimizationCaps.SupportedFeatures != 0;
+                            newDisplay.IsEnabledPowerOptimization = newDisplay.PowerOptimizationSettings.Enable;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got power optimization settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
@@ -1222,6 +1293,7 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             newDisplay.LaceConfig = display.GetLACEConfig();
+                            newDisplay.IsEnabledLaceConfig = newDisplay.LaceConfig.Enabled;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got LACE config for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
@@ -1235,6 +1307,7 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             newDisplay.SoftwarePsrSettings = display.SoftwarePSR(newDisplay.SoftwarePsrSettings);
+                            newDisplay.IsEnabledSoftwarePsrSettings = newDisplay.SoftwarePsrSettings.Enable;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Software PSR settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
@@ -1248,6 +1321,7 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             newDisplay.IntelArcSyncMonitorParams = display.GetIntelArcSyncInfoForMonitor();
+                            newDisplay.IsSupportedIntelArcSync = newDisplay.IntelArcSyncMonitorParams.IsIntelArcSyncSupported;
                             newDisplay.IntelArcSyncProfile = display.GetIntelArcSyncProfile();
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Intel Arc Sync settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
@@ -1262,6 +1336,23 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             newDisplay.WireFormat = display.GetWireFormat();
+                            bool wireFormatSupported = false;
+                            var supportedWireFormats = newDisplay.WireFormat.SupportedWireFormat;
+
+                            if (supportedWireFormats != null)
+                            {
+                                foreach (var supportedWireFormat in supportedWireFormats)
+                                {
+                                    if (supportedWireFormat.ColorDepth != 0)
+                                    {
+                                        wireFormatSupported = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            newDisplay.IsSupportedWireFormat = wireFormatSupported;
+                            
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got wire format settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
@@ -1275,6 +1366,7 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             (newDisplay.DynamicContrastEnhancement, newDisplay.DynamicContrastEnhancementHistogram) = display.GetDynamicContrastEnhancement();
+                            newDisplay.IsSupportedDynamicContrastEnhancement = newDisplay.DynamicContrastEnhancement.IsSupported;
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got dynamic contrast enhancement settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
