@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using Windows.Graphics.Display;
 
 namespace DisplayMagicianShared.Intel
@@ -1560,6 +1561,7 @@ namespace DisplayMagicianShared.Intel
                             {
                                 adapter.SetCombinedDisplay(disableCombinedDisplayArgs);
                                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Disabled the current Intel Combined Display on adapter {adapterNum} before creating a new one");
+                                Thread.Sleep(delayInMs); // Wait a moment to ensure the disable takes effect
                             }
                             catch (Exception ex)
                             {
@@ -1642,134 +1644,6 @@ namespace DisplayMagicianShared.Intel
 
             return true;
 
-            // if (_initialised && _igclApiHandle != null)
-            // {
-            //     ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
-
-            //     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Managing Intel Combined Display configuration");
-
-            //     // Enumerate Intel adapters
-            //     SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
-            //     IGCL.igcl_uint32P_assign(pAdapterCount, 0);
-                
-            //     status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
-            //     uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
-                
-            //     if (status != ctl_result_t.CTL_RESULT_SUCCESS || adapterCount == 0)
-            //     {
-            //         SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: No Intel adapters found or error getting adapter count. Status: {status}");
-            //         return false;
-            //     }
-
-            //     SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
-            //     status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
-                
-            //     if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-            //     {
-            //         SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error enumerating Intel adapters. Status: {status}");
-            //         return false;
-            //     }
-
-            //     IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
-
-            //     // Iterate through adapters
-            //     for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
-            //     {
-            //         IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
-
-            //         // If the display config needs a Combined Display then let's create one
-            //         if (displayConfig.IsCombinedDisplay)
-            //         {
-            //             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout requires a Combined Display");
-
-            //             // Check if the Combined Display is already set exactly as we want it
-            //             if (displayConfig.CombinedDisplay.Equals(ActiveDisplayConfig.CombinedDisplay))
-            //             {
-            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is exactly the same as the one we want, so skipping setting up the Combined Display");
-            //             }
-            //             else
-            //             {
-            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Attempting to create the Intel Combined Display");
-                            
-            //                 ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
-            //                 combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_ENABLE;
-            //                 combinedDisplayArgs.NumOutputs = (byte)displayConfig.CombinedDisplay.NumOutputs;
-            //                 combinedDisplayArgs.CombinedDesktopWidth = displayConfig.CombinedDisplay.CombinedDesktopWidth;
-            //                 combinedDisplayArgs.CombinedDesktopHeight = displayConfig.CombinedDisplay.CombinedDesktopHeight;
-                            
-            //                 // Note: In a full implementation, you would need to populate pChildInfo with the
-            //                 // display handles and layout information from displayConfig.CombinedDisplay.ChildDisplayHandles
-                            
-            //                 status = IGCL.ctlGetSetCombinedDisplay(hAdapter, combinedDisplayArgs);
-                            
-            //                 if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-            //                 {
-            //                     SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error creating the Intel Combined Display. ctlGetSetCombinedDisplay() returned error code {status}");
-            //                     return false;
-            //                 }
-            //                 else
-            //                 {
-            //                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully created the Intel Combined Display");
-                                
-            //                     // Verify the created display matches what we want
-            //                     ctl_combined_display_args_t queryArgs = new ctl_combined_display_args_t();
-            //                     queryArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_QUERY_CONFIG;
-                                
-            //                     status = IGCL.ctlGetSetCombinedDisplay(hAdapter, queryArgs);
-                                
-            //                     if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-            //                     {
-            //                         if (queryArgs.NumOutputs == displayConfig.CombinedDisplay.NumOutputs &&
-            //                             queryArgs.CombinedDesktopWidth == displayConfig.CombinedDisplay.CombinedDesktopWidth &&
-            //                             queryArgs.CombinedDesktopHeight == displayConfig.CombinedDisplay.CombinedDesktopHeight)
-            //                         {
-            //                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: This new Combined Display layout matches the desired configuration.");
-            //                         }
-            //                         else
-            //                         {
-            //                             SharedLogger.logger.Warn($"IntelLibrary/SetActiveConfig: This new Combined Display layout is different from the one originally saved. You may need to update this desktop profile.");
-            //                         }
-            //                     }
-            //                 }
-            //             }
-            //         }
-            //         else
-            //         {
-            //             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout does NOT require a Combined Display");
-
-            //             if (ActiveDisplayConfig.IsCombinedDisplay)
-            //             {
-            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is currently in use but is NOT required, so we need to destroy the Combined Display");
-
-            //                 ctl_combined_display_args_t combinedDisplayArgs = new ctl_combined_display_args_t();
-            //                 combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_DISABLE;
-                            
-            //                 status = IGCL.ctlGetSetCombinedDisplay(hAdapter, combinedDisplayArgs);
-                            
-            //                 if (status != ctl_result_t.CTL_RESULT_SUCCESS)
-            //                 {
-            //                     SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Error destroying the Intel Combined Display. ctlGetSetCombinedDisplay() returned error code {status}");
-            //                     return false;
-            //                 }
-            //                 else
-            //                 {
-            //                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Successfully destroyed the Intel Combined Display.");
-            //                 }
-            //             }
-            //             else
-            //             {
-            //                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is not currently in use and is NOT required, so leaving things as they are.");
-            //             }
-            //         }
-            //     }
-            // }
-            // else
-            // {
-            //     SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: ERROR - Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
-            //     throw new IntelLibraryException($"Tried to run SetActiveConfig but the Intel IGCL library isn't initialised!");
-            // }
-
-            // return true;
         }
 
         public bool SetActiveConfigOverride(INTEL_DISPLAY_CONFIG displayConfig, int delayInMs)
