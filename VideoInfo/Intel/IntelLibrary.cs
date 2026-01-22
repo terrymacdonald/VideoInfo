@@ -1819,7 +1819,11 @@ namespace DisplayMagicianShared.Intel
                             try
                             {
                                 var retroScalingCaps = display.GetSupportedRetroScalingCapability();
-                                if (retroScalingCaps.SupportedRetroScaling == 1)
+                                uint retroScalingMask =
+                                    (uint)(ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_INTEGER |
+                                        ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_NEAREST_NEIGHBOUR);
+
+                                if ((retroScalingCaps.SupportedRetroScaling & retroScalingMask) != 0)
                                 {
                                     var retroScalingSettings = display.GetRetroScalingSettings();
                                     if (retroScalingSettings.Enable != storedSettings.IsEnabledIntegerScaling ||
