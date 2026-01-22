@@ -1904,7 +1904,7 @@ namespace DisplayMagicianShared.Intel
                         var manufacturerCode = "";
                         var productCode = "";
                         try {
-                            var edidBytes = display.GetEdid();
+                            var edidBytes = display.GetPanelDescriptorData();
                             var edid = new EDID(edidBytes);
                             manufacturerCode = edid.ManufacturerCode.ToString();
                             productCode = edid.ProductCode.ToString();
@@ -1993,7 +1993,7 @@ namespace DisplayMagicianShared.Intel
                         var productCode = "";
 
                         try {
-                            var edidBytes = display.GetEdid();
+                            var edidBytes = display.GetPanelDescriptorData();
                             var edid = new EDID(edidBytes);
                             manufacturerCode = edid.ManufacturerCode.ToString();
                             productCode = edid.ProductCode.ToString();
