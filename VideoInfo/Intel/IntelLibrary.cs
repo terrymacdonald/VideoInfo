@@ -1293,7 +1293,7 @@ namespace DisplayMagicianShared.Intel
                         // 3. Create a unique Hardware PCI ID + Target ID
                         // Format: VEN_8086&DEV_XXXX&REV_XX-PORT_X
                         
-                        newDisplay.DisplayDeviceID = $"VEN_{adapterProperties.PciDeviceId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                        newDisplay.DisplayDeviceID = $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
 
                         // Add display to configuration
                         myDisplayConfig.Displays.Add(newDisplay.DisplayDeviceID, newDisplay);
