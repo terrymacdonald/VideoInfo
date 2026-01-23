@@ -1886,7 +1886,7 @@ namespace DisplayMagicianShared.Intel
                             var currentWireFormat = currentSettings.WireFormat;
                             if (currentSettings.IsSupportedWireFormat)
                             {
-                                if (!EqualityComparer<ctl_wire_format_t>.Default.Equals(currentWireFormat.WireFormat, storedSettings.WireFormat.WireFormat))
+                                if (!currentWireFormat.Equals(storedSettings.WireFormat.WireFormat))
                                 {
                                     var desiredWireFormat = storedSettings.WireFormat;
                                     desiredWireFormat.Operation = ctl_wire_format_operation_type_t.CTL_WIRE_FORMAT_OPERATION_TYPE_SET;
@@ -1966,7 +1966,7 @@ namespace DisplayMagicianShared.Intel
                             if (currentSettings.IsSupportedPowerOptimization)
                             {
                                 var currentPowerOptimization = currentSettings.PowerOptimizationSettings;
-                                if (!EqualityComparer<PowerOptimizationSettingsDto>.Default.Equals(currentPowerOptimization, storedSettings.PowerOptimizationSettings))
+                                if (!currentPowerOptimization.Equals(storedSettings.PowerOptimizationSettings))
                                 {
                                     display.SetPowerOptimizationSetting(storedSettings.PowerOptimizationSettings);
                                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set PowerOptimization settings for display {logDisplayId}");
@@ -2005,7 +2005,7 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             var currentLaceConfig = currentSettings.LaceConfig;
-                            if (!EqualityComparer<LaceConfigDto>.Default.Equals(currentLaceConfig, storedSettings.LaceConfig))
+                            if (!currentLaceConfig.Equals(storedSettings.LaceConfig))
                             {
                                 display.SetLACEConfig(storedSettings.LaceConfig);
                                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set LACE config for display {logDisplayId}");
@@ -2041,7 +2041,7 @@ namespace DisplayMagicianShared.Intel
                             var currentPsrSettings = currentSettings.SoftwarePsrSettings;
                             if (currentPsrSettings.Supported)
                             {
-                                if (!EqualityComparer<SwPsrSettingsDto>.Default.Equals(currentPsrSettings, storedSettings.SoftwarePsrSettings))
+                                if (!currentPsrSettings.Equals(storedSettings.SoftwarePsrSettings))
                                 {
                                     var desiredPsrSettings = storedSettings.SoftwarePsrSettings;
                                     desiredPsrSettings.Set = true;
@@ -2134,7 +2134,7 @@ namespace DisplayMagicianShared.Intel
                             if (currentSettings.IsSupportedIntelArcSync)
                             {
                                 var currentArcSyncProfile = currentSettings.IntelArcSyncProfile;
-                                if (!EqualityComparer<ctl_intel_arc_sync_profile_params_t>.Default.Equals(currentArcSyncProfile, storedSettings.IntelArcSyncProfile))
+                                if (!currentArcSyncProfile.Equals(storedSettings.IntelArcSyncProfile))
                                 {
                                     display.SetIntelArcSyncProfile(storedSettings.IntelArcSyncProfile);
                                     SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set Intel Arc Sync profile for display {logDisplayId}");
