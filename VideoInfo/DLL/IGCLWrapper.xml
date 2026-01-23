@@ -101,6 +101,26 @@
             Pointer to custom value buffer.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.ThreeDFeatureGetSetDto.Equals(IGCLWrapper.ThreeDFeatureGetSetDto)">
+            <summary>
+            Compare 3D feature get/set args while ignoring pointer fields.
+            </summary>
+            <param name="other">Other args instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.ThreeDFeatureGetSetDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.ThreeDFeatureGetSetDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.ThreeDFeatureGetSetDto.FromNative(IGCLWrapper.ctl_3d_feature_getset_t)">
             <summary>
             Create a DTO from a native struct.
@@ -686,6 +706,26 @@
             Reserved native fields.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.DeviceAdapterPropertiesDto.Equals(IGCLWrapper.DeviceAdapterPropertiesDto)">
+            <summary>
+            Compare adapter properties while ignoring reserved native fields.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DeviceAdapterPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DeviceAdapterPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.DeviceAdapterPropertiesDto.FromNative(IGCLWrapper.ctl_device_adapter_properties_t)">
             <summary>
             Create a DTO from a native struct.
@@ -754,6 +794,26 @@
             Combined display output handle.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.CombinedDisplayArgsDto.Equals(IGCLWrapper.CombinedDisplayArgsDto)">
+            <summary>
+            Compare combined display args while ignoring pointer fields.
+            </summary>
+            <param name="other">Other args instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayArgsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayArgsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.CombinedDisplayArgsDto.FromNative(IGCLWrapper.ctl_combined_display_args_t)">
             <summary>
             Create a DTO from a native struct.
@@ -796,6 +856,26 @@
             <summary>
             Target mode info.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.Equals(IGCLWrapper.CombinedDisplayChildInfoDto)">
+            <summary>
+            Compare child display info while ignoring pointer and reserved fields.
+            </summary>
+            <param name="other">Other child info instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.CombinedDisplayChildInfoDto.FromNative(IGCLWrapper.ctl_combined_display_child_info_t)">
             <summary>
@@ -844,6 +924,26 @@
             <summary>
             Indicates whether genlock is possible.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.GenlockArgsDto.Equals(IGCLWrapper.GenlockArgsDto)">
+            <summary>
+            Compare genlock args.
+            </summary>
+            <param name="other">Other args instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.GenlockArgsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.GenlockArgsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.GenlockArgsDto.FromNative(IGCLWrapper.ctl_genlock_args_t)">
             <summary>
@@ -1489,6 +1589,26 @@
             Reserved native fields.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.DisplayPropertiesDto.Equals(IGCLWrapper.DisplayPropertiesDto)">
+            <summary>
+            Compare display properties while ignoring pointer-backed and reserved fields.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DisplayPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DisplayPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.DisplayPropertiesDto.FromNative(IGCLWrapper.ctl_display_properties_t)">
             <summary>
             Create a DTO from a native struct.
@@ -1531,6 +1651,26 @@
             <summary>
             Selected wire format.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.WireFormatConfigDto.Equals(IGCLWrapper.WireFormatConfigDto)">
+            <summary>
+            Compare wire format settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.WireFormatConfigDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.WireFormatConfigDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.WireFormatConfigDto.FromNative(IGCLWrapper.ctl_get_set_wire_format_config_t)">
             <summary>
@@ -1687,6 +1827,26 @@
             <summary>
             Pointer to histogram buffer.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.DceArgsDto.Equals(IGCLWrapper.DceArgsDto)">
+            <summary>
+            Compare DCE args while ignoring pointer fields.
+            </summary>
+            <param name="other">Other args instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DceArgsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DceArgsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.DceArgsDto.FromNative(IGCLWrapper.ctl_dce_args_t)">
             <summary>
@@ -1849,6 +2009,26 @@
             Maximum frame time decrease in microseconds.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.IntelArcSyncMonitorParamsDto.Equals(IGCLWrapper.IntelArcSyncMonitorParamsDto)">
+            <summary>
+            Compare Arc Sync monitor parameters.
+            </summary>
+            <param name="other">Other params instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IntelArcSyncMonitorParamsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IntelArcSyncMonitorParamsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.IntelArcSyncMonitorParamsDto.FromNative(IGCLWrapper.ctl_intel_arc_sync_monitor_params_t)">
             <summary>
             Create a DTO from a native struct.
@@ -1902,6 +2082,26 @@
             Aggregation configuration.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.LaceConfigDto.Equals(IGCLWrapper.LaceConfigDto)">
+            <summary>
+            Compare LACE configuration.
+            </summary>
+            <param name="other">Other config instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.LaceConfigDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.LaceConfigDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.LaceConfigDto.FromNative(IGCLWrapper.ctl_lace_config_t)">
             <summary>
             Create a DTO from a native struct.
@@ -1944,6 +2144,26 @@
             <summary>
             Retro scaling type.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.RetroScalingSettingsDto.Equals(IGCLWrapper.RetroScalingSettingsDto)">
+            <summary>
+            Compare retro scaling settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.RetroScalingSettingsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.RetroScalingSettingsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.RetroScalingSettingsDto.FromNative(IGCLWrapper.ctl_retro_scaling_settings_t)">
             <summary>
@@ -2003,6 +2223,26 @@
             Preferred scaling type.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.ScalingSettingsDto.Equals(IGCLWrapper.ScalingSettingsDto)">
+            <summary>
+            Compare scaling settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.ScalingSettingsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.ScalingSettingsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.ScalingSettingsDto.FromNative(IGCLWrapper.ctl_scaling_settings_t)">
             <summary>
             Create a DTO from a native struct.
@@ -2046,6 +2286,26 @@
             Intensity value.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.SharpnessSettingsDto.Equals(IGCLWrapper.SharpnessSettingsDto)">
+            <summary>
+            Compare sharpness settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.SharpnessSettingsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.SharpnessSettingsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.SharpnessSettingsDto.FromNative(IGCLWrapper.ctl_sharpness_settings_t)">
             <summary>
             Create a DTO from a native struct.
@@ -2088,6 +2348,26 @@
             <summary>
             Enable flag.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.SwPsrSettingsDto.Equals(IGCLWrapper.SwPsrSettingsDto)">
+            <summary>
+            Compare software PSR settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.SwPsrSettingsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.SwPsrSettingsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.SwPsrSettingsDto.FromNative(IGCLWrapper.ctl_sw_psr_settings_t)">
             <summary>
@@ -2141,6 +2421,26 @@
             <summary>
             Power source.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.PowerOptimizationSettingsDto.Equals(IGCLWrapper.PowerOptimizationSettingsDto)">
+            <summary>
+            Compare power optimization settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerOptimizationSettingsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerOptimizationSettingsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.PowerOptimizationSettingsDto.FromNative(IGCLWrapper.ctl_power_optimization_settings_t)">
             <summary>
@@ -2213,6 +2513,26 @@
             <summary>
             Indicates whether ECC can be controlled.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.EccPropertiesDto.Equals(IGCLWrapper.EccPropertiesDto)">
+            <summary>
+            Compare ECC properties.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.EccPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.EccPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.EccPropertiesDto.FromNative(IGCLWrapper.ctl_ecc_properties_t)">
             <summary>
@@ -2374,6 +2694,26 @@
             Maximum points in the speed table.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.FanPropertiesDto.Equals(IGCLWrapper.FanPropertiesDto)">
+            <summary>
+            Compare fan properties.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.FanPropertiesDto.FromNative(IGCLWrapper.ctl_fan_properties_t)">
             <summary>
             Create a DTO from a native struct.
@@ -2470,6 +2810,26 @@
             Reserved native fields.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.FirmwarePropertiesDto.Equals(IGCLWrapper.FirmwarePropertiesDto)">
+            <summary>
+            Compare firmware properties while ignoring reserved fields.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FirmwarePropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FirmwarePropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.FirmwarePropertiesDto.FromNative(IGCLWrapper.ctl_firmware_properties_t)">
             <summary>
             Create a DTO from a native struct.
@@ -2512,6 +2872,26 @@
             <summary>
             Reserved native fields.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.FirmwareComponentPropertiesDto.Equals(IGCLWrapper.FirmwareComponentPropertiesDto)">
+            <summary>
+            Compare firmware component properties while ignoring reserved fields.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FirmwareComponentPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FirmwareComponentPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.FirmwareComponentPropertiesDto.FromNative(IGCLWrapper.ctl_firmware_component_properties_t)">
             <summary>
@@ -2631,6 +3011,26 @@
             <summary>
             Maximum frequency.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyPropertiesDto.Equals(IGCLWrapper.FrequencyPropertiesDto)">
+            <summary>
+            Compare frequency properties.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.FrequencyPropertiesDto.FromNative(IGCLWrapper.ctl_freq_properties_t)">
             <summary>
@@ -2762,6 +3162,26 @@
             Indicates whether RGB is supported.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.LedPropertiesDto.Equals(IGCLWrapper.LedPropertiesDto)">
+            <summary>
+            Compare LED properties.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.LedPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.LedPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.LedPropertiesDto.FromNative(IGCLWrapper.ctl_led_properties_t)">
             <summary>
             Create a DTO from a native struct.
@@ -2804,6 +3224,26 @@
             <summary>
             LED color struct.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.LedStateDto.Equals(IGCLWrapper.LedStateDto)">
+            <summary>
+            Compare LED state.
+            </summary>
+            <param name="other">Other state instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.LedStateDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.LedStateDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.LedStateDto.FromNative(IGCLWrapper.ctl_led_state_t)">
             <summary>
@@ -2919,6 +3359,26 @@
             <summary>
             Reserved fields from the native struct.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.VideoProcessingFeatureGetSetDto.Equals(IGCLWrapper.VideoProcessingFeatureGetSetDto)">
+            <summary>
+            Compare video processing feature get/set args while ignoring pointer and reserved fields.
+            </summary>
+            <param name="other">Other args instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.VideoProcessingFeatureGetSetDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.VideoProcessingFeatureGetSetDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.VideoProcessingFeatureGetSetDto.FromNative(IGCLWrapper.ctl_video_processing_feature_getset_t)">
             <summary>
@@ -3294,6 +3754,26 @@
             Reference value.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.OcControlInfoDto.Equals(IGCLWrapper.OcControlInfoDto)">
+            <summary>
+            Compare overclock control info.
+            </summary>
+            <param name="other">Other control info instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.OcControlInfoDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.OcControlInfoDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.OcControlInfoDto.FromNative(IGCLWrapper.ctl_oc_control_info_t)">
             <summary>
             Create a DTO from a native struct.
@@ -3372,6 +3852,26 @@
             GPU VF curve frequency limit control info.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.OverclockPropertiesDto.Equals(IGCLWrapper.OverclockPropertiesDto)">
+            <summary>
+            Compare overclock properties.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.OverclockPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.OverclockPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.OverclockPropertiesDto.FromNative(IGCLWrapper.ctl_oc_properties_t)">
             <summary>
             Create a DTO from a native struct.
@@ -3410,6 +3910,26 @@
             Telemetry value.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.OcTelemetryItemDto.Equals(IGCLWrapper.OcTelemetryItemDto)">
+            <summary>
+            Compare telemetry items.
+            </summary>
+            <param name="other">Other telemetry item.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.OcTelemetryItemDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.OcTelemetryItemDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.OcTelemetryItemDto.FromNative(IGCLWrapper.ctl_oc_telemetry_item_t)">
             <summary>
             Create a DTO from a native struct.
@@ -3447,6 +3967,26 @@
             <summary>
             Voltage telemetry item.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.PsuInfoDto.Equals(IGCLWrapper.PsuInfoDto)">
+            <summary>
+            Compare PSU info.
+            </summary>
+            <param name="other">Other PSU info instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PsuInfoDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PsuInfoDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.PsuInfoDto.FromNative(IGCLWrapper.ctl_psu_info_t)">
             <summary>
@@ -3661,6 +4201,26 @@
             VRAM write bandwidth telemetry item.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.PowerTelemetryDto.Equals(IGCLWrapper.PowerTelemetryDto)">
+            <summary>
+            Compare power telemetry values.
+            </summary>
+            <param name="other">Other telemetry instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerTelemetryDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerTelemetryDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.PowerTelemetryDto.FromNative(IGCLWrapper.ctl_power_telemetry_t)">
             <summary>
             Create a DTO from a native struct.
@@ -3736,6 +4296,26 @@
             <summary>
             Indicates whether resizable BAR is enabled.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.PciPropertiesDto.Equals(IGCLWrapper.PciPropertiesDto)">
+            <summary>
+            Compare PCI properties.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PciPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PciPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.PciPropertiesDto.FromNative(IGCLWrapper.ctl_pci_properties_t)">
             <summary>
@@ -3856,6 +4436,26 @@
             Maximum power limit.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.PowerPropertiesDto.Equals(IGCLWrapper.PowerPropertiesDto)">
+            <summary>
+            Compare power properties.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.PowerPropertiesDto.FromNative(IGCLWrapper.ctl_power_properties_t)">
             <summary>
             Create a DTO from a native struct.
@@ -3889,6 +4489,26 @@
             Time interval.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.PowerSustainedLimitDto.Equals(IGCLWrapper.PowerSustainedLimitDto)">
+            <summary>
+            Compare sustained power limit settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerSustainedLimitDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerSustainedLimitDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.PowerSustainedLimitDto.FromNative(IGCLWrapper.ctl_power_sustained_limit_t)">
             <summary>
             Create a DTO from a native struct.
@@ -3917,6 +4537,26 @@
             Power value.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.PowerBurstLimitDto.Equals(IGCLWrapper.PowerBurstLimitDto)">
+            <summary>
+            Compare burst power limit settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerBurstLimitDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerBurstLimitDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.PowerBurstLimitDto.FromNative(IGCLWrapper.ctl_power_burst_limit_t)">
             <summary>
             Create a DTO from a native struct.
@@ -3944,6 +4584,26 @@
             <summary>
             DC power value.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.PowerPeakLimitDto.Equals(IGCLWrapper.PowerPeakLimitDto)">
+            <summary>
+            Compare peak power limit settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerPeakLimitDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerPeakLimitDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.PowerPeakLimitDto.FromNative(IGCLWrapper.ctl_power_peak_limit_t)">
             <summary>
@@ -3987,6 +4647,26 @@
             <summary>
             Peak power limit settings.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.PowerLimitsDto.Equals(IGCLWrapper.PowerLimitsDto)">
+            <summary>
+            Compare power limit settings.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerLimitsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerLimitsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.PowerLimitsDto.FromNative(IGCLWrapper.ctl_power_limits_t)">
             <summary>
