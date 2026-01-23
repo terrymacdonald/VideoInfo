@@ -951,8 +951,32 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_ADAPTER_NAME other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_ADAPTER_NAME other)
-            => Header.Equals(other.Header) &&
-               AdapterDevicePath == other.AdapterDevicePath;
+        {
+            if (!Header.Equals(other.Header))
+            {
+                SharedLogger.logger.Warn($"CCD/DISPLAYCONFIG_ADAPTER_NAME Equals: The Header values don't equal each other");
+                return false;
+            }
+            // We have to ignore the DISPLAY ID part of the AdapterDevicePath as it is changed by the Intel driver after a Combinbed Display Change
+            // The only way to ensure that the comparison works is to ignore the DISPLAY ID part
+            var thisDevicePathParts = AdapterDevicePath.Split('#');
+            var otherDevicePathParts = other.AdapterDevicePath.Split('#');
+            for (int i = 0; i < thisDevicePathParts.Length - 1; i++)
+            {
+                if (i == 1)
+                {
+                    // This is the DISPLAY ID part, we skip it
+                    continue;
+                }
+                if (thisDevicePathParts[i] != otherDevicePathParts[i])
+                {
+                    SharedLogger.logger.Warn($"CCD/DISPLAYCONFIG_ADAPTER_NAME Equals: The AdapterDevicePath values don't equal each other");
+                    return false;
+                }
+            }
+            return true;
+        }
+            
 
         public override int GetHashCode()
         {

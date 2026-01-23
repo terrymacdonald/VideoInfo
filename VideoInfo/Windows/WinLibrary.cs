@@ -2303,22 +2303,32 @@ namespace DisplayMagicianShared.Windows
                     SharedLogger.logger.Warn(ex, $"WinLibrary/GetSomeDisplayIdentifiers: Exception getting Windows Display Connector Instance from video card. Substituting with a # instead");
                     displayInfo.Add("#");
                 }
+                // try
+                // {
+                //     //displayInfo.Add(targetInfo.EdidManufactureId.ToString());
+                //     displayInfo.Add(targetInfo.EdidManufactureId.ToString());
+                // }
+                // catch (Exception ex)
+                // {
+                //     SharedLogger.logger.Warn(ex, $"WinLibrary/GetSomeDisplayIdentifiers: Exception getting Windows Display EDID Manufacturer Code from video card. Substituting with a # instead");
+                //     displayInfo.Add("#");
+                // }
+                // try
+                // {
+                //     displayInfo.Add(targetInfo.EdidProductCodeId.ToString());
+                // }
+                // catch (Exception ex)
+                // {
+                //     SharedLogger.logger.Warn(ex, $"WinLibrary/GetSomeDisplayIdentifiers: Exception getting Windows Display EDID Product Code from video card. Substituting with a # instead");
+                //     displayInfo.Add("#");
+                //}
                 try
                 {
-                    displayInfo.Add(targetInfo.EdidManufactureId.ToString());
+                    displayInfo.Add(targetInfo.Header.Id.ToString());
                 }
                 catch (Exception ex)
                 {
-                    SharedLogger.logger.Warn(ex, $"WinLibrary/GetSomeDisplayIdentifiers: Exception getting Windows Display EDID Manufacturer Code from video card. Substituting with a # instead");
-                    displayInfo.Add("#");
-                }
-                try
-                {
-                    displayInfo.Add(targetInfo.EdidProductCodeId.ToString());
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Warn(ex, $"WinLibrary/GetSomeDisplayIdentifiers: Exception getting Windows Display EDID Product Code from video card. Substituting with a # instead");
+                    SharedLogger.logger.Warn(ex, $"WinLibrary/GetSomeDisplayIdentifiers: Exception getting Windows Display Target ID from video card. Substituting with a # instead");
                     displayInfo.Add("#");
                 }
                 try
