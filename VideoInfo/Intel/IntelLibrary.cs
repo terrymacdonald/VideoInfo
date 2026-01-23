@@ -159,6 +159,42 @@ namespace DisplayMagicianShared.Intel
             IsActive = false;
         }
 
+        internal static bool AreDisplaySettingsEqual(DisplaySettingsDto left, DisplaySettingsDto right)
+        {
+            return left.Size == right.Size &&
+                left.Version == right.Version &&
+                left.Set == right.Set &&
+                left.SupportedFlags == right.SupportedFlags &&
+                left.ControllableFlags == right.ControllableFlags &&
+                left.ValidFlags == right.ValidFlags &&
+                left.LowLatency == right.LowLatency &&
+                left.SourceTm == right.SourceTm &&
+                left.ContentType == right.ContentType &&
+                left.QuantizationRange == right.QuantizationRange &&
+                left.SupportedPictureAr == right.SupportedPictureAr &&
+                left.PictureAr == right.PictureAr &&
+                left.AudioSettings == right.AudioSettings;
+        }
+
+        internal static int GetDisplaySettingsHash(DisplaySettingsDto settings)
+        {
+            var hash = new HashCode();
+            hash.Add(settings.Size);
+            hash.Add(settings.Version);
+            hash.Add(settings.Set);
+            hash.Add(settings.SupportedFlags);
+            hash.Add(settings.ControllableFlags);
+            hash.Add(settings.ValidFlags);
+            hash.Add(settings.LowLatency);
+            hash.Add(settings.SourceTm);
+            hash.Add(settings.ContentType);
+            hash.Add(settings.QuantizationRange);
+            hash.Add(settings.SupportedPictureAr);
+            hash.Add(settings.PictureAr);
+            hash.Add(settings.AudioSettings);
+            return hash.ToHashCode();
+        }
+
         public override bool Equals(object obj) => obj is INTEL_DISPLAY_WITH_SETTINGS other && Equals(other);
         
         public bool Equals(INTEL_DISPLAY_WITH_SETTINGS other)
@@ -243,7 +279,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IsSupportedDisplaySettings values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<DisplaySettingsDto>.Default.Equals(DisplaySettings, other.DisplaySettings))
+            if (!AreDisplaySettingsEqual(DisplaySettings, other.DisplaySettings))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplaySettings values don't equal each other");
                 return false;
@@ -470,7 +506,7 @@ namespace DisplayMagicianShared.Intel
         {
 
             return (Name, DisplayDeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsEnabledIntegerScaling, IntegerScalingType, IsSupportedGPUScaling, IsEnabledGPUScaling, ScalingType, IsSupportedImageSharpening, IsEnabledImageSharpening, SharpeningFilterType, SharpeningIntensity, 
-                IsSupportedDisplaySettings, DisplaySettings, ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
+                IsSupportedDisplaySettings, GetDisplaySettingsHash(DisplaySettings), ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
                 DisplayProperties, /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, SharpnessFilterProperties, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes, LinkedDisplayAdaptersArgs, LinkedDisplayAdapters, MuxProperties, MuxDisplayOutputs, 
                 VblankTimestamp, /*ZeDeviceHandle, ZeDriverHandle,*/ RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
         }
@@ -1934,7 +1970,7 @@ namespace DisplayMagicianShared.Intel
                             var currentDisplaySettings = currentSettings.DisplaySettings;
                             if (currentSettings.IsSupportedDisplaySettings)
                             {
-                                if (!EqualityComparer<DisplaySettingsDto>.Default.Equals(currentDisplaySettings, storedSettings.DisplaySettings))
+                                if (!INTEL_DISPLAY_WITH_SETTINGS.AreDisplaySettingsEqual(currentDisplaySettings, storedSettings.DisplaySettings))
                                 {
                                     var desiredDisplaySettings = storedSettings.DisplaySettings;
                                     desiredDisplaySettings.Set = true;

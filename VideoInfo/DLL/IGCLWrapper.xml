@@ -1138,9 +1138,9 @@
             <param name="args">Panel descriptor access arguments.</param>
             <returns>Updated panel descriptor access arguments.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPanelDescriptorData">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPanelEdidData">
             <summary>
-            Read the panel descriptor data (EDID) as a single concatenated byte array.
+            Read EDID via panel descriptor access as a single concatenated byte array.
             </summary>
             <returns>Concatenated panel descriptor bytes.</returns>
         </member>
@@ -1288,16 +1288,16 @@
             <param name="args">EDID management arguments.</param>
             <returns>Updated EDID management arguments.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetEdid(IGCLWrapper.ctl_edid_type_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetEdidManagement(IGCLWrapper.ctl_edid_type_t)">
             <summary>
-            Read the EDID bytes for this display output.
+            Read EDID bytes via the EDID management API.
             </summary>
             <param name="edidType">EDID type to read.</param>
             <returns>EDID bytes.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetEdidWithFlags(IGCLWrapper.ctl_edid_type_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetEdidManagementWithFlags(IGCLWrapper.ctl_edid_type_t)">
             <summary>
-            Read the EDID bytes for this display output and return EDID management output flags.
+            Read EDID bytes via the EDID management API and return output flags.
             </summary>
             <param name="edidType">EDID type to read.</param>
             <returns>Tuple containing EDID bytes and output flags.</returns>
@@ -1605,6 +1605,26 @@
             Reserved native fields.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.AdapterDisplayEncoderPropertiesDto.Equals(IGCLWrapper.AdapterDisplayEncoderPropertiesDto)">
+            <summary>
+            Compare adapter display encoder properties while ignoring reserved native fields.
+            </summary>
+            <param name="other">Other properties instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.AdapterDisplayEncoderPropertiesDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.AdapterDisplayEncoderPropertiesDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="M:IGCLWrapper.AdapterDisplayEncoderPropertiesDto.FromNative(IGCLWrapper.ctl_adapter_display_encoder_properties_t)">
             <summary>
             Create a DTO from a native struct.
@@ -1755,6 +1775,26 @@
             <summary>
             Reserved native fields.
             </summary>
+        </member>
+        <member name="M:IGCLWrapper.DisplaySettingsDto.Equals(IGCLWrapper.DisplaySettingsDto)">
+            <summary>
+            Compare display settings while ignoring reserved native fields.
+            </summary>
+            <param name="other">Other settings instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DisplaySettingsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.DisplaySettingsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
         </member>
         <member name="M:IGCLWrapper.DisplaySettingsDto.FromNative(IGCLWrapper.ctl_display_settings_t)">
             <summary>
