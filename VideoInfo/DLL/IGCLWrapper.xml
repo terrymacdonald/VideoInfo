@@ -41,6 +41,22 @@
             </summary>
             <returns>Initialized 3D feature get/set struct.</returns>
         </member>
+        <member name="M:IGCLWrapper.IGCL3DHelper.Are3dFeatureCapsEqual(IGCLWrapper.ctl_3d_feature_caps_t,IGCLWrapper.ctl_3d_feature_caps_t)">
+            <summary>
+            Compare 3D feature capabilities while ignoring native-only fields.
+            </summary>
+            <param name="left">Left capabilities struct.</param>
+            <param name="right">Right capabilities struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCL3DHelper.Are3dFeatureGetSetEqual(IGCLWrapper.ctl_3d_feature_getset_t,IGCLWrapper.ctl_3d_feature_getset_t)">
+            <summary>
+            Compare 3D feature get/set data while ignoring native-only fields.
+            </summary>
+            <param name="left">Left get/set struct.</param>
+            <param name="right">Right get/set struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCL3DHelper.Dispose">
             <summary>
             Mark the helper as disposed.
@@ -402,6 +418,14 @@
             </summary>
             <param name="args">Runtime path arguments.</param>
         </member>
+        <member name="M:IGCLWrapper.IGCLApiHelper.AreRuntimePathArgsEqual(IGCLWrapper.ctl_runtime_path_args_t,IGCLWrapper.ctl_runtime_path_args_t)">
+            <summary>
+            Compare runtime path arguments while ignoring native-only fields.
+            </summary>
+            <param name="left">Left runtime path args struct.</param>
+            <param name="right">Right runtime path args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCLApiHelper.Dispose">
             <summary>
             Dispose the helper and release the underlying API handle.
@@ -450,6 +474,46 @@
             Create linked display adapters args with Size and Version initialized.
             </summary>
             <returns>Initialized linked display adapters args struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.AreDeviceAdapterPropertiesEqual(IGCLWrapper.ctl_device_adapter_properties_t,IGCLWrapper.ctl_device_adapter_properties_t)">
+            <summary>
+            Compare device adapter properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.AreCombinedDisplayArgsEqual(IGCLWrapper.ctl_combined_display_args_t,IGCLWrapper.ctl_combined_display_args_t)">
+            <summary>
+            Compare combined display args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.AreGenlockArgsEqual(IGCLWrapper.ctl_genlock_args_t,IGCLWrapper.ctl_genlock_args_t)">
+            <summary>
+            Compare genlock args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.AreLinkedDisplayAdaptersArgsEqual(IGCLWrapper.ctl_lda_args_t,IGCLWrapper.ctl_lda_args_t)">
+            <summary>
+            Compare linked display adapters args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.AreWaitPropertyChangeArgsEqual(IGCLWrapper.ctl_wait_property_change_args_t,IGCLWrapper.ctl_wait_property_change_args_t)">
+            <summary>
+            Compare wait property change args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.GetPropertiesNative">
             <summary>
@@ -1064,6 +1128,270 @@
             Create a dynamic contrast enhancement args struct with Size and Version initialized.
             </summary>
             <returns>Initialized DCE args struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreDisplayPropertiesEqual(IGCLWrapper.ctl_display_properties_t,IGCLWrapper.ctl_display_properties_t)">
+            <summary>
+            Compare display properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreDisplayTimingEqual(IGCLWrapper.ctl_display_timing_t,IGCLWrapper.ctl_display_timing_t)">
+            <summary>
+            Compare display timing while ignoring native-only fields.
+            </summary>
+            <param name="left">Left timing struct.</param>
+            <param name="right">Right timing struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreAdapterDisplayEncoderPropertiesEqual(IGCLWrapper.ctl_adapter_display_encoder_properties_t,IGCLWrapper.ctl_adapter_display_encoder_properties_t)">
+            <summary>
+            Compare adapter display encoder properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreSharpnessCapsEqual(IGCLWrapper.ctl_sharpness_caps_t,IGCLWrapper.ctl_sharpness_caps_t)">
+            <summary>
+            Compare sharpness capabilities while ignoring native-only fields.
+            </summary>
+            <param name="left">Left caps struct.</param>
+            <param name="right">Right caps struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreSharpnessFilterPropertiesEqual(IGCLWrapper.ctl_sharpness_filter_properties_t,IGCLWrapper.ctl_sharpness_filter_properties_t)">
+            <summary>
+            Compare sharpness filter properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left filter properties struct.</param>
+            <param name="right">Right filter properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreSharpnessSettingsEqual(IGCLWrapper.ctl_sharpness_settings_t,IGCLWrapper.ctl_sharpness_settings_t)">
+            <summary>
+            Compare sharpness settings while ignoring native-only fields.
+            </summary>
+            <param name="left">Left settings struct.</param>
+            <param name="right">Right settings struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreI2CAccessArgsEqual(IGCLWrapper.ctl_i2c_access_args_t,IGCLWrapper.ctl_i2c_access_args_t)">
+            <summary>
+            Compare I2C access args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreI2CAccessPinPairArgsEqual(IGCLWrapper.ctl_i2c_access_pinpair_args_t,IGCLWrapper.ctl_i2c_access_pinpair_args_t)">
+            <summary>
+            Compare I2C pin-pair access args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreAuxAccessArgsEqual(IGCLWrapper.ctl_aux_access_args_t,IGCLWrapper.ctl_aux_access_args_t)">
+            <summary>
+            Compare AUX access args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.ArePowerOptimizationCapsEqual(IGCLWrapper.ctl_power_optimization_caps_t,IGCLWrapper.ctl_power_optimization_caps_t)">
+            <summary>
+            Compare power optimization capabilities while ignoring native-only fields.
+            </summary>
+            <param name="left">Left caps struct.</param>
+            <param name="right">Right caps struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.ArePowerOptimizationSettingsEqual(IGCLWrapper.ctl_power_optimization_settings_t,IGCLWrapper.ctl_power_optimization_settings_t)">
+            <summary>
+            Compare power optimization settings while ignoring native-only fields.
+            </summary>
+            <param name="left">Left settings struct.</param>
+            <param name="right">Right settings struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreSetBrightnessEqual(IGCLWrapper.ctl_set_brightness_t,IGCLWrapper.ctl_set_brightness_t)">
+            <summary>
+            Compare set brightness args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreGetBrightnessEqual(IGCLWrapper.ctl_get_brightness_t,IGCLWrapper.ctl_get_brightness_t)">
+            <summary>
+            Compare get brightness args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.ArePixtxPipeGetConfigEqual(IGCLWrapper.ctl_pixtx_pipe_get_config_t,IGCLWrapper.ctl_pixtx_pipe_get_config_t)">
+            <summary>
+            Compare pixel transformation pipe get configs while ignoring native-only fields.
+            </summary>
+            <param name="left">Left config struct.</param>
+            <param name="right">Right config struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.ArePixtxPipeSetConfigEqual(IGCLWrapper.ctl_pixtx_pipe_set_config_t,IGCLWrapper.ctl_pixtx_pipe_set_config_t)">
+            <summary>
+            Compare pixel transformation pipe set configs while ignoring native-only fields.
+            </summary>
+            <param name="left">Left config struct.</param>
+            <param name="right">Right config struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.ArePixtxBlockConfigEqual(IGCLWrapper.ctl_pixtx_block_config_t,IGCLWrapper.ctl_pixtx_block_config_t)">
+            <summary>
+            Compare pixel transformation block configs while ignoring native-only fields.
+            </summary>
+            <param name="left">Left config struct.</param>
+            <param name="right">Right config struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.ArePanelDescriptorAccessArgsEqual(IGCLWrapper.ctl_panel_descriptor_access_args_t,IGCLWrapper.ctl_panel_descriptor_access_args_t)">
+            <summary>
+            Compare panel descriptor access args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreRetroScalingCapsEqual(IGCLWrapper.ctl_retro_scaling_caps_t,IGCLWrapper.ctl_retro_scaling_caps_t)">
+            <summary>
+            Compare retro scaling capabilities while ignoring native-only fields.
+            </summary>
+            <param name="left">Left caps struct.</param>
+            <param name="right">Right caps struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreRetroScalingSettingsEqual(IGCLWrapper.ctl_retro_scaling_settings_t,IGCLWrapper.ctl_retro_scaling_settings_t)">
+            <summary>
+            Compare retro scaling settings while ignoring native-only fields.
+            </summary>
+            <param name="left">Left settings struct.</param>
+            <param name="right">Right settings struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreScalingCapsEqual(IGCLWrapper.ctl_scaling_caps_t,IGCLWrapper.ctl_scaling_caps_t)">
+            <summary>
+            Compare scaling capabilities while ignoring native-only fields.
+            </summary>
+            <param name="left">Left caps struct.</param>
+            <param name="right">Right caps struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreScalingSettingsEqual(IGCLWrapper.ctl_scaling_settings_t,IGCLWrapper.ctl_scaling_settings_t)">
+            <summary>
+            Compare scaling settings while ignoring native-only fields.
+            </summary>
+            <param name="left">Left settings struct.</param>
+            <param name="right">Right settings struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreLaceConfigEqual(IGCLWrapper.ctl_lace_config_t,IGCLWrapper.ctl_lace_config_t)">
+            <summary>
+            Compare LACE config while ignoring native-only fields.
+            </summary>
+            <param name="left">Left config struct.</param>
+            <param name="right">Right config struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreSoftwarePsrSettingsEqual(IGCLWrapper.ctl_sw_psr_settings_t,IGCLWrapper.ctl_sw_psr_settings_t)">
+            <summary>
+            Compare software PSR settings while ignoring native-only fields.
+            </summary>
+            <param name="left">Left settings struct.</param>
+            <param name="right">Right settings struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreIntelArcSyncMonitorParamsEqual(IGCLWrapper.ctl_intel_arc_sync_monitor_params_t,IGCLWrapper.ctl_intel_arc_sync_monitor_params_t)">
+            <summary>
+            Compare Intel Arc Sync monitor params while ignoring native-only fields.
+            </summary>
+            <param name="left">Left params struct.</param>
+            <param name="right">Right params struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreMuxPropertiesEqual(IGCLWrapper.ctl_mux_properties_t,IGCLWrapper.ctl_mux_properties_t)">
+            <summary>
+            Compare mux properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreIntelArcSyncProfileParamsEqual(IGCLWrapper.ctl_intel_arc_sync_profile_params_t,IGCLWrapper.ctl_intel_arc_sync_profile_params_t)">
+            <summary>
+            Compare Intel Arc Sync profile params while ignoring native-only fields.
+            </summary>
+            <param name="left">Left params struct.</param>
+            <param name="right">Right params struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreEdidManagementArgsEqual(IGCLWrapper.ctl_edid_management_args_t,IGCLWrapper.ctl_edid_management_args_t)">
+            <summary>
+            Compare EDID management args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreCustomModeArgsEqual(IGCLWrapper.ctl_get_set_custom_mode_args_t,IGCLWrapper.ctl_get_set_custom_mode_args_t)">
+            <summary>
+            Compare custom mode args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreCustomSrcModeEqual(IGCLWrapper.ctl_custom_src_mode_t,IGCLWrapper.ctl_custom_src_mode_t)">
+            <summary>
+            Compare custom source modes while ignoring native-only fields.
+            </summary>
+            <param name="left">Left mode struct.</param>
+            <param name="right">Right mode struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreVblankTimestampArgsEqual(IGCLWrapper.ctl_vblank_ts_args_t,IGCLWrapper.ctl_vblank_ts_args_t)">
+            <summary>
+            Compare vblank timestamp args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreDceArgsEqual(IGCLWrapper.ctl_dce_args_t,IGCLWrapper.ctl_dce_args_t)">
+            <summary>
+            Compare DCE args while ignoring native-only fields.
+            </summary>
+            <param name="left">Left args struct.</param>
+            <param name="right">Right args struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreWireFormatConfigEqual(IGCLWrapper.ctl_get_set_wire_format_config_t,IGCLWrapper.ctl_get_set_wire_format_config_t)">
+            <summary>
+            Compare wire format config while ignoring native-only fields.
+            </summary>
+            <param name="left">Left config struct.</param>
+            <param name="right">Right config struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AreDisplaySettingsEqual(IGCLWrapper.ctl_display_settings_t,IGCLWrapper.ctl_display_settings_t)">
+            <summary>
+            Compare display settings while ignoring native-only fields.
+            </summary>
+            <param name="left">Left settings struct.</param>
+            <param name="right">Right settings struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPropertiesNative">
             <summary>
@@ -2484,6 +2812,22 @@
             </summary>
             <param name="desiredState">Desired ECC state.</param>
         </member>
+        <member name="M:IGCLWrapper.IGCLEccHelper.AreEccPropertiesEqual(IGCLWrapper.ctl_ecc_properties_t,IGCLWrapper.ctl_ecc_properties_t)">
+            <summary>
+            Compare ECC properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLEccHelper.AreEccStateDescriptionsEqual(IGCLWrapper.ctl_ecc_state_desc_t,IGCLWrapper.ctl_ecc_state_desc_t)">
+            <summary>
+            Compare ECC state descriptions while ignoring native-only fields.
+            </summary>
+            <param name="left">Left state description struct.</param>
+            <param name="right">Right state description struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCLEccHelper.Dispose">
             <summary>
             Mark the helper as disposed.
@@ -2572,6 +2916,22 @@
             <param name="engineHandle">Engine handle.</param>
             <returns>Engine stats struct.</returns>
         </member>
+        <member name="M:IGCLWrapper.IGCLEngineHelper.AreEnginePropertiesEqual(IGCLWrapper.ctl_engine_properties_t,IGCLWrapper.ctl_engine_properties_t)">
+            <summary>
+            Compare engine properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLEngineHelper.AreEngineStatsEqual(IGCLWrapper.ctl_engine_stats_t,IGCLWrapper.ctl_engine_stats_t)">
+            <summary>
+            Compare engine statistics while ignoring native-only fields.
+            </summary>
+            <param name="left">Left statistics struct.</param>
+            <param name="right">Right statistics struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCLEngineHelper.Dispose">
             <summary>
             Mark the helper as disposed.
@@ -2648,6 +3008,38 @@
             Create a fan speed table struct with Size and Version initialized.
             </summary>
             <returns>Initialized fan speed table struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFanHelper.AreFanPropertiesEqual(IGCLWrapper.ctl_fan_properties_t,IGCLWrapper.ctl_fan_properties_t)">
+            <summary>
+            Compare fan properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFanHelper.AreFanConfigEqual(IGCLWrapper.ctl_fan_config_t,IGCLWrapper.ctl_fan_config_t)">
+            <summary>
+            Compare fan configuration while ignoring native-only fields.
+            </summary>
+            <param name="left">Left config struct.</param>
+            <param name="right">Right config struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFanHelper.AreFanSpeedEqual(IGCLWrapper.ctl_fan_speed_t,IGCLWrapper.ctl_fan_speed_t)">
+            <summary>
+            Compare fan speed while ignoring native-only fields.
+            </summary>
+            <param name="left">Left speed struct.</param>
+            <param name="right">Right speed struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFanHelper.AreFanSpeedTableEqual(IGCLWrapper.ctl_fan_speed_table_t,IGCLWrapper.ctl_fan_speed_table_t)">
+            <summary>
+            Compare fan speed tables while ignoring native-only fields.
+            </summary>
+            <param name="left">Left table struct.</param>
+            <param name="right">Right table struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLFanHelper.Dispose">
             <summary>
@@ -2769,6 +3161,22 @@
             Allow or disallow PCIe link speed updates.
             </summary>
             <param name="allow">True to allow updates; otherwise false.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFirmwareHelper.AreFirmwarePropertiesEqual(IGCLWrapper.ctl_firmware_properties_t,IGCLWrapper.ctl_firmware_properties_t)">
+            <summary>
+            Compare firmware properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFirmwareHelper.AreFirmwareComponentPropertiesEqual(IGCLWrapper.ctl_firmware_component_properties_t,IGCLWrapper.ctl_firmware_component_properties_t)">
+            <summary>
+            Compare firmware component properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLFirmwareHelper.Dispose">
             <summary>
@@ -2972,6 +3380,38 @@
             </summary>
             <returns>Initialized frequency range struct.</returns>
         </member>
+        <member name="M:IGCLWrapper.IGCLFrequencyHelper.AreFrequencyPropertiesEqual(IGCLWrapper.ctl_freq_properties_t,IGCLWrapper.ctl_freq_properties_t)">
+            <summary>
+            Compare frequency properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFrequencyHelper.AreFrequencyRangeEqual(IGCLWrapper.ctl_freq_range_t,IGCLWrapper.ctl_freq_range_t)">
+            <summary>
+            Compare frequency ranges while ignoring native-only fields.
+            </summary>
+            <param name="left">Left range struct.</param>
+            <param name="right">Right range struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFrequencyHelper.AreFrequencyStateEqual(IGCLWrapper.ctl_freq_state_t,IGCLWrapper.ctl_freq_state_t)">
+            <summary>
+            Compare frequency state while ignoring native-only fields.
+            </summary>
+            <param name="left">Left state struct.</param>
+            <param name="right">Right state struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLFrequencyHelper.AreFrequencyThrottleTimeEqual(IGCLWrapper.ctl_freq_throttle_time_t,IGCLWrapper.ctl_freq_throttle_time_t)">
+            <summary>
+            Compare frequency throttle times while ignoring native-only fields.
+            </summary>
+            <param name="left">Left throttle time struct.</param>
+            <param name="right">Right throttle time struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCLFrequencyHelper.Dispose">
             <summary>
             Mark the helper as disposed.
@@ -3121,6 +3561,22 @@
             Create an LED state struct with Size and Version initialized.
             </summary>
             <returns>Initialized LED state struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLLedHelper.AreLedPropertiesEqual(IGCLWrapper.ctl_led_properties_t,IGCLWrapper.ctl_led_properties_t)">
+            <summary>
+            Compare LED properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLLedHelper.AreLedStateEqual(IGCLWrapper.ctl_led_state_t,IGCLWrapper.ctl_led_state_t)">
+            <summary>
+            Compare LED state while ignoring native-only fields.
+            </summary>
+            <param name="left">Left state struct.</param>
+            <param name="right">Right state struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLLedHelper.Dispose">
             <summary>
@@ -3295,6 +3751,22 @@
             </summary>
             <returns>Initialized video processing feature get/set struct.</returns>
         </member>
+        <member name="M:IGCLWrapper.IGCLMediaHelper.AreVideoProcessingFeatureCapsEqual(IGCLWrapper.ctl_video_processing_feature_caps_t,IGCLWrapper.ctl_video_processing_feature_caps_t)">
+            <summary>
+            Compare video processing feature capabilities while ignoring native-only fields.
+            </summary>
+            <param name="left">Left capabilities struct.</param>
+            <param name="right">Right capabilities struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLMediaHelper.AreVideoProcessingFeatureGetSetEqual(IGCLWrapper.ctl_video_processing_feature_getset_t,IGCLWrapper.ctl_video_processing_feature_getset_t)">
+            <summary>
+            Compare video processing feature get/set data while ignoring native-only fields.
+            </summary>
+            <param name="left">Left get/set struct.</param>
+            <param name="right">Right get/set struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCLMediaHelper.Dispose">
             <summary>
             Mark the helper as disposed.
@@ -3424,6 +3896,30 @@
             </summary>
             <param name="memoryHandle">Memory module handle.</param>
             <returns>Memory bandwidth struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLMemoryHelper.AreMemoryPropertiesEqual(IGCLWrapper.ctl_mem_properties_t,IGCLWrapper.ctl_mem_properties_t)">
+            <summary>
+            Compare memory properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLMemoryHelper.AreMemoryStatesEqual(IGCLWrapper.ctl_mem_state_t,IGCLWrapper.ctl_mem_state_t)">
+            <summary>
+            Compare memory state while ignoring native-only fields.
+            </summary>
+            <param name="left">Left state struct.</param>
+            <param name="right">Right state struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLMemoryHelper.AreMemoryBandwidthEqual(IGCLWrapper.ctl_mem_bandwidth_t,IGCLWrapper.ctl_mem_bandwidth_t)">
+            <summary>
+            Compare memory bandwidth while ignoring native-only fields.
+            </summary>
+            <param name="left">Left bandwidth struct.</param>
+            <param name="right">Right bandwidth struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLMemoryHelper.Dispose">
             <summary>
@@ -3698,6 +4194,38 @@
             Create a voltage/frequency pair struct with Size and Version initialized.
             </summary>
             <returns>Initialized voltage/frequency pair struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLOverclockHelper.AreOverclockPropertiesEqual(IGCLWrapper.ctl_oc_properties_t,IGCLWrapper.ctl_oc_properties_t)">
+            <summary>
+            Compare overclock properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLOverclockHelper.AreVfPairEqual(IGCLWrapper.ctl_oc_vf_pair_t,IGCLWrapper.ctl_oc_vf_pair_t)">
+            <summary>
+            Compare voltage/frequency pairs while ignoring native-only fields.
+            </summary>
+            <param name="left">Left pair struct.</param>
+            <param name="right">Right pair struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLOverclockHelper.ArePowerTelemetryEqual(IGCLWrapper.ctl_power_telemetry_t,IGCLWrapper.ctl_power_telemetry_t)">
+            <summary>
+            Compare power telemetry while ignoring native-only fields.
+            </summary>
+            <param name="left">Left telemetry struct.</param>
+            <param name="right">Right telemetry struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLOverclockHelper.AreVoltageFrequencyPointEqual(IGCLWrapper.ctl_voltage_frequency_point_t,IGCLWrapper.ctl_voltage_frequency_point_t)">
+            <summary>
+            Compare voltage/frequency points while ignoring native-only fields.
+            </summary>
+            <param name="left">Left point struct.</param>
+            <param name="right">Right point struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLOverclockHelper.Dispose">
             <summary>
@@ -4257,6 +4785,22 @@
             </summary>
             <returns>PCI state struct.</returns>
         </member>
+        <member name="M:IGCLWrapper.IGCLPciHelper.ArePciPropertiesEqual(IGCLWrapper.ctl_pci_properties_t,IGCLWrapper.ctl_pci_properties_t)">
+            <summary>
+            Compare PCI properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLPciHelper.ArePciStateEqual(IGCLWrapper.ctl_pci_state_t,IGCLWrapper.ctl_pci_state_t)">
+            <summary>
+            Compare PCI state while ignoring native-only fields.
+            </summary>
+            <param name="left">Left state struct.</param>
+            <param name="right">Right state struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
         <member name="M:IGCLWrapper.IGCLPciHelper.Dispose">
             <summary>
             Mark the helper as disposed.
@@ -4395,6 +4939,30 @@
             Create a power limits struct with Size and Version initialized.
             </summary>
             <returns>Initialized power limits struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLPowerHelper.ArePowerPropertiesEqual(IGCLWrapper.ctl_power_properties_t,IGCLWrapper.ctl_power_properties_t)">
+            <summary>
+            Compare power properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLPowerHelper.ArePowerEnergyCounterEqual(IGCLWrapper.ctl_power_energy_counter_t,IGCLWrapper.ctl_power_energy_counter_t)">
+            <summary>
+            Compare power energy counters while ignoring native-only fields.
+            </summary>
+            <param name="left">Left counter struct.</param>
+            <param name="right">Right counter struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLPowerHelper.ArePowerLimitsEqual(IGCLWrapper.ctl_power_limits_t,IGCLWrapper.ctl_power_limits_t)">
+            <summary>
+            Compare power limits while ignoring native-only fields.
+            </summary>
+            <param name="left">Left limits struct.</param>
+            <param name="right">Right limits struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLPowerHelper.Dispose">
             <summary>
@@ -4705,6 +5273,14 @@
             </summary>
             <param name="sensorHandle">Temperature sensor handle.</param>
             <returns>Temperature value in degrees C.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLTemperatureHelper.AreTemperaturePropertiesEqual(IGCLWrapper.ctl_temp_properties_t,IGCLWrapper.ctl_temp_properties_t)">
+            <summary>
+            Compare temperature properties while ignoring native-only fields.
+            </summary>
+            <param name="left">Left properties struct.</param>
+            <param name="right">Right properties struct.</param>
+            <returns>True when equal; otherwise, false.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLTemperatureHelper.Dispose">
             <summary>
