@@ -399,17 +399,17 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The WireFormat values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_get_brightness_t>.Default.Equals(Brightness, other.Brightness))
+            if (!IGCLDisplayHelper.AreGetBrightnessEqual(Brightness, other.Brightness))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The Brightness values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_scaling_caps_t>.Default.Equals(ScalingCaps, other.ScalingCaps))
+            if (!IGCLDisplayHelper.AreScalingCapsEqual(ScalingCaps, other.ScalingCaps))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ScalingCaps values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_sharpness_caps_t>.Default.Equals(SharpnessCaps, other.SharpnessCaps))
+            if (!IGCLDisplayHelper.AreSharpnessCapsEqual(SharpnessCaps, other.SharpnessCaps))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SharpnessCaps values don't equal each other");
                 return false;
@@ -419,22 +419,22 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The SharpnessFilterProperties values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_retro_scaling_caps_t>.Default.Equals(RetroScalingCaps, other.RetroScalingCaps))
+            if (!IGCLDisplayHelper.AreRetroScalingCapsEqual(RetroScalingCaps, other.RetroScalingCaps))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The RetroScalingCaps values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_power_optimization_caps_t>.Default.Equals(PowerOptimizationCaps, other.PowerOptimizationCaps))
+            if (!IGCLDisplayHelper.ArePowerOptimizationCapsEqual(PowerOptimizationCaps, other.PowerOptimizationCaps))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The PowerOptimizationCaps values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_intel_arc_sync_profile_params_t>.Default.Equals(IntelArcSyncProfile, other.IntelArcSyncProfile))
+            if (!IGCLDisplayHelper.AreIntelArcSyncProfileParamsEqual(IntelArcSyncProfile, other.IntelArcSyncProfile))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The IntelArcSyncProfile values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_get_set_custom_mode_args_t>.Default.Equals(CustomModeArgs, other.CustomModeArgs))
+            if (!IGCLDisplayHelper.AreCustomModeArgsEqual(CustomModeArgs, other.CustomModeArgs))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The CustomModeArgs values don't equal each other");
                 return false;
@@ -444,7 +444,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The CustomModes values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_lda_args_t>.Default.Equals(LinkedDisplayAdaptersArgs, other.LinkedDisplayAdaptersArgs))
+            if (!IGCLAdapterHelper.AreLinkedDisplayAdaptersArgsEqual(LinkedDisplayAdaptersArgs, other.LinkedDisplayAdaptersArgs))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The LinkedDisplayAdaptersArgs values don't equal each other");
                 return false;
@@ -454,7 +454,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The LinkedDisplayAdapters values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_mux_properties_t>.Default.Equals(MuxProperties, other.MuxProperties))
+            if (!IGCLDisplayHelper.AreMuxPropertiesEqual(MuxProperties, other.MuxProperties))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The MuxProperties values don't equal each other");
                 return false;
@@ -464,7 +464,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The MuxDisplayOutputs values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_vblank_ts_args_t>.Default.Equals(VblankTimestamp, other.VblankTimestamp))
+            if (!IGCLDisplayHelper.AreVblankTimestampArgsEqual(VblankTimestamp, other.VblankTimestamp))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The VblankTimestamp values don't equal each other");
                 return false;
