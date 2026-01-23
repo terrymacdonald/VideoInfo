@@ -1732,6 +1732,7 @@ namespace DisplayMagicianShared.Intel
             if (_initialised && _igclApiHelper != null)
             {
                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Applying display settings stored in the display configuration");
+                var currentDisplayConfig = GetIntelDisplayConfig();
 
                 var adapters = _igclApiHelper.EnumerateAdapters();
                 if (adapters == null || adapters.Count == 0)
@@ -1809,6 +1810,12 @@ namespace DisplayMagicianShared.Intel
                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Found stored settings for display {logDisplayId} (ID {displayDeviceId})");
                         }
 
+                        if (!currentDisplayConfig.Displays.TryGetValue(displayDeviceId, out INTEL_DISPLAY_WITH_SETTINGS currentSettings))
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: No current settings found for display {logDisplayId} (ID {displayDeviceId}), skipping");
+                            continue;
+                        }
+
                         SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Applying settings for display {logDisplayId}");
 
                         //------------------------------------
@@ -1818,14 +1825,9 @@ namespace DisplayMagicianShared.Intel
                         {
                             try
                             {
-                                var retroScalingCaps = display.GetSupportedRetroScalingCapability();
-                                uint retroScalingMask =
-                                    (uint)(ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_INTEGER |
-                                        ctl_retro_scaling_type_flag_t.CTL_RETRO_SCALING_TYPE_FLAG_NEAREST_NEIGHBOUR);
-
-                                if ((retroScalingCaps.SupportedRetroScaling & retroScalingMask) != 0)
+                                if (currentSettings.IsSupportedIntegerScaling)
                                 {
-                                    var retroScalingSettings = display.GetRetroScalingSettings();
+                                    var retroScalingSettings = currentSettings.RetroScalingSettings;
                                     if (retroScalingSettings.Enable != storedSettings.IsEnabledIntegerScaling ||
                                         (uint)retroScalingSettings.RetroScalingType != (uint)storedSettings.IntegerScalingType)
                                     {
@@ -1859,10 +1861,9 @@ namespace DisplayMagicianShared.Intel
                         {
                             try
                             {
-                                var scalingCaps = display.GetSupportedScalingCapability();
-                                if (scalingCaps.SupportedScaling == 1)
+                                if (currentSettings.IsSupportedGPUScaling)
                                 {
-                                    var scalingSettings = display.GetCurrentScaling();
+                                    var scalingSettings = currentSettings.ScalingSettings;
                                     if (scalingSettings.Enable != storedSettings.IsEnabledGPUScaling ||
                                         (uint)scalingSettings.ScalingType != (uint)storedSettings.ScalingType)
                                     {
@@ -1895,10 +1896,9 @@ namespace DisplayMagicianShared.Intel
                         {
                             try
                             {
-                                var (sharpnessCaps, _) = display.GetSharpnessCaps();
-                                if (sharpnessCaps.SupportedFilterFlags != 0)
+                                if (currentSettings.IsSupportedImageSharpening)
                                 {
-                                    var sharpnessSettings = display.GetCurrentSharpness();
+                                    var sharpnessSettings = currentSettings.SharpnessSettings;
                                     if (sharpnessSettings.Enable != storedSettings.IsEnabledImageSharpening ||
                                         (uint)sharpnessSettings.FilterType != (uint)storedSettings.SharpeningFilterType ||
                                         Math.Abs(sharpnessSettings.Intensity - storedSettings.SharpeningIntensity) > 0.001f)
@@ -1931,11 +1931,8 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            var currentDisplaySettings = display.GetDisplaySettings();
-                            bool displaySettingsSupported = Convert.ToUInt64((object)currentDisplaySettings.ValidFlags) != 0 ||
-                                Convert.ToUInt64((object)currentDisplaySettings.ControllableFlags) != 0;
-
-                            if (displaySettingsSupported)
+                            var currentDisplaySettings = currentSettings.DisplaySettings;
+                            if (currentSettings.IsSupportedDisplaySettings)
                             {
                                 if (!EqualityComparer<DisplaySettingsDto>.Default.Equals(currentDisplaySettings, storedSettings.DisplaySettings))
                                 {
@@ -1977,36 +1974,8 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            var currentWireFormat = display.GetWireFormat();
-                            object supportedWireFormatValue = currentWireFormat.SupportedWireFormat;
-                            bool wireFormatSupported = false;
-
-                            if (supportedWireFormatValue == null)
-                            {
-                                wireFormatSupported = false;
-                            }
-                            else if (supportedWireFormatValue is Array supportedWireFormatArray)
-                            {
-                                wireFormatSupported = supportedWireFormatArray.Length > 0;
-                            }
-                            else if (supportedWireFormatValue is System.Collections.IEnumerable supportedWireFormatEnumerable)
-                            {
-                                var enumerator = supportedWireFormatEnumerable.GetEnumerator();
-                                wireFormatSupported = enumerator.MoveNext();
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    wireFormatSupported = Convert.ToUInt64(supportedWireFormatValue) != 0;
-                                }
-                                catch
-                                {
-                                    wireFormatSupported = false;
-                                }
-                            }
-
-                            if (wireFormatSupported)
+                            var currentWireFormat = currentSettings.WireFormat;
+                            if (currentSettings.IsSupportedWireFormat)
                             {
                                 if (!EqualityComparer<ctl_wire_format_t>.Default.Equals(currentWireFormat.WireFormat, storedSettings.WireFormat.WireFormat))
                                 {
@@ -2048,7 +2017,7 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            var currentBrightness = display.GetBrightnessSetting();
+                            var currentBrightness = currentSettings.Brightness;
                             if (currentBrightness.TargetBrightness != storedSettings.Brightness.TargetBrightness)
                             {
                                 var brightnessToSet = IGCLDisplayHelper.CreateSetBrightness();
@@ -2085,12 +2054,9 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            var powerCaps = display.GetPowerOptimizationCaps();
-                            bool powerOptimizationSupported = Convert.ToUInt64((object)powerCaps.SupportedFeatures) != 0;
-
-                            if (powerOptimizationSupported)
+                            if (currentSettings.IsSupportedPowerOptimization)
                             {
-                                var currentPowerOptimization = display.GetPowerOptimizationSetting(storedSettings.PowerOptimizationSettings);
+                                var currentPowerOptimization = currentSettings.PowerOptimizationSettings;
                                 if (!EqualityComparer<PowerOptimizationSettingsDto>.Default.Equals(currentPowerOptimization, storedSettings.PowerOptimizationSettings))
                                 {
                                     display.SetPowerOptimizationSetting(storedSettings.PowerOptimizationSettings);
@@ -2129,7 +2095,7 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            var currentLaceConfig = display.GetLACEConfig();
+                            var currentLaceConfig = currentSettings.LaceConfig;
                             if (!EqualityComparer<LaceConfigDto>.Default.Equals(currentLaceConfig, storedSettings.LaceConfig))
                             {
                                 display.SetLACEConfig(storedSettings.LaceConfig);
@@ -2163,10 +2129,8 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            var currentPsrSettings = display.SoftwarePSR(new SwPsrSettingsDto());
-                            bool psrSupported = Convert.ToUInt64((object)currentPsrSettings.Supported) != 0;
-
-                            if (psrSupported)
+                            var currentPsrSettings = currentSettings.SoftwarePsrSettings;
+                            if (currentPsrSettings.Supported)
                             {
                                 if (!EqualityComparer<SwPsrSettingsDto>.Default.Equals(currentPsrSettings, storedSettings.SoftwarePsrSettings))
                                 {
@@ -2208,10 +2172,8 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            var (currentDceArgs, _) = display.GetDynamicContrastEnhancement();
-                            bool dceSupported = Convert.ToUInt64((object)currentDceArgs.IsSupported) != 0;
-
-                            if (dceSupported)
+                            var currentDceArgs = currentSettings.DynamicContrastEnhancement;
+                            if (currentSettings.IsSupportedDynamicContrastEnhancement)
                             {
                                 bool dceDifferent =
                                     currentDceArgs.Enable != storedSettings.DynamicContrastEnhancement.Enable ||
@@ -2260,12 +2222,9 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            var currentArcSyncMonitorParams = display.GetIntelArcSyncInfoForMonitor();
-                            bool arcSyncSupported = Convert.ToUInt64((object)currentArcSyncMonitorParams.IsIntelArcSyncSupported) != 0;
-
-                            if (arcSyncSupported)
+                            if (currentSettings.IsSupportedIntelArcSync)
                             {
-                                var currentArcSyncProfile = display.GetIntelArcSyncProfile();
+                                var currentArcSyncProfile = currentSettings.IntelArcSyncProfile;
                                 if (!EqualityComparer<ctl_intel_arc_sync_profile_params_t>.Default.Equals(currentArcSyncProfile, storedSettings.IntelArcSyncProfile))
                                 {
                                     display.SetIntelArcSyncProfile(storedSettings.IntelArcSyncProfile);
@@ -2306,7 +2265,7 @@ namespace DisplayMagicianShared.Intel
                         {
                             if (storedSettings.CustomModes != null && storedSettings.CustomModes.Length > 0)
                             {
-                                var (_, currentCustomModes) = display.GetCustomModes();
+                                var currentCustomModes = currentSettings.CustomModes;
                                 bool customModesDifferent = currentCustomModes == null ||
                                     currentCustomModes.Length != storedSettings.CustomModes.Length ||
                                     !currentCustomModes.SequenceEqual(storedSettings.CustomModes);
