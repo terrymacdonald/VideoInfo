@@ -846,6 +846,8 @@ namespace DisplayMagicianShared.Intel
         {
             get
             {
+                if (_activeDisplayConfig == null)
+                    _activeDisplayConfig = CreateDefaultConfig();
                 return _activeDisplayConfig.Value.DisplayIdentifiers;
             }
         }
@@ -1348,7 +1350,7 @@ namespace DisplayMagicianShared.Intel
             }
             else
             {
-                SharedLogger.logger.Error($"IntelLibrary/GetIntelDisplayConfig: ERROR - Tried to run GetIntelDisplayConfig but the Intel IGCL library isn't initialised!");
+                SharedLogger.logger.Error($"IntelLibrary/GetIntelDisplayConfig: ERROR - Tried to run GetIntelDisplayConfig but the Intel IGCL library isn't initialised! This generally means you don't have an Intel video card in your machine.");
                 return CreateDefaultConfig();
             }
             
@@ -1356,77 +1358,77 @@ namespace DisplayMagicianShared.Intel
             return myDisplayConfig;
         }
 
-        private IntPtr TryGetApiHandlePointer(IGCLApiHelper helper)
-        {
-            if (helper == null)
-            {
-                return IntPtr.Zero;
-            }
+        // private IntPtr TryGetApiHandlePointer(IGCLApiHelper helper)
+        // {
+        //     if (helper == null)
+        //     {
+        //         return IntPtr.Zero;
+        //     }
 
-            try
-            {
-                PropertyInfo handleProperty = helper.GetType().GetProperty("ApiHandle") ?? helper.GetType().GetProperty("Handle");
-                if (handleProperty != null && handleProperty.GetValue(helper) is SafeHandle safeHandle)
-                {
-                    return safeHandle.DangerousGetHandle();
-                }
-            }
-            catch (Exception ex)
-            {
-                SharedLogger.logger.Trace(ex, "IntelLibrary/TryGetApiHandlePointer: Failed to extract IGCL API handle from helper.");
-            }
+        //     try
+        //     {
+        //         PropertyInfo handleProperty = helper.GetType().GetProperty("ApiHandle") ?? helper.GetType().GetProperty("Handle");
+        //         if (handleProperty != null && handleProperty.GetValue(helper) is SafeHandle safeHandle)
+        //         {
+        //             return safeHandle.DangerousGetHandle();
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         SharedLogger.logger.Trace(ex, "IntelLibrary/TryGetApiHandlePointer: Failed to extract IGCL API handle from helper.");
+        //     }
 
-            return IntPtr.Zero;
-        }
+        //     return IntPtr.Zero;
+        // }
 
-        /// <summary>
-        /// Searches for all instances of a file recursively within a specified directory.
-        /// </summary>
-        private string[] FindAllFiles(string startPath, string fileName)
-        {
-            try
-            {
-                return Directory.GetFiles(startPath, fileName, SearchOption.AllDirectories);
-            }
-            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is DirectoryNotFoundException)
-            {
-                // Ignore access errors in protected directories.
-                Console.WriteLine($"Access error during search: {ex.Message}");
-            }
+        // /// <summary>
+        // /// Searches for all instances of a file recursively within a specified directory.
+        // /// </summary>
+        // private string[] FindAllFiles(string startPath, string fileName)
+        // {
+        //     try
+        //     {
+        //         return Directory.GetFiles(startPath, fileName, SearchOption.AllDirectories);
+        //     }
+        //     catch (Exception ex) when (ex is UnauthorizedAccessException || ex is DirectoryNotFoundException)
+        //     {
+        //         // Ignore access errors in protected directories.
+        //         Console.WriteLine($"Access error during search: {ex.Message}");
+        //     }
 
-            return new string[0];
-        }
+        //     return new string[0];
+        // }
 
-        /// <summary>
-        /// Compares the file version information of multiple DLLs and returns the path to the newest one.
-        /// </summary>
-        private string GetNewestDllPath(string[] dllPaths)
-        {
-            Version newestVersion = new Version(0, 0);
-            string newestPath = null;
+        // /// <summary>
+        // /// Compares the file version information of multiple DLLs and returns the path to the newest one.
+        // /// </summary>
+        // private string GetNewestDllPath(string[] dllPaths)
+        // {
+        //     Version newestVersion = new Version(0, 0);
+        //     string newestPath = null;
 
-            foreach (string path in dllPaths)
-            {
-                try
-                {
-                    FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(path);
-                    Version fileVersion = new Version(versionInfo.FileVersion);
+        //     foreach (string path in dllPaths)
+        //     {
+        //         try
+        //         {
+        //             FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(path);
+        //             Version fileVersion = new Version(versionInfo.FileVersion);
 
-                    if (fileVersion > newestVersion)
-                    {
-                        newestVersion = fileVersion;
-                        newestPath = path;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // This can happen if the file is locked or corrupt.
-                    Console.WriteLine($"Could not get version info for {path}. Error: {ex.Message}");
-                }
-            }
+        //             if (fileVersion > newestVersion)
+        //             {
+        //                 newestVersion = fileVersion;
+        //                 newestPath = path;
+        //             }
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             // This can happen if the file is locked or corrupt.
+        //             Console.WriteLine($"Could not get version info for {path}. Error: {ex.Message}");
+        //         }
+        //     }
 
-            return newestPath;
-        }
+        //     return newestPath;
+        // }
 
         public string PrintActiveConfig()
         {

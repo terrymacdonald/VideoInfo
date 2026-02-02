@@ -80,6 +80,13 @@
             </summary>
             <returns>Initialized NVAPI helper.</returns>
         </member>
+        <member name="M:NVAPIWrapper.NVAPIApiHelper.IsNVAPIDllAvailable(System.String@)">
+            <summary>
+            Expose NVAPI DLL availability check without requiring direct use of NVAPIApi.
+            </summary>
+            <param name="errorMessage">Details about why the DLL could not be loaded.</param>
+            <returns>True if the NVAPI DLL can be loaded; otherwise, false.</returns>
+        </member>
         <member name="M:NVAPIWrapper.NVAPIApiHelper.CreateDrsSession">
             <summary>
             Create a DRS session helper.

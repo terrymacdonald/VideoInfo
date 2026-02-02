@@ -1,4 +1,5 @@
 ﻿using DisplayMagicianShared.Windows;
+using NVAPIWrapper;
 using EDIDParser;
 using Microsoft.Win32.SafeHandles;
 using System;
@@ -552,6 +553,14 @@ namespace DisplayMagicianShared.NVIDIA
         // Instantiate a SafeHandle instance.
         private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
 
+        // NVAPI API Handle
+        private NVAPIApiHelper _nvapiApiHelper;
+
+        public IntPtr hNVAPIModule = IntPtr.Zero;
+        public const string NVIDIA_NVAPI_DLL = "nvapi64.dll";
+        public IntPtr hNVAPIBindingModule = IntPtr.Zero;
+        public const string NVIDIA_NVAPI_BINDING_DLL = "NVAPIWrapper.dll";
+
         static NVIDIALibrary() { }
         public NVIDIALibrary()
         {
@@ -590,59 +599,41 @@ namespace DisplayMagicianShared.NVIDIA
                     return;
                 }
 
-
-                SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Attempting to load the NVIDIA NVAPI DLL");
-
-                Status status = Status.Error;
-                SharedLogger.logger.Trace("NVIDIALibrary/NVIDIALibrary: Intialising NVIDIA NVAPI library interface");
-                // Step 1: Initialise the NVAPI                
-                try
-                {
-                    // The NVAPI.DLL is loaded by the NVAPI library when the NVAPI object is created, so just by calling this we are
-                    // loading the NVAPI DLLs. We don't need to do anything else here. If this causes an exception then the NVAPI DLL
-                    // is not available..
-                    if (NVAPI.IsAvailable())
-                    {
-                        // If we get here then we definitely have the NVIDIA driver available.
-                        _initialised = true;
-                        SharedLogger.logger.Trace("NVIDIALibrary/NVIDIALibrary: Successfully loaded the NVIDIA NVAPI DLL.");
-                        SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: NVIDIA NVAPI library was initialised successfully");
-                        SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Running UpdateActiveConfig to ensure there is a config to use later");
-                        _activeDisplayConfig = GetActiveConfig();
-                        _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
-                        return;
-                    }
-                    else
-                    {
-                        _initialised = false;
-                        SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Error intialising NVIDIA NVAPI library. NvAPI_Initialize() returned error code {status}. There is probably no NVIDIA hardware installed nor NVAPI64.DLL installed.");
-                    }
-
-                }
-                catch (DllNotFoundException ex)
-                {
-                    // If this fires, then the DLL isn't available, so we need don't try to do anything else
-                    _initialised = false;
-                    SharedLogger.logger.Info(ex, $"NVIDIALibrary/NVIDIALibrary: Exception trying to load the NVIDIA NVAPI DLL nvapi64.dll . This generally means you don't have the NVIDIA driver installed.");
-                }
-                catch (Exception ex)
+                 SharedLogger.logger.Trace("NVIDIALibrary/NVIDIALibrary: Intialising NVIDIA NVAPI library interface");
+                _nvapiApiHelper = NVAPIApiHelper.Initialize();
+                if (_nvapiApiHelper == null)
                 {
                     _initialised = false;
-                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/NVIDIALibrary: Exception intialising NVIDIA NVAPI library. NvAPI_Initialize() caused an exception.");
+                    SharedLogger.logger.Error("NVIDIALibrary/NVIDIALibrary: Failed to initialise NVIDIA NVAPI helper.");
+                    return;
                 }
-
+                _initialised = true;
+                SharedLogger.logger.Trace("NVIDIALibrary/NVIDIALibrary: Successfully initialised NVIDIA NVAPI helper.");               
             }
-            catch (ArgumentNullException ex)
+            catch (TypeInitializationException ex)
             {
-                // If we get here then the PrelinkAll didn't work, meaning the AMD ADL DLL links don't work. We can't continue to use it, so we log the error and exit
-                SharedLogger.logger.Info(ex, $"NVIDIALibrary/NVIDIALibrary: Exception2 trying to load the NVIDIA NVAPI DLLs nvapi64.dll or nvapi.dll. This generally means you don't have the NVIDIA driver installed.");
+                SharedLogger.logger.Info(ex, $"NVIDIALibrary/NVIDIALibrary: TypeInitializationException trying to load the NVIDIA NVAPI DLL {NVIDIA_NVAPI_DLL}. This generally means you don't have the NVIDIA NVAPI driver installed.");
+                _initialised = false;
+                return;
+            }
+            catch (DllNotFoundException ex)
+            {
+                // If we get here then the NVIDIA NVAPI DLL wasn't found. We can't continue to use it, so we log the error and exit
+                SharedLogger.logger.Info(ex, $"NVIDIALibrary/NVIDIALibrary: DllNotFoundException trying to load the NVIDIA NVAPI DLL {NVIDIA_NVAPI_DLL}. This generally means you don't have the NVIDIA NVAPI driver installed.");
+                _initialised = false;
+                return;
             }
             catch (Exception ex)
             {
-                // If we get here then something else didn't work. We can't continue to use the AMD library, so we log the error and exit
-                SharedLogger.logger.Info(ex, $"NVIDIALibrary/NVIDIALibrary: Exception3 trying to load the NVIDIA NVAPI DLLs nvapi64.dll or nvapi.dll. This generally means you don't have the NVIDIA driver installed.");
+                SharedLogger.logger.Info(ex, $"NVIDIALibrary/NVIDIALibrary: A general exception trying to load the NVIDIA NVAPI DLL {NVIDIA_NVAPI_DLL}.");
+                _initialised = false;
+                return;
             }
-
+            SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Automatically getting the NVIDIA Display Configuration");
+            _activeDisplayConfig = GetActiveConfig();
+            SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Automatically getting the NVIDIA Connected Display Identifiers");
+            _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
+        
         }
 
         ~NVIDIALibrary()
@@ -669,6 +660,23 @@ namespace DisplayMagicianShared.NVIDIA
                 _safeHandle?.Dispose();
             }
 
+            // Free unmanaged resources (unmanaged objects) and override finalizer.
+            if (_nvapiApiHelper != null)
+            {
+                _nvapiApiHelper.Dispose();
+                _nvapiApiHelper = null;
+            }
+
+
+            if (hNVAPIModule != IntPtr.Zero)
+            {
+                SharedLogger.logger.Trace("NVIDIALibrary/Dispose: Freeing the NVIDIA NVAPI DLL");
+                // Disabling as probably not needed now
+                // FreeLibrary(hNVAPIModule);
+                hNVAPIModule = IntPtr.Zero;
+            }
+
+            _initialised = false;
             _disposed = true;
         }
 
@@ -681,12 +689,23 @@ namespace DisplayMagicianShared.NVIDIA
             }
         }
 
+        public List<string> PCIVendorIDs
+        {
+            get
+            {
+                return new List<string>() { "10DE" };
+            }
+        }
+
         public NVIDIA_DISPLAY_CONFIG ActiveDisplayConfig
         {
             get
             {
                 if (_activeDisplayConfig == null)
+                {
+                    SharedLogger.logger.Trace($"NVIDIALibrary/ActiveDisplayConfig: ActiveDisplayConfig is null, so creating a new one");
                     _activeDisplayConfig = CreateDefaultConfig();
+                }                    
                 return _activeDisplayConfig.Value;
             }
         }
@@ -701,14 +720,6 @@ namespace DisplayMagicianShared.NVIDIA
             }
         }
 
-        public List<string> PCIVendorIDs
-        {
-            get
-            {
-                return new List<string>() { "10DE" };
-            }
-        }
-
         public static void KeepVideoCardOn()
         {
             NVAPI.LoadLibrary("NVIDIAExportsDLL.dll");
@@ -716,7 +727,24 @@ namespace DisplayMagicianShared.NVIDIA
 
         public static NVIDIALibrary GetLibrary()
         {
+
+            if (_instance == null)
+            {
+                _instance = new NVIDIALibrary();
+            }
+
             return _instance;
+        }
+
+        public static void Shutdown()
+        {
+            if (_instance == null)
+            {
+                return;
+            }
+
+            _instance.Dispose();
+            _instance = null;
         }
 
         public NVIDIA_DISPLAY_CONFIG CreateDefaultConfig()
@@ -773,7 +801,7 @@ namespace DisplayMagicianShared.NVIDIA
         {
             NVIDIA_DISPLAY_CONFIG myDisplayConfig = CreateDefaultConfig();
 
-            if (_initialised)
+            if (_initialised && _nvapiApiHelper != null)
             {
 
                 // Store all the found display IDs so we can use them later
@@ -1675,8 +1703,9 @@ namespace DisplayMagicianShared.NVIDIA
             }
             else
             {
-                SharedLogger.logger.Info($"NVIDIALibrary/GetNVIDIADisplayConfig: Tried to run GetNVIDIADisplayConfig but the NVIDIA NVAPI library isn't initialised! This generally means you don't have a NVIDIA video card in your machine.");
+                SharedLogger.logger.Info($"NVIDIALibrary/GetNVIDIADisplayConfig: ERROR - Tried to run GetNVIDIADisplayConfig but the NVIDIA NVAPI library isn't initialised! This generally means you don't have a NVIDIA video card in your machine.");
                 //throw new NVIDIALibraryException($"Tried to run GetNVIDIADisplayConfig but the NVIDIA NVAPI library isn't initialised!");
+                return CreateDefaultConfig();
             }
 
             // Return the configuration
@@ -1693,226 +1722,226 @@ namespace DisplayMagicianShared.NVIDIA
 
             stringToReturn += $"****** NVIDIA VIDEO CARDS *******\n";
 
-            // Enumerate all the Physical GPUs
-            PhysicalGPUHandle[] physicalGpus = new PhysicalGPUHandle[NvConstants.NV_MAX_PHYSICAL_GPUS];
-            uint physicalGpuCount = 0;
-            try 
-            {
-                SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to get the physical GPU count.");
-                physicalGpus = NVAPI.EnumPhysicalGPUs();
-                SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NvAPI_EnumPhysicalGPUs returned {physicalGpuCount} Physical GPUs");
-                stringToReturn += $"Number of NVIDIA Video cards found: {physicalGpuCount}\n";
-            }
-            catch (Exception ex)
-            {
-                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the physical GPU count.");
-            }
+            // // Enumerate all the Physical GPUs
+            // PhysicalGPUHandle[] physicalGpus = new PhysicalGPUHandle[NvConstants.NV_MAX_PHYSICAL_GPUS];
+            // uint physicalGpuCount = 0;
+            // try 
+            // {
+            //     SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to get the physical GPU count.");
+            //     physicalGpus = NVAPI.EnumPhysicalGPUs();
+            //     SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NvAPI_EnumPhysicalGPUs returned {physicalGpuCount} Physical GPUs");
+            //     stringToReturn += $"Number of NVIDIA Video cards found: {physicalGpuCount}\n";
+            // }
+            // catch (Exception ex)
+            // {
+            //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the physical GPU count.");
+            // }
         
-            // This check is to make sure that if there aren't any physical GPUS then we exit!
-            if (physicalGpuCount == 0)
-            {
-                // Print out that there aren't any video cards detected
-                stringToReturn += "No NVIDIA Video Cards detected.\n\n";
-                SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: No NVIDIA Videocards detected");
-                return stringToReturn;
-            }
+            // // This check is to make sure that if there aren't any physical GPUS then we exit!
+            // if (physicalGpuCount == 0)
+            // {
+            //     // Print out that there aren't any video cards detected
+            //     stringToReturn += "No NVIDIA Video Cards detected.\n\n";
+            //     SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: No NVIDIA Videocards detected");
+            //     return stringToReturn;
+            // }
 
-            // Go through the Physical GPUs one by one
-            for (uint physicalGpuIndex = 0; physicalGpuIndex < physicalGpuCount; physicalGpuIndex++)
-            {
-                //We want to get the name of the physical device
-                string gpuName = "";
-                try
-                {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to get the physical GPU name for GPU #{physicalGpuIndex}.");
-                    gpuName = NVAPI.GetFullName(physicalGpus[physicalGpuIndex]);
-                    SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Successfully got the physical GPU name for GPU #{physicalGpuIndex}. The GPU Full Name is {gpuName}");
-                    stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is a {gpuName}\n";
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the physical GPU name for GPU #{physicalGpuIndex}.");
-                }
+            // // Go through the Physical GPUs one by one
+            // for (uint physicalGpuIndex = 0; physicalGpuIndex < physicalGpuCount; physicalGpuIndex++)
+            // {
+            //     //We want to get the name of the physical device
+            //     string gpuName = "";
+            //     try
+            //     {
+            //         SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to get the physical GPU name for GPU #{physicalGpuIndex}.");
+            //         gpuName = NVAPI.GetFullName(physicalGpus[physicalGpuIndex]);
+            //         SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Successfully got the physical GPU name for GPU #{physicalGpuIndex}. The GPU Full Name is {gpuName}");
+            //         stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is a {gpuName}\n";
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the physical GPU name for GPU #{physicalGpuIndex}.");
+            //     }
 
-                //This function retrieves the Quadro status for the GPU (1 if Quadro, 0 if GeForce)
-                bool quadroStatus = false;
-                try
-                {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to find out if the GPU is from the Quadro range.");
-                    quadroStatus = NVAPI.GetQuadroStatus(physicalGpus[physicalGpuIndex]);
-                    if (quadroStatus)
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NVIDIA Video Card is one from the GeForce range");
-                        stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is in the GeForce range\n";
-                    }
-                    else                     {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NVIDIA Video Card is NOT one from the Quadro range");
-                        stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is NOT in the Quadro range\n";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst finding out if the GPU is from the Quadro range.");
-                }
-            }
+            //     //This function retrieves the Quadro status for the GPU (1 if Quadro, 0 if GeForce)
+            //     bool quadroStatus = false;
+            //     try
+            //     {
+            //         SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to find out if the GPU is from the Quadro range.");
+            //         quadroStatus = NVAPI.GetQuadroStatus(physicalGpus[physicalGpuIndex]);
+            //         if (quadroStatus)
+            //         {
+            //             SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NVIDIA Video Card is one from the GeForce range");
+            //             stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is in the GeForce range\n";
+            //         }
+            //         else                     {
+            //             SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NVIDIA Video Card is NOT one from the Quadro range");
+            //             stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is NOT in the Quadro range\n";
+            //         }
+            //     }
+            //     catch (Exception ex)
+            //     {
+            //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst finding out if the GPU is from the Quadro range.");
+            //     }
+            // }
 
-            stringToReturn += $"\n****** NVIDIA SURROUND/MOSAIC *******\n";
-            if (displayConfig.MosaicConfig.IsMosaicEnabled)
-            {
-                stringToReturn += $"NVIDIA Surround/Mosaic is Enabled\n";
-                if (displayConfig.MosaicConfig.MosaicGridTopos.Length > 1)
-                {
-                    stringToReturn += $"There are {displayConfig.MosaicConfig.MosaicGridTopos.Length} NVIDIA Surround/Mosaic Grid Topologies in use.\n";
-                }
-                if (displayConfig.MosaicConfig.MosaicGridTopos.Length == 1)
-                {
-                    stringToReturn += $"There is 1 NVIDIA Surround/Mosaic Grid Topology in use.\n";
-                }
-                else
-                {
-                    stringToReturn += $"There are no NVIDIA Surround/Mosaic Grid Topologies in use.\n";
-                }
+            // stringToReturn += $"\n****** NVIDIA SURROUND/MOSAIC *******\n";
+            // if (displayConfig.MosaicConfig.IsMosaicEnabled)
+            // {
+            //     stringToReturn += $"NVIDIA Surround/Mosaic is Enabled\n";
+            //     if (displayConfig.MosaicConfig.MosaicGridTopos.Length > 1)
+            //     {
+            //         stringToReturn += $"There are {displayConfig.MosaicConfig.MosaicGridTopos.Length} NVIDIA Surround/Mosaic Grid Topologies in use.\n";
+            //     }
+            //     if (displayConfig.MosaicConfig.MosaicGridTopos.Length == 1)
+            //     {
+            //         stringToReturn += $"There is 1 NVIDIA Surround/Mosaic Grid Topology in use.\n";
+            //     }
+            //     else
+            //     {
+            //         stringToReturn += $"There are no NVIDIA Surround/Mosaic Grid Topologies in use.\n";
+            //     }
 
-                int count = 0;
-                foreach (GridTopologyV2 gridTopology in displayConfig.MosaicConfig.MosaicGridTopos)
-                {
-                    stringToReturn += $"NOTE: This Surround/Mosaic screen will be treated as a single display by Windows.\n";
-                    stringToReturn += $"The NVIDIA Surround/Mosaic Grid Topology #{count} is {gridTopology.Rows} Rows x {gridTopology.Columns} Columns\n";
-                    stringToReturn += $"The NVIDIA Surround/Mosaic Grid Topology #{count} involves {gridTopology.Displays.Count()} Displays\n";
-                    count++;
-                }
-            }
-            else
-            {
-                stringToReturn += $"NVIDIA Surround/Mosaic is Disabled\n";
-            }
+            //     int count = 0;
+            //     foreach (GridTopologyV2 gridTopology in displayConfig.MosaicConfig.MosaicGridTopos)
+            //     {
+            //         stringToReturn += $"NOTE: This Surround/Mosaic screen will be treated as a single display by Windows.\n";
+            //         stringToReturn += $"The NVIDIA Surround/Mosaic Grid Topology #{count} is {gridTopology.Rows} Rows x {gridTopology.Columns} Columns\n";
+            //         stringToReturn += $"The NVIDIA Surround/Mosaic Grid Topology #{count} involves {gridTopology.Displays.Count()} Displays\n";
+            //         count++;
+            //     }
+            // }
+            // else
+            // {
+            //     stringToReturn += $"NVIDIA Surround/Mosaic is Disabled\n";
+            // }
 
-            // Start printing out things for the physical GPU
-            foreach (KeyValuePair<UInt32, NVIDIA_PER_ADAPTER_CONFIG> physicalGPU in displayConfig.PhysicalAdapters)
-            {
-                stringToReturn += $"\n****** NVIDIA PHYSICAL ADAPTER {physicalGPU.Key} *******\n";
+            // // Start printing out things for the physical GPU
+            // foreach (KeyValuePair<UInt32, NVIDIA_PER_ADAPTER_CONFIG> physicalGPU in displayConfig.PhysicalAdapters)
+            // {
+            //     stringToReturn += $"\n****** NVIDIA PHYSICAL ADAPTER {physicalGPU.Key} *******\n";
 
-                NVIDIA_PER_ADAPTER_CONFIG myAdapter = physicalGPU.Value;
+            //     NVIDIA_PER_ADAPTER_CONFIG myAdapter = physicalGPU.Value;
 
-                foreach (KeyValuePair<UInt32, NVIDIA_PER_DISPLAY_CONFIG> myDisplayItem in myAdapter.Displays)
-                {
-                    string displayId = myDisplayItem.Key.ToString();
-                    NVIDIA_PER_DISPLAY_CONFIG myDisplay = myDisplayItem.Value;
+            //     foreach (KeyValuePair<UInt32, NVIDIA_PER_DISPLAY_CONFIG> myDisplayItem in myAdapter.Displays)
+            //     {
+            //         string displayId = myDisplayItem.Key.ToString();
+            //         NVIDIA_PER_DISPLAY_CONFIG myDisplay = myDisplayItem.Value;
 
-                    stringToReturn += $"\n****** NVIDIA PER DISPLAY CONFIG {displayId} *******\n";
+            //         stringToReturn += $"\n****** NVIDIA PER DISPLAY CONFIG {displayId} *******\n";
 
-                    stringToReturn += $"\n****** NVIDIA COLOR CONFIG *******\n";
-                    ColorDataV5 colorData = (ColorDataV5)myDisplay.ColorData;
-                    stringToReturn += $"Display {displayId} BPC is {colorData.DesktopColorDepth.ToString()}.\n";
-                    stringToReturn += $"Display {displayId} ColorFormat is {colorData.ColorFormat.ToString("G")}.\n";
-                    stringToReturn += $"Display {displayId} Colorimetry is {colorData.Colorimetry.ToString("G")}.\n";
-                    stringToReturn += $"Display {displayId} ColorSelectionPolicy is {colorData.SelectionPolicy.Value.ToString()}.\n";
-                    stringToReturn += $"Display {displayId} Depth is {colorData.ColorDepth.ToString()}.\n";
-                    stringToReturn += $"Display {displayId} DynamicRange is {colorData.DynamicRange.ToString()}.\n";
+            //         stringToReturn += $"\n****** NVIDIA COLOR CONFIG *******\n";
+            //         ColorDataV5 colorData = (ColorDataV5)myDisplay.ColorData;
+            //         stringToReturn += $"Display {displayId} BPC is {colorData.DesktopColorDepth.ToString()}.\n";
+            //         stringToReturn += $"Display {displayId} ColorFormat is {colorData.ColorFormat.ToString("G")}.\n";
+            //         stringToReturn += $"Display {displayId} Colorimetry is {colorData.Colorimetry.ToString("G")}.\n";
+            //         stringToReturn += $"Display {displayId} ColorSelectionPolicy is {colorData.SelectionPolicy.Value.ToString()}.\n";
+            //         stringToReturn += $"Display {displayId} Depth is {colorData.ColorDepth.ToString()}.\n";
+            //         stringToReturn += $"Display {displayId} DynamicRange is {colorData.DynamicRange.ToString()}.\n";
 
-                    // Start printing out HDR things
-                    stringToReturn += $"\n****** NVIDIA HDR CONFIG *******\n";
-                    if (myDisplay.HasNvHdrEnabled)
-                    {
-                        stringToReturn += $"NVIDIA HDR is Enabled\n";
-                        if (displayConfig.MosaicConfig.MosaicGridTopos.Length == 1)
-                        {
-                            stringToReturn += $"There is 1 NVIDIA HDR devices in use.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"There are no NVIDIA HDR devices in use.\n";
-                        }
+            //         // Start printing out HDR things
+            //         stringToReturn += $"\n****** NVIDIA HDR CONFIG *******\n";
+            //         if (myDisplay.HasNvHdrEnabled)
+            //         {
+            //             stringToReturn += $"NVIDIA HDR is Enabled\n";
+            //             if (displayConfig.MosaicConfig.MosaicGridTopos.Length == 1)
+            //             {
+            //                 stringToReturn += $"There is 1 NVIDIA HDR devices in use.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"There are no NVIDIA HDR devices in use.\n";
+            //             }
 
-                        HDRCapabilitiesV3 hdrCap = (HDRCapabilitiesV3)myDisplay.HdrCapabilities;
+            //             HDRCapabilitiesV3 hdrCap = (HDRCapabilitiesV3)myDisplay.HdrCapabilities;
 
-                        if (hdrCap.IsDolbyVisionSupported)
-                        {
-                            stringToReturn += $"Display {displayId} supports DolbyVision HDR.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support DolbyVision HDR.\n";
-                        }
-                        if (hdrCap.IsST2084EOTFSupported)
-                        {
-                            stringToReturn += $"Display {displayId} supports ST2084EOTF HDR Mode.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support ST2084EOTF HDR Mode.\n";
-                        }
-                        if (hdrCap.IsTraditionalHDRGammaSupported)
-                        {
-                            stringToReturn += $"Display {displayId} supports Traditional HDR Gamma.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support Traditional HDR Gamma.\n";
-                        }
-                        if (hdrCap.IsEDRSupported)
-                        {
-                            stringToReturn += $"Display {displayId} supports EDR.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support EDR.\n";
-                        }
-                        if (hdrCap.IsTraditionalSDRGammaSupported)
-                        {
-                            stringToReturn += $"Display {displayId} supports SDR Gamma.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support SDR Gamma.\n";
-                        }
-                        if (hdrCap.IsDolbyVisionSupported)
-                        {
-                            stringToReturn += $"Display {displayId} supports Dolby Vision.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support Dolby Vision.\n";
-                        }
-                        if (hdrCap.isHdr10PlusSupported)
-                        {
-                            stringToReturn += $"Display {displayId} supports HDR10Plus.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support HDR10Plus.\n";
-                        }
-                        if (hdrCap.isHdr10PlusGamingSupported)
-                        {
-                            stringToReturn += $"Display {displayId} supports HDR10Plus Gaming.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support HDR10Plus Gaming.\n";
-                        }
-                        if (hdrCap.IsDriverDefaultHDRParametersExpanded)
-                        {
-                            stringToReturn += $"Display {displayId} supports driver default HDR Parameters expanded.\n";
-                        }
-                        else
-                        {
-                            stringToReturn += $"Display {displayId} DOES NOT support driver default HDR Parameters expanded.\n";
-                        }
+            //             if (hdrCap.IsDolbyVisionSupported)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports DolbyVision HDR.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support DolbyVision HDR.\n";
+            //             }
+            //             if (hdrCap.IsST2084EOTFSupported)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports ST2084EOTF HDR Mode.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support ST2084EOTF HDR Mode.\n";
+            //             }
+            //             if (hdrCap.IsTraditionalHDRGammaSupported)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports Traditional HDR Gamma.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support Traditional HDR Gamma.\n";
+            //             }
+            //             if (hdrCap.IsEDRSupported)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports EDR.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support EDR.\n";
+            //             }
+            //             if (hdrCap.IsTraditionalSDRGammaSupported)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports SDR Gamma.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support SDR Gamma.\n";
+            //             }
+            //             if (hdrCap.IsDolbyVisionSupported)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports Dolby Vision.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support Dolby Vision.\n";
+            //             }
+            //             if (hdrCap.isHdr10PlusSupported)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports HDR10Plus.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support HDR10Plus.\n";
+            //             }
+            //             if (hdrCap.isHdr10PlusGamingSupported)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports HDR10Plus Gaming.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support HDR10Plus Gaming.\n";
+            //             }
+            //             if (hdrCap.IsDriverDefaultHDRParametersExpanded)
+            //             {
+            //                 stringToReturn += $"Display {displayId} supports driver default HDR Parameters expanded.\n";
+            //             }
+            //             else
+            //             {
+            //                 stringToReturn += $"Display {displayId} DOES NOT support driver default HDR Parameters expanded.\n";
+            //             }
 
-                    }
-                    else
-                    {
-                        stringToReturn += $"NVIDIA HDR is Disabled (HDR may still be enabled within Windows itself)\n";
-                    }
-                }
-            }
+            //         }
+            //         else
+            //         {
+            //             stringToReturn += $"NVIDIA HDR is Disabled (HDR may still be enabled within Windows itself)\n";
+            //         }
+            //     }
+            // }
 
-            // I have to disable this as NvAPI_DRS_EnumAvailableSettingIds function can't be found within the NVAPI.DLL
-            // It's looking like it is a problem with the NVAPI.DLL rather than with my code, but I need to do more testing to be sure.
-            // Disabling this for now.
-            //stringToReturn += DumpAllDRSSettings();
+            // // I have to disable this as NvAPI_DRS_EnumAvailableSettingIds function can't be found within the NVAPI.DLL
+            // // It's looking like it is a problem with the NVAPI.DLL rather than with my code, but I need to do more testing to be sure.
+            // // Disabling this for now.
+            // //stringToReturn += DumpAllDRSSettings();
 
-            stringToReturn += $"\n\n";
+            // stringToReturn += $"\n\n";
 
             return stringToReturn;
         }
@@ -2962,51 +2991,51 @@ namespace DisplayMagicianShared.NVIDIA
 
         }
 
-        public static bool MosaicIsOn()
-        {
-            PhysicalGPUHandle[] physicalGpus = new PhysicalGPUHandle[NvConstants.NVAPI_MAX_PHYSICAL_GPUS];
-            try
-            {
-                SharedLogger.logger.Trace($"NVIDIALibrary/MosaicIsOn: Attempting to get the list of physical GPUs.");
-                physicalGpus = NVAPI.EnumPhysicalGPUs();
-                SharedLogger.logger.Trace($"NVIDIALibrary/MosaicIsOn: Successfully got the list of physical GPUS. There are {physicalGpus.Length} Physical GPUs.");
+        // public static bool MosaicIsOn()
+        // {
+        //     PhysicalGPUHandle[] physicalGpus = new PhysicalGPUHandle[NvConstants.NVAPI_MAX_PHYSICAL_GPUS];
+        //     try
+        //     {
+        //         SharedLogger.logger.Trace($"NVIDIALibrary/MosaicIsOn: Attempting to get the list of physical GPUs.");
+        //         physicalGpus = NVAPI.EnumPhysicalGPUs();
+        //         SharedLogger.logger.Trace($"NVIDIALibrary/MosaicIsOn: Successfully got the list of physical GPUS. There are {physicalGpus.Length} Physical GPUs.");
 
-                // If we have a physical GPU
-                if (physicalGpus.Length > 0)
-                {
-                    // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
-                    TopologyBrief mosaicTopoBrief = new TopologyBrief();
-                    IDisplaySettings mosaicDisplaySetting = new DisplaySettingsV2();
-                    int mosaicOverlapX = 0;
-                    int mosaicOverlapY = 0;
-                    try
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/MosaicIsOn: Attempting to get the mosaic topology.");
-                        NVAPI.GetCurrentTopology(out mosaicTopoBrief, out mosaicDisplaySetting, out mosaicOverlapX, out mosaicOverlapY);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/MosaicIsOn: Successfully got the mosaic topology. The mosaic topology is {physicalGpus.Length} Physical GPUs.");
-                        DisplaySettingsV2 mosaicDisplaySettingv2 = (DisplaySettingsV2)mosaicDisplaySetting;
+        //         // If we have a physical GPU
+        //         if (physicalGpus.Length > 0)
+        //         {
+        //             // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
+        //             TopologyBrief mosaicTopoBrief = new TopologyBrief();
+        //             IDisplaySettings mosaicDisplaySetting = new DisplaySettingsV2();
+        //             int mosaicOverlapX = 0;
+        //             int mosaicOverlapY = 0;
+        //             try
+        //             {
+        //                 SharedLogger.logger.Trace($"NVIDIALibrary/MosaicIsOn: Attempting to get the mosaic topology.");
+        //                 NVAPI.GetCurrentTopology(out mosaicTopoBrief, out mosaicDisplaySetting, out mosaicOverlapX, out mosaicOverlapY);
+        //                 SharedLogger.logger.Trace($"NVIDIALibrary/MosaicIsOn: Successfully got the mosaic topology. The mosaic topology is {physicalGpus.Length} Physical GPUs.");
+        //                 DisplaySettingsV2 mosaicDisplaySettingv2 = (DisplaySettingsV2)mosaicDisplaySetting;
 
-                        // Check if there is a topology and that Mosaic is enabled
-                        if (mosaicTopoBrief.Topology != Topology.None && mosaicTopoBrief.IsEnable)
-                        {
-                            return true;
-                        }
+        //                 // Check if there is a topology and that Mosaic is enabled
+        //                 if (mosaicTopoBrief.Topology != Topology.None && mosaicTopoBrief.IsEnable)
+        //                 {
+        //                     return true;
+        //                 }
 
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/MosaicIsOn: Exception occurred whilst getting the list pf physical GPUs.");
-                        return false;
-                    }
-                }
+        //             }
+        //             catch (Exception ex)
+        //             {
+        //                 SharedLogger.logger.Error(ex, $"NVIDIALibrary/MosaicIsOn: Exception occurred whilst getting the list pf physical GPUs.");
+        //                 return false;
+        //             }
+        //         }
 
-            }
-            catch (Exception ex)
-            {
-                SharedLogger.logger.Error(ex, $"NVIDIALibrary/MosaicIsOn: Exception occurred whilst getting the list pf physical GPUs.");
-            }
-            return false;
-        }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/MosaicIsOn: Exception occurred whilst getting the list pf physical GPUs.");
+        //     }
+        //     return false;
+        // }
 
         public List<string> GetCurrentDisplayIdentifiers(out bool failure)
         {
