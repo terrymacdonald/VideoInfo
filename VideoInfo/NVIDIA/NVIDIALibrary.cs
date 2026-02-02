@@ -565,6 +565,8 @@ namespace DisplayMagicianShared.NVIDIA
             };
 
             _activeDisplayConfig = CreateDefaultConfig();
+            _allConnectedDisplayIdentifiers = new List<string>();
+
             try
             {
                 _initialised = false;
@@ -577,6 +579,14 @@ namespace DisplayMagicianShared.NVIDIA
                 else
                 {
                     SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: No NVIDIA hardware detected");
+                    return;
+                }
+
+                 // Confirm the NVAPI DLL is available before attempting to initialise
+                if (!NVAPIApiHelper.IsNVAPIDllAvailable(out string dllError))
+                {
+                    _initialised = false;
+                    SharedLogger.logger.Error($"NVIDIALibrary/NVIDIALibrary: Failed to load the NVIDIA NVAPI DLL. {dllError}");
                     return;
                 }
 

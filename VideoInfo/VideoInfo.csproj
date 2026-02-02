@@ -38,12 +38,12 @@
     <Reference Include="IGCLWrapper">
       <HintPath>DLL\IGCLWrapper.dll</HintPath>
     </Reference>
+    <Reference Include="NVAPIWrapper">
+      <HintPath>DLL\NVAPIWrapper.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="ADLXWrapper.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="AMDExportsDll.dll">
+    <None Update="DLL\ADLXWrapper.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="DLL\AMDExportsDll.dll">
@@ -55,10 +55,7 @@
     <None Update="DLL\NVIDIAExportsDll.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="IGCLWrapper.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="NVIDIAExportsDll.dll">
+    <None Update="DLL\NVIDIAWrapper.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
