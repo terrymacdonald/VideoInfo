@@ -104,6 +104,9 @@ namespace DisplayMagicianShared.NVIDIA
     [StructLayout(LayoutKind.Sequential)]
     public struct NVIDIA_PER_DISPLAY_CONFIG : IEquatable<NVIDIA_PER_DISPLAY_CONFIG>
     {
+        public uint DisplayId;
+        public NV_MONITOR_CONN_TYPE ConnectorType;        
+
         public bool HasNvHdrEnabled;
         public HDRCapabilitiesV3 HdrCapabilities;
         public HDRColorDataV2 HdrColorData;
@@ -326,12 +329,21 @@ namespace DisplayMagicianShared.NVIDIA
     {
         public bool IsQuadro;
         public bool HasLogicalGPU;
-        public SystemType SystemType;        
-        public string AdapterName;
-        public GPUType GPUType;
-        public GPUBusType BusType;
-        public Int32 BusId;
-        public Int32 BusSlotId;
+        public NV_SYSTEM_TYPE SystemType;        
+        public string FullName;
+        public _NV_GPU_TYPE GPUType;
+        public _NV_GPU_BUS_TYPE BusType;
+        public uint BusId;
+        public uint BusSlotId;
+        public NVAPIPciIdentifiers PciIdentifiers;
+
+        public string VbiosVersionString;
+        public NVAPINvLinkStatusDto NvLinkStatus;
+
+        public NVAPIGpuInfoDto GpuInfo;
+
+        public NVAPIGpuEccConfigurationInfoDto EccConfigurationInfo;
+
         public UInt32 DisplayCount;
         public Dictionary<UInt32, NVIDIA_PER_DISPLAY_CONFIG> Displays;
 
@@ -339,12 +351,17 @@ namespace DisplayMagicianShared.NVIDIA
         {
             IsQuadro = false;
             HasLogicalGPU = false;
-            SystemType = SystemType.Unknown;
-            AdapterName = string.Empty;
-            GPUType = GPUType.Unknown;
-            BusType = GPUBusType.Undefined;
-            BusId = -1;
-            BusSlotId = -1;
+            SystemType = NV_SYSTEM_TYPE.NV_SYSTEM_TYPE_UNKNOWN;
+            FullName = string.Empty;
+            GPUType = _NV_GPU_TYPE.NV_SYSTEM_TYPE_GPU_UNKNOWN;
+            BusType = _NV_GPU_BUS_TYPE.NVAPI_GPU_BUS_TYPE_UNDEFINED;
+            BusId = 0;
+            BusSlotId = 0;
+            PciIdentifiers = new NVAPIPciIdentifiers();
+            VbiosVersionString = string.Empty;
+            NvLinkStatus = new NVAPINvLinkStatusDto();
+            GpuInfo = new NVAPIGpuInfoDto();
+            EccConfigurationInfo = new NVAPIGpuEccConfigurationInfoDto();
             DisplayCount = 0;
             Displays = new Dictionary<UInt32, NVIDIA_PER_DISPLAY_CONFIG>();
         }
@@ -372,7 +389,7 @@ namespace DisplayMagicianShared.NVIDIA
                     return false;
                 }
 
-                if (!AdapterName.Equals(other.AdapterName))
+                if (!FullName.Equals(other.FullName))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The AdapterName fields don't match!");
                     return false;
@@ -401,7 +418,31 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The BusSlotId fields don't match!");
                     return false;
                 }
-
+                if (!PciIdentifiers.Equals(other.PciIdentifiers))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The PciIdentifiers structs don't match!");
+                    return false;
+                }
+                if (!GpuInfo.Equals(other.GpuInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The GpuInfo structs don't match!");
+                    return false;
+                }
+                if (!EccConfigurationInfo.Equals(other.EccConfigurationInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The EccConfigurationInfo structs don't match!");
+                    return false;
+                }
+                if (VbiosVersionString != other.VbiosVersionString)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The VbiosVersionString fields don't match!");
+                    return false;
+                }
+                if (!NvLinkStatus.Equals(other.NvLinkStatus))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The NvLinkStatus structs don't match!");
+                    return false;
+                }                
                 if (DisplayCount != other.DisplayCount)
                 {
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The DisplayCount fields don't match!");
@@ -427,7 +468,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override int GetHashCode()
         {
-            return (IsQuadro, HasLogicalGPU, SystemType, AdapterName, GPUType, BusType, BusId, BusSlotId, DisplayCount, Displays).GetHashCode();
+            return (IsQuadro, HasLogicalGPU, SystemType, FullName, GPUType, BusType, BusId, BusSlotId, DisplayCount, Displays).GetHashCode();
         }
         public static bool operator ==(NVIDIA_PER_ADAPTER_CONFIG lhs, NVIDIA_PER_ADAPTER_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -437,14 +478,7 @@ namespace DisplayMagicianShared.NVIDIA
     [StructLayout(LayoutKind.Sequential)]
     public struct NVIDIA_DISPLAY_CONFIG : IEquatable<NVIDIA_DISPLAY_CONFIG>
     {
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr LoadLibrary(string dllToLoad);
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern bool FreeLibrary(IntPtr hModule);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
 
         public bool IsInUse;
         public bool IsCloned;
@@ -542,7 +576,15 @@ namespace DisplayMagicianShared.NVIDIA
     public class NVIDIALibrary : IDisposable
     {
     
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr LoadLibrary(string dllToLoad);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool FreeLibrary(IntPtr hModule);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+        
         // Static members are 'eagerly initialized', that is, 
         // immediately when class is loaded for the first time.
         // .NET guarantees thread safety for static initialization
@@ -811,45 +853,43 @@ namespace DisplayMagicianShared.NVIDIA
 
             if (_initialised && _nvapiApiHelper != null)
             {
-
-                // Store all the found display IDs so we can use them later
-                List<UInt32> foundDisplayIds = new List<uint>();
-                int physicalGpuCount = 0;
-                PhysicalGPUHandle[] physicalGpus = new PhysicalGPUHandle[PhysicalGPUHandle.MaxPhysicalGPUs];
-
+                // Enumerate the NVIDIA GPUs adapters in the sytem
+                NVAPIPhysicalGpuHelper[] adapters;
+                int adapterTotalCount = 0;
+                int adapterNum = 0;
                 try
                 {
                     // Enumerate all the Physical GPUs
-                    physicalGpus = NVAPI.EnumPhysicalGPUs();
-                    physicalGpuCount = physicalGpus.Length;
-                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_EnumPhysicalGPUs returned {physicalGpuCount} Physical GPUs");
+                    adapters = _nvapiApiHelper.EnumeratePhysicalGpus();
+                    adapterTotalCount = adapters.Length;
+                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: EnumeratePhysicalGpus returned {adapterTotalCount} Physical GPUs");
 
                     // This check is to make sure that we only continue in this function if there are physical GPUs to actually do anything with
                     // If the driver is installed, but not physical GPUs are present then we just want to return a default blank config.
-                    if (physicalGpuCount == 0)
+                    if (adapterTotalCount == 0)
                     {
                         // Return the default config
                         return CreateDefaultConfig();
                     }
-
                 }
                 catch (Exception ex)
                 {
                     SharedLogger.logger.Error(ex,$"NVIDIALibrary/GetNVIDIADisplayConfig: Error getting physical GPU count.");
-                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Returning the blank NVIDIA config to try and allow other video libraries to work.");
+                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to wake the NVIDIA video card up and try again.");
                     try
                     {
                         // Load the library that keeps the NVIDIA video card visible to this application (potentially wasting laptop power)
                         NVIDIALibrary.KeepVideoCardOn();
 
                         // Enumerate all the Physical GPUs
-                        physicalGpus = NVAPI.EnumPhysicalGPUs();
-                        physicalGpuCount = physicalGpus.Length;
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_EnumPhysicalGPUs returned {physicalGpuCount} Physical GPUs");
+                        adapters = _nvapiApiHelper.EnumeratePhysicalGpus();
+                        adapterTotalCount = adapters.Length;
+                        adapterNum = 0;
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: EnumeratePhysicalGpus returned {adapterTotalCount} Physical GPUs (2nd attempt)");
 
                         // This check is to make sure that we only continue in this function if there are physical GPUs to actually do anything with
                         // If the driver is installed, but not physical GPUs are present then we just want to return a default blank config.
-                        if (physicalGpuCount == 0)
+                        if (adapterTotalCount == 0)
                         {
                             // Return the default config
                             return CreateDefaultConfig();
@@ -865,52 +905,58 @@ namespace DisplayMagicianShared.NVIDIA
                     }
                 }
 
-                try
+                // If we get here we have more than one NVIDIA GPU adapter
+                // Go through each adapter
+                foreach (var adapter in adapters)
                 {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the number of displays connected to the NVIDIA cards.");
-                    DisplayHandle[] connectedDisplays = NVAPI.EnumNvidiaDisplayHandle();
-                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the number of displays connected to the NVIDIA cards.");
-                    // If there are no NVIDIA connected displays
-                    if (connectedDisplays.Length == 0)
+                    // Enumerate the displays for this adapter
+                    var displays = adapter.EnumActiveDisplays();
+                    int displayTotalCount = displays.Length;
+                    int displayNum = 0;
+
+                    // Set some adapter specific items we will use later
+                    var gpuName = adapter.GetFullName();
+                    var gpuBusType = adapter.GetBusType();
+                    var gpuBusId = adapter.GetBusId();                    
+
+                    foreach (var display in displays)
                     {
-                        // Return the default config.
-                        return myDisplayConfig;
-                        // The IsInUse will not be the set to true, and will stay false.
+                        var displayId = display.DisplayId;
+                        var IsConnected = display.IsConnected;
+
+                        // The GetEDID function in NVIDIA doesn't work reliably, and often errors saying that the driver cannot get the EDDID information. 
+                        // Lets set some EDID default in case the EDID doesn't work (which is likely to happen now as NVIDIA EDID is unreliable at best :( )
+                        string manufacturerName = "Unknown";
+                        UInt32 productCode = 0;
+                        UInt32 serialNumber = 0;
+                        // We try to get an EDID block and extract the info         
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the EDID information from for Display Index {displayNum} on Adapter {adapterNum}.");
+                            var edidInfo = display.GetEdidData(NV_EDID_FLAG.NV_EDID_FLAG_DEFAULT);
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the EDID information from for Display Index {displayNum} on Adapter {adapterNum}. There are currently {displays.Length} displays connected.");
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to parse the EDID information from for Display Index {displayNum} on Adapter {adapterNum} so that we can read it.");
+                            EDID edidParsedInfo = new EDID(edidInfo.Value.Data);
+                            manufacturerName = edidParsedInfo.ManufacturerCode;
+                            productCode = edidParsedInfo.ProductCode;
+                            serialNumber = edidParsedInfo.SerialNumber;
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Found that the manufacturer name is {manufacturerName}, the product code is {productCode}, and the serial numver is {serialNumber}.");
+
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Warn(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the EDID information from for Display Index {displayNum} on Adapter {adapterNum}. This is unfortuntately common now, and appears to be a bug in the NVIDIA driver.");
+                        }
+                        displayNum++;
+
                     }
-
-                }
-                catch (NVIDIAApiException nex)
-                {
-                    if (nex.Status == Status.NvidiaDeviceNotFound)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Device not found when trying to get the number of displays connected to the NVIDIA card(s). This typically happens if the PC is a laptop with a separate discrete NVIDIA GPU and the laptop has no external monitors connected to it. ");
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Exception caused whilst trying to get the number of displays connected to the NVIDIA cards.");
-                    }
-                    // Return the default config.
-                    return myDisplayConfig;
-                    // The IsInUse will not be the set to true, and will stay false.
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst trying to get the number of displays connected to the NVIDIA cards.");
-                    // Return the default config.
-                    return myDisplayConfig;
-                    // The IsInUse will not be the set to true, and will stay false.
+                    adapterNum++;
                 }
 
 
-                // This try/catch is to handle the case where there is an NVIDIA GPU in the machine but it's not being used! e.g. display not connected to it
-                try
-                {
-                    // If we reach here, then the nmvidia display is in use!
-                    myDisplayConfig.IsInUse = true;
 
-                    // Go through the Physical GPUs one by one to get the logical adapter information
-                    for (uint physicalGpuIndex = 0; physicalGpuIndex < physicalGpuCount; physicalGpuIndex++)
-                    {
+
+                
                         // Prepare the physicalGPU per adapter structure to use later
                         NVIDIA_PER_ADAPTER_CONFIG myAdapter = new NVIDIA_PER_ADAPTER_CONFIG();
                         //myAdapter.LogicalGPU.PhysicalGPUHandles = new PhysicalGPUHandle[0];
@@ -919,12 +965,12 @@ namespace DisplayMagicianShared.NVIDIA
                         myAdapter.Displays = new Dictionary<uint, NVIDIA_PER_DISPLAY_CONFIG>();
 
                         //We want to get the name of the physical device
-                        myAdapter.AdapterName = "";
+                        myAdapter.FullName = "";
                         try
                         {
                             SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the name of the physical GPU #{physicalGpuIndex + 1}.");
-                            myAdapter.AdapterName = NVAPI.GetFullName(physicalGpus[physicalGpuIndex]);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the GPU fullname of the physical GPU #{physicalGpuIndex + 1}. The GPU Full Name is '{myAdapter.AdapterName}'");
+                            myAdapter.FullName = NVAPI.GetFullName(physicalGpus[physicalGpuIndex]);
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the GPU fullname of the physical GPU #{physicalGpuIndex + 1}. The GPU Full Name is '{myAdapter.FullName}'");
                         }
                         catch (Exception ex)
                         {
@@ -3078,9 +3124,6 @@ namespace DisplayMagicianShared.NVIDIA
                 {
                     // Enumerate the displays for this adapter
                     NVAPIDisplayHelper[] displays;
-                    var dispIds = adapter.GetAllDisplayIds();
-      
-
                     if (allDisplays)
                         // Get the connected displays as they are potentially able to be used
                         displays = adapter.EnumConnectedDisplays();
