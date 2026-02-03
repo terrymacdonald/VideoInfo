@@ -1959,6 +1959,56 @@
             Facade helper for an NVIDIA display handle.
             </summary>
         </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.DisplayId">
+            <summary>
+            Get the display ID for this handle when available.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.ConnectorType">
+            <summary>
+            Get the connector type for this display when available.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.IsDynamic">
+            <summary>
+            Get whether this display is part of an MST topology and is dynamic.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.IsMultiStreamRootNode">
+            <summary>
+            Get whether this display is the multi-stream root node.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.IsActive">
+            <summary>
+            Get whether this display is actively driven.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.IsCluster">
+            <summary>
+            Get whether this display is the representative display.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.IsOSVisible">
+            <summary>
+            Get whether this display is reported to the OS.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.IsWfd">
+            <summary>
+            Get whether this display is a WFD display (deprecated in NVAPI).
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.IsConnected">
+            <summary>
+            Get whether this display is connected.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIDisplayHelper.IsPhysicallyConnected">
+            <summary>
+            Get whether this display is physically connected.
+            </summary>
+        </member>
         <member name="M:NVAPIWrapper.NVAPIDisplayHelper.CreateEdidData">
             <summary>
             Create an EDID data struct with the version initialized.
@@ -6073,9 +6123,21 @@
             <param name="outputId">Output ID (single bit set).</param>
             <returns>Display ID, or null if unavailable.</returns>
         </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.EnumerateNvidiaDisplayHandles">
+        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.EnumAllDisplays">
             <summary>
-            Enumerate NVIDIA display handles associated with this GPU.
+            Enumerate all NVIDIA displays associated with this GPU.
+            </summary>
+            <returns>Array of display helpers, or empty if none are found.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.EnumConnectedDisplays">
+            <summary>
+            Enumerate NVIDIA displays associated with this GPU that are connected.
+            </summary>
+            <returns>Array of display helpers, or empty if none are found.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.EnumActiveDisplays">
+            <summary>
+            Enumerate NVIDIA displays associated with this GPU that are active.
             </summary>
             <returns>Array of display helpers, or empty if none are found.</returns>
         </member>
