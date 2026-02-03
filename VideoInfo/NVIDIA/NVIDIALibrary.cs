@@ -437,6 +437,15 @@ namespace DisplayMagicianShared.NVIDIA
     [StructLayout(LayoutKind.Sequential)]
     public struct NVIDIA_DISPLAY_CONFIG : IEquatable<NVIDIA_DISPLAY_CONFIG>
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr LoadLibrary(string dllToLoad);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool FreeLibrary(IntPtr hModule);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+
         public bool IsInUse;
         public bool IsCloned;
         public NVIDIA_MOSAIC_CONFIG MosaicConfig;
@@ -721,7 +730,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public static void KeepVideoCardOn()
         {
-            NVAPI.LoadLibrary("NVIDIAExportsDLL.dll");
+            LoadLibrary("NVIDIAExportsDLL.dll");
         }
 
         public static NVIDIALibrary GetLibrary()
@@ -3228,86 +3237,86 @@ namespace DisplayMagicianShared.NVIDIA
 
         }
 
-        public static string DumpAllDRSSettings()
-        {
-            // This bit of code dumps all the profiles in the DRS, and all the settings within that
-            // This is really only used for debugging, but is still very useful to have!
-            // Get the DRS Settings
-            string stringToReturn = "";
-            stringToReturn += $"\n****** CURRENTLY SET NVIDIA DRIVER SETTINGS (DRS) *******\n";
+        // public static string DumpAllDRSSettings()
+        // {
+        //     // This bit of code dumps all the profiles in the DRS, and all the settings within that
+        //     // This is really only used for debugging, but is still very useful to have!
+        //     // Get the DRS Settings
+        //     string stringToReturn = "";
+        //     stringToReturn += $"\n****** CURRENTLY SET NVIDIA DRIVER SETTINGS (DRS) *******\n";
 
-            // Set the DRS Settings
-            DRSSessionHandle drsSessionHandle = new DRSSessionHandle();
-            try
-            {
-                SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to create a DRS Session Handle.");
-                drsSessionHandle = NVAPI.CreateSession();
-                SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully created a DRS Session Handle.");
+        //     // Set the DRS Settings
+        //     DRSSessionHandle drsSessionHandle = new DRSSessionHandle();
+        //     try
+        //     {
+        //         SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to create a DRS Session Handle.");
+        //         drsSessionHandle = NVAPI.CreateSession();
+        //         SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully created a DRS Session Handle.");
 
-                // Load the current DRS Settings into memory
-                SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to load the current DRS settings into memory.");
-                NVAPI.LoadSettings(drsSessionHandle);
-                SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully loaded the current DRS settings into memory.");
+        //         // Load the current DRS Settings into memory
+        //         SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to load the current DRS settings into memory.");
+        //         NVAPI.LoadSettings(drsSessionHandle);
+        //         SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully loaded the current DRS settings into memory.");
 
 
-                // Get ALL available settings
-                UInt32[] drsSettingIds = new UInt32[0];
-                try
-                {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to enumerate all the available settings available in this NVIDIA Driver.");
-                    drsSettingIds = NVAPI.EnumAvailableSettingIds();
-                    SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully enumerated all the available settings available in this NVIDIA Driver. There are {drsSettingIds.Length} settings available");
-                    foreach (var drsSettingId in drsSettingIds)
-                    {
-                        // Get the name of the DRS setting
-                        string drsSettingName;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to get the name of this DRS setting from the NVIDIA Driver.");
-                            drsSettingName = NVAPI.GetSettingNameFromId(drsSettingId);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully got the name of this DRS setting this NVIDIA Driver. THe name is '{drsSettingName}'.");
-                            stringToReturn += $"DRS Setting: {drsSettingName}:\n";
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Warn(ex, $"NVIDIALibrary/DumpAllDRSSettings: Exception getting the name of this DRS setting (ID#{drsSettingId}).");
-                            stringToReturn += $"DRS Setting: UNKNOWN:\n";
-                        }
+        //         // Get ALL available settings
+        //         UInt32[] drsSettingIds = new UInt32[0];
+        //         try
+        //         {
+        //             SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to enumerate all the available settings available in this NVIDIA Driver.");
+        //             drsSettingIds = NVAPI.EnumAvailableSettingIds();
+        //             SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully enumerated all the available settings available in this NVIDIA Driver. There are {drsSettingIds.Length} settings available");
+        //             foreach (var drsSettingId in drsSettingIds)
+        //             {
+        //                 // Get the name of the DRS setting
+        //                 string drsSettingName;
+        //                 try
+        //                 {
+        //                     SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to get the name of this DRS setting from the NVIDIA Driver.");
+        //                     drsSettingName = NVAPI.GetSettingNameFromId(drsSettingId);
+        //                     SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully got the name of this DRS setting this NVIDIA Driver. THe name is '{drsSettingName}'.");
+        //                     stringToReturn += $"DRS Setting: {drsSettingName}:\n";
+        //                 }
+        //                 catch (Exception ex)
+        //                 {
+        //                     SharedLogger.logger.Warn(ex, $"NVIDIALibrary/DumpAllDRSSettings: Exception getting the name of this DRS setting (ID#{drsSettingId}).");
+        //                     stringToReturn += $"DRS Setting: UNKNOWN:\n";
+        //                 }
 
-                        // Now get the available options for this DRS setting
-                        stringToReturn += $"OPTIONS:\n";
-                        DRSSettingValues drsSettingValues = new DRSSettingValues();
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to enumerate all the options a user could select for this DRS setting from the NVIDIA Driver.");
-                            drsSettingValues = NVAPI.EnumAvailableSettingValues(drsSettingId);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully enumerated all the options a user could select for this DRS setting from the NVIDIA Driver.");
-                            stringToReturn += $"    Default Value: {drsSettingValues.DefaultValueAsUnicodeString()}\n";
-                            stringToReturn += $"    All Values: {String.Join(", ", drsSettingValues.Values)}\n";                           
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Warn(ex, $"NVIDIALibrary/DumpAllDRSSettings: Exception getting the name of this DRS setting (ID#{drsSettingId}).");
-                            stringToReturn += $"DRS Setting: UNKNOWN:\n";
-                        }
-                    }
+        //                 // Now get the available options for this DRS setting
+        //                 stringToReturn += $"OPTIONS:\n";
+        //                 DRSSettingValues drsSettingValues = new DRSSettingValues();
+        //                 try
+        //                 {
+        //                     SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to enumerate all the options a user could select for this DRS setting from the NVIDIA Driver.");
+        //                     drsSettingValues = NVAPI.EnumAvailableSettingValues(drsSettingId);
+        //                     SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully enumerated all the options a user could select for this DRS setting from the NVIDIA Driver.");
+        //                     stringToReturn += $"    Default Value: {drsSettingValues.DefaultValueAsUnicodeString()}\n";
+        //                     stringToReturn += $"    All Values: {String.Join(", ", drsSettingValues.Values)}\n";                           
+        //                 }
+        //                 catch (Exception ex)
+        //                 {
+        //                     SharedLogger.logger.Warn(ex, $"NVIDIALibrary/DumpAllDRSSettings: Exception getting the name of this DRS setting (ID#{drsSettingId}).");
+        //                     stringToReturn += $"DRS Setting: UNKNOWN:\n";
+        //                 }
+        //             }
 
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Warn(ex, $"NVIDIALibrary/DumpAllDRSSettings: Exception getting Display ID from video card. Substituting with a # instead");
-                }
-            }
-            finally
-            {
-                // Destroy the DRS Session Handle to clean up
-                SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to destroy the DRS Session handle.");
-                NVAPI.DestroySession(drsSessionHandle);
-                SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully destroyed our DRS Session Handle");
-            }
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             SharedLogger.logger.Warn(ex, $"NVIDIALibrary/DumpAllDRSSettings: Exception getting Display ID from video card. Substituting with a # instead");
+        //         }
+        //     }
+        //     finally
+        //     {
+        //         // Destroy the DRS Session Handle to clean up
+        //         SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Attempting to destroy the DRS Session handle.");
+        //         NVAPI.DestroySession(drsSessionHandle);
+        //         SharedLogger.logger.Trace($"NVIDIALibrary/DumpAllDRSSettings: Successfully destroyed our DRS Session Handle");
+        //     }
 
-            return stringToReturn;
-        }
+        //     return stringToReturn;
+        // }
 
         public static GridTopologyV2[] CreateSingleScreenMosaicTopology()
         {
