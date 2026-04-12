@@ -979,931 +979,969 @@
         <member name="F:NVAPIWrapper.NVAPI.NV_FALSE">
             <summary>NVAPI boolean false value (NvBool).</summary>
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetDriverAndBranchVersion(System.UInt32*,System.SByte*)">
+        <member name="M:NVAPIWrapper.NVAPI.InitializeManualImports(NVAPIWrapper.NVAPINative.NvApiQueryInterfaceDelegate)">
+            <summary>
+            Initializes all ClangSharp-generated <c>delegate*</c> function-pointer
+            fields by resolving each function through <c>NvAPI_QueryInterface</c>.
+            </summary>
+            <remarks>
+            <para>
+            The NVAPI DLL (<c>nvapi64.dll</c>) does not export individual functions
+            as named symbols. Instead, every function must be resolved at runtime via
+            <c>NvAPI_QueryInterface(uint id)</c>. ClangSharp generates the matching
+            <c>delegate* unmanaged[Cdecl]&lt;...&gt;</c> fields (via
+            <c>--with-manual-import</c>), and this method populates them.
+            </para>
+            <para>
+            The interface IDs come from <see cref="T:NVAPIWrapper.NVAPIInterfaceTable"/>, which is
+            auto-generated from <c>nvapi_interface.h</c>.
+            </para>
+            </remarks>
+            <param name="queryInterface">
+            The <c>NvAPI_QueryInterface</c> delegate obtained from the loaded NVAPI DLL.
+            </param>
+            <returns>
+            The number of function-pointer fields that were successfully resolved.
+            </returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPI.ClearManualImports">
+            <summary>
+            Resets all ClangSharp-generated <c>delegate*</c> function-pointer fields
+            to <c>null</c>. Must be called before <c>FreeLibrary</c> to prevent
+            dangling pointers into the unloaded DLL from blocking process shutdown.
+            </summary>
+        </member>
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetDriverAndBranchVersion">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetDriverAndBranchVersion&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetMemoryInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_DISPLAY_DRIVER_MEMORY_INFO_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetMemoryInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetMemoryInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetMemoryInfoEx(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_MEMORY_INFO_EX_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetMemoryInfoEx">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetMemoryInfoEx&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_EnumPhysicalGPUs(NVAPIWrapper.NvPhysicalGpuHandle__**,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_EnumPhysicalGPUs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_EnumPhysicalGPUs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetGDIPrimaryDisplayId(System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetGDIPrimaryDisplayId">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetGDIPrimaryDisplayId&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetDisplayViewportsByResolution(System.UInt32,System.UInt32,System.UInt32,NVAPIWrapper._NV_RECT*,System.Byte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetDisplayViewportsByResolution">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_GetDisplayViewportsByResolution&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_Enable">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_Enable">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_Enable&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_Disable">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_Disable">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_Disable&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_IsEnabled(System.Byte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_IsEnabled">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_IsEnabled&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_DestroyHandle(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_DestroyHandle">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_DestroyHandle&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_Activate(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_Activate">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_Activate&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_Deactivate(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_Deactivate">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_Deactivate&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_IsActivated(System.Void*,System.Byte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_IsActivated">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_IsActivated&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetSeparation(System.Void*,System.Single*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetSeparation">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_GetSeparation&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetSeparation(System.Void*,System.Single)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetSeparation">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetSeparation&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetConvergence(System.Void*,System.Single*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetConvergence">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_GetConvergence&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetConvergence(System.Void*,System.Single)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetConvergence">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetConvergence&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetActiveEye(System.Void*,NVAPIWrapper._NV_StereoActiveEye)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetActiveEye">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetActiveEye&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetDriverMode(NVAPIWrapper._NV_StereoDriverMode)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetDriverMode">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetDriverMode&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetEyeSeparation(System.Void*,System.Single*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetEyeSeparation">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_GetEyeSeparation&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_IsWindowedModeSupported(System.Byte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_IsWindowedModeSupported">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_IsWindowedModeSupported&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetSurfaceCreationMode(System.Void*,NVAPIWrapper._NVAPI_STEREO_SURFACECREATEMODE)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetSurfaceCreationMode">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetSurfaceCreationMode&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetSurfaceCreationMode(System.Void*,NVAPIWrapper._NVAPI_STEREO_SURFACECREATEMODE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetSurfaceCreationMode">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_GetSurfaceCreationMode&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_Debug_WasLastDrawStereoized(System.Void*,System.Byte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_Debug_WasLastDrawStereoized">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_Debug_WasLastDrawStereoized&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetDefaultProfile(System.SByte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetDefaultProfile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetDefaultProfile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetDefaultProfile(System.UInt32,System.SByte*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetDefaultProfile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_GetDefaultProfile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Initialize">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Initialize">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Initialize&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Unload">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Unload">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Unload&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetErrorMessage(NVAPIWrapper._NvAPI_Status,System.SByte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetErrorMessage">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetErrorMessage&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetInterfaceVersionString(System.SByte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetInterfaceVersionString">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetInterfaceVersionString&quot;]/*" />
         </member>
         <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetInterfaceVersionStringEx(System.SByte*)">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetInterfaceVersionStringEx&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetEDID(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32,NVAPIWrapper.NV_EDID_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetEDID">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetEDID&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SetView(NVAPIWrapper.NvDisplayHandle__*,NVAPIWrapper.NV_VIEW_TARGET_INFO*,NVAPIWrapper._NV_TARGET_VIEW_MODE)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SetView">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SetView&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SetViewEx(NVAPIWrapper.NvDisplayHandle__*,NVAPIWrapper.NV_DISPLAY_PATH_INFO*,NVAPIWrapper._NV_TARGET_VIEW_MODE)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SetViewEx">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SetViewEx&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetDisplayDriverVersion(NVAPIWrapper.NvDisplayHandle__*,NVAPIWrapper.NV_DISPLAY_DRIVER_VERSION*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetDisplayDriverVersion">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetDisplayDriverVersion&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_OGL_ExpertModeSet(System.UInt32,System.UInt32,System.UInt32,)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_OGL_ExpertModeSet">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_OGL_ExpertModeSet&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_OGL_ExpertModeGet(System.UInt32*,System.UInt32*,System.UInt32*,*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_OGL_ExpertModeGet">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_OGL_ExpertModeGet&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_OGL_ExpertModeDefaultsSet(System.UInt32,System.UInt32,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_OGL_ExpertModeDefaultsSet">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_OGL_ExpertModeDefaultsSet&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_OGL_ExpertModeDefaultsGet(System.UInt32*,System.UInt32*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_OGL_ExpertModeDefaultsGet">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_OGL_ExpertModeDefaultsGet&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_EnumTCCPhysicalGPUs(NVAPIWrapper.NvPhysicalGpuHandle__**,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_EnumTCCPhysicalGPUs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_EnumTCCPhysicalGPUs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_EnumLogicalGPUs(NVAPIWrapper.NvLogicalGpuHandle__**,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_EnumLogicalGPUs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_EnumLogicalGPUs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetPhysicalGPUsFromDisplay(NVAPIWrapper.NvDisplayHandle__*,NVAPIWrapper.NvPhysicalGpuHandle__**,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetPhysicalGPUsFromDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetPhysicalGPUsFromDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetPhysicalGPUFromUnAttachedDisplay(NVAPIWrapper.NvUnAttachedDisplayHandle__*,NVAPIWrapper.NvPhysicalGpuHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetPhysicalGPUFromUnAttachedDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetPhysicalGPUFromUnAttachedDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetLogicalGPUFromDisplay(NVAPIWrapper.NvDisplayHandle__*,NVAPIWrapper.NvLogicalGpuHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetLogicalGPUFromDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetLogicalGPUFromDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetLogicalGPUFromPhysicalGPU(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NvLogicalGpuHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetLogicalGPUFromPhysicalGPU">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetLogicalGPUFromPhysicalGPU&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetPhysicalGPUsFromLogicalGPU(NVAPIWrapper.NvLogicalGpuHandle__*,NVAPIWrapper.NvPhysicalGpuHandle__**,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetPhysicalGPUsFromLogicalGPU">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetPhysicalGPUsFromLogicalGPU&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetPhysicalGPUFromGPUID(System.UInt32,NVAPIWrapper.NvPhysicalGpuHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetPhysicalGPUFromGPUID">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetPhysicalGPUFromGPUID&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetGPUIDfromPhysicalGPU(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetGPUIDfromPhysicalGPU">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetGPUIDfromPhysicalGPU&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetShaderSubPipeCount(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetShaderSubPipeCount">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetShaderSubPipeCount&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetGpuCoreCount(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetGpuCoreCount">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetGpuCoreCount&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAllOutputs(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAllOutputs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetAllOutputs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedOutputs(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedOutputs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetConnectedOutputs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedSLIOutputs(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedSLIOutputs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetConnectedSLIOutputs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedDisplayIds(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_DISPLAYIDS*,System.UInt32*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedDisplayIds">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetConnectedDisplayIds&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAllDisplayIds(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_DISPLAYIDS*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAllDisplayIds">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetAllDisplayIds&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedOutputsWithLidState(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedOutputsWithLidState">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetConnectedOutputsWithLidState&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedSLIOutputsWithLidState(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetConnectedSLIOutputsWithLidState">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetConnectedSLIOutputsWithLidState&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetSystemType(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_SYSTEM_TYPE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetSystemType">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetSystemType&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetActiveOutputs(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetActiveOutputs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetActiveOutputs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_SetEDID(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32,NVAPIWrapper.NV_EDID_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_SetEDID">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_SetEDID&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetOutputType(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32,NVAPIWrapper._NV_GPU_OUTPUT_TYPE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetOutputType">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetOutputType&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ValidateOutputCombination(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ValidateOutputCombination">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ValidateOutputCombination&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetFullName(NVAPIWrapper.NvPhysicalGpuHandle__*,System.SByte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetFullName">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetFullName&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPCIIdentifiers(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*,System.UInt32*,System.UInt32*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPCIIdentifiers">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetPCIIdentifiers&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetGPUType(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_TYPE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetGPUType">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetGPUType&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetBusType(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_BUS_TYPE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetBusType">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetBusType&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetBusId(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetBusId">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetBusId&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetBusSlotId(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetBusSlotId">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetBusSlotId&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetIRQ(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetIRQ">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetIRQ&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVbiosRevision(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVbiosRevision">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetVbiosRevision&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVbiosOEMRevision(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVbiosOEMRevision">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetVbiosOEMRevision&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVbiosVersionString(NVAPIWrapper.NvPhysicalGpuHandle__*,System.SByte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVbiosVersionString">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetVbiosVersionString&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAGPAperture(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAGPAperture">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetAGPAperture&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetCurrentAGPRate(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetCurrentAGPRate">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetCurrentAGPRate&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetCurrentPCIEDownstreamWidth(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetCurrentPCIEDownstreamWidth">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetCurrentPCIEDownstreamWidth&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPhysicalFrameBufferSize(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPhysicalFrameBufferSize">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetPhysicalFrameBufferSize&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVirtualFrameBufferSize(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVirtualFrameBufferSize">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetVirtualFrameBufferSize&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetQuadroStatus(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetQuadroStatus">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetQuadroStatus&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetBoardInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_BOARD_INFO*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetBoardInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetBoardInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetRamBusWidth(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetRamBusWidth">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetRamBusWidth&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetArchInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_ARCH_INFO_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetArchInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetArchInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_I2CRead(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_I2C_INFO_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_I2CRead">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_I2CRead&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_I2CWrite(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_I2C_INFO_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_I2CWrite">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_I2CWrite&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_WorkstationFeatureSetup(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_WorkstationFeatureSetup">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_WorkstationFeatureSetup&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_WorkstationFeatureQuery(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_WorkstationFeatureQuery">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_WorkstationFeatureQuery&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetHDCPSupportStatus(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_GET_HDCP_SUPPORT_STATUS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetHDCPSupportStatus">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetHDCPSupportStatus&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_CudaEnumComputeCapableGpus(NVAPIWrapper._NV_COMPUTE_GPU_TOPOLOGY_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_CudaEnumComputeCapableGpus">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_CudaEnumComputeCapableGpus&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetTachReading(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetTachReading">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetTachReading&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetECCStatusInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_ECC_STATUS_INFO*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetECCStatusInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetECCStatusInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetECCErrorInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_ECC_ERROR_INFO*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetECCErrorInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetECCErrorInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ResetECCErrorInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,System.Byte,System.Byte)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ResetECCErrorInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ResetECCErrorInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetECCConfigurationInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_ECC_CONFIGURATION_INFO*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetECCConfigurationInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetECCConfigurationInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_SetECCConfiguration(NVAPIWrapper.NvPhysicalGpuHandle__*,System.Byte,System.Byte)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_SetECCConfiguration">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_SetECCConfiguration&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_QueryWorkstationFeatureSupport(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_WORKSTATION_FEATURE_TYPE)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_QueryWorkstationFeatureSupport">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_QueryWorkstationFeatureSupport&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_SetScanoutIntensity(System.UInt32,NVAPIWrapper.NV_SCANOUT_INTENSITY_DATA_V2*,System.Int32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_SetScanoutIntensity">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_SetScanoutIntensity&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutIntensityState(System.UInt32,NVAPIWrapper._NV_SCANOUT_INTENSITY_STATE_DATA*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutIntensityState">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetScanoutIntensityState&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_SetScanoutWarping(System.UInt32,NVAPIWrapper.NV_SCANOUT_WARPING_DATA*,System.Int32*,System.Int32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_SetScanoutWarping">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_SetScanoutWarping&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutWarpingState(System.UInt32,NVAPIWrapper._NV_SCANOUT_WARPING_STATE_DATA*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutWarpingState">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetScanoutWarpingState&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_SetScanoutCompositionParameter(System.UInt32,NVAPIWrapper.NV_GPU_SCANOUT_COMPOSITION_PARAMETER,NVAPIWrapper.NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE,System.Single*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_SetScanoutCompositionParameter">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_SetScanoutCompositionParameter&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutCompositionParameter(System.UInt32,NVAPIWrapper.NV_GPU_SCANOUT_COMPOSITION_PARAMETER,NVAPIWrapper.NV_GPU_SCANOUT_COMPOSITION_PARAMETER_VALUE*,System.Single*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutCompositionParameter">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetScanoutCompositionParameter&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutConfiguration(System.UInt32,NVAPIWrapper.NvSBox*,NVAPIWrapper.NvSBox*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutConfiguration">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetScanoutConfiguration&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutConfigurationEx(System.UInt32,NVAPIWrapper._NV_SCANOUT_INFORMATION*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetScanoutConfigurationEx">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetScanoutConfigurationEx&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAdapterIdFromPhysicalGpu(NVAPIWrapper.NvPhysicalGpuHandle__*,System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAdapterIdFromPhysicalGpu">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetAdapterIdFromPhysicalGpu&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVirtualizationInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_VIRTUALIZATION_INFO*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVirtualizationInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetVirtualizationInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetLogicalGpuInfo(NVAPIWrapper.NvLogicalGpuHandle__*,NVAPIWrapper._NV_LOGICAL_GPU_DATA_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetLogicalGpuInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetLogicalGpuInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetLicensableFeatures(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_LICENSABLE_FEATURES_V4*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetLicensableFeatures">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetLicensableFeatures&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetEncoderStatistics(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_ENCODER_STATISTICS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetEncoderStatistics">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetEncoderStatistics&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetEncoderSessionsInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_ENCODER_SESSIONS_INFO_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetEncoderSessionsInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetEncoderSessionsInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetGPUInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_INFO_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetGPUInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetGPUInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVRReadyData(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_VR_READY_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetVRReadyData">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetVRReadyData&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetGspFeatures(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_GSP_INFO_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetGspFeatures">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetGspFeatures&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_NVLINK_GetCaps(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NVLINK_GET_CAPS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetUUID">
+            <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetUUID&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_NVLINK_GetCaps">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_NVLINK_GetCaps&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_NVLINK_GetStatus(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NVLINK_GET_STATUS_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_NVLINK_GetStatus">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_NVLINK_GetStatus&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPerfDecreaseInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPerfDecreaseInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetPerfDecreaseInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPstatesInfoEx(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_PERF_PSTATES_INFO_V2*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPstatesInfoEx">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetPstatesInfoEx&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPstates20(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_PERF_PSTATES20_INFO_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetPstates20">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetPstates20&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetCurrentPstate(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_PERF_PSTATE_ID*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetCurrentPstate">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetCurrentPstate&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetDynamicPstatesInfoEx(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_DYNAMIC_PSTATES_INFO_EX*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetDynamicPstatesInfoEx">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetDynamicPstatesInfoEx&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetThermalSettings(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32,NVAPIWrapper.NV_GPU_THERMAL_SETTINGS_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetThermalSettings">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetThermalSettings&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAllClockFrequencies(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_CLOCK_FREQUENCIES_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetAllClockFrequencies">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetAllClockFrequencies&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_QueryIlluminationSupport(NVAPIWrapper._NV_GPU_QUERY_ILLUMINATION_SUPPORT_PARM_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_QueryIlluminationSupport">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_QueryIlluminationSupport&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_GetIllumination(NVAPIWrapper._NV_GPU_GET_ILLUMINATION_PARM_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_GetIllumination">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_GetIllumination&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_SetIllumination(NVAPIWrapper._NV_GPU_SET_ILLUMINATION_PARM_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_SetIllumination">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_SetIllumination&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumDevicesGetInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_CLIENT_ILLUM_DEVICE_INFO_PARAMS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumDevicesGetInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ClientIllumDevicesGetInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumDevicesGetControl(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_PARAMS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumDevicesGetControl">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ClientIllumDevicesGetControl&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumDevicesSetControl(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_PARAMS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumDevicesSetControl">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ClientIllumDevicesSetControl&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumZonesGetInfo(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_INFO_PARAMS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumZonesGetInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ClientIllumZonesGetInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumZonesGetControl(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_PARAMS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumZonesGetControl">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ClientIllumZonesGetControl&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumZonesSetControl(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_PARAMS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientIllumZonesSetControl">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ClientIllumZonesSetControl&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Event_RegisterCallback(NVAPIWrapper.NV_EVENT_REGISTER_CALLBACK*,NVAPIWrapper.NvEventHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Event_RegisterCallback">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Event_RegisterCallback&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Event_UnregisterCallback(NVAPIWrapper.NvEventHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Event_UnregisterCallback">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Event_UnregisterCallback&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_EnumNvidiaDisplayHandle(System.UInt32,NVAPIWrapper.NvDisplayHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_EnumNvidiaDisplayHandle">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_EnumNvidiaDisplayHandle&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_EnumNvidiaUnAttachedDisplayHandle(System.UInt32,NVAPIWrapper.NvUnAttachedDisplayHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_EnumNvidiaUnAttachedDisplayHandle">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_EnumNvidiaUnAttachedDisplayHandle&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_CreateDisplayFromUnAttachedDisplay(NVAPIWrapper.NvUnAttachedDisplayHandle__*,NVAPIWrapper.NvDisplayHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_CreateDisplayFromUnAttachedDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_CreateDisplayFromUnAttachedDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetAssociatedNvidiaDisplayHandle(System.SByte*,NVAPIWrapper.NvDisplayHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetAssociatedNvidiaDisplayHandle">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetAssociatedNvidiaDisplayHandle&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetAssociatedUnAttachedNvidiaDisplayHandle(System.SByte*,NVAPIWrapper.NvUnAttachedDisplayHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetAssociatedUnAttachedNvidiaDisplayHandle">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetAssociatedUnAttachedNvidiaDisplayHandle&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetAssociatedNvidiaDisplayName(NVAPIWrapper.NvDisplayHandle__*,System.SByte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetAssociatedNvidiaDisplayName">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetAssociatedNvidiaDisplayName&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetUnAttachedAssociatedDisplayName(NVAPIWrapper.NvUnAttachedDisplayHandle__*,System.SByte*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetUnAttachedAssociatedDisplayName">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetUnAttachedAssociatedDisplayName&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_EnableHWCursor(NVAPIWrapper.NvDisplayHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_EnableHWCursor">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_EnableHWCursor&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DisableHWCursor(NVAPIWrapper.NvDisplayHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DisableHWCursor">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DisableHWCursor&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetVBlankCounter(NVAPIWrapper.NvDisplayHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetVBlankCounter">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetVBlankCounter&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SetRefreshRateOverride(NVAPIWrapper.NvDisplayHandle__*,System.UInt32,System.Single,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SetRefreshRateOverride">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SetRefreshRateOverride&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetAssociatedDisplayOutputId(NVAPIWrapper.NvDisplayHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetAssociatedDisplayOutputId">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetAssociatedDisplayOutputId&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetDisplayPortInfo(NVAPIWrapper.NvDisplayHandle__*,System.UInt32,NVAPIWrapper._NV_DISPLAY_PORT_INFO_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetDisplayPortInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetDisplayPortInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SetDisplayPort(NVAPIWrapper.NvDisplayHandle__*,System.UInt32,NVAPIWrapper.NV_DISPLAY_PORT_CONFIG*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SetDisplayPort">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SetDisplayPort&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetHDMISupportInfo(NVAPIWrapper.NvDisplayHandle__*,System.UInt32,NVAPIWrapper._NV_HDMI_SUPPORT_INFO_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetHDMISupportInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetHDMISupportInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_InfoFrameControl(System.UInt32,NVAPIWrapper.NV_INFOFRAME_DATA*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_InfoFrameControl">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_InfoFrameControl&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_ColorControl(System.UInt32,NVAPIWrapper._NV_COLOR_DATA_V5*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_ColorControl">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_ColorControl&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetHdrCapabilities(System.UInt32,NVAPIWrapper._NV_HDR_CAPABILITIES_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetHdrCapabilities">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetHdrCapabilities&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_HdrColorControl(System.UInt32,NVAPIWrapper._NV_HDR_COLOR_DATA_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_HdrColorControl">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_HdrColorControl&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_SetSourceColorSpace(System.UInt32,NVAPIWrapper._NV_COLORSPACE_TYPE)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_SetSourceColorSpace">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_SetSourceColorSpace&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetSourceColorSpace(System.UInt32,NVAPIWrapper._NV_COLORSPACE_TYPE*,System.UInt64)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetSourceColorSpace">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetSourceColorSpace&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_SetSourceHdrMetadata(System.UInt32,NVAPIWrapper._NV_HDR_METADATA_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_SetSourceHdrMetadata">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_SetSourceHdrMetadata&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetSourceHdrMetadata(System.UInt32,NVAPIWrapper._NV_HDR_METADATA_V1*,System.UInt64)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetSourceHdrMetadata">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetSourceHdrMetadata&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_SetOutputMode(System.UInt32,NVAPIWrapper._NV_DISPLAY_OUTPUT_MODE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_SetOutputMode">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_SetOutputMode&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetOutputMode(System.UInt32,NVAPIWrapper._NV_DISPLAY_OUTPUT_MODE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetOutputMode">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetOutputMode&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_SetHdrToneMapping(System.UInt32,NVAPIWrapper._NV_HDR_TONEMAPPING_METHOD)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_SetHdrToneMapping">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_SetHdrToneMapping&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetHdrToneMapping(System.UInt32,NVAPIWrapper._NV_HDR_TONEMAPPING_METHOD*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetHdrToneMapping">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetHdrToneMapping&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetColorimetry(System.UInt32,NVAPIWrapper._NV_DISPLAY_COLORIMETRY_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetColorimetry">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetColorimetry&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetTiming(System.UInt32,NVAPIWrapper._NV_TIMING_INPUT*,NVAPIWrapper._NV_TIMING*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetTiming">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetTiming&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetMonitorCapabilities(System.UInt32,NVAPIWrapper._NV_MONITOR_CAPABILITIES_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetMonitorCapabilities">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetMonitorCapabilities&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetMonitorColorCapabilities(System.UInt32,NVAPIWrapper._NV_MONITOR_COLOR_DATA*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetMonitorColorCapabilities">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetMonitorColorCapabilities&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_EnumCustomDisplay(System.UInt32,System.UInt32,NVAPIWrapper.NV_CUSTOM_DISPLAY*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_EnumCustomDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_EnumCustomDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_TryCustomDisplay(System.UInt32*,System.UInt32,NVAPIWrapper.NV_CUSTOM_DISPLAY*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_TryCustomDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_TryCustomDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_DeleteCustomDisplay(System.UInt32*,System.UInt32,NVAPIWrapper.NV_CUSTOM_DISPLAY*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_DeleteCustomDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_DeleteCustomDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_SaveCustomDisplay(System.UInt32*,System.UInt32,System.UInt32,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_SaveCustomDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_SaveCustomDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_RevertCustomDisplayTrial(System.UInt32*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_RevertCustomDisplayTrial">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_RevertCustomDisplayTrial&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetView(NVAPIWrapper.NvDisplayHandle__*,NVAPIWrapper.NV_VIEW_TARGET_INFO*,System.UInt32*,NVAPIWrapper._NV_TARGET_VIEW_MODE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetView">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetView&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetViewEx(NVAPIWrapper.NvDisplayHandle__*,NVAPIWrapper.NV_DISPLAY_PATH_INFO*,System.UInt32*,NVAPIWrapper._NV_TARGET_VIEW_MODE*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetViewEx">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetViewEx&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetSupportedViews(NVAPIWrapper.NvDisplayHandle__*,NVAPIWrapper._NV_TARGET_VIEW_MODE*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetSupportedViews">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetSupportedViews&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetDisplayIdByDisplayName(System.SByte*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetDisplayIdByDisplayName">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetDisplayIdByDisplayName&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetDisplayConfig(System.UInt32*,NVAPIWrapper._NV_DISPLAYCONFIG_PATH_INFO*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetDisplayConfig">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetDisplayConfig&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_SetDisplayConfig(System.UInt32,NVAPIWrapper._NV_DISPLAYCONFIG_PATH_INFO*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_SetDisplayConfig">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_SetDisplayConfig&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetEdidData(System.UInt32,NVAPIWrapper._NV_EDID_DATA_V2*,NVAPIWrapper.NV_EDID_FLAG*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetEdidData">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetEdidData&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetAdaptiveSyncData(System.UInt32,NVAPIWrapper._NV_GET_ADAPTIVE_SYNC_DATA_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetAdaptiveSyncData">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetAdaptiveSyncData&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_SetAdaptiveSyncData(System.UInt32,NVAPIWrapper._NV_SET_ADAPTIVE_SYNC_DATA_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_SetAdaptiveSyncData">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_SetAdaptiveSyncData&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetVirtualRefreshRateData(System.UInt32,NVAPIWrapper._NV_GET_VIRTUAL_REFRESH_RATE_DATA_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetVirtualRefreshRateData">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetVirtualRefreshRateData&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_SetVirtualRefreshRateData(System.UInt32,NVAPIWrapper._NV_SET_VIRTUAL_REFRESH_RATE_DATA_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_SetVirtualRefreshRateData">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_SetVirtualRefreshRateData&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_SetPreferredStereoDisplay(NVAPIWrapper.NV_SET_PREFERRED_STEREO_DISPLAY_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_SetPreferredStereoDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_SetPreferredStereoDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetPreferredStereoDisplay(NVAPIWrapper.NV_GET_PREFERRED_STEREO_DISPLAY_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetPreferredStereoDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetPreferredStereoDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetNvManagedDedicatedDisplays(System.UInt32*,NVAPIWrapper._NV_MANAGED_DEDICATED_DISPLAY_INFO*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetNvManagedDedicatedDisplays">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetNvManagedDedicatedDisplays&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_AcquireDedicatedDisplay(System.UInt32,System.UInt64*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_AcquireDedicatedDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_AcquireDedicatedDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_ReleaseDedicatedDisplay(System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_ReleaseDedicatedDisplay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_ReleaseDedicatedDisplay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_GetNvManagedDedicatedDisplayMetadata(NVAPIWrapper._NV_MANAGED_DEDICATED_DISPLAY_METADATA*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_GetNvManagedDedicatedDisplayMetadata">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_GetNvManagedDedicatedDisplayMetadata&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DISP_SetNvManagedDedicatedDisplayMetadata(NVAPIWrapper._NV_MANAGED_DEDICATED_DISPLAY_METADATA*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DISP_SetNvManagedDedicatedDisplayMetadata">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DISP_SetNvManagedDedicatedDisplayMetadata&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetDisplayIdInfo(System.UInt32,NVAPIWrapper._NV_DISPLAY_ID_INFO_DATA_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetDisplayIdInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetDisplayIdInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetDisplayIdsFromTarget(NVAPIWrapper._NV_TARGET_INFO_DATA_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetDisplayIdsFromTarget">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetDisplayIdsFromTarget&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Disp_GetVRRInfo(System.UInt32,NVAPIWrapper._NV_GET_VRR_INFO_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Disp_GetVRRInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Disp_GetVRRInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetSupportedTopoInfo(NVAPIWrapper._NV_MOSAIC_SUPPORTED_TOPO_INFO_V2*,NVAPIWrapper.NV_MOSAIC_TOPO_TYPE)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetSupportedTopoInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_GetSupportedTopoInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetTopoGroup(NVAPIWrapper.NV_MOSAIC_TOPO_BRIEF*,NVAPIWrapper.NV_MOSAIC_TOPO_GROUP*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetTopoGroup">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_GetTopoGroup&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetOverlapLimits(NVAPIWrapper.NV_MOSAIC_TOPO_BRIEF*,NVAPIWrapper.NV_MOSAIC_DISPLAY_SETTING_V2*,System.Int32*,System.Int32*,System.Int32*,System.Int32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetOverlapLimits">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_GetOverlapLimits&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_SetCurrentTopo(NVAPIWrapper.NV_MOSAIC_TOPO_BRIEF*,NVAPIWrapper.NV_MOSAIC_DISPLAY_SETTING_V2*,System.Int32,System.Int32,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_SetCurrentTopo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_SetCurrentTopo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetCurrentTopo(NVAPIWrapper.NV_MOSAIC_TOPO_BRIEF*,NVAPIWrapper.NV_MOSAIC_DISPLAY_SETTING_V2*,System.Int32*,System.Int32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_GetCurrentTopo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_GetCurrentTopo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_EnableCurrentTopo(System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_EnableCurrentTopo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_EnableCurrentTopo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_SetDisplayGrids(NVAPIWrapper._NV_MOSAIC_GRID_TOPO_V2*,System.UInt32,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_SetDisplayGrids">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_SetDisplayGrids&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_ValidateDisplayGrids(System.UInt32,NVAPIWrapper._NV_MOSAIC_GRID_TOPO_V2*,NVAPIWrapper.NV_MOSAIC_DISPLAY_TOPO_STATUS*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_ValidateDisplayGrids">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_ValidateDisplayGrids&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_EnumDisplayModes(NVAPIWrapper._NV_MOSAIC_GRID_TOPO_V2*,NVAPIWrapper.NV_MOSAIC_DISPLAY_SETTING_V2*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_EnumDisplayModes">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_EnumDisplayModes&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Mosaic_EnumDisplayGrids(NVAPIWrapper._NV_MOSAIC_GRID_TOPO_V2*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Mosaic_EnumDisplayGrids">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Mosaic_EnumDisplayGrids&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetSupportedMosaicTopologies(NVAPIWrapper.NV_MOSAIC_SUPPORTED_TOPOLOGIES*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetSupportedMosaicTopologies">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetSupportedMosaicTopologies&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GetCurrentMosaicTopology(NVAPIWrapper.NV_MOSAIC_TOPOLOGY*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GetCurrentMosaicTopology">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GetCurrentMosaicTopology&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SetCurrentMosaicTopology(NVAPIWrapper.NV_MOSAIC_TOPOLOGY*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SetCurrentMosaicTopology">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SetCurrentMosaicTopology&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_EnableCurrentMosaicTopology(System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_EnableCurrentMosaicTopology">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_EnableCurrentMosaicTopology&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_EnumSyncDevices(NVAPIWrapper.NvGSyncDeviceHandle__**,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_EnumSyncDevices">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_EnumSyncDevices&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_QueryCapabilities(NVAPIWrapper.NvGSyncDeviceHandle__*,NVAPIWrapper._NV_GSYNC_CAPABILITIES_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_QueryCapabilities">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_QueryCapabilities&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_GetTopology(NVAPIWrapper.NvGSyncDeviceHandle__*,System.UInt32*,NVAPIWrapper._NV_GSYNC_GPU*,System.UInt32*,NVAPIWrapper._NV_GSYNC_DISPLAY*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_GetTopology">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_GetTopology&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_SetSyncStateSettings(System.UInt32,NVAPIWrapper._NV_GSYNC_DISPLAY*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_SetSyncStateSettings">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_SetSyncStateSettings&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_GetControlParameters(NVAPIWrapper.NvGSyncDeviceHandle__*,NVAPIWrapper._NV_GSYNC_CONTROL_PARAMS_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_GetControlParameters">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_GetControlParameters&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_SetControlParameters(NVAPIWrapper.NvGSyncDeviceHandle__*,NVAPIWrapper._NV_GSYNC_CONTROL_PARAMS_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_SetControlParameters">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_SetControlParameters&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_AdjustSyncDelay(NVAPIWrapper.NvGSyncDeviceHandle__*,NVAPIWrapper._NVAPI_GSYNC_DELAY_TYPE,NVAPIWrapper._NV_GSYNC_DELAY*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_AdjustSyncDelay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_AdjustSyncDelay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_GetSyncStatus(NVAPIWrapper.NvGSyncDeviceHandle__*,NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GSYNC_STATUS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_GetSyncStatus">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_GetSyncStatus&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GSync_GetStatusParameters(NVAPIWrapper.NvGSyncDeviceHandle__*,NVAPIWrapper._NV_GSYNC_STATUS_PARAMS_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GSync_GetStatusParameters">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GSync_GetStatusParameters&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DestroyPresentBarrierClient(NVAPIWrapper.NvPresentBarrierClientHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DestroyPresentBarrierClient">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DestroyPresentBarrierClient&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_JoinPresentBarrier(NVAPIWrapper.NvPresentBarrierClientHandle__*,NVAPIWrapper._NV_JOIN_PRESENT_BARRIER_PARAMS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_JoinPresentBarrier">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_JoinPresentBarrier&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_LeavePresentBarrier(NVAPIWrapper.NvPresentBarrierClientHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_LeavePresentBarrier">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_LeavePresentBarrier&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_QueryPresentBarrierFrameStatistics(NVAPIWrapper.NvPresentBarrierClientHandle__*,NVAPIWrapper._NV_PRESENT_BARRIER_FRAME_STATISTICS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_QueryPresentBarrierFrameStatistics">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_QueryPresentBarrierFrameStatistics&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_NGX_GetNGXOverrideState(NVAPIWrapper._NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_NGX_GetNGXOverrideState">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_NGX_GetNGXOverrideState&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_NGX_SetNGXOverrideState(NVAPIWrapper._NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_NGX_SetNGXOverrideState">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_NGX_SetNGXOverrideState&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_GetCapabilities(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOCAPS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_GetCapabilities">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_GetCapabilities&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_Open(NVAPIWrapper.NvVioHandle__*,System.UInt32,NVAPIWrapper._NVVIOOWNERTYPE)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_Open">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_Open&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_Close(NVAPIWrapper.NvVioHandle__*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_Close">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_Close&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_Status(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOSTATUS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_Status">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_Status&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_SyncFormatDetect(NVAPIWrapper.NvVioHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_SyncFormatDetect">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_SyncFormatDetect&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_GetConfig(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOCONFIG_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_GetConfig">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_GetConfig&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_SetConfig(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOCONFIG_V3*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_SetConfig">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_SetConfig&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_SetCSC(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOCOLORCONVERSION*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_SetCSC">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_SetCSC&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_GetCSC(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOCOLORCONVERSION*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_GetCSC">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_GetCSC&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_SetGamma(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOGAMMACORRECTION*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_SetGamma">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_SetGamma&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_GetGamma(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOGAMMACORRECTION*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_GetGamma">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_GetGamma&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_SetSyncDelay(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOSYNCDELAY*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_SetSyncDelay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_SetSyncDelay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_GetSyncDelay(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOSYNCDELAY*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_GetSyncDelay">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_GetSyncDelay&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_GetPCIInfo(NVAPIWrapper.NvVioHandle__*,NVAPIWrapper._NVVIOPCIINFO*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_GetPCIInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_GetPCIInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_IsRunning(NVAPIWrapper.NvVioHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_IsRunning">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_IsRunning&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_Start(NVAPIWrapper.NvVioHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_Start">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_Start&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_Stop(NVAPIWrapper.NvVioHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_Stop">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_Stop&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_IsFrameLockModeCompatible(NVAPIWrapper.NvVioHandle__*,System.UInt32,System.UInt32,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_IsFrameLockModeCompatible">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_IsFrameLockModeCompatible&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_EnumDevices(NVAPIWrapper.NvVioHandle__**,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_EnumDevices">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_EnumDevices&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_QueryTopology(NVAPIWrapper._NV_VIO_TOPOLOGY*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_QueryTopology">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_QueryTopology&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_EnumSignalFormats(NVAPIWrapper.NvVioHandle__*,System.UInt32,NVAPIWrapper._NVVIOSIGNALFORMATDETAIL*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_EnumSignalFormats">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_EnumSignalFormats&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_VIO_EnumDataFormats(NVAPIWrapper.NvVioHandle__*,System.UInt32,NVAPIWrapper._NVVIODATAFORMATDETAIL*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_VIO_EnumDataFormats">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_VIO_EnumDataFormats&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_CreateConfigurationProfileRegistryKey(NVAPIWrapper._NV_StereoRegistryProfileType)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_CreateConfigurationProfileRegistryKey">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_CreateConfigurationProfileRegistryKey&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_DeleteConfigurationProfileRegistryKey(NVAPIWrapper._NV_StereoRegistryProfileType)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_DeleteConfigurationProfileRegistryKey">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_DeleteConfigurationProfileRegistryKey&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetConfigurationProfileValue(NVAPIWrapper._NV_StereoRegistryProfileType,NVAPIWrapper._NV_StereoRegistryID,System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetConfigurationProfileValue">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetConfigurationProfileValue&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_DeleteConfigurationProfileValue(NVAPIWrapper._NV_StereoRegistryProfileType,NVAPIWrapper._NV_StereoRegistryID)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_DeleteConfigurationProfileValue">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_DeleteConfigurationProfileValue&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetStereoSupport(NVAPIWrapper.NvMonitorHandle__*,NVAPIWrapper._NVAPI_STEREO_CAPS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetStereoSupport">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_GetStereoSupport&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_DecreaseSeparation(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_DecreaseSeparation">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_DecreaseSeparation&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_IncreaseSeparation(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_IncreaseSeparation">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_IncreaseSeparation&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_DecreaseConvergence(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_DecreaseConvergence">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_DecreaseConvergence&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_IncreaseConvergence(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_IncreaseConvergence">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_IncreaseConvergence&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetFrustumAdjustMode(System.Void*,NVAPIWrapper._NV_FrustumAdjustMode*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_GetFrustumAdjustMode">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_GetFrustumAdjustMode&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetFrustumAdjustMode(System.Void*,NVAPIWrapper._NV_FrustumAdjustMode)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetFrustumAdjustMode">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetFrustumAdjustMode&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_CaptureJpegImage(System.Void*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_CaptureJpegImage">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_CaptureJpegImage&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_InitActivation(System.Void*,NVAPIWrapper._NVAPI_STEREO_INIT_ACTIVATION_FLAGS)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_InitActivation">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_InitActivation&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_Trigger_Activation(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_Trigger_Activation">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_Trigger_Activation&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_CapturePngImage(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_CapturePngImage">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_CapturePngImage&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_ReverseStereoBlitControl(System.Void*,System.Byte)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_ReverseStereoBlitControl">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_ReverseStereoBlitControl&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetNotificationMessage(System.Void*,System.UInt64,System.UInt64)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Stereo_SetNotificationMessage">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Stereo_SetNotificationMessage&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Vulkan_InitLowLatencyDevice(System.Void*,System.Void**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Vulkan_InitLowLatencyDevice">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Vulkan_InitLowLatencyDevice&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Vulkan_DestroyLowLatencyDevice(System.Void*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Vulkan_DestroyLowLatencyDevice">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Vulkan_DestroyLowLatencyDevice&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Vulkan_GetSleepStatus(System.Void*,NVAPIWrapper._NV_VULKAN_GET_SLEEP_STATUS_PARAMS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Vulkan_GetSleepStatus">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Vulkan_GetSleepStatus&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Vulkan_SetSleepMode(System.Void*,NVAPIWrapper._NV_VULKAN_SET_SLEEP_MODE_PARAMS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Vulkan_SetSleepMode">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Vulkan_SetSleepMode&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Vulkan_Sleep(System.Void*,System.UInt64)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Vulkan_Sleep">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Vulkan_Sleep&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Vulkan_GetLatency(System.Void*,NVAPIWrapper._NV_VULKAN_LATENCY_RESULT_PARAMS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Vulkan_GetLatency">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Vulkan_GetLatency&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Vulkan_SetLatencyMarker(System.Void*,NVAPIWrapper._NV_VULKAN_LATENCY_MARKER_PARAMS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Vulkan_SetLatencyMarker">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Vulkan_SetLatencyMarker&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_Vulkan_NotifyOutOfBandVkQueue(System.Void*,System.Void*,NVAPIWrapper.NV_VULKAN_OUT_OF_BAND_QUEUE_TYPE)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_Vulkan_NotifyOutOfBandVkQueue">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_Vulkan_NotifyOutOfBandVkQueue&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_CreateSession(NVAPIWrapper.NvDRSSessionHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_CreateSession">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_CreateSession&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_DestroySession(NVAPIWrapper.NvDRSSessionHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_DestroySession">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_DestroySession&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_LoadSettings(NVAPIWrapper.NvDRSSessionHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_LoadSettings">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_LoadSettings&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_SaveSettings(NVAPIWrapper.NvDRSSessionHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_SaveSettings">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_SaveSettings&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_LoadSettingsFromFile(NVAPIWrapper.NvDRSSessionHandle__*,System.UInt16*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_LoadSettingsFromFile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_LoadSettingsFromFile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_SaveSettingsToFile(NVAPIWrapper.NvDRSSessionHandle__*,System.UInt16*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_SaveSettingsToFile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_SaveSettingsToFile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_CreateProfile(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper._NVDRS_PROFILE_V1*,NVAPIWrapper.NvDRSProfileHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_CreateProfile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_CreateProfile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_DeleteProfile(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_DeleteProfile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_DeleteProfile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_SetCurrentGlobalProfile(NVAPIWrapper.NvDRSSessionHandle__*,System.UInt16*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_SetCurrentGlobalProfile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_SetCurrentGlobalProfile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_GetCurrentGlobalProfile(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_GetCurrentGlobalProfile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_GetCurrentGlobalProfile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_GetProfileInfo(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,NVAPIWrapper._NVDRS_PROFILE_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_GetProfileInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_GetProfileInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_SetProfileInfo(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,NVAPIWrapper._NVDRS_PROFILE_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_SetProfileInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_SetProfileInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_FindProfileByName(NVAPIWrapper.NvDRSSessionHandle__*,System.UInt16*,NVAPIWrapper.NvDRSProfileHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_FindProfileByName">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_FindProfileByName&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumProfiles(NVAPIWrapper.NvDRSSessionHandle__*,System.UInt32,NVAPIWrapper.NvDRSProfileHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumProfiles">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_EnumProfiles&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_GetNumProfiles(NVAPIWrapper.NvDRSSessionHandle__*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_GetNumProfiles">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_GetNumProfiles&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_CreateApplication(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,NVAPIWrapper._NVDRS_APPLICATION_V4*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_CreateApplication">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_CreateApplication&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_DeleteApplicationEx(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,NVAPIWrapper._NVDRS_APPLICATION_V4*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_DeleteApplicationEx">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_DeleteApplicationEx&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_DeleteApplication(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,System.UInt16*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_DeleteApplication">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_DeleteApplication&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_GetApplicationInfo(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,System.UInt16*,NVAPIWrapper._NVDRS_APPLICATION_V4*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_GetApplicationInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_GetApplicationInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumApplications(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,System.UInt32,System.UInt32*,NVAPIWrapper._NVDRS_APPLICATION_V4*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumApplications">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_EnumApplications&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_FindApplicationByName(NVAPIWrapper.NvDRSSessionHandle__*,System.UInt16*,NVAPIWrapper.NvDRSProfileHandle__**,NVAPIWrapper._NVDRS_APPLICATION_V4*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_FindApplicationByName">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_FindApplicationByName&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_SetSetting(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,NVAPIWrapper._NVDRS_SETTING_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_SetSetting">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_SetSetting&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_GetSetting(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,System.UInt32,NVAPIWrapper._NVDRS_SETTING_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_GetSetting">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_GetSetting&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumSettings(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,System.UInt32,System.UInt32*,NVAPIWrapper._NVDRS_SETTING_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumSettings">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_EnumSettings&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumAvailableSettingIds(System.UInt32*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumAvailableSettingIds">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_EnumAvailableSettingIds&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumAvailableSettingValues(System.UInt32,System.UInt32*,NVAPIWrapper._NVDRS_SETTING_VALUES*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_EnumAvailableSettingValues">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_EnumAvailableSettingValues&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_GetSettingIdFromName(System.UInt16*,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_GetSettingIdFromName">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_GetSettingIdFromName&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_GetSettingNameFromId(System.UInt32,System.UInt16**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_GetSettingNameFromId">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_GetSettingNameFromId&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_DeleteProfileSetting(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_DeleteProfileSetting">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_DeleteProfileSetting&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_RestoreAllDefaults(NVAPIWrapper.NvDRSSessionHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_RestoreAllDefaults">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_RestoreAllDefaults&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_RestoreProfileDefault(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_RestoreProfileDefault">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_RestoreProfileDefault&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_RestoreProfileDefaultSetting(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__*,System.UInt32)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_RestoreProfileDefaultSetting">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_RestoreProfileDefaultSetting&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_DRS_GetBaseProfile(NVAPIWrapper.NvDRSSessionHandle__*,NVAPIWrapper.NvDRSProfileHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_DRS_GetBaseProfile">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_DRS_GetBaseProfile&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetChipSetInfo(NVAPIWrapper.NV_CHIPSET_INFO_v4*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetChipSetInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetChipSetInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetLidAndDockInfo(NVAPIWrapper.NV_LID_DOCK_PARAMS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetLidAndDockInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetLidAndDockInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetDisplayIdFromGpuAndOutputId(NVAPIWrapper.NvPhysicalGpuHandle__*,System.UInt32,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetDisplayIdFromGpuAndOutputId">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetDisplayIdFromGpuAndOutputId&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetGpuAndOutputIdFromDisplayId(System.UInt32,NVAPIWrapper.NvPhysicalGpuHandle__**,System.UInt32*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetGpuAndOutputIdFromDisplayId">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetGpuAndOutputIdFromDisplayId&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetPhysicalGpuFromDisplayId(System.UInt32,NVAPIWrapper.NvPhysicalGpuHandle__**)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetPhysicalGpuFromDisplayId">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetPhysicalGpuFromDisplayId&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetDisplayDriverInfo(NVAPIWrapper._NV_DISPLAY_DRIVER_INFO_V2*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetDisplayDriverInfo">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetDisplayDriverInfo&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetPhysicalGPUs(NVAPIWrapper._NV_PHYSICAL_GPUS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetPhysicalGPUs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetPhysicalGPUs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_SYS_GetLogicalGPUs(NVAPIWrapper._NV_LOGICAL_GPUS*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_SYS_GetLogicalGPUs">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_SYS_GetLogicalGPUs&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientRegisterForUtilizationSampleUpdates(NVAPIWrapper.NvPhysicalGpuHandle__*,NVAPIWrapper._NV_GPU_CLIENT_UTILIZATION_PERIODIC_CALLBACK_SETTINGS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_NGX_GetDriverFeatureSupport">
+            <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_NGX_GetDriverFeatureSupport&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_GPU_ClientRegisterForUtilizationSampleUpdates">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_GPU_ClientRegisterForUtilizationSampleUpdates&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_RegisterRiseCallback(NVAPIWrapper._NV_RISE_CALLBACK_SETTINGS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_RegisterRiseCallback">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_RegisterRiseCallback&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_RequestRise(NVAPIWrapper._NV_REQUEST_RISE_SETTINGS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_RequestRise">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_RequestRise&quot;]/*" />
         </member>
-        <member name="M:NVAPIWrapper.NVAPI.NvAPI_UninstallRise(NVAPIWrapper._NV_UNINSTALL_RISE_SETTINGS_V1*)">
+        <member name="F:NVAPIWrapper.NVAPI.NvAPI_UninstallRise">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI.xml" path="doc/member[@name=&quot;NVAPI.NvAPI_UninstallRise&quot;]/*" />
         </member>
         <member name="T:NVAPIWrapper._NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1">
@@ -4751,6 +4789,24 @@
             <param name="name">Function name.</param>
             <param name="id">Function ID.</param>
             <param name="isAvailable">Availability flag.</param>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIHardwareDetection">
+            <summary>
+            Hardware detection utilities for NVIDIA GPU presence.
+            </summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIHardwareDetection.HasNVIDIAGPU(System.String@)">
+            <summary>
+            Checks if an NVIDIA GPU is present in the system via PCI Vendor ID detection.
+            </summary>
+            <param name="errorMessage">Details about why NVIDIA GPU was not detected.</param>
+            <returns>True if NVIDIA GPU hardware is detected, false otherwise.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIHardwareDetection.GetNVIDIAGPUNames">
+            <summary>
+            Gets the names of detected NVIDIA GPUs.
+            </summary>
+            <returns>Array of GPU names, or empty array if none found.</returns>
         </member>
         <member name="T:NVAPIWrapper.NVAPIInterfaceTable">
             <summary>Managed copy of nvapi_interface_table for QueryInterface lookups.</summary>
@@ -8049,11 +8105,23 @@
         <member name="F:NVAPIWrapper.ESetting.NGX_DLAA_OVERRIDE_ID">
             <!-- Failed to insert some or all of included XML --><include file="ESetting.xml" path="doc/member[@name=&quot;ESetting.NGX_DLAA_OVERRIDE_ID&quot;]/*" />
         </member>
+        <member name="F:NVAPIWrapper.ESetting.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_ID">
+            <!-- Failed to insert some or all of included XML --><include file="ESetting.xml" path="doc/member[@name=&quot;ESetting.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_ID&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.ESetting.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_ID">
+            <!-- Failed to insert some or all of included XML --><include file="ESetting.xml" path="doc/member[@name=&quot;ESetting.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_ID&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.ESetting.NGX_DLSSG_MODE_ID">
+            <!-- Failed to insert some or all of included XML --><include file="ESetting.xml" path="doc/member[@name=&quot;ESetting.NGX_DLSSG_MODE_ID&quot;]/*" />
+        </member>
         <member name="F:NVAPIWrapper.ESetting.NGX_DLSSG_MULTI_FRAME_COUNT_ID">
             <!-- Failed to insert some or all of included XML --><include file="ESetting.xml" path="doc/member[@name=&quot;ESetting.NGX_DLSSG_MULTI_FRAME_COUNT_ID&quot;]/*" />
         </member>
         <member name="F:NVAPIWrapper.ESetting.NGX_DLSS_FG_OVERRIDE_ID">
             <!-- Failed to insert some or all of included XML --><include file="ESetting.xml" path="doc/member[@name=&quot;ESetting.NGX_DLSS_FG_OVERRIDE_ID&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.ESetting.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_ID">
+            <!-- Failed to insert some or all of included XML --><include file="ESetting.xml" path="doc/member[@name=&quot;ESetting.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_ID&quot;]/*" />
         </member>
         <member name="F:NVAPIWrapper.ESetting.NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1_ID">
             <!-- Failed to insert some or all of included XML --><include file="ESetting.xml" path="doc/member[@name=&quot;ESetting.NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1_ID&quot;]/*" />
@@ -9033,8 +9101,74 @@
         <member name="F:NVAPIWrapper.EValues_NGX_DLAA_OVERRIDE.NGX_DLAA_OVERRIDE_DEFAULT">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLAA_OVERRIDE.xml" path="doc/member[@name=&quot;EValues_NGX_DLAA_OVERRIDE.NGX_DLAA_OVERRIDE_DEFAULT&quot;]/*" />
         </member>
+        <member name="T:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_OFF">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_OFF&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_MIN">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_MIN&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_MAX">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_MAX&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_NUM_VALUES">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_NUM_VALUES&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_DEFAULT">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX.NGX_DLSSG_DYNAMIC_MULTI_FRAME_COUNT_MAX_DEFAULT&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_DISABLED">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_DISABLED&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_MIN">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_MIN&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_MAX">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_MAX&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_AUTO">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_AUTO&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_NUM_VALUES">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_NUM_VALUES&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_DEFAULT">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE.NGX_DLSSG_DYNAMIC_TARGET_FRAME_RATE_DEFAULT&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper.EValues_NGX_DLSSG_MODE">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MODE&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_DISABLED">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_DISABLED&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_OFF">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_OFF&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_ON">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_ON&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_AUTO">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_AUTO&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_DYNAMIC">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_DYNAMIC&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_NUM_VALUES">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_NUM_VALUES&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_DEFAULT">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MODE.NGX_DLSSG_MODE_DEFAULT&quot;]/*" />
+        </member>
         <member name="T:NVAPIWrapper.EValues_NGX_DLSSG_MULTI_FRAME_COUNT">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MULTI_FRAME_COUNT.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MULTI_FRAME_COUNT&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_OFF">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MULTI_FRAME_COUNT.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_OFF&quot;]/*" />
         </member>
         <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_MIN">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MULTI_FRAME_COUNT.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_MIN&quot;]/*" />
@@ -9042,11 +9176,11 @@
         <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_MAX">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MULTI_FRAME_COUNT.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_MAX&quot;]/*" />
         </member>
-        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_DEFAULT">
-            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MULTI_FRAME_COUNT.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_DEFAULT&quot;]/*" />
-        </member>
         <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_NUM_VALUES">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MULTI_FRAME_COUNT.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_NUM_VALUES&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_DEFAULT">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSSG_MULTI_FRAME_COUNT.xml" path="doc/member[@name=&quot;EValues_NGX_DLSSG_MULTI_FRAME_COUNT.NGX_DLSSG_MULTI_FRAME_COUNT_DEFAULT&quot;]/*" />
         </member>
         <member name="T:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE&quot;]/*" />
@@ -9062,6 +9196,102 @@
         </member>
         <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE.NGX_DLSS_FG_OVERRIDE_DEFAULT">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE.NGX_DLSS_FG_OVERRIDE_DEFAULT&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_OFF">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_OFF&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_A">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_A&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_B">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_B&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_C">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_C&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_D">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_D&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_E">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_E&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_F">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_F&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_G">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_G&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_H">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_H&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_I">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_I&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_J">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_J&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_K">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_K&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_L">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_L&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_M">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_M&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_N">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_N&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_O">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_O&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_P">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_P&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Q">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Q&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_R">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_R&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_S">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_S&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_T">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_T&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_U">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_U&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_V">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_V&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_W">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_W&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_X">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_X&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Y">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Y&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Z">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Z&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Default">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Default&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Latest">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_RENDER_PRESET_Latest&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_NUM_VALUES">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_NUM_VALUES&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_DEFAULT">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION.NGX_DLSS_FG_OVERRIDE_RENDER_PRESET_SELECTION_DEFAULT&quot;]/*" />
         </member>
         <member name="T:NVAPIWrapper.EValues_NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_FG_OVERRIDE_RESERVED_KEY1&quot;]/*" />
@@ -9257,6 +9487,9 @@
         </member>
         <member name="F:NVAPIWrapper.EValues_NGX_DLSS_SR_MODE.NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_CUSTOM">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_SR_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_SR_MODE.NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_CUSTOM&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.EValues_NGX_DLSS_SR_MODE.NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_RESERVED_A">
+            <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_SR_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_SR_MODE.NGX_DLSS_SR_MODE_NGX_DLSS_SR_MODE_RESERVED_A&quot;]/*" />
         </member>
         <member name="F:NVAPIWrapper.EValues_NGX_DLSS_SR_MODE.NGX_DLSS_SR_MODE_NUM_VALUES">
             <!-- Failed to insert some or all of included XML --><include file="EValues_NGX_DLSS_SR_MODE.xml" path="doc/member[@name=&quot;EValues_NGX_DLSS_SR_MODE.NGX_DLSS_SR_MODE_NUM_VALUES&quot;]/*" />
@@ -10768,6 +11001,18 @@
         </member>
         <member name="F:NVAPIWrapper.Nv3DVPTransceiverHandle__.unused">
             <!-- Failed to insert some or all of included XML --><include file="Nv3DVPTransceiverHandle__.xml" path="doc/member[@name=&quot;Nv3DVPTransceiverHandle__.unused&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper.NVAPI_FLIP_CONFIG_FEEDBACK_MASK">
+            <!-- Failed to insert some or all of included XML --><include file="NVAPI_FLIP_CONFIG_FEEDBACK_MASK.xml" path="doc/member[@name=&quot;NVAPI_FLIP_CONFIG_FEEDBACK_MASK&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.NVAPI_FLIP_CONFIG_FEEDBACK_MASK.NVAPI_FLIP_CONFIG_FEEDBACK_OK">
+            <!-- Failed to insert some or all of included XML --><include file="NVAPI_FLIP_CONFIG_FEEDBACK_MASK.xml" path="doc/member[@name=&quot;NVAPI_FLIP_CONFIG_FEEDBACK_MASK.NVAPI_FLIP_CONFIG_FEEDBACK_OK&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.NVAPI_FLIP_CONFIG_FEEDBACK_MASK.NVAPI_FLIP_CONFIG_FEEDBACK_NO_IFLIP">
+            <!-- Failed to insert some or all of included XML --><include file="NVAPI_FLIP_CONFIG_FEEDBACK_MASK.xml" path="doc/member[@name=&quot;NVAPI_FLIP_CONFIG_FEEDBACK_MASK.NVAPI_FLIP_CONFIG_FEEDBACK_NO_IFLIP&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.NVAPI_FLIP_CONFIG_FEEDBACK_MASK.NVAPI_FLIP_CONFIG_FEEDBACK_MIRRORING_DETECTED">
+            <!-- Failed to insert some or all of included XML --><include file="NVAPI_FLIP_CONFIG_FEEDBACK_MASK.xml" path="doc/member[@name=&quot;NVAPI_FLIP_CONFIG_FEEDBACK_MASK.NVAPI_FLIP_CONFIG_FEEDBACK_MIRRORING_DETECTED&quot;]/*" />
         </member>
         <member name="T:NVAPIWrapper.NVAPI_GPU_WORKSTATION_FEATURE_MASK">
             <!-- Failed to insert some or all of included XML --><include file="NVAPI_GPU_WORKSTATION_FEATURE_MASK.xml" path="doc/member[@name=&quot;NVAPI_GPU_WORKSTATION_FEATURE_MASK&quot;]/*" />
@@ -14218,6 +14463,9 @@
         </member>
         <member name="F:NVAPIWrapper.NV_NGX_DLSS_OVERRIDE_BITFIELD.NV_NGX_DLSS_OVERRIDE_FLAG_EVALUATE">
             <!-- Failed to insert some or all of included XML --><include file="NV_NGX_DLSS_OVERRIDE_BITFIELD.xml" path="doc/member[@name=&quot;NV_NGX_DLSS_OVERRIDE_BITFIELD.NV_NGX_DLSS_OVERRIDE_FLAG_EVALUATE&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper.NV_NGX_DLSS_OVERRIDE_BITFIELD.NV_NGX_DLSS_OVERRIDE_FLAG_FG_MODE">
+            <!-- Failed to insert some or all of included XML --><include file="NV_NGX_DLSS_OVERRIDE_BITFIELD.xml" path="doc/member[@name=&quot;NV_NGX_DLSS_OVERRIDE_BITFIELD.NV_NGX_DLSS_OVERRIDE_FLAG_FG_MODE&quot;]/*" />
         </member>
         <member name="F:NVAPIWrapper.NV_NGX_DLSS_OVERRIDE_BITFIELD.NV_NGX_DLSS_OVERRIDE_FLAG_SR_DLAA_MODE">
             <!-- Failed to insert some or all of included XML --><include file="NV_NGX_DLSS_OVERRIDE_BITFIELD.xml" path="doc/member[@name=&quot;NV_NGX_DLSS_OVERRIDE_BITFIELD.NV_NGX_DLSS_OVERRIDE_FLAG_SR_DLAA_MODE&quot;]/*" />
@@ -18437,6 +18685,12 @@
         <member name="F:NVAPIWrapper._NV_GET_SLEEP_STATUS_PARAMS.bUseGameSleep">
             <!-- Failed to insert some or all of included XML --><include file="_NV_GET_SLEEP_STATUS_PARAMS.xml" path="doc/member[@name=&quot;_NV_GET_SLEEP_STATUS_PARAMS.bUseGameSleep&quot;]/*" />
         </member>
+        <member name="F:NVAPIWrapper._NV_GET_SLEEP_STATUS_PARAMS.bFullscreenIFlip">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_GET_SLEEP_STATUS_PARAMS.xml" path="doc/member[@name=&quot;_NV_GET_SLEEP_STATUS_PARAMS.bFullscreenIFlip&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_GET_SLEEP_STATUS_PARAMS.fgMultiplier">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_GET_SLEEP_STATUS_PARAMS.xml" path="doc/member[@name=&quot;_NV_GET_SLEEP_STATUS_PARAMS.fgMultiplier&quot;]/*" />
+        </member>
         <member name="F:NVAPIWrapper._NV_GET_SLEEP_STATUS_PARAMS.rsvd">
             <!-- Failed to insert some or all of included XML --><include file="_NV_GET_SLEEP_STATUS_PARAMS.xml" path="doc/member[@name=&quot;_NV_GET_SLEEP_STATUS_PARAMS.rsvd&quot;]/*" />
         </member>
@@ -19913,6 +20167,18 @@
         <member name="F:NVAPIWrapper._NV_GPU_TYPE.NV_SYSTEM_TYPE_DGPU">
             <!-- Failed to insert some or all of included XML --><include file="_NV_GPU_TYPE.xml" path="doc/member[@name=&quot;_NV_GPU_TYPE.NV_SYSTEM_TYPE_DGPU&quot;]/*" />
         </member>
+        <member name="T:NVAPIWrapper._NV_GPU_UUID_V1">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_GPU_UUID_V1.xml" path="doc/member[@name=&quot;_NV_GPU_UUID_V1&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_GPU_UUID_V1.version">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_GPU_UUID_V1.xml" path="doc/member[@name=&quot;_NV_GPU_UUID_V1.version&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_GPU_UUID_V1.uuid">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_GPU_UUID_V1.xml" path="doc/member[@name=&quot;_NV_GPU_UUID_V1.uuid&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper._NV_GPU_UUID_V1._uuid_e__FixedBuffer">
+            <!-- Failed to insert some or all of included XML --><include file="_uuid_e__FixedBuffer.xml" path="doc/member[@name=&quot;_uuid_e__FixedBuffer&quot;]/*" />
+        </member>
         <member name="T:NVAPIWrapper._NV_GPU_VIRTUALIZATION_INFO">
             <!-- Failed to insert some or all of included XML --><include file="_NV_GPU_VIRTUALIZATION_INFO.xml" path="doc/member[@name=&quot;_NV_GPU_VIRTUALIZATION_INFO&quot;]/*" />
         </member>
@@ -20930,6 +21196,15 @@
         <member name="F:NVAPIWrapper._NV_LATENCY_RESULT_PARAMS.FrameReport.gpuFrameTimeUs">
             <!-- Failed to insert some or all of included XML --><include file="FrameReport.xml" path="doc/member[@name=&quot;FrameReport.gpuFrameTimeUs&quot;]/*" />
         </member>
+        <member name="F:NVAPIWrapper._NV_LATENCY_RESULT_PARAMS.FrameReport.cameraConstructedTime">
+            <!-- Failed to insert some or all of included XML --><include file="FrameReport.xml" path="doc/member[@name=&quot;FrameReport.cameraConstructedTime&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_LATENCY_RESULT_PARAMS.FrameReport.crossAdapterCopyTimeUs">
+            <!-- Failed to insert some or all of included XML --><include file="FrameReport.xml" path="doc/member[@name=&quot;FrameReport.crossAdapterCopyTimeUs&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_LATENCY_RESULT_PARAMS.FrameReport.aiFrameTimeUs">
+            <!-- Failed to insert some or all of included XML --><include file="FrameReport.xml" path="doc/member[@name=&quot;FrameReport.aiFrameTimeUs&quot;]/*" />
+        </member>
         <member name="F:NVAPIWrapper._NV_LATENCY_RESULT_PARAMS.FrameReport.rsvd">
             <!-- Failed to insert some or all of included XML --><include file="FrameReport.xml" path="doc/member[@name=&quot;FrameReport.rsvd&quot;]/*" />
         </member>
@@ -21803,6 +22078,9 @@
         <member name="F:NVAPIWrapper._NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.frameGenerationPreset">
             <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.frameGenerationPreset&quot;]/*" />
         </member>
+        <member name="F:NVAPIWrapper._NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.frameGenerationMode">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.frameGenerationMode&quot;]/*" />
+        </member>
         <member name="F:NVAPIWrapper._NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.reserved">
             <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_DLSS_OVERRIDE_GET_STATE_PARAMS_V1.reserved&quot;]/*" />
         </member>
@@ -21828,6 +22106,51 @@
             <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_V1.reserved&quot;]/*" />
         </member>
         <member name="T:NVAPIWrapper._NV_NGX_DLSS_OVERRIDE_SET_STATE_PARAMS_V1._reserved_e__FixedBuffer">
+            <!-- Failed to insert some or all of included XML --><include file="_reserved_e__FixedBuffer.xml" path="doc/member[@name=&quot;_reserved_e__FixedBuffer&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper._NV_NGX_DRIVER_FEATURE_ID">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DRIVER_FEATURE_ID.xml" path="doc/member[@name=&quot;_NV_NGX_DRIVER_FEATURE_ID&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_NGX_DRIVER_FEATURE_ID.NV_NGX_DRIVER_FEATURE_ID_SET_FLIP_CONFIG_V2">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DRIVER_FEATURE_ID.xml" path="doc/member[@name=&quot;_NV_NGX_DRIVER_FEATURE_ID.NV_NGX_DRIVER_FEATURE_ID_SET_FLIP_CONFIG_V2&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper._NV_NGX_DRIVER_FEATURE_SUPPORT_INFO">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.xml" path="doc/member[@name=&quot;_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.featureId">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.xml" path="doc/member[@name=&quot;_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.featureId&quot;]/*" />
+        </member>
+        <member name="P:NVAPIWrapper._NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.bSupported">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.xml" path="doc/member[@name=&quot;_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.bSupported&quot;]/*" />
+        </member>
+        <member name="P:NVAPIWrapper._NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.reserved1">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.xml" path="doc/member[@name=&quot;_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.reserved1&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.reserved2">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.xml" path="doc/member[@name=&quot;_NV_NGX_DRIVER_FEATURE_SUPPORT_INFO.reserved2&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper._NV_NGX_DRIVER_FEATURE_SUPPORT_INFO._reserved2_e__FixedBuffer">
+            <!-- Failed to insert some or all of included XML --><include file="_reserved2_e__FixedBuffer.xml" path="doc/member[@name=&quot;_reserved2_e__FixedBuffer&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper._NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.version">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.version&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.featureCount">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.featureCount&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.featureSupportInfo">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.featureSupportInfo&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.reserved">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.xml" path="doc/member[@name=&quot;_NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1.reserved&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper._NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1._featureSupportInfo_e__FixedBuffer">
+            <!-- Failed to insert some or all of included XML --><include file="_featureSupportInfo_e__FixedBuffer.xml" path="doc/member[@name=&quot;_featureSupportInfo_e__FixedBuffer&quot;]/*" />
+        </member>
+        <member name="T:NVAPIWrapper._NV_NGX_GET_DRIVER_FEATURE_SUPPORT_PARAMS_V1._reserved_e__FixedBuffer">
             <!-- Failed to insert some or all of included XML --><include file="_reserved_e__FixedBuffer.xml" path="doc/member[@name=&quot;_reserved_e__FixedBuffer&quot;]/*" />
         </member>
         <member name="T:NVAPIWrapper._NV_PHYSICAL_GPUS">
@@ -22264,6 +22587,9 @@
         </member>
         <member name="F:NVAPIWrapper._NV_SET_REFLEX_SYNC_PARAMS.timeInQueueUsTarget">
             <!-- Failed to insert some or all of included XML --><include file="_NV_SET_REFLEX_SYNC_PARAMS.xml" path="doc/member[@name=&quot;_NV_SET_REFLEX_SYNC_PARAMS.timeInQueueUsTarget&quot;]/*" />
+        </member>
+        <member name="F:NVAPIWrapper._NV_SET_REFLEX_SYNC_PARAMS.fgMultiplier">
+            <!-- Failed to insert some or all of included XML --><include file="_NV_SET_REFLEX_SYNC_PARAMS.xml" path="doc/member[@name=&quot;_NV_SET_REFLEX_SYNC_PARAMS.fgMultiplier&quot;]/*" />
         </member>
         <member name="F:NVAPIWrapper._NV_SET_REFLEX_SYNC_PARAMS.rsvd">
             <!-- Failed to insert some or all of included XML --><include file="_NV_SET_REFLEX_SYNC_PARAMS.xml" path="doc/member[@name=&quot;_NV_SET_REFLEX_SYNC_PARAMS.rsvd&quot;]/*" />

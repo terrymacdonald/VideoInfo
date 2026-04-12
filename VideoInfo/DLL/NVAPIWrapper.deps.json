@@ -6,11 +6,12 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "NVAPIWrapper/1.0.37": {
+      "NVAPIWrapper/1.0.44": {
         "dependencies": {
           "ClangSharp": "20.1.2",
           "ClangSharp.Interop": "20.1.2",
-          "ClangSharp.PInvokeGenerator": "20.1.2"
+          "ClangSharp.PInvokeGenerator": "20.1.2",
+          "System.Management": "9.0.5"
         },
         "runtime": {
           "NVAPIWrapper.dll": {}
@@ -45,11 +46,38 @@
             "fileVersion": "20.1.2.0"
           }
         }
+      },
+      "System.CodeDom/9.0.5": {
+        "runtime": {
+          "lib/net9.0/System.CodeDom.dll": {
+            "assemblyVersion": "9.0.0.0",
+            "fileVersion": "9.0.525.21509"
+          }
+        }
+      },
+      "System.Management/9.0.5": {
+        "dependencies": {
+          "System.CodeDom": "9.0.5"
+        },
+        "runtime": {
+          "lib/net9.0/System.Management.dll": {
+            "assemblyVersion": "9.0.0.5",
+            "fileVersion": "9.0.525.21509"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net9.0/System.Management.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "9.0.0.5",
+            "fileVersion": "9.0.525.21509"
+          }
+        }
       }
     }
   },
   "libraries": {
-    "NVAPIWrapper/1.0.37": {
+    "NVAPIWrapper/1.0.44": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -74,6 +102,20 @@
       "sha512": "sha512-mDTx1axEaINH9ko/OdBh/52C2lEWIqXEun0GlX3zdC5aSQj6oiINCK2WK2VRnoYUFvOU920lj4LLL4B+jRroPQ==",
       "path": "clangsharp.pinvokegenerator/20.1.2",
       "hashPath": "clangsharp.pinvokegenerator.20.1.2.nupkg.sha512"
+    },
+    "System.CodeDom/9.0.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-cuzLM2MWutf9ZBEMPYYfd0DXwYdvntp7VCT6a/wvbKCa2ZuvGmW74xi+YBa2mrfEieAXqM4TNKlMmSnfAfpUoQ==",
+      "path": "system.codedom/9.0.5",
+      "hashPath": "system.codedom.9.0.5.nupkg.sha512"
+    },
+    "System.Management/9.0.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-n6o9PZm9p25+zAzC3/48K0oHnaPKTInRrxqFq1fi/5TPbMLjuoCm/h//mS3cUmSy+9AO1Z+qsC/Ilt/ZFatv5Q==",
+      "path": "system.management/9.0.5",
+      "hashPath": "system.management.9.0.5.nupkg.sha512"
     }
   }
 }
