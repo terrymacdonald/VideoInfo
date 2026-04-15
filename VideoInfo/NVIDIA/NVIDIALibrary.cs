@@ -155,6 +155,16 @@ namespace DisplayMagicianShared.NVIDIA
         // InfoFrame Data
         public bool HasInfoFrameData;
         public NVAPIInfoFrameDataDto InfoFrameData;
+
+        // Display status properties
+        public bool IsActive;
+        public bool IsConnected;
+        public bool IsPhysicallyConnected;
+        public bool IsCluster;
+        public bool IsDynamic;
+        public bool IsMultiStreamRootNode;
+        public bool IsOSVisible;
+        public bool IsWfd;
         
         public NVIDIA_PER_DISPLAY_CONFIG()
         {
@@ -183,6 +193,14 @@ namespace DisplayMagicianShared.NVIDIA
             HdrToneMapping = default;
             HasInfoFrameData = false;
             InfoFrameData = new NVAPIInfoFrameDataDto();
+            IsActive = false;
+            IsConnected = false;
+            IsPhysicallyConnected = false;
+            IsCluster = false;
+            IsDynamic = false;
+            IsMultiStreamRootNode = false;
+            IsOSVisible = false;
+            IsWfd = false;
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_DISPLAY_CONFIG other && this.Equals(other);
@@ -344,6 +362,54 @@ namespace DisplayMagicianShared.NVIDIA
                     return false;
                 }
 
+                if (IsActive != other.IsActive)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The IsActive fields don't match!");
+                    return false;
+                }
+
+                if (IsConnected != other.IsConnected)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The IsConnected fields don't match!");
+                    return false;
+                }
+
+                if (IsPhysicallyConnected != other.IsPhysicallyConnected)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The IsPhysicallyConnected fields don't match!");
+                    return false;
+                }
+
+                if (IsCluster != other.IsCluster)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The IsCluster fields don't match!");
+                    return false;
+                }
+
+                if (IsDynamic != other.IsDynamic)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The IsDynamic fields don't match!");
+                    return false;
+                }
+
+                if (IsMultiStreamRootNode != other.IsMultiStreamRootNode)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The IsMultiStreamRootNode fields don't match!");
+                    return false;
+                }
+
+                if (IsOSVisible != other.IsOSVisible)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The IsOSVisible fields don't match!");
+                    return false;
+                }
+
+                if (IsWfd != other.IsWfd)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The IsWfd fields don't match!");
+                    return false;
+                }
+
                 // If we make it here then the two configs are equal
                 return true;
             }
@@ -363,7 +429,8 @@ namespace DisplayMagicianShared.NVIDIA
             return (HasNvHdrEnabled, HdrCapabilities, HdrColorData, HasColorData, ColorData, HasCustomDisplay, CustomDisplays, 
                 HasDisplayPortInfo, DisplayPortInfo, HasVirtualRefreshRate, VirtualRefreshRateData, HasPreferredStereoDisplay, PreferredStereoDisplay,
                 HasSourceColorSpace, SourceColorSpace, HasSourceHdrMetadata, SourceHdrMetadata, HasOutputMode, OutputMode, 
-                HasHdrToneMapping, HdrToneMapping, HasInfoFrameData, InfoFrameData).GetHashCode();
+                HasHdrToneMapping, HdrToneMapping, HasInfoFrameData, InfoFrameData,
+                IsActive, IsConnected, IsPhysicallyConnected, IsCluster, IsDynamic, IsMultiStreamRootNode, IsOSVisible, IsWfd).GetHashCode();
         }
         public static bool operator ==(NVIDIA_PER_DISPLAY_CONFIG lhs, NVIDIA_PER_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -1262,6 +1329,27 @@ namespace DisplayMagicianShared.NVIDIA
                         // Create per-display config
                         NVIDIA_PER_DISPLAY_CONFIG myDisplay = new NVIDIA_PER_DISPLAY_CONFIG();
                         myDisplay.DisplayId = displayId;
+
+                        //------------------------------------
+                        // GET DISPLAY STATUS PROPERTIES
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the display status properties for Display {displayNum} on Adapter {adapterNum}.");
+                            myDisplay.IsActive = display.IsActive;
+                            myDisplay.IsConnected = display.IsConnected;
+                            myDisplay.IsPhysicallyConnected = display.IsPhysicallyConnected;
+                            myDisplay.IsCluster = display.IsCluster;
+                            myDisplay.IsDynamic = display.IsDynamic;
+                            myDisplay.IsMultiStreamRootNode = display.IsMultiStreamRootNode;
+                            myDisplay.IsOSVisible = display.IsOSVisible;
+                            myDisplay.IsWfd = display.IsWfd;
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got display status properties for Display {displayNum} on Adapter {adapterNum}: IsActive={myDisplay.IsActive}, IsConnected={myDisplay.IsConnected}, IsPhysicallyConnected={myDisplay.IsPhysicallyConnected}, IsCluster={myDisplay.IsCluster}, IsDynamic={myDisplay.IsDynamic}, IsMultiStreamRootNode={myDisplay.IsMultiStreamRootNode}, IsOSVisible={myDisplay.IsOSVisible}, IsWfd={myDisplay.IsWfd}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting display status properties for Display {displayNum} on Adapter {adapterNum}.");
+                        }
 
                         //------------------------------------
                         // GET EDID INFORMATION
