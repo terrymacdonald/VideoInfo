@@ -26,7 +26,7 @@ namespace DisplayMagicianShared.NVIDIA
         public NV_MOSAIC_DISPLAY_SETTING_V2 MosaicDisplaySettings;
         public Int32 OverlapX;
         public Int32 OverlapY;
-        public NV_GRID_TOPOLOGY_V2[] MosaicGridTopos;
+        public _NV_MOSAIC_GRID_TOPO_V2[] MosaicGridTopos;
         public UInt32 MosaicGridCount;
 
         public NVIDIA_MOSAIC_CONFIG()
@@ -36,7 +36,7 @@ namespace DisplayMagicianShared.NVIDIA
             MosaicDisplaySettings = new NV_MOSAIC_DISPLAY_SETTING_V2();
             OverlapX = 0;
             OverlapY = 0;
-            MosaicGridTopos = new NV_GRID_TOPOLOGY_V2[] { };
+            MosaicGridTopos = new _NV_MOSAIC_GRID_TOPO_V2[] { };
             MosaicGridCount = 0;
         }
 
@@ -107,35 +107,82 @@ namespace DisplayMagicianShared.NVIDIA
         public uint DisplayId;
         public NV_MONITOR_CONN_TYPE ConnectorType;        
 
+        // HDR capabilities and color data
         public bool HasNvHdrEnabled;
-        public _NV_HDR_CAPABILITIES_V3 HdrCapabilities;
-        public _NV_HDR_COLOR_DATA_V2 HdrColorData;
-        public bool HasAdaptiveSync;
-        public _NV_ADAPTIVE_SYNC_DATA AdaptiveSyncConfig;
-        public bool HasColorData;
-        public _NV_COLOR_DATA_V5 ColorData;
-        public bool HasCustomDisplay;
-        public List<NV_CUSTOM_DISPLAY> CustomDisplays;
-        public bool HasDVCInfo;
-        public PrivateDisplayDVCInfoEx DVCInfo;
-        public bool HasHUEInfo;
-        public PrivateDisplayHUEInfo HUEInfo;
+        public NVAPIHdrCapabilitiesDto HdrCapabilities;
+        public NVAPIHdrColorDataDto HdrColorData;
 
+        // Adaptive Sync
+        public bool HasAdaptiveSync;
+        public NVAPIAdaptiveSyncSetDataDto AdaptiveSyncConfig;
+
+        // Color data
+        public bool HasColorData;
+        public NVAPIDisplayColorDataDto ColorData;
+
+        // Custom display
+        public bool HasCustomDisplay;
+        public List<NVAPICustomDisplayDto> CustomDisplays;
+
+        // DisplayPort info
+        public bool HasDisplayPortInfo;
+        public NVAPIDisplayPortInfoDto DisplayPortInfo;
+
+        // Virtual Refresh Rate
+        public bool HasVirtualRefreshRate;
+        public NVAPIVirtualRefreshRateDataDto VirtualRefreshRateData;
+
+        // Preferred Stereo Display
+        public bool HasPreferredStereoDisplay;
+        public NVAPIPreferredStereoDisplayDto PreferredStereoDisplay;
+
+        // Source Color Space
+        public bool HasSourceColorSpace;
+        public _NV_COLORSPACE_TYPE SourceColorSpace;
+
+        // Source HDR Metadata
+        public bool HasSourceHdrMetadata;
+        public NVAPIHdrMetadataDto SourceHdrMetadata;
+
+        // Output Mode
+        public bool HasOutputMode;
+        public _NV_DISPLAY_OUTPUT_MODE OutputMode;
+
+        // HDR Tone Mapping
+        public bool HasHdrToneMapping;
+        public _NV_HDR_TONEMAPPING_METHOD HdrToneMapping;
+
+        // InfoFrame Data
+        public bool HasInfoFrameData;
+        public NVAPIInfoFrameDataDto InfoFrameData;
+        
         public NVIDIA_PER_DISPLAY_CONFIG()
         {
             HasNvHdrEnabled = false;
-            HdrCapabilities = new _NV_HDR_CAPABILITIES_V3();
-            HdrColorData = new _NV_HDR_COLOR_DATA_V2();
+            HdrCapabilities = new NVAPIHdrCapabilitiesDto();
+            HdrColorData = new NVAPIHdrColorDataDto();
             HasAdaptiveSync = false;
-            AdaptiveSyncConfig = new _NV_ADAPTIVE_SYNC_DATA();
+            AdaptiveSyncConfig = new NVAPIAdaptiveSyncSetDataDto();
             HasColorData = false;
-            ColorData = new _NV_COLOR_DATA_V5();
+            ColorData = new NVAPIDisplayColorDataDto();
             HasCustomDisplay = false;
-            CustomDisplays = new List<NV_CUSTOM_DISPLAY>();
-            HasDVCInfo = false;
-            DVCInfo = new PrivateDisplayDVCInfoEx();
-            HasHUEInfo = false;
-            HUEInfo = new PrivateDisplayHUEInfo();
+            CustomDisplays = new List<NVAPICustomDisplayDto>();
+            HasDisplayPortInfo = false;
+            DisplayPortInfo = new NVAPIDisplayPortInfoDto();
+            HasVirtualRefreshRate = false;
+            VirtualRefreshRateData = new NVAPIVirtualRefreshRateDataDto();
+            HasPreferredStereoDisplay = false;
+            PreferredStereoDisplay = new NVAPIPreferredStereoDisplayDto();
+            HasSourceColorSpace = false;
+            SourceColorSpace = default;
+            HasSourceHdrMetadata = false;
+            SourceHdrMetadata = new NVAPIHdrMetadataDto();
+            HasOutputMode = false;
+            OutputMode = default;
+            HasHdrToneMapping = false;
+            HdrToneMapping = default;
+            HasInfoFrameData = false;
+            InfoFrameData = new NVAPIInfoFrameDataDto();
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_DISPLAY_CONFIG other && this.Equals(other);
@@ -200,25 +247,100 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The CustomDisplays lists don't match!");
                     return false;
                 }
-                if (HasDVCInfo != other.HasDVCInfo)
+
+                if (HasDisplayPortInfo != other.HasDisplayPortInfo)
                 {
-                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasDVCInfo fields don't match!");
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasDisplayPortInfo fields don't match!");
                     return false;
                 }
 
-                if (!DVCInfo.Equals(other.DVCInfo))
+                if (!DisplayPortInfo.Equals(other.DisplayPortInfo))
                 {
-                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The DVCInfo fields don't match!");
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The DisplayPortInfo structs don't match!");
                     return false;
                 }
-                if (HasHUEInfo != other.HasHUEInfo)
+
+                if (HasVirtualRefreshRate != other.HasVirtualRefreshRate)
                 {
-                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasHUEInfo fields don't match!");
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasVirtualRefreshRate fields don't match!");
                     return false;
                 }
-                if (!HUEInfo.Equals(other.HUEInfo))
+
+                if (!VirtualRefreshRateData.Equals(other.VirtualRefreshRateData))
                 {
-                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HUEInfo fields don't match!");
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The VirtualRefreshRateData structs don't match!");
+                    return false;
+                }
+
+                if (HasPreferredStereoDisplay != other.HasPreferredStereoDisplay)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasPreferredStereoDisplay fields don't match!");
+                    return false;
+                }
+
+                if (!PreferredStereoDisplay.Equals(other.PreferredStereoDisplay))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The PreferredStereoDisplay structs don't match!");
+                    return false;
+                }
+
+                if (HasSourceColorSpace != other.HasSourceColorSpace)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasSourceColorSpace fields don't match!");
+                    return false;
+                }
+
+                if (!SourceColorSpace.Equals(other.SourceColorSpace))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The SourceColorSpace fields don't match!");
+                    return false;
+                }
+
+                if (HasSourceHdrMetadata != other.HasSourceHdrMetadata)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasSourceHdrMetadata fields don't match!");
+                    return false;
+                }
+
+                if (!SourceHdrMetadata.Equals(other.SourceHdrMetadata))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The SourceHdrMetadata structs don't match!");
+                    return false;
+                }
+
+                if (HasOutputMode != other.HasOutputMode)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasOutputMode fields don't match!");
+                    return false;
+                }
+
+                if (!OutputMode.Equals(other.OutputMode))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The OutputMode fields don't match!");
+                    return false;
+                }
+
+                if (HasHdrToneMapping != other.HasHdrToneMapping)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasHdrToneMapping fields don't match!");
+                    return false;
+                }
+
+                if (!HdrToneMapping.Equals(other.HdrToneMapping))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HdrToneMapping fields don't match!");
+                    return false;
+                }
+
+                if (HasInfoFrameData != other.HasInfoFrameData)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasInfoFrameData fields don't match!");
+                    return false;
+                }
+
+                if (!InfoFrameData.Equals(other.InfoFrameData))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The InfoFrameData structs don't match!");
                     return false;
                 }
 
@@ -238,7 +360,10 @@ namespace DisplayMagicianShared.NVIDIA
             // To fix this bit, we need to test the SetActiveConfigOverride Adaptive Sync part of the codebase to apply this properly.
             // But for now, we'll exclude it from the equality matching and also stop trying to use the adaptive sync config.
             //return (HasNvHdrEnabled, HdrCapabilities, HdrColorData, HasAdaptiveSync, AdaptiveSyncConfig, HasColorData, ColorData, HasCustomDisplay, CustomDisplays).GetHashCode();
-            return (HasNvHdrEnabled, HdrCapabilities, HdrColorData, HasColorData, ColorData, HasCustomDisplay, CustomDisplays, HasDVCInfo, DVCInfo, HasHUEInfo, HUEInfo).GetHashCode();
+            return (HasNvHdrEnabled, HdrCapabilities, HdrColorData, HasColorData, ColorData, HasCustomDisplay, CustomDisplays, 
+                HasDisplayPortInfo, DisplayPortInfo, HasVirtualRefreshRate, VirtualRefreshRateData, HasPreferredStereoDisplay, PreferredStereoDisplay,
+                HasSourceColorSpace, SourceColorSpace, HasSourceHdrMetadata, SourceHdrMetadata, HasOutputMode, OutputMode, 
+                HasHdrToneMapping, HdrToneMapping, HasInfoFrameData, InfoFrameData).GetHashCode();
         }
         public static bool operator ==(NVIDIA_PER_DISPLAY_CONFIG lhs, NVIDIA_PER_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -327,6 +452,7 @@ namespace DisplayMagicianShared.NVIDIA
     [StructLayout(LayoutKind.Sequential)]
     public struct NVIDIA_PER_ADAPTER_CONFIG : IEquatable<NVIDIA_PER_ADAPTER_CONFIG>
     {
+        public string AdapterID;
         public bool IsQuadro;
         public bool HasLogicalGPU;
         public NV_SYSTEM_TYPE SystemType;        
@@ -345,10 +471,11 @@ namespace DisplayMagicianShared.NVIDIA
         public NVAPIGpuEccConfigurationInfoDto EccConfigurationInfo;
 
         public UInt32 DisplayCount;
-        public Dictionary<UInt32, NVIDIA_PER_DISPLAY_CONFIG> Displays;
+        public Dictionary<string, NVIDIA_PER_DISPLAY_CONFIG> Displays;
 
         public NVIDIA_PER_ADAPTER_CONFIG()
         {
+            AdapterID = string.Empty;
             IsQuadro = false;
             HasLogicalGPU = false;
             SystemType = NV_SYSTEM_TYPE.NV_SYSTEM_TYPE_UNKNOWN;
@@ -363,7 +490,7 @@ namespace DisplayMagicianShared.NVIDIA
             GpuInfo = new NVAPIGpuInfoDto();
             EccConfigurationInfo = new NVAPIGpuEccConfigurationInfoDto();
             DisplayCount = 0;
-            Displays = new Dictionary<UInt32, NVIDIA_PER_DISPLAY_CONFIG>();
+            Displays = new Dictionary<string, NVIDIA_PER_DISPLAY_CONFIG>();
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_ADAPTER_CONFIG other && this.Equals(other);
@@ -483,7 +610,7 @@ namespace DisplayMagicianShared.NVIDIA
         public bool IsInUse;
         public bool IsCloned;
         public NVIDIA_MOSAIC_CONFIG MosaicConfig;
-        public Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG> PhysicalAdapters;
+        public Dictionary<string, NVIDIA_PER_ADAPTER_CONFIG> PhysicalAdapters;
         public List<NV_DISPLAY_PATH_INFO_V3> DisplayConfigs;
         public List<NVIDIA_DRS_CONFIG> DRSSettings;
         // Note: We purposely have left out the DisplayNames from the Equals as it's order keeps changing after each reboot and after each profile swap
@@ -497,7 +624,7 @@ namespace DisplayMagicianShared.NVIDIA
             IsInUse = false;
             IsCloned = false;
             MosaicConfig = new NVIDIA_MOSAIC_CONFIG();
-            PhysicalAdapters = new Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG>();
+            PhysicalAdapters = new Dictionary<string, NVIDIA_PER_ADAPTER_CONFIG>();
             DisplayConfigs = new List<NV_DISPLAY_PATH_INFO_V3>();
             DRSSettings = new List<NVIDIA_DRS_CONFIG>();
             DisplayNames = new Dictionary<string, string>();
@@ -812,9 +939,9 @@ namespace DisplayMagicianShared.NVIDIA
             myDefaultConfig.MosaicConfig.MosaicGridTopos = new _NV_MOSAIC_GRID_TOPO_V2[0];
             myDefaultConfig.MosaicConfig.MosaicGridCount = 0;
             myDefaultConfig.MosaicConfig.MosaicDisplaySettings = new NV_MOSAIC_DISPLAY_SETTING_V2();
-            myDefaultConfig.PhysicalAdapters = new Dictionary<UInt32, NV_PER_ADAPTER_CONFIG>();
-            myDefaultConfig.DisplayConfigs = new List<_NV_DISPLAY_PATH_INFO_V3>();
-            myDefaultConfig.DRSSettings = new List<_NV_DRS_CONFIG>();
+            myDefaultConfig.PhysicalAdapters = new Dictionary<string, NVIDIA_PER_ADAPTER_CONFIG>();
+            myDefaultConfig.DisplayConfigs = new List<NV_DISPLAY_PATH_INFO_V3>();
+            myDefaultConfig.DRSSettings = new List<NVIDIA_DRS_CONFIG>();
             myDefaultConfig.DisplayNames = new Dictionary<string, string>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.IsCloned = false;
@@ -909,716 +1036,1228 @@ namespace DisplayMagicianShared.NVIDIA
                 // Go through each adapter
                 foreach (var adapter in adapters)
                 {
-                    // Enumerate the displays for this adapter
-                    var displays = adapter.EnumActiveDisplays();
+                    adapterNum++;
+
+                    //------------------------------------
+                    // POPULATE ADAPTER-LEVEL CONFIG
+                    //------------------------------------
+                    NVIDIA_PER_ADAPTER_CONFIG myAdapter = new NVIDIA_PER_ADAPTER_CONFIG();
+
+                    // Get the GPU full name
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the full name of the physical GPU adapter {adapterNum}.");
+                        myAdapter.FullName = adapter.GetFullName();
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the GPU full name '{myAdapter.FullName}' for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting full name for adapter {adapterNum}.");
+                    }
+
+                    // Get the GPU bus type
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the bus type of the physical GPU adapter {adapterNum}.");
+                        var busTypeResult = adapter.GetBusType();
+                        if (busTypeResult.HasValue)
+                        {
+                            myAdapter.BusType = busTypeResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the bus type '{myAdapter.BusType}' for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting bus type for adapter {adapterNum}.");
+                    }
+
+                    // Get the GPU bus ID
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the bus ID of the physical GPU adapter {adapterNum}.");
+                        var busIdResult = adapter.GetBusId();
+                        if (busIdResult.HasValue)
+                        {
+                            myAdapter.BusId = busIdResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the bus ID '{myAdapter.BusId}' for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting bus ID for adapter {adapterNum}.");
+                    }
+
+                    // Get the GPU bus slot ID
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the bus slot ID of the physical GPU adapter {adapterNum}.");
+                        var busSlotIdResult = adapter.GetBusSlotId();
+                        if (busSlotIdResult.HasValue)
+                        {
+                            myAdapter.BusSlotId = busSlotIdResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the bus slot ID '{myAdapter.BusSlotId}' for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting bus slot ID for adapter {adapterNum}.");
+                    }
+
+                    // Get the GPU type
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the GPU type of the physical GPU adapter {adapterNum}.");
+                        var gpuTypeResult = adapter.GetGpuType();
+                        if (gpuTypeResult.HasValue)
+                        {
+                            myAdapter.GPUType = gpuTypeResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the GPU type '{myAdapter.GPUType}' for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting GPU type for adapter {adapterNum}.");
+                    }
+
+                    // Get the system type (laptop/desktop)
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the system type of the physical GPU adapter {adapterNum}.");
+                        var systemTypeResult = adapter.GetSystemType();
+                        if (systemTypeResult.HasValue)
+                        {
+                            myAdapter.SystemType = systemTypeResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the system type '{myAdapter.SystemType}' for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting system type for adapter {adapterNum}.");
+                    }
+
+                    // Get PCI identifiers (used to build the composite adapter key)
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the PCI identifiers of the physical GPU adapter {adapterNum}.");
+                        var pciIdResult = adapter.GetPCIIdentifiers();
+                        if (pciIdResult.HasValue)
+                        {
+                            myAdapter.PciIdentifiers = pciIdResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the PCI identifiers for adapter {adapterNum}. DeviceId=0x{myAdapter.PciIdentifiers.DeviceId:X4}, SubSystemId=0x{myAdapter.PciIdentifiers.SubSystemId:X4}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting PCI identifiers for adapter {adapterNum}.");
+                    }
+
+                    // Build the composite adapter key from PCI identifiers and bus ID
+                    string adapterDeviceID = $"{myAdapter.PciIdentifiers.DeviceId}_{myAdapter.PciIdentifiers.SubSystemId}_{myAdapter.BusId}";
+                    myAdapter.AdapterID = adapterDeviceID;
+                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Adapter {adapterNum} has AdapterID '{adapterDeviceID}'.");
+
+                    // Get the VBIOS version string
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the VBIOS version string of the physical GPU adapter {adapterNum}.");
+                        myAdapter.VbiosVersionString = adapter.GetVbiosVersionString();
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the VBIOS version string '{myAdapter.VbiosVersionString}' for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting VBIOS version string for adapter {adapterNum}.");
+                    }
+
+                    // Get the NvLink status
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the NvLink status of the physical GPU adapter {adapterNum}.");
+                        var nvLinkResult = adapter.GetNvlinkStatus();
+                        if (nvLinkResult.HasValue)
+                        {
+                            myAdapter.NvLinkStatus = nvLinkResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the NvLink status for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting NvLink status for adapter {adapterNum}.");
+                    }
+
+                    // Get the GPU info
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the GPU info of the physical GPU adapter {adapterNum}.");
+                        var gpuInfoResult = adapter.GetGpuInfo();
+                        if (gpuInfoResult.HasValue)
+                        {
+                            myAdapter.GpuInfo = gpuInfoResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the GPU info for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting GPU info for adapter {adapterNum}.");
+                    }
+
+                    // Get the ECC configuration info
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the ECC configuration info of the physical GPU adapter {adapterNum}.");
+                        var eccResult = adapter.GetEccConfigurationInfo();
+                        if (eccResult.HasValue)
+                        {
+                            myAdapter.EccConfigurationInfo = eccResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the ECC configuration info for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting ECC configuration info for adapter {adapterNum}.");
+                    }
+
+                    // Check if this is a Quadro card
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to check if adapter {adapterNum} is a Quadro card.");
+                        var isQuadroResult = adapter.QueryWorkstationFeatureSupport(_NV_GPU_WORKSTATION_FEATURE_TYPE.NV_GPU_WORKSTATION_FEATURE_TYPE_PROVIZ);
+                        if (isQuadroResult.HasValue)
+                        {
+                            myAdapter.IsQuadro = isQuadroResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Adapter {adapterNum} IsQuadro={myAdapter.IsQuadro}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception checking Quadro status for adapter {adapterNum}.");
+                    }
+
+                    //------------------------------------
+                    // ENUMERATE DISPLAYS FOR THIS ADAPTER
+                    //------------------------------------
+                    NVAPIDisplayHelper[] displays;
+                    if (allDisplays)
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Enumerating all displays for Adapter {adapterNum}.");
+                        displays = adapter.EnumAllDisplays();
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Enumerating active displays for Adapter {adapterNum}.");
+                        displays = adapter.EnumActiveDisplays();
+                    }
                     int displayTotalCount = displays.Length;
                     int displayNum = 0;
 
-                    // Set some adapter specific items we will use later
-                    var gpuName = adapter.GetFullName();
-                    var gpuBusType = adapter.GetBusType();
-                    var gpuBusId = adapter.GetBusId();                    
+                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Found {displayTotalCount} display(s) on adapter {adapterNum}.");
 
                     foreach (var display in displays)
                     {
+                        displayNum++;
                         var displayId = display.DisplayId;
                         var IsConnected = display.IsConnected;
 
-                        // The GetEDID function in NVIDIA doesn't work reliably, and often errors saying that the driver cannot get the EDDID information. 
-                        // Lets set some EDID default in case the EDID doesn't work (which is likely to happen now as NVIDIA EDID is unreliable at best :( )
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Processing display {displayNum}/{displayTotalCount} (DisplayId={displayId}, Connected={IsConnected}) on adapter {adapterNum}.");
+
+                        // Create per-display config
+                        NVIDIA_PER_DISPLAY_CONFIG myDisplay = new NVIDIA_PER_DISPLAY_CONFIG();
+                        myDisplay.DisplayId = displayId;
+
+                        //------------------------------------
+                        // GET EDID INFORMATION
+                        //------------------------------------
                         string manufacturerName = "Unknown";
                         UInt32 productCode = 0;
                         UInt32 serialNumber = 0;
-                        // We try to get an EDID block and extract the info         
                         try
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the EDID information from for Display Index {displayNum} on Adapter {adapterNum}.");
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the EDID information for Display {displayNum} on Adapter {adapterNum}.");
                             var edidInfo = display.GetEdidData(NV_EDID_FLAG.NV_EDID_FLAG_DEFAULT);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the EDID information from for Display Index {displayNum} on Adapter {adapterNum}. There are currently {displays.Length} displays connected.");
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to parse the EDID information from for Display Index {displayNum} on Adapter {adapterNum} so that we can read it.");
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the EDID information for Display {displayNum} on Adapter {adapterNum}.");
                             EDID edidParsedInfo = new EDID(edidInfo.Value.Data);
                             manufacturerName = edidParsedInfo.ManufacturerCode;
                             productCode = edidParsedInfo.ProductCode;
                             serialNumber = edidParsedInfo.SerialNumber;
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Found that the manufacturer name is {manufacturerName}, the product code is {productCode}, and the serial numver is {serialNumber}.");
-
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: EDID for Display {displayNum}: Manufacturer={manufacturerName}, ProductCode={productCode}, SerialNumber={serialNumber}.");
                         }
                         catch (Exception ex)
                         {
-                            SharedLogger.logger.Warn(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the EDID information from for Display Index {displayNum} on Adapter {adapterNum}. This is unfortuntately common now, and appears to be a bug in the NVIDIA driver.");
+                            SharedLogger.logger.Warn(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting EDID for Display {displayNum} on Adapter {adapterNum}. This is unfortunately common and appears to be a bug in the NVIDIA driver.");
                         }
-                        displayNum++;
 
+                        //------------------------------------
+                        // GET COLOR DATA
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the color data for Display {displayNum} on Adapter {adapterNum}.");
+                            var colorDataInput = new NVAPIDisplayColorDataDto();
+                            var colorDataResult = display.ColorControl(colorDataInput);
+                            if (colorDataResult.HasValue)
+                            {
+                                myDisplay.ColorData = colorDataResult.Value;
+                                myDisplay.HasColorData = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got color data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting color data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET HDR CAPABILITIES
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                            var hdrCapsResult = display.GetHdrCapabilities();
+                            if (hdrCapsResult.HasValue)
+                            {
+                                myDisplay.HdrCapabilities = hdrCapsResult.Value;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET HDR COLOR DATA
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR color data for Display {displayNum} on Adapter {adapterNum}.");
+                            var hdrColorDataInput = new NVAPIHdrColorDataDto();
+                            var hdrColorDataResult = display.HdrColorControl(hdrColorDataInput);
+                            if (hdrColorDataResult.HasValue)
+                            {
+                                myDisplay.HdrColorData = hdrColorDataResult.Value;
+                                myDisplay.HasNvHdrEnabled = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: HDR color data retrieved for Display {displayNum} on Adapter {adapterNum}.");
+                            }
+                            else
+                            {
+                                myDisplay.HasNvHdrEnabled = false;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: HDR color data not available for Display {displayNum} on Adapter {adapterNum}.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR color data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET ADAPTIVE SYNC DATA
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
+                            var getAdaptiveSyncData = display.GetAdaptiveSyncData();
+                            if (getAdaptiveSyncData.HasValue)
+                            {
+                                // Store a default Set DTO to indicate adaptive sync is available
+                                myDisplay.AdaptiveSyncConfig = new NVAPIAdaptiveSyncSetDataDto();
+                                myDisplay.HasAdaptiveSync = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET DISPLAYPORT INFO
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
+                            var dpInfoResult = display.GetDisplayPortInfo();
+                            if (dpInfoResult.HasValue)
+                            {
+                                myDisplay.DisplayPortInfo = dpInfoResult.Value;
+                                myDisplay.HasDisplayPortInfo = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET VIRTUAL REFRESH RATE DATA
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
+                            var vrrResult = display.GetVirtualRefreshRateData();
+                            if (vrrResult.HasValue)
+                            {
+                                myDisplay.VirtualRefreshRateData = vrrResult.Value;
+                                myDisplay.HasVirtualRefreshRate = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET PREFERRED STEREO DISPLAY
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Preferred Stereo Display for Display {displayNum} on Adapter {adapterNum}.");
+                            var stereoResult = display.GetPreferredStereoDisplay();
+                            if (stereoResult.HasValue)
+                            {
+                                myDisplay.PreferredStereoDisplay = stereoResult.Value;
+                                myDisplay.HasPreferredStereoDisplay = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Preferred Stereo Display for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Preferred Stereo Display for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET SOURCE COLOR SPACE
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Source Color Space for Display {displayNum} on Adapter {adapterNum}.");
+                            var colorSpaceResult = display.GetSourceColorSpace(displayId);
+                            if (colorSpaceResult.HasValue)
+                            {
+                                myDisplay.SourceColorSpace = colorSpaceResult.Value;
+                                myDisplay.HasSourceColorSpace = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Source Color Space '{myDisplay.SourceColorSpace}' for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Source Color Space for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET SOURCE HDR METADATA
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
+                            var hdrMetadataResult = display.GetSourceHdrMetadata(displayId);
+                            if (hdrMetadataResult.HasValue)
+                            {
+                                myDisplay.SourceHdrMetadata = hdrMetadataResult.Value;
+                                myDisplay.HasSourceHdrMetadata = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET OUTPUT MODE
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Output Mode for Display {displayNum} on Adapter {adapterNum}.");
+                            var outputModeResult = display.GetOutputMode();
+                            if (outputModeResult.HasValue)
+                            {
+                                myDisplay.OutputMode = outputModeResult.Value;
+                                myDisplay.HasOutputMode = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Output Mode '{myDisplay.OutputMode}' for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Output Mode for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET HDR TONE MAPPING
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR Tone Mapping for Display {displayNum} on Adapter {adapterNum}.");
+                            var hdrToneMappingResult = display.GetHdrToneMapping();
+                            if (hdrToneMappingResult.HasValue)
+                            {
+                                myDisplay.HdrToneMapping = hdrToneMappingResult.Value;
+                                myDisplay.HasHdrToneMapping = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDR Tone Mapping '{myDisplay.HdrToneMapping}' for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR Tone Mapping for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET INFOFRAME DATA
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
+                            var infoFrameDataInput = new NVAPIInfoFrameDataDto();
+                            var infoFrameResult = display.InfoFrameControl(infoFrameDataInput);
+                            if (infoFrameResult.HasValue)
+                            {
+                                myDisplay.InfoFrameData = infoFrameResult.Value;
+                                myDisplay.HasInfoFrameData = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // ENUM CUSTOM DISPLAYS
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to enumerate custom displays for Display {displayNum} on Adapter {adapterNum}.");
+                            myDisplay.CustomDisplays = new List<NVAPICustomDisplayDto>();
+                            for (uint customIndex = 0; customIndex < 100; customIndex++)
+                            {
+                                try
+                                {
+                                    var customDisplayResult = display.EnumCustomDisplay(customIndex);
+                                    if (customDisplayResult.HasValue)
+                                    {
+                                        myDisplay.CustomDisplays.Add(customDisplayResult.Value);
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                                catch
+                                {
+                                    // End of custom display enumeration
+                                    break;
+                                }
+                            }
+                            if (myDisplay.CustomDisplays.Count > 0)
+                            {
+                                myDisplay.HasCustomDisplay = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Found {myDisplay.CustomDisplays.Count} custom display(s) for Display {displayNum} on Adapter {adapterNum}.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: No custom displays found for Display {displayNum} on Adapter {adapterNum}.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception enumerating custom displays for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        // Build a composite display key from adapter, manufacturer and display ID
+                        string displayDeviceKey = $"{adapterDeviceID}|{manufacturerName}|{productCode}|{displayId}";
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Adding display '{displayDeviceKey}' to adapter {adapterNum} Displays dictionary.");
+
+                        // Add the display to the adapter's Displays dictionary
+                        if (!myAdapter.Displays.ContainsKey(displayDeviceKey))
+                        {
+                            myAdapter.Displays.Add(displayDeviceKey, myDisplay);
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Duplicate display key '{displayDeviceKey}' detected on adapter {adapterNum}. Skipping duplicate.");
+                        }
                     }
-                    adapterNum++;
-                }
 
+                    // Set the display count for this adapter
+                    myAdapter.DisplayCount = (UInt32)myAdapter.Displays.Count;
 
-
-
+                    // Add the adapter to the config
+                    if (!myDisplayConfig.PhysicalAdapters.ContainsKey(adapterDeviceID))
+                    {
+                        myDisplayConfig.PhysicalAdapters.Add(adapterDeviceID, myAdapter);
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Duplicate adapter key '{adapterDeviceID}' detected. Skipping duplicate adapter.");
+                    }
                 
-                        // Prepare the physicalGPU per adapter structure to use later
-                        NVIDIA_PER_ADAPTER_CONFIG myAdapter = new NVIDIA_PER_ADAPTER_CONFIG();
-                        //myAdapter.LogicalGPU.PhysicalGPUHandles = new PhysicalGPUHandle[0];
-                        myAdapter.IsQuadro = false;
-                        myAdapter.HasLogicalGPU = false;
-                        myAdapter.Displays = new Dictionary<uint, NVIDIA_PER_DISPLAY_CONFIG>();
-
-                        //We want to get the name of the physical device
-                        myAdapter.FullName = "";
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the name of the physical GPU #{physicalGpuIndex + 1}.");
-                            myAdapter.FullName = NVAPI.GetFullName(physicalGpus[physicalGpuIndex]);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the GPU fullname of the physical GPU #{physicalGpuIndex + 1}. The GPU Full Name is '{myAdapter.FullName}'");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the fullname of the physical GPU #{physicalGpuIndex + 1}.");
-                        }
-
-                        // We want to get the physical details of the physical device
-                        // This is the Host System Type Laptop/desktop/Unknown
-                        myAdapter.SystemType = SystemType.Unknown;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the host system type of the physical GPU #{physicalGpuIndex + 1}.");
-                            myAdapter.GPUType = NVAPI.GetGPUType(physicalGpus[physicalGpuIndex]);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the host system type of the physical GPU #{physicalGpuIndex + 1}. The host system type is {myAdapter.SystemType.ToString()}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the host system type of the physical GPU #{physicalGpuIndex + 1}.");
-                        }
-
-                        // This is the GPU Bus Type
-                        myAdapter.GPUType = GPUType.Unknown;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the GPU type of the physical GPU #{physicalGpuIndex + 1}.");
-                            myAdapter.GPUType = NVAPI.GetGPUType(physicalGpus[physicalGpuIndex]);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the GPU type of the physical GPU #{physicalGpuIndex + 1}. The bus type is {myAdapter.GPUType.ToString()}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the GPU type of the physical GPU #{physicalGpuIndex + 1}.");
-                        }
-
-                        // This is the GPU Bus Type
-                        myAdapter.BusType = GPUBusType.Undefined;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the bus type of the physical GPU #{physicalGpuIndex + 1}.");
-                            myAdapter.BusType = NVAPI.GetBusType(physicalGpus[physicalGpuIndex]);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the bus type of the physical GPU #{physicalGpuIndex + 1}. The bus type is {myAdapter.BusType.ToString()}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the bus type of the physical GPU #{physicalGpuIndex + 1}.");
-                        }
-
-                        // This is the GPU Bus ID
-                        myAdapter.BusId = 0;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the bus ID of the physical GPU #{physicalGpuIndex + 1}.");
-                            myAdapter.BusId = NVAPI.GetBusId(physicalGpus[physicalGpuIndex]);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the bus ID of the physical GPU #{physicalGpuIndex + 1}. The bus ID is {myAdapter.BusId}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the bus ID of the physical GPU #{physicalGpuIndex + 1}.");
-                        }
-
-                        // This is the GPU Bus Slot ID
-                        myAdapter.BusSlotId = 0;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the bus slot ID of the physical GPU #{physicalGpuIndex + 1}.");
-                            myAdapter.BusSlotId = NVAPI.GetBusSlotId(physicalGpus[physicalGpuIndex]);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the bus slot ID of the physical GPU #{physicalGpuIndex + 1}. The bus slot ID is {myAdapter.BusId}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the bus slot ID of the physical GPU #{physicalGpuIndex + 1}.");
-                        }
-
-                        try
-                        {
-                            if (NVAPI.QueryWorkstationFeatureSupport(physicalGpus[physicalGpuIndex], WorkstationFeatureType.Proviz))
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Video Card is one from the Quadro range");
-                                myAdapter.IsQuadro = true;
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Video Card is not a Quadro range video card.");
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex,$"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst trying to find out if the card is from the Quadro range.");
-                        }
-
-
-                        try
-                        {
-                            // Firstly let's get the logical GPU from the Physical handle
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the Logical GPU Handle");
-                            LogicalGPUHandle logicalGPUHandle = NVAPI.GetLogicalGPUFromPhysicalGPU(physicalGpus[physicalGpuIndex]);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Logical GPU Handle from physical GPU. It means there is a Logical GPU in use.");
-                            myAdapter.HasLogicalGPU = true;
-                            /*SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Now attempting to get the Logical GPU Information");
-                            LogicalGPUData logicalGPUData = new LogicalGPUData();
-                            NVAPI.GetLogicalGPUInfo(logicalGPUHandle, out logicalGPUData);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the Logical GPU information from the NVIDIA driver!");*/
-                            //myAdapter.LogicalGPU = logicalGPUData;                            
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilstgetting Logical GPU handle from Physical GPU using NvAPI_GetLogicalGPUFromPhysicalGPU().");
-                            myAdapter.HasLogicalGPU = false;
-                        }
-
-                        myDisplayConfig.PhysicalAdapters[physicalGpuIndex] = myAdapter;
-                    }
-
-
-                    TopologyBrief mosaicTopoBrief = new TopologyBrief();
-                    IDisplaySettings mosaicDisplaySettings = new DisplaySettingsV2();
-                    int mosaicOverlapX = 0;
-                    int mosaicOverlapY = 0;
-
-                    try
-                    {
-                        // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the current mosaic topology brief and mosaic display settings.");
-                        NVAPI.GetCurrentTopology(out mosaicTopoBrief, out mosaicDisplaySettings, out mosaicOverlapX, out mosaicOverlapY);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the current mosaic toplogy brief and mosaic display settings.");
-
-                        myDisplayConfig.MosaicConfig.MosaicTopologyBrief = mosaicTopoBrief;
-                        myDisplayConfig.MosaicConfig.MosaicDisplaySettings = (DisplaySettingsV2)mosaicDisplaySettings;
-                        myDisplayConfig.MosaicConfig.OverlapX = mosaicOverlapX;
-                        myDisplayConfig.MosaicConfig.OverlapY = mosaicOverlapY;
-                    }
-                    catch (NVIDIAApiException nex)
-                    {
-                        if (nex.Status == Status.NotSupported)
-                        {
-                            _mosaic_supported = false;
-                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported by this GPU.");
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
-                    }
-
-                    if (_mosaic_supported)
-                    {
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_Mosaic_GetTopoGroup returned OK.");
-                            if (mosaicTopoBrief.IsPossible)
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is possible to use");
-                                //myDisplayConfig.MosaicConfig.IsMosaicPossible = true;
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is NOT possible to use");
-                                //myDisplayConfig.MosaicConfig.IsMosaicPossible = false;
-                            }
-                            if (mosaicTopoBrief.IsEnable)
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is enabled right now");
-                                myDisplayConfig.MosaicConfig.IsMosaicEnabled = true;
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is NOT enabled right now");
-                                myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology group.");
-                        }
-
-                    }
-                    else
-                    {
-                        // Mosaic isn't possible/supported
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Mosaic is NOT enabled.");
-                        myDisplayConfig.MosaicConfig.MosaicTopologyBrief = mosaicTopoBrief;
-                        myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
-                        //myDisplayConfig.MosaicConfig.IsMosaicPossible = false;
-                        myDisplayConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[] { };
-                        //myDisplayConfig.MosaicConfig.MosaicViewports = new List<ViewPortF[]>();
-                    }
-
-                    // Get Mosaic Grid settings!
-                    GridTopologyV2[] mosaicGridTopos;
-                    try
-                    {
-                        // Figure out how many Mosaic Grid topoligies there are                    
-                        mosaicGridTopos = NVAPI.EnumDisplayGrids();
-                        /*for (var i = 0; i < mosaicGridTopos.Length; i++)
-                        {
-                            GridTopologyDisplayV2[] gtdlist = mosaicGridTopos[i].Displays.Cast<GridTopologyDisplayV2>().ToArray<GridTopologyDisplayV2>();
-
-                            for (var j = 0; j<gtdlist.Length; j++)
-                            {
-                                gtdlist[i].Version = new StructureVersion(2, typeof(GridTopologyDisplayV2));
-                            }
-
-                            mosaicGridTopos[i].Displays = gtdlist.ToList();
-                        }*/
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_Mosaic_GetCurrentTopo returned OK.");
-
-
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred while getting Mosaic Topology! NvAPI_Mosaic_EnumDisplayGrids() returned error.");
-                        mosaicGridTopos = new GridTopologyV2[0];
-                    }
-
-                    myDisplayConfig.MosaicConfig.MosaicGridTopos = mosaicGridTopos;
-                    myDisplayConfig.MosaicConfig.MosaicGridCount = (uint)mosaicGridTopos.Length;
-
-                    /*//List<ViewPortF[]> allViewports = new List<ViewPortF[]>();
-                    foreach (GridTopologyV2 gridTopo in mosaicGridTopos)
-                    {
-                        *//*// Get Current Mosaic Grid settings using the Grid topologies numbers we got before
-                        ViewPortF[] viewports = new ViewPortF[0];
-                        byte bezelCorrected = 0;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get mosaic display viewport details by resolution.");
-                            NVAPI.GetDisplayViewportsByResolution(gridTopo.Displays.FirstOrDefault().DisplayId, 0, 0, out viewports, out bezelCorrected);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got mosaic display viewport details by resolution.");
-                        }
-                        catch (NVIDIAApiException nex)
-                        {
-                            if (nex.Status == Status.MosaicNotActive)
-                            {
-                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not currently in use, so unable to get the list of ViewportsF.");
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIAApiException occurred whilst getting display viewport details by resolution.");
-                            }
-                        }
-                        catch(Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting display viewport details by resolution.");
-                        }
-
-                        // Save the viewports to the List
-                        allViewports.Add(viewports);*//*
-
-                        // Get Current Mosaic Display Topology mode settings using the Grid topology we matched before before
-                        IDisplaySettings[] mosaicDisplaySettings;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Getting mosaic display modes from the current display topology.");
-                            mosaicDisplaySettings = NVAPI.EnumDisplayModes(gridTopo);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got mosaic display modes from the current display topology.");
-
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting display modes from current display topology");
-                            mosaicDisplaySettings = new IDisplaySettings[0];
-                        }
-                    }*/
-
-                    //myDisplayConfig.MosaicConfig.MosaicViewports = allViewports;
 
 
 
-                    // Now we try to get the NVIDIA Windows Display Config. This is needed for handling some of the advanced scaling settings that some advanced users make use of
-                    PathInfoV2[] pathInfos;
-                    try
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get NVIDIA display configuration.");
-                        pathInfos = NVAPI.GetDisplayConfig();
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got NVIDIA display configuration..");
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting NVIDIA display configuration.");
-                        pathInfos = new PathInfoV2[0];
-                    }
 
-                    // Now try and see if we have a cloned display in the current layout
-                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Checking if there is a cloned display detected within NVIDIA Display Configuration.");
-                    int pathInfoCount = pathInfos.Length;
-                    for (int x = 0; x < pathInfoCount; x++)
-                    {
-                        if (pathInfos[x].TargetsInfo.Count() > 1)
-                        {
-                            // This is a cloned display, we need to mark this NVIDIA display profile as cloned so we correct the profile later
-                            myDisplayConfig.IsCloned = true;
+        
+                    //     // Prepare the physicalGPU per adapter structure to use later
+                    //     NVIDIA_PER_ADAPTER_CONFIG myAdapter = new NVIDIA_PER_ADAPTER_CONFIG();
+                    //     //myAdapter.LogicalGPU.PhysicalGPUHandles = new PhysicalGPUHandle[0];
+                    //     myAdapter.IsQuadro = false;
+                    //     myAdapter.HasLogicalGPU = false;
+                    //     myAdapter.Displays = new Dictionary<uint, NVIDIA_PER_DISPLAY_CONFIG>();
 
-                        }
-                    }
-                    if (myDisplayConfig.IsCloned)
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Cloned display detected within NVIDIA Display Configuration.");
-                    }
-                    else
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Cloned display NOT detected within NVIDIA Display Configuration.");
-                    }
+                    //     //We want to get the name of the physical device
+                    //     myAdapter.FullName = "";
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the name of the physical GPU #{physicalGpuIndex + 1}.");
+                    //         myAdapter.FullName = NVAPI.GetFullName(physicalGpus[physicalGpuIndex]);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the GPU fullname of the physical GPU #{physicalGpuIndex + 1}. The GPU Full Name is '{myAdapter.FullName}'");
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the fullname of the physical GPU #{physicalGpuIndex + 1}.");
+                    //     }
 
-                    myDisplayConfig.DisplayConfigs = pathInfos.ToList();
-                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DISP_GetDisplayConfig returned OK on third pass.");
+                    //     // We want to get the physical details of the physical device
+                    //     // This is the Host System Type Laptop/desktop/Unknown
+                    //     myAdapter.SystemType = SystemType.Unknown;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the host system type of the physical GPU #{physicalGpuIndex + 1}.");
+                    //         myAdapter.GPUType = NVAPI.GetGPUType(physicalGpus[physicalGpuIndex]);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the host system type of the physical GPU #{physicalGpuIndex + 1}. The host system type is {myAdapter.SystemType.ToString()}");
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the host system type of the physical GPU #{physicalGpuIndex + 1}.");
+                    //     }
 
-                    // I don't think this is worth recording any more and we should remove the code. It isn't set anywhere.
-                    /*// We want to get the primary monitor
-                    UInt32 primaryDisplayId = 0;
-                    try
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the primary windows display id.");
-                        primaryDisplayId = NVAPI.GetGDIPrimaryDisplayId();
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the primary windows display id.");
-                    }
-                    catch (NVIDIAApiException nex)
-                    {
-                        if (nex.Status == Status.NvidiaDeviceNotFound)
-                        {
-                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: An NVIDIA device is not the primary display.");
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Exception occurred whilst getting the primary windows display id.");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the primary windows display id.");
-                    }
-                    myDisplayConfig.MosaicConfig.PrimaryDisplayId = primaryDisplayId;*/
+                    //     // This is the GPU Bus Type
+                    //     myAdapter.GPUType = GPUType.Unknown;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the GPU type of the physical GPU #{physicalGpuIndex + 1}.");
+                    //         myAdapter.GPUType = NVAPI.GetGPUType(physicalGpus[physicalGpuIndex]);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the GPU type of the physical GPU #{physicalGpuIndex + 1}. The bus type is {myAdapter.GPUType.ToString()}");
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the GPU type of the physical GPU #{physicalGpuIndex + 1}.");
+                    //     }
 
-                    // We want to get the number of displays we have
-                    // Go through the Physical GPUs one by one
-                    for (uint physicalGpuIndex = 0; physicalGpuIndex < physicalGpuCount; physicalGpuIndex++)
-                    {
+                    //     // This is the GPU Bus Type
+                    //     myAdapter.BusType = GPUBusType.Undefined;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the bus type of the physical GPU #{physicalGpuIndex + 1}.");
+                    //         myAdapter.BusType = NVAPI.GetBusType(physicalGpus[physicalGpuIndex]);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the bus type of the physical GPU #{physicalGpuIndex + 1}. The bus type is {myAdapter.BusType.ToString()}");
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the bus type of the physical GPU #{physicalGpuIndex + 1}.");
+                    //     }
 
-                        // Get a new variable to the PhysicalAdapters to make easier to use
-                        // NOTE: This struct was filled in earlier by code further up
-                        NVIDIA_PER_ADAPTER_CONFIG myAdapter = myDisplayConfig.PhysicalAdapters[physicalGpuIndex];
-                        myAdapter.Displays = new Dictionary<uint, NVIDIA_PER_DISPLAY_CONFIG>();
+                    //     // This is the GPU Bus ID
+                    //     myAdapter.BusId = 0;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the bus ID of the physical GPU #{physicalGpuIndex + 1}.");
+                    //         myAdapter.BusId = NVAPI.GetBusId(physicalGpus[physicalGpuIndex]);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the bus ID of the physical GPU #{physicalGpuIndex + 1}. The bus ID is {myAdapter.BusId}");
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the bus ID of the physical GPU #{physicalGpuIndex + 1}.");
+                    //     }
 
-                        //This function retrieves the number of display IDs we know about
-                        DisplayIdsV2[] displayIds;
-                        try
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the list of connected display ids that VIDIA knows about.");
-                            displayIds = NVAPI.GetConnectedDisplayIds(physicalGpus[physicalGpuIndex], ConnectedIdsFlag.UnCached | ConnectedIdsFlag.SLI | ConnectedIdsFlag.Fake);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the list of connected display ids that VIDIA knows about.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the list of connected display ids that VIDIA knows about.");
-                            displayIds = new DisplayIdsV2[0];
-                        }
+                    //     // This is the GPU Bus Slot ID
+                    //     myAdapter.BusSlotId = 0;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Attempting to get the bus slot ID of the physical GPU #{physicalGpuIndex + 1}.");
+                    //         myAdapter.BusSlotId = NVAPI.GetBusSlotId(physicalGpus[physicalGpuIndex]);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetSomeDisplayIdentifiers: Successfully got the bus slot ID of the physical GPU #{physicalGpuIndex + 1}. The bus slot ID is {myAdapter.BusSlotId}");
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetSomeDisplayIdentifiers: Exception occurred whilst getting the bus slot ID of the physical GPU #{physicalGpuIndex + 1}.");
+                    //     }
 
-                        // Time to get the color settings, HDR capabilities and settings for each display
-                        //bool isNvHdrEnabled = false;
-                        for (int displayIndex = 0; displayIndex < displayIds.Length; displayIndex++)
-                        {
-                            if (allDisplays)
-                            {
-                                // We want all physicallyconnected or connected displays
-                                if (!(displayIds[displayIndex].IsConnected || displayIds[displayIndex].IsPhysicallyConnected))
-                                {
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                // We want only active displays, so skip any non-active ones
-                                if (!displayIds[displayIndex].IsActive)
-                                {
-                                    continue;
-                                }
-                            }
+                    //     try
+                    //     {
+                    //         if (NVAPI.QueryWorkstationFeatureSupport(physicalGpus[physicalGpuIndex], WorkstationFeatureType.Proviz))
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Video Card is one from the Quadro range");
+                    //             myAdapter.IsQuadro = true;
+                    //         }
+                    //         else
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Video Card is not a Quadro range video card.");
+                    //         }
 
-                            // Record this as an active display ID
-                            foundDisplayIds.Add(displayIds[displayIndex].DisplayId);
-
-                            // Prepare the config structure for us to fill it in
-                            NVIDIA_PER_DISPLAY_CONFIG myDisplay = new NVIDIA_PER_DISPLAY_CONFIG();
-                            myDisplay.ColorData = new ColorDataV5();
-                            myDisplay.HdrColorData = new HDRColorDataV2();
-                            myDisplay.HdrCapabilities = new HDRCapabilitiesV3();
-                            myDisplay.AdaptiveSyncConfig = new SetAdaptiveSyncData();
-                            myDisplay.CustomDisplays = new List<CustomDisplay>();
-                            myDisplay.HasNvHdrEnabled = false;
-                            myDisplay.HasAdaptiveSync = false;
-                            myDisplay.HasCustomDisplay = false;
-                            myDisplay.HasColorData = false;
-
-                            // We need to skip recording anything that doesn't support color communication
-                            if (!SkippedColorConnectionTypes.Contains(displayIds[displayIndex].ConnectionType))
-                            {
-                                // Convert displayId to OutputId for the GetDVCInfoEx calls and others later
-                                PhysicalGPUHandle physicalGpu = new PhysicalGPUHandle();
-                                OutputId gpuOutputId = OutputId.Invalid;
-                                NVAPI.GetGpuAndOutputIdFromDisplayId(displayIds[displayIndex].DisplayId, out physicalGpu, out gpuOutputId);
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex,$"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst trying to find out if the card is from the Quadro range.");
+                    //     }
 
 
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: This display supports color information, so attempting to get the various color configuration settings from it.");
+                    //     try
+                    //     {
+                    //         // Firstly let's get the logical GPU from the Physical handle
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the Logical GPU Handle");
+                    //         LogicalGPUHandle logicalGPUHandle = NVAPI.GetLogicalGPUFromPhysicalGPU(physicalGpus[physicalGpuIndex]);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Logical GPU Handle from physical GPU. It means there is a Logical GPU in use.");
+                    //         myAdapter.HasLogicalGPU = true;
+                    //         /*SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Now attempting to get the Logical GPU Information");
+                    //         LogicalGPUData logicalGPUData = new LogicalGPUData();
+                    //         NVAPI.GetLogicalGPUInfo(logicalGPUHandle, out logicalGPUData);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the Logical GPU information from the NVIDIA driver!");*/
+                    //         //myAdapter.LogicalGPU = logicalGPUData;                            
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilstgetting Logical GPU handle from Physical GPU using NvAPI_GetLogicalGPUFromPhysicalGPU().");
+                    //         myAdapter.HasLogicalGPU = false;
+                    //     }
 
-                                // skip this monitor connection type as it won't provide the data in the section, and just creates errors                                
-                                // We get the Color Capabilities of the display, by setting the command to GET
-                                ColorDataV5 colorData5 = new ColorDataV5(ColorDataCommand.Get);
-                                try
-                                {
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the standard  color data from the display.");
-                                    NVAPI.ColorControl(displayIds[displayIndex].DisplayId, ref colorData5);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the standard  color data from the display.");
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Your monitor {displayIds[displayIndex].DisplayId} has the following color settings set. BPC = {colorData5.DesktopColorDepth.ToString()}. Color Format = {colorData5.ColorFormat.ToString()}. Colorimetry = {colorData5.Colorimetry.ToString("G")}. Color Selection Policy = {colorData5.SelectionPolicy.ToString()}. Color Depth = {colorData5.ColorDepth.ToString()}. Dynamic Range = {colorData5.DynamicRange.ToString()}. ");
-                                    myDisplay.ColorData = colorData5;
-                                    myDisplay.HasColorData = true;
+                    //     myDisplayConfig.PhysicalAdapters[physicalGpuIndex] = myAdapter;
+                    // }
 
-                                }
-                                catch (Exception ex)
-                                {
-                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the standard color data from the display.");
-                                }
 
-                                // Now we get the HDR capabilities of the display
-                                // TODO: CHange to HDRCapabilitiesV3 once the v3 struct is completed and tested
-                                HDRCapabilitiesV3 hdrCapabilities;
-                                try
-                                {
-                                    hdrCapabilities = NVAPI.GetHDRCapabilities(displayIds[displayIndex].DisplayId, false);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_Disp_GetHdrCapabilities returned OK.");
-                                    if (hdrCapabilities.IsST2084EOTFSupported)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports HDR mode ST2084 EOTF");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support HDR mode ST2084 EOTF");
-                                    }
-                                    if (hdrCapabilities.IsDolbyVisionSupported)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports DolbyVision HDR");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support DolbyVision HDR");
-                                    }
-                                    if (hdrCapabilities.IsEDRSupported)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports EDR");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support EDR");
-                                    }
-                                    if (hdrCapabilities.IsTraditionalHDRGammaSupported)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports Traditional HDR Gama");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support Traditional HDR Gama");
-                                    }
+                    // TopologyBrief mosaicTopoBrief = new TopologyBrief();
+                    // IDisplaySettings mosaicDisplaySettings = new DisplaySettingsV2();
+                    // int mosaicOverlapX = 0;
+                    // int mosaicOverlapY = 0;
 
-                                    if (hdrCapabilities.IsTraditionalSDRGammaSupported)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports Traditional SDR Gama");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT supports Traditional SDR Gama");
-                                    }
-                                    if (hdrCapabilities.IsDriverDefaultHDRParametersExpanded)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports Driver Expanded Default HDR Parameters");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support Driver Expanded Default HDR Parameters ");
-                                    }
+                    // try
+                    // {
+                    //     // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the current mosaic topology brief and mosaic display settings.");
+                    //     NVAPI.GetCurrentTopology(out mosaicTopoBrief, out mosaicDisplaySettings, out mosaicOverlapX, out mosaicOverlapY);
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the current mosaic toplogy brief and mosaic display settings.");
 
-                                }
-                                catch (Exception nex)
-                                {
-                                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the standard  color data from the display.");
-                                    hdrCapabilities = new HDRCapabilitiesV3();
-                                }
+                    //     myDisplayConfig.MosaicConfig.MosaicTopologyBrief = mosaicTopoBrief;
+                    //     myDisplayConfig.MosaicConfig.MosaicDisplaySettings = (DisplaySettingsV2)mosaicDisplaySettings;
+                    //     myDisplayConfig.MosaicConfig.OverlapX = mosaicOverlapX;
+                    //     myDisplayConfig.MosaicConfig.OverlapY = mosaicOverlapY;
+                    // }
+                    // catch (NVIDIAApiException nex)
+                    // {
+                    //     if (nex.Status == Status.NotSupported)
+                    //     {
+                    //         _mosaic_supported = false;
+                    //         SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported by this GPU.");
+                    //     }
+                    //     else
+                    //     {
+                    //         SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
+                    //     }
+                    // }
+                    // catch (Exception ex)
+                    // {
+                    //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
+                    // }
 
-                                myDisplay.HdrCapabilities = hdrCapabilities;
+                    // if (_mosaic_supported)
+                    // {
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_Mosaic_GetTopoGroup returned OK.");
+                    //         if (mosaicTopoBrief.IsPossible)
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is possible to use");
+                    //             //myDisplayConfig.MosaicConfig.IsMosaicPossible = true;
+                    //         }
+                    //         else
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is NOT possible to use");
+                    //             //myDisplayConfig.MosaicConfig.IsMosaicPossible = false;
+                    //         }
+                    //         if (mosaicTopoBrief.IsEnable)
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is enabled right now");
+                    //             myDisplayConfig.MosaicConfig.IsMosaicEnabled = true;
+                    //         }
+                    //         else
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is NOT enabled right now");
+                    //             myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
+                    //         }
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology group.");
+                    //     }
+
+                    // }
+                    // else
+                    // {
+                    //     // Mosaic isn't possible/supported
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Mosaic is NOT enabled.");
+                    //     myDisplayConfig.MosaicConfig.MosaicTopologyBrief = mosaicTopoBrief;
+                    //     myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
+                    //     //myDisplayConfig.MosaicConfig.IsMosaicPossible = false;
+                    //     myDisplayConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[] { };
+                    //     //myDisplayConfig.MosaicConfig.MosaicViewports = new List<ViewPortF[]>();
+                    // }
+
+                    // // Get Mosaic Grid settings!
+                    // GridTopologyV2[] mosaicGridTopos;
+                    // try
+                    // {
+                    //     // Figure out how many Mosaic Grid topoligies there are                    
+                    //     mosaicGridTopos = NVAPI.EnumDisplayGrids();
+                    //     /*for (var i = 0; i < mosaicGridTopos.Length; i++)
+                    //     {
+                    //         GridTopologyDisplayV2[] gtdlist = mosaicGridTopos[i].Displays.Cast<GridTopologyDisplayV2>().ToArray<GridTopologyDisplayV2>();
+
+                    //         for (var j = 0; j<gtdlist.Length; j++)
+                    //         {
+                    //             gtdlist[i].Version = new StructureVersion(2, typeof(GridTopologyDisplayV2));
+                    //         }
+
+                    //         mosaicGridTopos[i].Displays = gtdlist.ToList();
+                    //     }*/
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_Mosaic_GetCurrentTopo returned OK.");
+
+
+                    // }
+                    // catch (Exception ex)
+                    // {
+                    //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred while getting Mosaic Topology! NvAPI_Mosaic_EnumDisplayGrids() returned error.");
+                    //     mosaicGridTopos = new GridTopologyV2[0];
+                    // }
+
+                    // myDisplayConfig.MosaicConfig.MosaicGridTopos = mosaicGridTopos;
+                    // myDisplayConfig.MosaicConfig.MosaicGridCount = (uint)mosaicGridTopos.Length;
+
+                    // /*//List<ViewPortF[]> allViewports = new List<ViewPortF[]>();
+                    // foreach (GridTopologyV2 gridTopo in mosaicGridTopos)
+                    // {
+                    //     *//*// Get Current Mosaic Grid settings using the Grid topologies numbers we got before
+                    //     ViewPortF[] viewports = new ViewPortF[0];
+                    //     byte bezelCorrected = 0;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get mosaic display viewport details by resolution.");
+                    //         NVAPI.GetDisplayViewportsByResolution(gridTopo.Displays.FirstOrDefault().DisplayId, 0, 0, out viewports, out bezelCorrected);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got mosaic display viewport details by resolution.");
+                    //     }
+                    //     catch (NVIDIAApiException nex)
+                    //     {
+                    //         if (nex.Status == Status.MosaicNotActive)
+                    //         {
+                    //             SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not currently in use, so unable to get the list of ViewportsF.");
+                    //         }
+                    //         else
+                    //         {
+                    //             SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIAApiException occurred whilst getting display viewport details by resolution.");
+                    //         }
+                    //     }
+                    //     catch(Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting display viewport details by resolution.");
+                    //     }
+
+                    //     // Save the viewports to the List
+                    //     allViewports.Add(viewports);*//*
+
+                    //     // Get Current Mosaic Display Topology mode settings using the Grid topology we matched before before
+                    //     IDisplaySettings[] mosaicDisplaySettings;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Getting mosaic display modes from the current display topology.");
+                    //         mosaicDisplaySettings = NVAPI.EnumDisplayModes(gridTopo);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got mosaic display modes from the current display topology.");
+
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting display modes from current display topology");
+                    //         mosaicDisplaySettings = new IDisplaySettings[0];
+                    //     }
+                    // }*/
+
+                    // //myDisplayConfig.MosaicConfig.MosaicViewports = allViewports;
+
+
+
+                    // // Now we try to get the NVIDIA Windows Display Config. This is needed for handling some of the advanced scaling settings that some advanced users make use of
+                    // PathInfoV2[] pathInfos;
+                    // try
+                    // {
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get NVIDIA display configuration.");
+                    //     pathInfos = NVAPI.GetDisplayConfig();
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got NVIDIA display configuration..");
+                    // }
+                    // catch (Exception ex)
+                    // {
+                    //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting NVIDIA display configuration.");
+                    //     pathInfos = new PathInfoV2[0];
+                    // }
+
+                    // // Now try and see if we have a cloned display in the current layout
+                    // SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Checking if there is a cloned display detected within NVIDIA Display Configuration.");
+                    // int pathInfoCount = pathInfos.Length;
+                    // for (int x = 0; x < pathInfoCount; x++)
+                    // {
+                    //     if (pathInfos[x].TargetsInfo.Count() > 1)
+                    //     {
+                    //         // This is a cloned display, we need to mark this NVIDIA display profile as cloned so we correct the profile later
+                    //         myDisplayConfig.IsCloned = true;
+
+                    //     }
+                    // }
+                    // if (myDisplayConfig.IsCloned)
+                    // {
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Cloned display detected within NVIDIA Display Configuration.");
+                    // }
+                    // else
+                    // {
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Cloned display NOT detected within NVIDIA Display Configuration.");
+                    // }
+
+                    // myDisplayConfig.DisplayConfigs = pathInfos.ToList();
+                    // SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DISP_GetDisplayConfig returned OK on third pass.");
+
+                    // // I don't think this is worth recording any more and we should remove the code. It isn't set anywhere.
+                    // /*// We want to get the primary monitor
+                    // UInt32 primaryDisplayId = 0;
+                    // try
+                    // {
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the primary windows display id.");
+                    //     primaryDisplayId = NVAPI.GetGDIPrimaryDisplayId();
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the primary windows display id.");
+                    // }
+                    // catch (NVIDIAApiException nex)
+                    // {
+                    //     if (nex.Status == Status.NvidiaDeviceNotFound)
+                    //     {
+                    //         SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: An NVIDIA device is not the primary display.");
+                    //     }
+                    //     else
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Exception occurred whilst getting the primary windows display id.");
+                    //     }
+                    // }
+                    // catch (Exception ex)
+                    // {
+                    //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the primary windows display id.");
+                    // }
+                    // myDisplayConfig.MosaicConfig.PrimaryDisplayId = primaryDisplayId;*/
+
+                    // // We want to get the number of displays we have
+                    // // Go through the Physical GPUs one by one
+                    // for (uint physicalGpuIndex = 0; physicalGpuIndex < physicalGpuCount; physicalGpuIndex++)
+                    // {
+
+                    //     // Get a new variable to the PhysicalAdapters to make easier to use
+                    //     // NOTE: This struct was filled in earlier by code further up
+                    //     NVIDIA_PER_ADAPTER_CONFIG myAdapter = myDisplayConfig.PhysicalAdapters[physicalGpuIndex];
+                    //     myAdapter.Displays = new Dictionary<uint, NVIDIA_PER_DISPLAY_CONFIG>();
+
+                    //     //This function retrieves the number of display IDs we know about
+                    //     DisplayIdsV2[] displayIds;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the list of connected display ids that VIDIA knows about.");
+                    //         displayIds = NVAPI.GetConnectedDisplayIds(physicalGpus[physicalGpuIndex], ConnectedIdsFlag.UnCached | ConnectedIdsFlag.SLI | ConnectedIdsFlag.Fake);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the list of connected display ids that VIDIA knows about.");
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the list of connected display ids that VIDIA knows about.");
+                    //         displayIds = new DisplayIdsV2[0];
+                    //     }
+
+                    //     // Time to get the color settings, HDR capabilities and settings for each display
+                    //     //bool isNvHdrEnabled = false;
+                    //     for (int displayIndex = 0; displayIndex < displayIds.Length; displayIndex++)
+                    //     {
+                    //         if (allDisplays)
+                    //         {
+                    //             // We want all physicallyconnected or connected displays
+                    //             if (!(displayIds[displayIndex].IsConnected || displayIds[displayIndex].IsPhysicallyConnected))
+                    //             {
+                    //                 continue;
+                    //             }
+                    //         }
+                    //         else
+                    //         {
+                    //             // We want only active displays, so skip any non-active ones
+                    //             if (!displayIds[displayIndex].IsActive)
+                    //             {
+                    //                 continue;
+                    //             }
+                    //         }
+
+                    //         // Record this as an active display ID
+                    //         foundDisplayIds.Add(displayIds[displayIndex].DisplayId);
+
+                    //         // Prepare the config structure for us to fill it in
+                    //         NVIDIA_PER_DISPLAY_CONFIG myDisplay = new NVIDIA_PER_DISPLAY_CONFIG();
+                    //         myDisplay.ColorData = new ColorDataV5();
+                    //         myDisplay.HdrColorData = new HDRColorDataV2();
+                    //         myDisplay.HdrCapabilities = new HDRCapabilitiesV3();
+                    //         myDisplay.AdaptiveSyncConfig = new SetAdaptiveSyncData();
+                    //         myDisplay.CustomDisplays = new List<CustomDisplay>();
+                    //         myDisplay.HasNvHdrEnabled = false;
+                    //         myDisplay.HasAdaptiveSync = false;
+                    //         myDisplay.HasCustomDisplay = false;
+                    //         myDisplay.HasColorData = false;
+
+                    //         // We need to skip recording anything that doesn't support color communication
+                    //         if (!SkippedColorConnectionTypes.Contains(displayIds[displayIndex].ConnectionType))
+                    //         {
+                    //             // Convert displayId to OutputId for the GetDVCInfoEx calls and others later
+                    //             PhysicalGPUHandle physicalGpu = new PhysicalGPUHandle();
+                    //             OutputId gpuOutputId = OutputId.Invalid;
+                    //             NVAPI.GetGpuAndOutputIdFromDisplayId(displayIds[displayIndex].DisplayId, out physicalGpu, out gpuOutputId);
+
+
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: This display supports color information, so attempting to get the various color configuration settings from it.");
+
+                    //             // skip this monitor connection type as it won't provide the data in the section, and just creates errors                                
+                    //             // We get the Color Capabilities of the display, by setting the command to GET
+                    //             ColorDataV5 colorData5 = new ColorDataV5(ColorDataCommand.Get);
+                    //             try
+                    //             {
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the standard  color data from the display.");
+                    //                 NVAPI.ColorControl(displayIds[displayIndex].DisplayId, ref colorData5);
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the standard  color data from the display.");
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Your monitor {displayIds[displayIndex].DisplayId} has the following color settings set. BPC = {colorData5.DesktopColorDepth.ToString()}. Color Format = {colorData5.ColorFormat.ToString()}. Colorimetry = {colorData5.Colorimetry.ToString("G")}. Color Selection Policy = {colorData5.SelectionPolicy.ToString()}. Color Depth = {colorData5.ColorDepth.ToString()}. Dynamic Range = {colorData5.DynamicRange.ToString()}. ");
+                    //                 myDisplay.ColorData = colorData5;
+                    //                 myDisplay.HasColorData = true;
+
+                    //             }
+                    //             catch (Exception ex)
+                    //             {
+                    //                 SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the standard color data from the display.");
+                    //             }
+
+                    //             // Now we get the HDR capabilities of the display
+                    //             // TODO: CHange to HDRCapabilitiesV3 once the v3 struct is completed and tested
+                    //             HDRCapabilitiesV3 hdrCapabilities;
+                    //             try
+                    //             {
+                    //                 hdrCapabilities = NVAPI.GetHDRCapabilities(displayIds[displayIndex].DisplayId, false);
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_Disp_GetHdrCapabilities returned OK.");
+                    //                 if (hdrCapabilities.IsST2084EOTFSupported)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports HDR mode ST2084 EOTF");
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support HDR mode ST2084 EOTF");
+                    //                 }
+                    //                 if (hdrCapabilities.IsDolbyVisionSupported)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports DolbyVision HDR");
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support DolbyVision HDR");
+                    //                 }
+                    //                 if (hdrCapabilities.IsEDRSupported)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports EDR");
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support EDR");
+                    //                 }
+                    //                 if (hdrCapabilities.IsTraditionalHDRGammaSupported)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports Traditional HDR Gama");
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support Traditional HDR Gama");
+                    //                 }
+
+                    //                 if (hdrCapabilities.IsTraditionalSDRGammaSupported)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports Traditional SDR Gama");
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT supports Traditional SDR Gama");
+                    //                 }
+                    //                 if (hdrCapabilities.IsDriverDefaultHDRParametersExpanded)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} supports Driver Expanded Default HDR Parameters");
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayIds[displayIndex].DisplayId} DOES NOT support Driver Expanded Default HDR Parameters ");
+                    //                 }
+
+                    //             }
+                    //             catch (Exception nex)
+                    //             {
+                    //                 SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the standard  color data from the display.");
+                    //                 hdrCapabilities = new HDRCapabilitiesV3();
+                    //             }
+
+                    //             myDisplay.HdrCapabilities = hdrCapabilities;
                             
  
-                                // Now we get the HDR colour settings of the display
-                                HDRColorDataV2 hdrColorData;
-                                try
-                                {
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the HDR Color Mode for Display ID# {displayIds[displayIndex].DisplayId}.");
-                                    hdrColorData = new HDRColorDataV2(ColorDataHDRCommand.Get);
-                                    NVAPI.HDRColorControl(displayIds[displayIndex].DisplayId, ref hdrColorData);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the HDR Color Mode for Display ID# {displayIds[displayIndex].DisplayId} is set to {hdrColorData.HDRMode.ToString("G")}.");
-                                    if (hdrColorData.HDRMode != ColorDataHDRMode.Off)
-                                    {
-                                        myDisplay.HasNvHdrEnabled = true;
-                                    }
-                                    else
-                                    {
-                                        myDisplay.HasNvHdrEnabled = false;
-                                    }
+                    //             // Now we get the HDR colour settings of the display
+                    //             HDRColorDataV2 hdrColorData;
+                    //             try
+                    //             {
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the HDR Color Mode for Display ID# {displayIds[displayIndex].DisplayId}.");
+                    //                 hdrColorData = new HDRColorDataV2(ColorDataHDRCommand.Get);
+                    //                 NVAPI.HDRColorControl(displayIds[displayIndex].DisplayId, ref hdrColorData);
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the HDR Color Mode for Display ID# {displayIds[displayIndex].DisplayId} is set to {hdrColorData.HDRMode.ToString("G")}.");
+                    //                 if (hdrColorData.HDRMode != ColorDataHDRMode.Off)
+                    //                 {
+                    //                     myDisplay.HasNvHdrEnabled = true;
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     myDisplay.HasNvHdrEnabled = false;
+                    //                 }
 
-                                }
-                                catch (Exception nex)
-                                {
-                                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the HDR Color Mode for Display ID# {displayIds[displayIndex].DisplayId}.");
-                                    hdrColorData = new HDRColorDataV2();
-                                }
-                                myDisplay.HdrColorData = hdrColorData;
+                    //             }
+                    //             catch (Exception nex)
+                    //             {
+                    //                 SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the HDR Color Mode for Display ID# {displayIds[displayIndex].DisplayId}.");
+                    //                 hdrColorData = new HDRColorDataV2();
+                    //             }
+                    //             myDisplay.HdrColorData = hdrColorData;
                             
-                                // Now we get the Adaptive Sync Settings from the display
-                                GetAdaptiveSyncData getAdaptiveSyncData  = typeof(GetAdaptiveSyncData).Instantiate<GetAdaptiveSyncData>();
-                                try
-                                {
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Adaptive Sync Settings for Display ID# {displayIds[displayIndex].DisplayId}.");
-                                    NVAPI.GetAdaptiveSyncData(displayIds[displayIndex].DisplayId, out getAdaptiveSyncData);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the Adaptive Sync Settings for Display ID# {displayIds[displayIndex].DisplayId} is set to {hdrColorData.HDRMode.ToString("G")}.");
-                                    // Copy the AdaptiveSync Data we got into a NV_SET_ADAPTIVE_SYNC_DATA_V1 object so that it can be used without conversion
-                                    SetAdaptiveSyncData setAdaptiveSyncData = new SetAdaptiveSyncData();
-                                    setAdaptiveSyncData.Flags = getAdaptiveSyncData.Flags;
-                                    setAdaptiveSyncData.MaxFrameInterval = getAdaptiveSyncData.MaxFrameInterval;
+                    //             // Now we get the Adaptive Sync Settings from the display
+                    //             GetAdaptiveSyncData getAdaptiveSyncData  = typeof(GetAdaptiveSyncData).Instantiate<GetAdaptiveSyncData>();
+                    //             try
+                    //             {
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Adaptive Sync Settings for Display ID# {displayIds[displayIndex].DisplayId}.");
+                    //                 NVAPI.GetAdaptiveSyncData(displayIds[displayIndex].DisplayId, out getAdaptiveSyncData);
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the Adaptive Sync Settings for Display ID# {displayIds[displayIndex].DisplayId} is set to {hdrColorData.HDRMode.ToString("G")}.");
+                    //                 // Copy the AdaptiveSync Data we got into a NV_SET_ADAPTIVE_SYNC_DATA_V1 object so that it can be used without conversion
+                    //                 SetAdaptiveSyncData setAdaptiveSyncData = new SetAdaptiveSyncData();
+                    //                 setAdaptiveSyncData.Flags = getAdaptiveSyncData.Flags;
+                    //                 setAdaptiveSyncData.MaxFrameInterval = getAdaptiveSyncData.MaxFrameInterval;
 
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DISP_GetAdaptiveSyncData returned OK.");
-                                    if (getAdaptiveSyncData.DisableAdaptiveSync)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: AdaptiveSync is DISABLED for Display {displayIds[displayIndex].DisplayId} .");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: AdaptiveSync is ENABLED for Display {displayIds[displayIndex].DisplayId} .");
-                                    }
-                                    if (getAdaptiveSyncData.DisableFrameSplitting)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: FrameSplitting is DISABLED for Display {displayIds[displayIndex].DisplayId} .");
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: FrameSplitting is ENABLED for Display {displayIds[displayIndex].DisplayId} .");
-                                    }
-                                    myDisplay.AdaptiveSyncConfig = setAdaptiveSyncData;
-                                    myDisplay.HasAdaptiveSync = true;
-                                }
-                                catch (Exception nex)
-                                {
-                                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the Adaptive Sync Settings for Display ID# {displayIds[displayIndex].DisplayId}.");
-                                }
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DISP_GetAdaptiveSyncData returned OK.");
+                    //                 if (getAdaptiveSyncData.DisableAdaptiveSync)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: AdaptiveSync is DISABLED for Display {displayIds[displayIndex].DisplayId} .");
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: AdaptiveSync is ENABLED for Display {displayIds[displayIndex].DisplayId} .");
+                    //                 }
+                    //                 if (getAdaptiveSyncData.DisableFrameSplitting)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: FrameSplitting is DISABLED for Display {displayIds[displayIndex].DisplayId} .");
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: FrameSplitting is ENABLED for Display {displayIds[displayIndex].DisplayId} .");
+                    //                 }
+                    //                 myDisplay.AdaptiveSyncConfig = setAdaptiveSyncData;
+                    //                 myDisplay.HasAdaptiveSync = true;
+                    //             }
+                    //             catch (Exception nex)
+                    //             {
+                    //                 SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the Adaptive Sync Settings for Display ID# {displayIds[displayIndex].DisplayId}.");
+                    //             }
 
-                                // Now we get the Digital Vibrance Control (DVC) information
-                                PrivateDisplayDVCInfoEx dvcInfo;
-                                try
-                                {
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Digital Vibrance Control info for Display ID# {displayIds[displayIndex].DisplayId}.");
-                                    dvcInfo = NVAPI.GetDVCInfoEx(gpuOutputId);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got DVC info. Current level: {dvcInfo.CurrentLevel}");
-                                    myDisplay.DVCInfo = dvcInfo;
-                                    myDisplay.HasDVCInfo = true;
-                                }
-                                catch (Exception nex)
-                                {
-                                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting DVC info for Display ID# {displayIds[displayIndex].DisplayId}.");
-                                    dvcInfo = new PrivateDisplayDVCInfoEx();
-                                }
+                    //             // Now we get the Digital Vibrance Control (DVC) information
+                    //             PrivateDisplayDVCInfoEx dvcInfo;
+                    //             try
+                    //             {
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Digital Vibrance Control info for Display ID# {displayIds[displayIndex].DisplayId}.");
+                    //                 dvcInfo = NVAPI.GetDVCInfoEx(gpuOutputId);
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got DVC info. Current level: {dvcInfo.CurrentLevel}");
+                    //                 myDisplay.DVCInfo = dvcInfo;
+                    //                 myDisplay.HasDVCInfo = true;
+                    //             }
+                    //             catch (Exception nex)
+                    //             {
+                    //                 SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting DVC info for Display ID# {displayIds[displayIndex].DisplayId}.");
+                    //                 dvcInfo = new PrivateDisplayDVCInfoEx();
+                    //             }
 
-                                // Now we get the Hue information
-                                PrivateDisplayHUEInfo hueInfo;
-                                try
-                                {
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Hue info for Display ID# {displayIds[displayIndex].DisplayId}.");
-                                    hueInfo = NVAPI.GetHUEInfo(gpuOutputId);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Hue info. Current angle: {hueInfo.CurrentAngle}");
-                                    myDisplay.HUEInfo = hueInfo;
-                                    myDisplay.HasHUEInfo = true;
-                                }
-                                catch (Exception nex)
-                                {
-                                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting Hue info for Display ID# {displayIds[displayIndex].DisplayId}.");
-                                    hueInfo = new PrivateDisplayHUEInfo();
-                                }
+                    //             // Now we get the Hue information
+                    //             PrivateDisplayHUEInfo hueInfo;
+                    //             try
+                    //             {
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the Hue info for Display ID# {displayIds[displayIndex].DisplayId}.");
+                    //                 hueInfo = NVAPI.GetHUEInfo(gpuOutputId);
+                    //                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Hue info. Current angle: {hueInfo.CurrentAngle}");
+                    //                 myDisplay.HUEInfo = hueInfo;
+                    //                 myDisplay.HasHUEInfo = true;
+                    //             }
+                    //             catch (Exception nex)
+                    //             {
+                    //                 SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting Hue info for Display ID# {displayIds[displayIndex].DisplayId}.");
+                    //                 hueInfo = new PrivateDisplayHUEInfo();
+                    //             }
 
-                                // TEMPORARILY DISABLING THE CUSTOM DISPLAY CODE FOR NOW, AS NOT SURE WHAT NVIDIA SETTINGS IT TRACKS
-                                // KEEPING IT IN CASE I NEED IT FOR LATER. I ORIGINALLY THOUGHT THAT IS WHERE INTEGER SCALING SETTINGS LIVED< BUT WAS WRONG
-                                /*// Now we get the Custom Display settings of the display (if there are any)
-                                //NVIDIA_CUSTOM_DISPLAY_CONFIG customDisplayConfig = new NVIDIA_CUSTOM_DISPLAY_CONFIG();
-                                List<NV_CUSTOM_DISPLAY_V1> customDisplayConfig = new List<NV_CUSTOM_DISPLAY_V1>();
-                                for (UInt32 d = 0; d < UInt32.MaxValue; d++)
-                                {
-                                    NV_CUSTOM_DISPLAY_V1 customDisplay = new NV_CUSTOM_DISPLAY_V1();
-                                    status = NVAPI.EnumCustomDisplay(displayIds[displayIndex].DisplayId, d, ref customDisplay);
-                                    if (status == Status.Ok)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DISP_EnumCustomDisplay returned OK. Custom Display settings retrieved.");
-                                        myDisplay.CustomDisplay = customDisplay;
-                                        myDisplay.HasCustomDisplay = true;
-                                    }
-                                    else if (status == Status.NVAPI_END_ENUMERATION)
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: We've reached the end of the list of Custom Displays. Breaking the polling loop.");
-                                        break;
-                                    }
-                                    else if (status == Status.InvalidDisplayId)
-                                    {
-                                        SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: The input monitor is either not connected or is not a DP or HDMI panel. NvAPI_DISP_EnumCustomDisplay() returned error code {status}");
-                                        break;
-                                    }
-                                    else if (status == Status.ApiNotInitialized)
-                                    {
-                                        SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: The NvAPI API needs to be initialized first. NvAPI_DISP_EnumCustomDisplay() returned error code {status}");
-                                        break;
-                                    }
-                                    else if (status == Status.NoImplementation)
-                                    {
-                                        SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: This entry point not available in this NVIDIA Driver. NvAPI_DISP_EnumCustomDisplay() returned error code {status}");
-                                        break;
-                                    }
-                                    else if (status == Status.IncompatibleStructureVersion)
-                                    {
-                                        SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: The supplied struct is incompatible. NvAPI_DISP_EnumCustomDisplay() returned error code {status}");
-                                        break;
-                                    }
-                                    else if (status == Status.Error)
-                                    {
-                                        SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: A miscellaneous error occurred. NvAPI_DISP_EnumCustomDisplay() returned error code {status}.");
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Some non standard error occurred while enumerating the custom displays! NvAPI_DISP_EnumCustomDisplay() returned error code {status}.");
-                                        break;
-                                    }
+                    //             // TEMPORARILY DISABLING THE CUSTOM DISPLAY CODE FOR NOW, AS NOT SURE WHAT NVIDIA SETTINGS IT TRACKS
+                    //             // KEEPING IT IN CASE I NEED IT FOR LATER. I ORIGINALLY THOUGHT THAT IS WHERE INTEGER SCALING SETTINGS LIVED< BUT WAS WRONG
+                    //             /*// Now we get the Custom Display settings of the display (if there are any)
+                    //             //NVIDIA_CUSTOM_DISPLAY_CONFIG customDisplayConfig = new NVIDIA_CUSTOM_DISPLAY_CONFIG();
+                    //             List<NV_CUSTOM_DISPLAY_V1> customDisplayConfig = new List<NV_CUSTOM_DISPLAY_V1>();
+                    //             for (UInt32 d = 0; d < UInt32.MaxValue; d++)
+                    //             {
+                    //                 NV_CUSTOM_DISPLAY_V1 customDisplay = new NV_CUSTOM_DISPLAY_V1();
+                    //                 status = NVAPI.EnumCustomDisplay(displayIds[displayIndex].DisplayId, d, ref customDisplay);
+                    //                 if (status == Status.Ok)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DISP_EnumCustomDisplay returned OK. Custom Display settings retrieved.");
+                    //                     myDisplay.CustomDisplay = customDisplay;
+                    //                     myDisplay.HasCustomDisplay = true;
+                    //                 }
+                    //                 else if (status == Status.NVAPI_END_ENUMERATION)
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: We've reached the end of the list of Custom Displays. Breaking the polling loop.");
+                    //                     break;
+                    //                 }
+                    //                 else if (status == Status.InvalidDisplayId)
+                    //                 {
+                    //                     SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: The input monitor is either not connected or is not a DP or HDMI panel. NvAPI_DISP_EnumCustomDisplay() returned error code {status}");
+                    //                     break;
+                    //                 }
+                    //                 else if (status == Status.ApiNotInitialized)
+                    //                 {
+                    //                     SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: The NvAPI API needs to be initialized first. NvAPI_DISP_EnumCustomDisplay() returned error code {status}");
+                    //                     break;
+                    //                 }
+                    //                 else if (status == Status.NoImplementation)
+                    //                 {
+                    //                     SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: This entry point not available in this NVIDIA Driver. NvAPI_DISP_EnumCustomDisplay() returned error code {status}");
+                    //                     break;
+                    //                 }
+                    //                 else if (status == Status.IncompatibleStructureVersion)
+                    //                 {
+                    //                     SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: The supplied struct is incompatible. NvAPI_DISP_EnumCustomDisplay() returned error code {status}");
+                    //                     break;
+                    //                 }
+                    //                 else if (status == Status.Error)
+                    //                 {
+                    //                     SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: A miscellaneous error occurred. NvAPI_DISP_EnumCustomDisplay() returned error code {status}.");
+                    //                     break;
+                    //                 }
+                    //                 else
+                    //                 {
+                    //                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Some non standard error occurred while enumerating the custom displays! NvAPI_DISP_EnumCustomDisplay() returned error code {status}.");
+                    //                     break;
+                    //                 }
 
-                                }*/
+                    //             }*/
 
-                                myAdapter.Displays.Add(displayIds[displayIndex].DisplayId, myDisplay);
+                    //             myAdapter.Displays.Add(displayIds[displayIndex].DisplayId, myDisplay);
                                 
-                            }
-                        }
+                    //         }
+                    //     }
 
-                        myAdapter.DisplayCount = (UInt32)myAdapter.Displays.Count();
-                        myDisplayConfig.PhysicalAdapters[physicalGpuIndex] = myAdapter;
+                    //     myAdapter.DisplayCount = (UInt32)myAdapter.Displays.Count();
+                    //     myDisplayConfig.PhysicalAdapters[physicalGpuIndex] = myAdapter;
 
-                    }
+                    // }
 
 
                     // Now we need to loop through each of the windows paths so we can record the Windows DisplayName to DisplayID mapping
@@ -2011,11 +2650,24 @@ namespace DisplayMagicianShared.NVIDIA
                 {
                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Processing settings for Physical GPU #{physicalGPU.Key}");
                     NVIDIA_PER_ADAPTER_CONFIG myAdapter = physicalGPU.Value;
-                    UInt32 myAdapterIndex = physicalGPU.Key;
+                    string myAdapterIndex = physicalGPU.Key;
                     foreach (var displayDict in myAdapter.Displays)
                     {
                         NVIDIA_PER_DISPLAY_CONFIG myDisplay = displayDict.Value;
-                        UInt32 displayId = displayDict.Key;
+                        string displayKey = displayDict.Key;
+
+                        // Parse displayId from the composite key for connected display check
+                        // Key format: "{adapterDeviceID}|{manufacturerName}|{productCode}|{displayId}"
+                        UInt32 displayId = 0;
+                        if (displayKey.Contains("|"))
+                        {
+                            var parts = displayKey.Split('|');
+                            if (parts.Length >= 4) UInt32.TryParse(parts[3], out displayId);
+                        }
+                        else
+                        {
+                            UInt32.TryParse(displayKey, out displayId);
+                        }
 
                         if (!_allConnectedDisplayIds.Contains(displayId))
                         {
@@ -2523,12 +3175,24 @@ namespace DisplayMagicianShared.NVIDIA
                 {
                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Processing settings for Physical GPU #{physicalGPU.Key}");
                     NVIDIA_PER_ADAPTER_CONFIG myAdapter = physicalGPU.Value;
-                    UInt32 myAdapterIndex = physicalGPU.Key;
+                    string myAdapterIndex = physicalGPU.Key;
 
                     foreach (var displayDict in myAdapter.Displays)
                     {
                         NVIDIA_PER_DISPLAY_CONFIG myDisplay = displayDict.Value;
-                        UInt32 displayId = displayDict.Key;
+                        string displayKey = displayDict.Key;
+
+                        // Parse displayId from the composite key for connected display check
+                        UInt32 displayId = 0;
+                        if (displayKey.Contains("|"))
+                        {
+                            var parts = displayKey.Split('|');
+                            if (parts.Length >= 4) UInt32.TryParse(parts[3], out displayId);
+                        }
+                        else
+                        {
+                            UInt32.TryParse(displayKey, out displayId);
+                        }
 
                         // Now we try to set each display settings
                         SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to process settings for display {displayId}.");
@@ -2546,14 +3210,14 @@ namespace DisplayMagicianShared.NVIDIA
                             ColorDataV5 colorData = (ColorDataV5)myDisplay.ColorData;
                             try
                             {
-                                ColorDataV5 activeColorData = (ColorDataV5)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData;
+                                ColorDataV5 activeColorData = (ColorDataV5)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayKey].ColorData;
                                 // If the setting for this display is not the same as we want, then we set it to NV_COLOR_SELECTION_POLICY_BEST_QUALITY
-                                if (ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData.SelectionPolicy != colorData.SelectionPolicy)
+                                if (ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayKey].ColorData.SelectionPolicy != colorData.SelectionPolicy)
                                 {
                                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to set the NVIDIA custom colour settings for display {displayId} to what the user wants them to be.");
 
                                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to use custom NVIDIA HDR Colour for display {displayId}.");
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want the standard colour settings to be {myDisplay.ColorData.SelectionPolicy.ToString()} and they are {ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData.SelectionPolicy.ToString()} for Mosaic display {displayId}.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want the standard colour settings to be {myDisplay.ColorData.SelectionPolicy.ToString()} and they are {ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayKey].ColorData.SelectionPolicy.ToString()} for Mosaic display {displayId}.");
                                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want to turn off standard colour mode for Mosaic display {displayId}.");
                                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings Color selection policy {colorData.SelectionPolicy.ToString()} for Mosaic display {displayId}");
                                     SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We want standard colour settings Desktop Colour Depth {colorData.DesktopColorDepth} for Mosaic display {displayId}");
@@ -2597,7 +3261,7 @@ namespace DisplayMagicianShared.NVIDIA
                             {
 
                                 // if it's not the same HDR we want, then we turn off HDR (and will apply it if needed later on in SetActiveOverride)
-                                HDRColorDataV2 activeHdrColorData = (HDRColorDataV2)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].HdrColorData;
+                                HDRColorDataV2 activeHdrColorData = (HDRColorDataV2)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayKey].HdrColorData;
                                 // if it's HDR and it's a different mode than what we are in now, then set HDR
                                 if (activeHdrColorData.HDRMode != hdrColorData.HDRMode)
                                 {
@@ -2643,7 +3307,7 @@ namespace DisplayMagicianShared.NVIDIA
                             PrivateDisplayDVCInfoEx dvcInfo = myDisplay.DVCInfo;
                             try
                             {
-                                PrivateDisplayDVCInfoEx activeDvcInfo = ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].DVCInfo;
+                                PrivateDisplayDVCInfoEx activeDvcInfo = ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayKey].DVCInfo;
 
                                 if (activeDvcInfo.CurrentLevel != dvcInfo.CurrentLevel)
                                 {
@@ -2689,7 +3353,7 @@ namespace DisplayMagicianShared.NVIDIA
                             PrivateDisplayHUEInfo hueInfo = myDisplay.HUEInfo;
                             try
                             {
-                                PrivateDisplayHUEInfo activeHueInfo = ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].HUEInfo;
+                                PrivateDisplayHUEInfo activeHueInfo = ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayKey].HUEInfo;
 
                                 if (activeHueInfo.CurrentAngle != hueInfo.CurrentAngle)
                                 {

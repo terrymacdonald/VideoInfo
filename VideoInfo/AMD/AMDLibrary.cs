@@ -23,7 +23,6 @@ using System.Xml.Linq;
 using Windows.Devices.PointOfService;
 using Windows.Graphics;
 using WinRT;
-using static DisplayMagicianShared.NVIDIA.DisplayTopologyStatus;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
