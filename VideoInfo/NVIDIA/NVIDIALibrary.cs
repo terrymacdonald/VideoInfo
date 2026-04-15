@@ -22,21 +22,21 @@ namespace DisplayMagicianShared.NVIDIA
     public struct NVIDIA_MOSAIC_CONFIG : IEquatable<NVIDIA_MOSAIC_CONFIG>
     {
         public bool IsMosaicEnabled;
-        public TopologyBrief  MosaicTopologyBrief;
-        public DisplaySettingsV2 MosaicDisplaySettings;
+        public NV_MOSAIC_TOPO_BRIEF  MosaicTopologyBrief;
+        public NV_MOSAIC_DISPLAY_SETTING_V2 MosaicDisplaySettings;
         public Int32 OverlapX;
         public Int32 OverlapY;
-        public GridTopologyV2[] MosaicGridTopos;
+        public NV_GRID_TOPOLOGY_V2[] MosaicGridTopos;
         public UInt32 MosaicGridCount;
 
         public NVIDIA_MOSAIC_CONFIG()
         {
             IsMosaicEnabled = false;
-            MosaicTopologyBrief = new TopologyBrief();
-            MosaicDisplaySettings = new DisplaySettingsV2();
+            MosaicTopologyBrief = new NV_MOSAIC_TOPO_BRIEF();
+            MosaicDisplaySettings = new NV_MOSAIC_DISPLAY_SETTING_V2();
             OverlapX = 0;
             OverlapY = 0;
-            MosaicGridTopos = new GridTopologyV2[] { };
+            MosaicGridTopos = new NV_GRID_TOPOLOGY_V2[] { };
             MosaicGridCount = 0;
         }
 
@@ -108,14 +108,14 @@ namespace DisplayMagicianShared.NVIDIA
         public NV_MONITOR_CONN_TYPE ConnectorType;        
 
         public bool HasNvHdrEnabled;
-        public HDRCapabilitiesV3 HdrCapabilities;
-        public HDRColorDataV2 HdrColorData;
+        public _NV_HDR_CAPABILITIES_V3 HdrCapabilities;
+        public _NV_HDR_COLOR_DATA_V2 HdrColorData;
         public bool HasAdaptiveSync;
-        public SetAdaptiveSyncData AdaptiveSyncConfig;
+        public _NV_ADAPTIVE_SYNC_DATA AdaptiveSyncConfig;
         public bool HasColorData;
-        public ColorDataV5 ColorData;
+        public _NV_COLOR_DATA_V5 ColorData;
         public bool HasCustomDisplay;
-        public List<CustomDisplay> CustomDisplays;
+        public List<NV_CUSTOM_DISPLAY> CustomDisplays;
         public bool HasDVCInfo;
         public PrivateDisplayDVCInfoEx DVCInfo;
         public bool HasHUEInfo;
@@ -124,14 +124,14 @@ namespace DisplayMagicianShared.NVIDIA
         public NVIDIA_PER_DISPLAY_CONFIG()
         {
             HasNvHdrEnabled = false;
-            HdrCapabilities = new HDRCapabilitiesV3();
-            HdrColorData = new HDRColorDataV2();
+            HdrCapabilities = new _NV_HDR_CAPABILITIES_V3();
+            HdrColorData = new _NV_HDR_COLOR_DATA_V2();
             HasAdaptiveSync = false;
-            AdaptiveSyncConfig = new SetAdaptiveSyncData();
+            AdaptiveSyncConfig = new _NV_ADAPTIVE_SYNC_DATA();
             HasColorData = false;
-            ColorData = new ColorDataV5();
+            ColorData = new _NV_COLOR_DATA_V5();
             HasCustomDisplay = false;
-            CustomDisplays = new List<CustomDisplay>();
+            CustomDisplays = new List<NV_CUSTOM_DISPLAY>();
             HasDVCInfo = false;
             DVCInfo = new PrivateDisplayDVCInfoEx();
             HasHUEInfo = false;
@@ -269,15 +269,15 @@ namespace DisplayMagicianShared.NVIDIA
     {
         //public bool HasDRSSettings;
         public bool IsBaseProfile;
-        public DRSProfileV1 ProfileInfo;
-        public List<DRSSettingV1> DriverSettings;
+        public _NVDRS_PROFILE_V1 ProfileInfo;
+        public List<_NVDRS_SETTING_V1> DriverSettings;
 
         public NVIDIA_DRS_CONFIG()
         {
             //HasDRSSettings = false;
             IsBaseProfile = false;
-            ProfileInfo = new DRSProfileV1();
-            DriverSettings = new List<DRSSettingV1>();
+            ProfileInfo = new _NVDRS_PROFILE_V1();
+            DriverSettings = new List<_NVDRS_SETTING_V1>();
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_DRS_CONFIG other && this.Equals(other);
@@ -484,7 +484,7 @@ namespace DisplayMagicianShared.NVIDIA
         public bool IsCloned;
         public NVIDIA_MOSAIC_CONFIG MosaicConfig;
         public Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG> PhysicalAdapters;
-        public List<PathInfoV2> DisplayConfigs;
+        public List<NV_DISPLAY_PATH_INFO_V3> DisplayConfigs;
         public List<NVIDIA_DRS_CONFIG> DRSSettings;
         // Note: We purposely have left out the DisplayNames from the Equals as it's order keeps changing after each reboot and after each profile swap
         // and it is informational only and doesn't contribute to the configuration (it's used for generating the Screens structure, and therefore for
@@ -498,7 +498,7 @@ namespace DisplayMagicianShared.NVIDIA
             IsCloned = false;
             MosaicConfig = new NVIDIA_MOSAIC_CONFIG();
             PhysicalAdapters = new Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG>();
-            DisplayConfigs = new List<PathInfoV2>();
+            DisplayConfigs = new List<NV_DISPLAY_PATH_INFO_V3>();
             DRSSettings = new List<NVIDIA_DRS_CONFIG>();
             DisplayNames = new Dictionary<string, string>();
             DisplayIdentifiers = new List<string>();
@@ -547,7 +547,7 @@ namespace DisplayMagicianShared.NVIDIA
                 }
 
                 // Now we need to go through the display configs comparing values, as the order changes if there is a cloned display
-                if (!CollectionComparer.EqualButDifferentOrder<PathInfoV2>(DisplayConfigs, other.DisplayConfigs))
+                if (!CollectionComparer.EqualButDifferentOrder<NV_DISPLAY_PATH_INFO_V3>(DisplayConfigs, other.DisplayConfigs))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DisplayConfigs lists don't match!");
                     return false;
@@ -592,7 +592,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         private bool _initialised = false;
         private NVIDIA_DISPLAY_CONFIG? _activeDisplayConfig;
-        public List<MonitorConnectionType> SkippedColorConnectionTypes;
+        public List<NV_MONITOR_CONN_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
         public List<uint> _allConnectedDisplayIds = new List<uint>();
         private bool _mosaic_supported = true;
@@ -615,12 +615,12 @@ namespace DisplayMagicianShared.NVIDIA
         public NVIDIALibrary()
         {
             // Populate the list of ConnectionTypes we want to skip as they don't support querying
-            SkippedColorConnectionTypes = new List<MonitorConnectionType> {
-                MonitorConnectionType.VGA,
-                MonitorConnectionType.Component,
-                MonitorConnectionType.Composite,
-                MonitorConnectionType.SVideo,
-                MonitorConnectionType.DVI,
+            SkippedColorConnectionTypes = new List<NV_MONITOR_CONN_TYPE>() {
+                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_VGA,
+                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_COMPONENT,
+                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_COMPOSITE,
+                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_SVIDEO,
+                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_DVI,
             };
 
             _activeDisplayConfig = CreateDefaultConfig();
@@ -809,12 +809,12 @@ namespace DisplayMagicianShared.NVIDIA
             // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
             myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;
             //myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[GridTopologyV2.MaxDisplays];
-            myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[] { };
+            myDefaultConfig.MosaicConfig.MosaicGridTopos = new _NV_MOSAIC_GRID_TOPO_V2[0];
             myDefaultConfig.MosaicConfig.MosaicGridCount = 0;
-            myDefaultConfig.MosaicConfig.MosaicDisplaySettings = new DisplaySettingsV2();
-            myDefaultConfig.PhysicalAdapters = new Dictionary<UInt32, NVIDIA_PER_ADAPTER_CONFIG>();
-            myDefaultConfig.DisplayConfigs = new List<PathInfoV2>();
-            myDefaultConfig.DRSSettings = new List<NVIDIA_DRS_CONFIG>();
+            myDefaultConfig.MosaicConfig.MosaicDisplaySettings = new NV_MOSAIC_DISPLAY_SETTING_V2();
+            myDefaultConfig.PhysicalAdapters = new Dictionary<UInt32, NV_PER_ADAPTER_CONFIG>();
+            myDefaultConfig.DisplayConfigs = new List<_NV_DISPLAY_PATH_INFO_V3>();
+            myDefaultConfig.DRSSettings = new List<_NV_DRS_CONFIG>();
             myDefaultConfig.DisplayNames = new Dictionary<string, string>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.IsCloned = false;
