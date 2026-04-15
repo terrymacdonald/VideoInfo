@@ -2209,20 +2209,6 @@
             </summary>
             <returns>VBlank counter value, or null if unavailable.</returns>
         </member>
-        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.GetDisplayConfig">
-            <summary>
-            Get the current display configuration snapshot.
-            </summary>
-            <returns>Display configuration info, or null if unavailable.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.SetDisplayConfig(NVAPIWrapper.NVAPIDisplayConfigDto,System.UInt32)">
-            <summary>
-            Apply a display configuration snapshot using NvAPI_DISP_SetDisplayConfig.
-            </summary>
-            <param name="config">Desired display configuration snapshot.</param>
-            <param name="flags">Optional NVAPI display config flags.</param>
-            <returns>True if applied, false if unavailable or unchanged.</returns>
-        </member>
         <member name="M:NVAPIWrapper.NVAPIDisplayHelper.GetDisplayIdByDisplayName(System.String)">
             <summary>
             Get the display ID associated with a display name.
@@ -6196,6 +6182,20 @@
             Enumerate NVIDIA displays associated with this GPU that are active.
             </summary>
             <returns>Array of display helpers, or empty if none are found.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetDisplayConfig">
+            <summary>
+            Get the current display configuration snapshot.
+            </summary>
+            <returns>Display configuration info, or null if unavailable.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.SetDisplayConfig(NVAPIWrapper.NVAPIDisplayConfigDto,System.UInt32)">
+            <summary>
+            Apply a display configuration snapshot using NvAPI_DISP_SetDisplayConfig.
+            </summary>
+            <param name="config">Desired display configuration snapshot.</param>
+            <param name="flags">Optional NVAPI display config flags.</param>
+            <returns>True if applied, false if unavailable or unchanged.</returns>
         </member>
         <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetShaderSubPipeCount">
             <summary>
