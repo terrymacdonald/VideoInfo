@@ -165,6 +165,38 @@ namespace DisplayMagicianShared.NVIDIA
         public bool IsMultiStreamRootNode;
         public bool IsOSVisible;
         public bool IsWfd;
+
+        // Monitor Capabilities
+        public bool HasMonitorCapabilities;
+        public NVAPIMonitorCapabilitiesDto MonitorCapabilities;
+
+        // Monitor Color Capabilities
+        public bool HasMonitorColorCapabilities;
+        public NVAPIMonitorColorCapabilitiesDto MonitorColorCapabilities;
+
+        // HDMI Support Info
+        public bool HasHdmiSupportInfo;
+        public NVAPIDisplayHdmiSupportInfoDto HdmiSupportInfo;
+
+        // VRR Info
+        public bool HasVrrInfo;
+        public NVAPIVrrInfoDto VrrInfo;
+
+        // Display Colorimetry
+        public bool HasDisplayColorimetry;
+        public NVAPIDisplayColorimetryDto DisplayColorimetry;
+
+        // Display ID Info
+        public bool HasDisplayIdInfo;
+        public NVAPIDisplayIdInfoDto DisplayIdInfo;
+
+        // Timing
+        public bool HasTiming;
+        public NVAPITimingDto Timing;
+
+        // Scanout Configuration
+        public bool HasScanoutConfiguration;
+        public NVAPIGpuScanoutConfigurationDto ScanoutConfiguration;
         
         public NVIDIA_PER_DISPLAY_CONFIG()
         {
@@ -201,6 +233,22 @@ namespace DisplayMagicianShared.NVIDIA
             IsMultiStreamRootNode = false;
             IsOSVisible = false;
             IsWfd = false;
+            HasMonitorCapabilities = false;
+            MonitorCapabilities = new NVAPIMonitorCapabilitiesDto();
+            HasMonitorColorCapabilities = false;
+            MonitorColorCapabilities = new NVAPIMonitorColorCapabilitiesDto();
+            HasHdmiSupportInfo = false;
+            HdmiSupportInfo = new NVAPIDisplayHdmiSupportInfoDto();
+            HasVrrInfo = false;
+            VrrInfo = new NVAPIVrrInfoDto();
+            HasDisplayColorimetry = false;
+            DisplayColorimetry = new NVAPIDisplayColorimetryDto();
+            HasDisplayIdInfo = false;
+            DisplayIdInfo = new NVAPIDisplayIdInfoDto();
+            HasTiming = false;
+            Timing = new NVAPITimingDto();
+            HasScanoutConfiguration = false;
+            ScanoutConfiguration = new NVAPIGpuScanoutConfigurationDto();
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_PER_DISPLAY_CONFIG other && this.Equals(other);
@@ -410,6 +458,102 @@ namespace DisplayMagicianShared.NVIDIA
                     return false;
                 }
 
+                if (HasMonitorCapabilities != other.HasMonitorCapabilities)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasMonitorCapabilities fields don't match!");
+                    return false;
+                }
+
+                if (!MonitorCapabilities.Equals(other.MonitorCapabilities))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The MonitorCapabilities structs don't match!");
+                    return false;
+                }
+
+                if (HasMonitorColorCapabilities != other.HasMonitorColorCapabilities)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasMonitorColorCapabilities fields don't match!");
+                    return false;
+                }
+
+                if (!MonitorColorCapabilities.Equals(other.MonitorColorCapabilities))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The MonitorColorCapabilities structs don't match!");
+                    return false;
+                }
+
+                if (HasHdmiSupportInfo != other.HasHdmiSupportInfo)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasHdmiSupportInfo fields don't match!");
+                    return false;
+                }
+
+                if (!HdmiSupportInfo.Equals(other.HdmiSupportInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HdmiSupportInfo structs don't match!");
+                    return false;
+                }
+
+                if (HasVrrInfo != other.HasVrrInfo)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasVrrInfo fields don't match!");
+                    return false;
+                }
+
+                if (!VrrInfo.Equals(other.VrrInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The VrrInfo structs don't match!");
+                    return false;
+                }
+
+                if (HasDisplayColorimetry != other.HasDisplayColorimetry)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasDisplayColorimetry fields don't match!");
+                    return false;
+                }
+
+                if (!DisplayColorimetry.Equals(other.DisplayColorimetry))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The DisplayColorimetry structs don't match!");
+                    return false;
+                }
+
+                if (HasDisplayIdInfo != other.HasDisplayIdInfo)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasDisplayIdInfo fields don't match!");
+                    return false;
+                }
+
+                if (!DisplayIdInfo.Equals(other.DisplayIdInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The DisplayIdInfo structs don't match!");
+                    return false;
+                }
+
+                if (HasTiming != other.HasTiming)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasTiming fields don't match!");
+                    return false;
+                }
+
+                if (!Timing.Equals(other.Timing))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The Timing structs don't match!");
+                    return false;
+                }
+
+                if (HasScanoutConfiguration != other.HasScanoutConfiguration)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The HasScanoutConfiguration fields don't match!");
+                    return false;
+                }
+
+                if (!ScanoutConfiguration.Equals(other.ScanoutConfiguration))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_DISPLAY_CONFIG/Equals: The ScanoutConfiguration structs don't match!");
+                    return false;
+                }
+
                 // If we make it here then the two configs are equal
                 return true;
             }
@@ -430,7 +574,11 @@ namespace DisplayMagicianShared.NVIDIA
                 HasDisplayPortInfo, DisplayPortInfo, HasVirtualRefreshRate, VirtualRefreshRateData, HasPreferredStereoDisplay, PreferredStereoDisplay,
                 HasSourceColorSpace, SourceColorSpace, HasSourceHdrMetadata, SourceHdrMetadata, HasOutputMode, OutputMode, 
                 HasHdrToneMapping, HdrToneMapping, HasInfoFrameData, InfoFrameData,
-                IsActive, IsConnected, IsPhysicallyConnected, IsCluster, IsDynamic, IsMultiStreamRootNode, IsOSVisible, IsWfd).GetHashCode();
+                IsActive, IsConnected, IsPhysicallyConnected, IsCluster, IsDynamic, IsMultiStreamRootNode, IsOSVisible, IsWfd,
+                HasMonitorCapabilities, MonitorCapabilities, HasMonitorColorCapabilities, MonitorColorCapabilities,
+                HasHdmiSupportInfo, HdmiSupportInfo, HasVrrInfo, VrrInfo,
+                HasDisplayColorimetry, DisplayColorimetry, HasDisplayIdInfo, DisplayIdInfo,
+                HasTiming, Timing, HasScanoutConfiguration, ScanoutConfiguration).GetHashCode();
         }
         public static bool operator ==(NVIDIA_PER_DISPLAY_CONFIG lhs, NVIDIA_PER_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -539,6 +687,12 @@ namespace DisplayMagicianShared.NVIDIA
 
         public NVAPIDisplayConfigDto DisplayConfig;
 
+        public NVAPIGpuArchInfoDto ArchInfo;
+
+        public NVAPIGpuBoardInfoDto BoardInfo;
+
+        public NVAPIGpuHdcpSupportStatusDto HdcpSupportStatus;
+
         public UInt32 DisplayCount;
         public Dictionary<string, NVIDIA_PER_DISPLAY_CONFIG> Displays;
 
@@ -559,6 +713,9 @@ namespace DisplayMagicianShared.NVIDIA
             GpuInfo = new NVAPIGpuInfoDto();
             EccConfigurationInfo = new NVAPIGpuEccConfigurationInfoDto();
             DisplayConfig = new NVAPIDisplayConfigDto();
+            ArchInfo = new NVAPIGpuArchInfoDto();
+            BoardInfo = new NVAPIGpuBoardInfoDto();
+            HdcpSupportStatus = new NVAPIGpuHdcpSupportStatusDto();
             DisplayCount = 0;
             Displays = new Dictionary<string, NVIDIA_PER_DISPLAY_CONFIG>();
         }
@@ -645,6 +802,21 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The DisplayConfig structs don't match!");
                     return false;
                 }
+                if (!ArchInfo.Equals(other.ArchInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The ArchInfo structs don't match!");
+                    return false;
+                }
+                if (!BoardInfo.Equals(other.BoardInfo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The BoardInfo structs don't match!");
+                    return false;
+                }
+                if (!HdcpSupportStatus.Equals(other.HdcpSupportStatus))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The HdcpSupportStatus structs don't match!");
+                    return false;
+                }
                 if (DisplayCount != other.DisplayCount)
                 {
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The DisplayCount fields don't match!");
@@ -670,7 +842,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override int GetHashCode()
         {
-            return (IsQuadro, HasLogicalGPU, SystemType, FullName, GPUType, BusType, BusId, BusSlotId, DisplayConfig, DisplayCount, Displays).GetHashCode();
+            return (IsQuadro, HasLogicalGPU, SystemType, FullName, GPUType, BusType, BusId, BusSlotId, DisplayConfig, ArchInfo, BoardInfo, HdcpSupportStatus, DisplayCount, Displays).GetHashCode();
         }
         public static bool operator ==(NVIDIA_PER_ADAPTER_CONFIG lhs, NVIDIA_PER_ADAPTER_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -1323,6 +1495,54 @@ namespace DisplayMagicianShared.NVIDIA
                         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting display config for adapter {adapterNum}.");
                     }
 
+                    // Get the GPU architecture info
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the architecture info of the physical GPU adapter {adapterNum}.");
+                        var archInfoResult = adapter.GetArchInfo();
+                        if (archInfoResult.HasValue)
+                        {
+                            myAdapter.ArchInfo = archInfoResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the architecture info for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting architecture info for adapter {adapterNum}.");
+                    }
+
+                    // Get the GPU board info
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the board info of the physical GPU adapter {adapterNum}.");
+                        var boardInfoResult = adapter.GetBoardInfo();
+                        if (boardInfoResult.HasValue)
+                        {
+                            myAdapter.BoardInfo = boardInfoResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the board info for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting board info for adapter {adapterNum}.");
+                    }
+
+                    // Get the HDCP support status
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the HDCP support status of the physical GPU adapter {adapterNum}.");
+                        var hdcpResult = adapter.GetHdcpSupportStatus();
+                        if (hdcpResult.HasValue)
+                        {
+                            myAdapter.HdcpSupportStatus = hdcpResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the HDCP support status for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDCP support status for adapter {adapterNum}.");
+                    }
+
                     //------------------------------------
                     // ENUMERATE DISPLAYS FOR THIS ADAPTER
                     //------------------------------------
@@ -1631,6 +1851,159 @@ namespace DisplayMagicianShared.NVIDIA
                         catch (Exception ex)
                         {
                             SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET MONITOR CAPABILITIES
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Monitor Capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                            var monitorCapsResult = display.GetMonitorCapabilities();
+                            if (monitorCapsResult.HasValue)
+                            {
+                                myDisplay.MonitorCapabilities = monitorCapsResult.Value;
+                                myDisplay.HasMonitorCapabilities = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Monitor Capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Monitor Capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET MONITOR COLOR CAPABILITIES
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Monitor Color Capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                            var monitorColorCapsResult = display.GetMonitorColorCapabilities();
+                            if (monitorColorCapsResult.HasValue)
+                            {
+                                myDisplay.MonitorColorCapabilities = monitorColorCapsResult.Value;
+                                myDisplay.HasMonitorColorCapabilities = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Monitor Color Capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Monitor Color Capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET HDMI SUPPORT INFO
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
+                            var hdmiSupportResult = display.GetHdmiSupportInfo(null);
+                            if (hdmiSupportResult.HasValue)
+                            {
+                                myDisplay.HdmiSupportInfo = hdmiSupportResult.Value;
+                                myDisplay.HasHdmiSupportInfo = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET VRR INFO
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get VRR Info for Display {displayNum} on Adapter {adapterNum}.");
+                            var vrrInfoResult = display.GetVrrInfo();
+                            if (vrrInfoResult.HasValue)
+                            {
+                                myDisplay.VrrInfo = vrrInfoResult.Value;
+                                myDisplay.HasVrrInfo = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got VRR Info for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting VRR Info for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET DISPLAY COLORIMETRY
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
+                            var colorimetryResult = display.GetColorimetry();
+                            if (colorimetryResult.HasValue)
+                            {
+                                myDisplay.DisplayColorimetry = colorimetryResult.Value;
+                                myDisplay.HasDisplayColorimetry = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET DISPLAY ID INFO
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Display ID Info for Display {displayNum} on Adapter {adapterNum}.");
+                            var displayIdInfoResult = display.GetDisplayIdInfo(null);
+                            if (displayIdInfoResult.HasValue)
+                            {
+                                myDisplay.DisplayIdInfo = displayIdInfoResult.Value;
+                                myDisplay.HasDisplayIdInfo = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Display ID Info for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Display ID Info for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET TIMING
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Timing for Display {displayNum} on Adapter {adapterNum}.");
+                            var timingInput = new NVAPITimingInputDto(0, 0, 0f, new NV_TIMING_FLAG(), _NV_TIMING_OVERRIDE.NV_TIMING_OVERRIDE_CURRENT);
+                            var timingResult = display.GetTiming(timingInput);
+                            if (timingResult.HasValue)
+                            {
+                                myDisplay.Timing = timingResult.Value;
+                                myDisplay.HasTiming = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Timing for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Timing for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+
+                        //------------------------------------
+                        // GET SCANOUT CONFIGURATION
+                        //------------------------------------
+                        try
+                        {
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Scanout Configuration for Display {displayNum} on Adapter {adapterNum}.");
+                            var scanoutResult = adapter.GetScanoutConfiguration(displayId);
+                            if (scanoutResult.HasValue)
+                            {
+                                myDisplay.ScanoutConfiguration = scanoutResult.Value;
+                                myDisplay.HasScanoutConfiguration = true;
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Scanout Configuration for Display {displayNum} on Adapter {adapterNum}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Scanout Configuration for Display {displayNum} on Adapter {adapterNum}.");
                         }
 
                         //------------------------------------
