@@ -537,6 +537,8 @@ namespace DisplayMagicianShared.NVIDIA
 
         public NVAPIGpuEccConfigurationInfoDto EccConfigurationInfo;
 
+        public NVAPIDisplayConfigDto DisplayConfig;
+
         public UInt32 DisplayCount;
         public Dictionary<string, NVIDIA_PER_DISPLAY_CONFIG> Displays;
 
@@ -556,6 +558,7 @@ namespace DisplayMagicianShared.NVIDIA
             NvLinkStatus = new NVAPINvLinkStatusDto();
             GpuInfo = new NVAPIGpuInfoDto();
             EccConfigurationInfo = new NVAPIGpuEccConfigurationInfoDto();
+            DisplayConfig = new NVAPIDisplayConfigDto();
             DisplayCount = 0;
             Displays = new Dictionary<string, NVIDIA_PER_DISPLAY_CONFIG>();
         }
@@ -636,7 +639,12 @@ namespace DisplayMagicianShared.NVIDIA
                 {
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The NvLinkStatus structs don't match!");
                     return false;
-                }                
+                }
+                if (!DisplayConfig.Equals(other.DisplayConfig))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The DisplayConfig structs don't match!");
+                    return false;
+                }
                 if (DisplayCount != other.DisplayCount)
                 {
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The DisplayCount fields don't match!");
@@ -662,7 +670,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override int GetHashCode()
         {
-            return (IsQuadro, HasLogicalGPU, SystemType, FullName, GPUType, BusType, BusId, BusSlotId, DisplayCount, Displays).GetHashCode();
+            return (IsQuadro, HasLogicalGPU, SystemType, FullName, GPUType, BusType, BusId, BusSlotId, DisplayConfig, DisplayCount, Displays).GetHashCode();
         }
         public static bool operator ==(NVIDIA_PER_ADAPTER_CONFIG lhs, NVIDIA_PER_ADAPTER_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -1297,6 +1305,22 @@ namespace DisplayMagicianShared.NVIDIA
                     catch (Exception ex)
                     {
                         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception checking Quadro status for adapter {adapterNum}.");
+                    }
+
+                    // Get the display config for this adapter
+                    try
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the display config of the physical GPU adapter {adapterNum}.");
+                        var displayConfigResult = adapter.GetDisplayConfig();
+                        if (displayConfigResult.HasValue)
+                        {
+                            myAdapter.DisplayConfig = displayConfigResult.Value;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the display config for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting display config for adapter {adapterNum}.");
                     }
 
                     //------------------------------------
