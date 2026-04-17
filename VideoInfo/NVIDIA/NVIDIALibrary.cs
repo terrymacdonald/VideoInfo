@@ -863,7 +863,6 @@ namespace DisplayMagicianShared.NVIDIA
         public bool IsCloned;
         public NVIDIA_MOSAIC_CONFIG MosaicConfig;
         public Dictionary<string, NVIDIA_PER_ADAPTER_CONFIG> PhysicalAdapters;
-        public List<NV_DISPLAY_PATH_INFO_V3> DisplayConfigs;
         public List<NVIDIA_DRS_CONFIG> DRSSettings;
         // Note: We purposely have left out the DisplayNames from the Equals as it's order keeps changing after each reboot and after each profile swap
         // and it is informational only and doesn't contribute to the configuration (it's used for generating the Screens structure, and therefore for
@@ -877,7 +876,6 @@ namespace DisplayMagicianShared.NVIDIA
             IsCloned = false;
             MosaicConfig = new NVIDIA_MOSAIC_CONFIG();
             PhysicalAdapters = new Dictionary<string, NVIDIA_PER_ADAPTER_CONFIG>();
-            DisplayConfigs = new List<NV_DISPLAY_PATH_INFO_V3>();
             DRSSettings = new List<NVIDIA_DRS_CONFIG>();
             DisplayNames = new Dictionary<string, string>();
             DisplayIdentifiers = new List<string>();
@@ -925,13 +923,6 @@ namespace DisplayMagicianShared.NVIDIA
                     return false;
                 }
 
-                // Now we need to go through the display configs comparing values, as the order changes if there is a cloned display
-                if (!CollectionComparer.EqualButDifferentOrder<NV_DISPLAY_PATH_INFO_V3>(DisplayConfigs, other.DisplayConfigs))
-                {
-                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DisplayConfigs lists don't match!");
-                    return false;
-                }
-
                 // If we make it here then the two configs are equal
                 return true;
             }
@@ -945,7 +936,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCloned, MosaicConfig, PhysicalAdapters, DisplayConfigs, DisplayIdentifiers, DRSSettings).GetHashCode();
+            return (IsInUse, IsCloned, MosaicConfig, PhysicalAdapters, DisplayIdentifiers, DRSSettings).GetHashCode();
         }
         public static bool operator ==(NVIDIA_DISPLAY_CONFIG lhs, NVIDIA_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -1188,7 +1179,6 @@ namespace DisplayMagicianShared.NVIDIA
             // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
             myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;
             myDefaultConfig.PhysicalAdapters = new Dictionary<string, NVIDIA_PER_ADAPTER_CONFIG>();
-            myDefaultConfig.DisplayConfigs = new List<NV_DISPLAY_PATH_INFO_V3>();
             myDefaultConfig.DRSSettings = new List<NVIDIA_DRS_CONFIG>();
             myDefaultConfig.DisplayNames = new Dictionary<string, string>();
             myDefaultConfig.DisplayIdentifiers = new List<string>();
@@ -2696,11 +2686,19 @@ namespace DisplayMagicianShared.NVIDIA
                                                         // If the setting is also in the active base profile (it should be!), then we set it.
                                                         if (drsSetting.SettingId == currentSetting.SettingId)
                                                         {
-                                                            // Use the DTO's built-in Equals to compare setting values
-                                                            // NOTE: This compares ALL fields including current values across all types (DWORD/string/binary)
-                                                            if (drsSetting.Equals(currentSetting))
+                                                            // Compare only the current value based on the setting type (closest to old CurrentValue behavior)
+                                                            bool currentValueMatches = drsSetting.SettingType switch
                                                             {
-                                                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: '{currentSetting.SettingName}' ({currentSetting.SettingId}) is set to the same value as the one we want, so skipping changing it.");
+                                                                _NVDRS_SETTING_TYPE.NVDRS_DWORD_TYPE => drsSetting.CurrentDwordValue == currentSetting.CurrentDwordValue,
+                                                                _NVDRS_SETTING_TYPE.NVDRS_STRING_TYPE or _NVDRS_SETTING_TYPE.NVDRS_WSTRING_TYPE => string.Equals(drsSetting.CurrentStringValue, currentSetting.CurrentStringValue, StringComparison.Ordinal),
+                                                                _NVDRS_SETTING_TYPE.NVDRS_BINARY_TYPE => (drsSetting.CurrentBinaryValue == null && currentSetting.CurrentBinaryValue == null) ||
+                                                                    (drsSetting.CurrentBinaryValue != null && currentSetting.CurrentBinaryValue != null && drsSetting.CurrentBinaryValue.SequenceEqual(currentSetting.CurrentBinaryValue)),
+                                                                _ => drsSetting.Equals(currentSetting)
+                                                            };
+
+                                                            if (currentValueMatches)
+                                                            {
+                                                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: '{currentSetting.SettingName}' ({currentSetting.SettingId}) current value already matches the desired value, so skipping changing it.");
                                                             }
                                                             else
                                                             {
