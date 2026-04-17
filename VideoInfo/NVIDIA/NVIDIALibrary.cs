@@ -22,22 +22,18 @@ namespace DisplayMagicianShared.NVIDIA
     public struct NVIDIA_MOSAIC_CONFIG : IEquatable<NVIDIA_MOSAIC_CONFIG>
     {
         public bool IsMosaicEnabled;
-        public NV_MOSAIC_TOPO_BRIEF  MosaicTopologyBrief;
-        public NV_MOSAIC_DISPLAY_SETTING_V2 MosaicDisplaySettings;
-        public Int32 OverlapX;
-        public Int32 OverlapY;
-        public _NV_MOSAIC_GRID_TOPO_V2[] MosaicGridTopos;
-        public UInt32 MosaicGridCount;
+        public NVAPIMosaicCurrentTopoDto MosaicCurrentTopo;
+        public NVAPIMosaicGridTopologiesDto MosaicGridTopologies;
+        //public _NV_MOSAIC_GRID_TOPO_V2[] MosaicGridTopos;
+        //public UInt32 MosaicGridCount;
 
         public NVIDIA_MOSAIC_CONFIG()
         {
             IsMosaicEnabled = false;
-            MosaicTopologyBrief = new NV_MOSAIC_TOPO_BRIEF();
-            MosaicDisplaySettings = new NV_MOSAIC_DISPLAY_SETTING_V2();
-            OverlapX = 0;
-            OverlapY = 0;
-            MosaicGridTopos = new _NV_MOSAIC_GRID_TOPO_V2[] { };
-            MosaicGridCount = 0;
+            MosaicCurrentTopo = new NVAPIMosaicCurrentTopoDto();
+            MosaicGridTopologies = new NVAPIMosaicGridTopologiesDto();
+            //MosaicGridTopos = new _NV_MOSAIC_GRID_TOPO_V2[] { };
+            //MosaicGridCount = 0;
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_MOSAIC_CONFIG other && this.Equals(other);
@@ -51,37 +47,47 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The IsMosaicEnabled fields don't match!");
                     return false;
                 }
+                if (!MosaicCurrentTopo.Equals(other.MosaicCurrentTopo))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicCurrentTopo structs don't match!");
+                    return false;
+                }
+                if (!MosaicGridTopologies.Equals(other.MosaicGridTopologies))
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridTopologies structs don't match!");
+                    return false;
+                }
 
-                if (!MosaicTopologyBrief.Equals(other.MosaicTopologyBrief))
-                {
-                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicTopologyBrief structs don't match!");
-                    return false;
-                }
-                if (!MosaicDisplaySettings.Equals(other.MosaicDisplaySettings))
-                {
-                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicDisplaySettings structs don't match!");
-                    return false;
-                }
-                if (OverlapX != other.OverlapX)
-                {
-                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The OverlapX fields don't match!");
-                    return false;
-                }
-                if (OverlapY != other.OverlapY)
-                {
-                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The OverlapY fields don't match!");
-                    return false;
-                }
-                if (!MosaicGridTopos.SequenceEqual(other.MosaicGridTopos))
-                {
-                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridTopos struct arrays don't match!");
-                    return false;
-                }
-                if (MosaicGridCount != other.MosaicGridCount)
-                {
-                    SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridCount fields don't match!");
-                    return false;
-                }
+                // if (!MosaicTopologyBrief.Equals(other.MosaicTopologyBrief))
+                // {
+                //     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicTopologyBrief structs don't match!");
+                //     return false;
+                // }
+                // if (!MosaicDisplaySettings.Equals(other.MosaicDisplaySettings))
+                // {
+                //     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicDisplaySettings structs don't match!");
+                //     return false;
+                // }
+                // if (OverlapX != other.OverlapX)
+                // {
+                //     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The OverlapX fields don't match!");
+                //     return false;
+                // }
+                // if (OverlapY != other.OverlapY)
+                // {
+                //     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The OverlapY fields don't match!");
+                //     return false;
+                // }
+                // if (!MosaicGridTopos.SequenceEqual(other.MosaicGridTopos))
+                // {
+                //     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridTopos struct arrays don't match!");
+                //     return false;
+                // }
+                // if (MosaicGridCount != other.MosaicGridCount)
+                // {
+                //     SharedLogger.logger.Debug($"NVIDIA_MOSAIC_CONFIG/Equals: The MosaicGridCount fields don't match!");
+                //     return false;
+                // }
                 // If we make it here then the two configs are equal
                 return true;
             }
@@ -94,7 +100,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override int GetHashCode()
         {
-            return (IsMosaicEnabled, MosaicTopologyBrief, MosaicDisplaySettings, OverlapX, OverlapY, MosaicGridTopos, MosaicGridCount).GetHashCode();
+            return (IsMosaicEnabled, MosaicCurrentTopo, MosaicGridTopologies).GetHashCode();
         }
         public static bool operator ==(NVIDIA_MOSAIC_CONFIG lhs, NVIDIA_MOSAIC_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -2076,40 +2082,41 @@ namespace DisplayMagicianShared.NVIDIA
                         SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Duplicate adapter key '{adapterDeviceID}' detected. Skipping duplicate adapter.");
                     }
 
-                    
-                    // TopologyBrief mosaicTopoBrief = new TopologyBrief();
-                    // IDisplaySettings mosaicDisplaySettings = new DisplaySettingsV2();
-                    // int mosaicOverlapX = 0;
-                    // int mosaicOverlapY = 0;
+                    // Try to get the mosaic settings
+                    try
+                    {
+                        // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the current mosaic topology brief and mosaic display settings.");
+                        var mosaicHelper = _nvapiApiHelper.GetMosaicHelper();
+                        var mosaicDto = mosaicHelper.GetCurrentTopo();
+                        if (!mosaicDto.HasValue)
+                        {
+                            // Mosaic is not enabled/supported, so set the mosaic config to reflect this
+                            myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
+                            myDisplayConfig.MosaicConfig.MosaicCurrentTopo = new  NVAPIMosaicCurrentTopoDto();
+                            myDisplayConfig.MosaicConfig.MosaicGridTopologies = new NVAPIMosaicGridTopologiesDto();
+                        }
+                        else
+                        {
+                            myDisplayConfig.MosaicConfig.IsMosaicEnabled = mosaicDto.Value.TopoBrief.Enabled;
+                            myDisplayConfig.MosaicConfig.MosaicCurrentTopo = mosaicDto.Value;
+                            var mosaicGridToposDto = mosaicHelper.EnumDisplayGrids();
+                            if (mosaicGridToposDto.HasValue)
+                            {   
+                                myDisplayConfig.MosaicConfig.MosaicGridTopologies = mosaicGridToposDto.Value;
+                            }
+                            else
+                            {
+                               SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Failed to grab the mosaic grid toplogy.");
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the current mosaic toplogy brief and mosaic display settings.");
 
-                    // try
-                    // {
-                    //     // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
-                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the current mosaic topology brief and mosaic display settings.");
-                    //     NVAPI.GetCurrentTopology(out mosaicTopoBrief, out mosaicDisplaySettings, out mosaicOverlapX, out mosaicOverlapY);
-                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the current mosaic toplogy brief and mosaic display settings.");
-
-                    //     myDisplayConfig.MosaicConfig.MosaicTopologyBrief = mosaicTopoBrief;
-                    //     myDisplayConfig.MosaicConfig.MosaicDisplaySettings = (DisplaySettingsV2)mosaicDisplaySettings;
-                    //     myDisplayConfig.MosaicConfig.OverlapX = mosaicOverlapX;
-                    //     myDisplayConfig.MosaicConfig.OverlapY = mosaicOverlapY;
-                    // }
-                    // catch (NVIDIAApiException nex)
-                    // {
-                    //     if (nex.Status == Status.NotSupported)
-                    //     {
-                    //         _mosaic_supported = false;
-                    //         SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported by this GPU.");
-                    //     }
-                    //     else
-                    //     {
-                    //         SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
-                    //     }
-                    // }
-                    // catch (Exception ex)
-                    // {
-                    //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
-                    // }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
+                    }
 
                     // if (_mosaic_supported)
                     // {
