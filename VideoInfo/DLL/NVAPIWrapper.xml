@@ -2531,6 +2531,58 @@
             <param name="metadata">Managed dedicated display metadata DTO.</param>
             <returns>True if applied, false if unavailable.</returns>
         </member>
+        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.GetScanoutCompositionParameter(NVAPIWrapper.NV_GPU_SCANOUT_COMPOSITION_PARAMETER)">
+            <summary>
+            Get scanout composition parameter for this display.
+            </summary>
+            <param name="parameter">Parameter to query.</param>
+            <returns>Scanout composition parameter DTO, or null if unavailable.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.SetScanoutCompositionParameter(NVAPIWrapper.NVAPIGpuScanoutCompositionParameterDto)">
+            <summary>
+            Set scanout composition parameter for this display.
+            </summary>
+            <param name="parameter">Parameter settings.</param>
+            <returns>True if applied or unchanged, false if unavailable.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.GetScanoutConfiguration">
+            <summary>
+            Get scanout configuration for this display.
+            </summary>
+            <returns>Scanout configuration DTO, or null if unavailable.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.GetScanoutConfigurationEx">
+            <summary>
+            Get extended scanout configuration for this display.
+            </summary>
+            <returns>Scanout configuration DTO, or null if unavailable.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.GetScanoutIntensityState">
+            <summary>
+            Get scanout intensity state for this display.
+            </summary>
+            <returns>Scanout intensity state DTO, or null if unavailable.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.SetScanoutIntensity(NVAPIWrapper.NVAPIGpuScanoutIntensityDataDto)">
+            <summary>
+            Set scanout intensity for this display.
+            </summary>
+            <param name="data">Scanout intensity data.</param>
+            <returns>Result DTO, or null if unavailable.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.GetScanoutWarpingState">
+            <summary>
+            Get scanout warping state for this display.
+            </summary>
+            <returns>Scanout warping state DTO, or null if unavailable.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIDisplayHelper.SetScanoutWarping(NVAPIWrapper.NVAPIGpuScanoutWarpingDataDto)">
+            <summary>
+            Set scanout warping for this display.
+            </summary>
+            <param name="data">Scanout warping data.</param>
+            <returns>Result DTO, or null if unavailable.</returns>
+        </member>
         <member name="M:NVAPIWrapper.NVAPIDisplayHelper.Dispose">
             <summary>
             Dispose the helper and prevent further use.
@@ -4078,6 +4130,51 @@
             <typeparam name="T">Element type.</typeparam>
             <param name="values">Array values.</param>
             <returns>Hash code for the array contents.</returns>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutConfigurationDto">
+            <summary>
+            Scanout configuration DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutConfigurationExDto">
+            <summary>
+            Extended scanout configuration DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutCompositionParameterDto">
+            <summary>
+            Scanout composition parameter DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutIntensityStateDto">
+            <summary>
+            Scanout intensity state DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutIntensityDataDto">
+            <summary>
+            Scanout intensity data DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutIntensityResultDto">
+            <summary>
+            Scanout intensity result DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutWarpingStateDto">
+            <summary>
+            Scanout warping state DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutWarpingDataDto">
+            <summary>
+            Scanout warping data DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuScanoutWarpingResultDto">
+            <summary>
+            Scanout warping result DTO.
+            </summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIDrsHelper">
             <summary>
@@ -6517,66 +6614,6 @@
             <param name="settings">Callback settings DTO (set Callback to IntPtr.Zero to unregister).</param>
             <returns>True if registered, false if unavailable.</returns>
         </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetScanoutCompositionParameter(System.UInt32,NVAPIWrapper.NV_GPU_SCANOUT_COMPOSITION_PARAMETER)">
-            <summary>
-            Get scanout composition parameter.
-            </summary>
-            <param name="displayId">Display ID.</param>
-            <param name="parameter">Parameter to query.</param>
-            <returns>Scanout composition parameter DTO, or null if unavailable.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.SetScanoutCompositionParameter(System.UInt32,NVAPIWrapper.NVAPIGpuScanoutCompositionParameterDto)">
-            <summary>
-            Set scanout composition parameter.
-            </summary>
-            <param name="displayId">Display ID.</param>
-            <param name="parameter">Parameter settings.</param>
-            <returns>True if applied or unchanged, false if unavailable.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetScanoutConfiguration(System.UInt32)">
-            <summary>
-            Get scanout configuration.
-            </summary>
-            <param name="displayId">Display ID.</param>
-            <returns>Scanout configuration DTO, or null if unavailable.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetScanoutConfigurationEx(System.UInt32)">
-            <summary>
-            Get extended scanout configuration.
-            </summary>
-            <param name="displayId">Display ID.</param>
-            <returns>Scanout configuration DTO, or null if unavailable.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetScanoutIntensityState(System.UInt32)">
-            <summary>
-            Get scanout intensity state.
-            </summary>
-            <param name="displayId">Display ID.</param>
-            <returns>Scanout intensity state DTO, or null if unavailable.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.SetScanoutIntensity(System.UInt32,NVAPIWrapper.NVAPIGpuScanoutIntensityDataDto)">
-            <summary>
-            Set scanout intensity.
-            </summary>
-            <param name="displayId">Display ID.</param>
-            <param name="data">Scanout intensity data.</param>
-            <returns>Result DTO, or null if unavailable.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetScanoutWarpingState(System.UInt32)">
-            <summary>
-            Get scanout warping state.
-            </summary>
-            <param name="displayId">Display ID.</param>
-            <returns>Scanout warping state DTO, or null if unavailable.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.SetScanoutWarping(System.UInt32,NVAPIWrapper.NVAPIGpuScanoutWarpingDataDto)">
-            <summary>
-            Set scanout warping.
-            </summary>
-            <param name="displayId">Display ID.</param>
-            <param name="data">Scanout warping data.</param>
-            <returns>Result DTO, or null if unavailable.</returns>
-        </member>
         <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.QueryWorkstationFeatureSupport(NVAPIWrapper._NV_GPU_WORKSTATION_FEATURE_TYPE)">
             <summary>
             Query workstation feature support for this GPU.
@@ -6799,51 +6836,6 @@
         <member name="T:NVAPIWrapper.NVAPISBoxDto">
             <summary>
             DTO for NvSBox values.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutConfigurationDto">
-            <summary>
-            Scanout configuration DTO.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutConfigurationExDto">
-            <summary>
-            Extended scanout configuration DTO.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutCompositionParameterDto">
-            <summary>
-            Scanout composition parameter DTO.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutIntensityStateDto">
-            <summary>
-            Scanout intensity state DTO.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutIntensityDataDto">
-            <summary>
-            Scanout intensity data DTO.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutIntensityResultDto">
-            <summary>
-            Scanout intensity result DTO.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutWarpingStateDto">
-            <summary>
-            Scanout warping state DTO.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutWarpingDataDto">
-            <summary>
-            Scanout warping data DTO.
-            </summary>
-        </member>
-        <member name="T:NVAPIWrapper.NVAPIGpuScanoutWarpingResultDto">
-            <summary>
-            Scanout warping result DTO.
             </summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIGpuWorkstationFeatureQueryDto">

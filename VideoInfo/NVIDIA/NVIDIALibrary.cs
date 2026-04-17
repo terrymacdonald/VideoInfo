@@ -1993,7 +1993,7 @@ namespace DisplayMagicianShared.NVIDIA
                         try
                         {
                             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Scanout Configuration for Display {displayNum} on Adapter {adapterNum}.");
-                            var scanoutResult = adapter.GetScanoutConfiguration(displayId);
+                            var scanoutResult = display.GetScanoutConfiguration();
                             if (scanoutResult.HasValue)
                             {
                                 myDisplay.ScanoutConfiguration = scanoutResult.Value;
@@ -2075,6 +2075,166 @@ namespace DisplayMagicianShared.NVIDIA
                     {
                         SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Duplicate adapter key '{adapterDeviceID}' detected. Skipping duplicate adapter.");
                     }
+
+                    
+                    // TopologyBrief mosaicTopoBrief = new TopologyBrief();
+                    // IDisplaySettings mosaicDisplaySettings = new DisplaySettingsV2();
+                    // int mosaicOverlapX = 0;
+                    // int mosaicOverlapY = 0;
+
+                    // try
+                    // {
+                    //     // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the current mosaic topology brief and mosaic display settings.");
+                    //     NVAPI.GetCurrentTopology(out mosaicTopoBrief, out mosaicDisplaySettings, out mosaicOverlapX, out mosaicOverlapY);
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the current mosaic toplogy brief and mosaic display settings.");
+
+                    //     myDisplayConfig.MosaicConfig.MosaicTopologyBrief = mosaicTopoBrief;
+                    //     myDisplayConfig.MosaicConfig.MosaicDisplaySettings = (DisplaySettingsV2)mosaicDisplaySettings;
+                    //     myDisplayConfig.MosaicConfig.OverlapX = mosaicOverlapX;
+                    //     myDisplayConfig.MosaicConfig.OverlapY = mosaicOverlapY;
+                    // }
+                    // catch (NVIDIAApiException nex)
+                    // {
+                    //     if (nex.Status == Status.NotSupported)
+                    //     {
+                    //         _mosaic_supported = false;
+                    //         SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not supported by this GPU.");
+                    //     }
+                    //     else
+                    //     {
+                    //         SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
+                    //     }
+                    // }
+                    // catch (Exception ex)
+                    // {
+                    //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
+                    // }
+
+                    // if (_mosaic_supported)
+                    // {
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_Mosaic_GetTopoGroup returned OK.");
+                    //         if (mosaicTopoBrief.IsPossible)
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is possible to use");
+                    //             //myDisplayConfig.MosaicConfig.IsMosaicPossible = true;
+                    //         }
+                    //         else
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is NOT possible to use");
+                    //             //myDisplayConfig.MosaicConfig.IsMosaicPossible = false;
+                    //         }
+                    //         if (mosaicTopoBrief.IsEnable)
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is enabled right now");
+                    //             myDisplayConfig.MosaicConfig.IsMosaicEnabled = true;
+                    //         }
+                    //         else
+                    //         {
+                    //             SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: The current Mosaic Topology of {mosaicTopoBrief.Topology} is NOT enabled right now");
+                    //             myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
+                    //         }
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology group.");
+                    //     }
+
+                    // }
+                    // else
+                    // {
+                    //     // Mosaic isn't possible/supported
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIA Mosaic is NOT enabled.");
+                    //     myDisplayConfig.MosaicConfig.MosaicTopologyBrief = mosaicTopoBrief;
+                    //     myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
+                    //     //myDisplayConfig.MosaicConfig.IsMosaicPossible = false;
+                    //     myDisplayConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[] { };
+                    //     //myDisplayConfig.MosaicConfig.MosaicViewports = new List<ViewPortF[]>();
+                    // }
+
+                    // // Get Mosaic Grid settings!
+                    // GridTopologyV2[] mosaicGridTopos;
+                    // try
+                    // {
+                    //     // Figure out how many Mosaic Grid topoligies there are                    
+                    //     mosaicGridTopos = NVAPI.EnumDisplayGrids();
+                    //     /*for (var i = 0; i < mosaicGridTopos.Length; i++)
+                    //     {
+                    //         GridTopologyDisplayV2[] gtdlist = mosaicGridTopos[i].Displays.Cast<GridTopologyDisplayV2>().ToArray<GridTopologyDisplayV2>();
+
+                    //         for (var j = 0; j<gtdlist.Length; j++)
+                    //         {
+                    //             gtdlist[i].Version = new StructureVersion(2, typeof(GridTopologyDisplayV2));
+                    //         }
+
+                    //         mosaicGridTopos[i].Displays = gtdlist.ToList();
+                    //     }*/
+                    //     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_Mosaic_GetCurrentTopo returned OK.");
+
+
+                    // }
+                    // catch (Exception ex)
+                    // {
+                    //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred while getting Mosaic Topology! NvAPI_Mosaic_EnumDisplayGrids() returned error.");
+                    //     mosaicGridTopos = new GridTopologyV2[0];
+                    // }
+
+                    // myDisplayConfig.MosaicConfig.MosaicGridTopos = mosaicGridTopos;
+                    // myDisplayConfig.MosaicConfig.MosaicGridCount = (uint)mosaicGridTopos.Length;
+
+                    // /*//List<ViewPortF[]> allViewports = new List<ViewPortF[]>();
+                    // foreach (GridTopologyV2 gridTopo in mosaicGridTopos)
+                    // {
+                    //     *//*// Get Current Mosaic Grid settings using the Grid topologies numbers we got before
+                    //     ViewPortF[] viewports = new ViewPortF[0];
+                    //     byte bezelCorrected = 0;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get mosaic display viewport details by resolution.");
+                    //         NVAPI.GetDisplayViewportsByResolution(gridTopo.Displays.FirstOrDefault().DisplayId, 0, 0, out viewports, out bezelCorrected);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got mosaic display viewport details by resolution.");
+                    //     }
+                    //     catch (NVIDIAApiException nex)
+                    //     {
+                    //         if (nex.Status == Status.MosaicNotActive)
+                    //         {
+                    //             SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Mosaic is not currently in use, so unable to get the list of ViewportsF.");
+                    //         }
+                    //         else
+                    //         {
+                    //             SharedLogger.logger.Error(nex, $"NVIDIALibrary/GetNVIDIADisplayConfig: NVIDIAApiException occurred whilst getting display viewport details by resolution.");
+                    //         }
+                    //     }
+                    //     catch(Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting display viewport details by resolution.");
+                    //     }
+
+                    //     // Save the viewports to the List
+                    //     allViewports.Add(viewports);*//*
+
+                    //     // Get Current Mosaic Display Topology mode settings using the Grid topology we matched before before
+                    //     IDisplaySettings[] mosaicDisplaySettings;
+                    //     try
+                    //     {
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Getting mosaic display modes from the current display topology.");
+                    //         mosaicDisplaySettings = NVAPI.EnumDisplayModes(gridTopo);
+                    //         SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got mosaic display modes from the current display topology.");
+
+                    //     }
+                    //     catch (Exception ex)
+                    //     {
+                    //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting display modes from current display topology");
+                    //         mosaicDisplaySettings = new IDisplaySettings[0];
+                    //     }
+                    // }*/
+
+                    // //myDisplayConfig.MosaicConfig.MosaicViewports = allViewports;
+
+
+
                 
 
 
