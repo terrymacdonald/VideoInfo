@@ -610,20 +610,19 @@ namespace DisplayMagicianShared.NVIDIA
         public static bool operator !=(NVIDIA_CUSTOM_DISPLAY_CONFIG lhs, NVIDIA_CUSTOM_DISPLAY_CONFIG rhs) => !(lhs == rhs);
     }*/
 
-    [StructLayout(LayoutKind.Sequential)]
     public struct NVIDIA_DRS_CONFIG : IEquatable<NVIDIA_DRS_CONFIG>
     {
         //public bool HasDRSSettings;
         public bool IsBaseProfile;
-        public _NVDRS_PROFILE_V1 ProfileInfo;
-        public List<_NVDRS_SETTING_V1> DriverSettings;
+        public NVAPIDrsProfileDto ProfileInfo;
+        public List<NVAPIDrsSettingDto> DriverSettings;
 
         public NVIDIA_DRS_CONFIG()
         {
             //HasDRSSettings = false;
             IsBaseProfile = false;
-            ProfileInfo = new _NVDRS_PROFILE_V1();
-            DriverSettings = new List<_NVDRS_SETTING_V1>();
+            ProfileInfo = new NVAPIDrsProfileDto();
+            DriverSettings = new List<NVAPIDrsSettingDto>();
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_DRS_CONFIG other && this.Equals(other);
@@ -1188,10 +1187,6 @@ namespace DisplayMagicianShared.NVIDIA
 
             // THIS IS ALL TAKEN CARE OF IN THE STRUCT CONSTRUCTORS NOW \o/ yay!
             myDefaultConfig.MosaicConfig.IsMosaicEnabled = false;
-            //myDefaultConfig.MosaicConfig.MosaicGridTopos = new GridTopologyV2[GridTopologyV2.MaxDisplays];
-            myDefaultConfig.MosaicConfig.MosaicGridTopos = new _NV_MOSAIC_GRID_TOPO_V2[0];
-            myDefaultConfig.MosaicConfig.MosaicGridCount = 0;
-            myDefaultConfig.MosaicConfig.MosaicDisplaySettings = new NV_MOSAIC_DISPLAY_SETTING_V2();
             myDefaultConfig.PhysicalAdapters = new Dictionary<string, NVIDIA_PER_ADAPTER_CONFIG>();
             myDefaultConfig.DisplayConfigs = new List<NV_DISPLAY_PATH_INFO_V3>();
             myDefaultConfig.DRSSettings = new List<NVIDIA_DRS_CONFIG>();
@@ -2175,89 +2170,73 @@ namespace DisplayMagicianShared.NVIDIA
                     }
 
 
-                    // Get the DRS Settings
-                    DRSSessionHandle drsSessionHandle = new DRSSessionHandle();
+                    // Get the DRS Settings using the NVAPIWrapper DRS helper
                     try
                     {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the DRS Session Handle so we can get the DRS settings.");
-                        drsSessionHandle = NVAPI.CreateSession(); 
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the DRS Session Handle so we can get the DRS settings.");
-
-                        // Load the DRS Settings into memory
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to load the DRS Settings into memory.");
-                        NVAPI.LoadSettings(drsSessionHandle);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully loaded the DRS Settings into memory.");
-
-                        // Now we try to start getting the DRS Settings we need
-                        // Firstly, we get the profile handle to the global DRS Profile currently in use
-                        DRSProfileHandle drsProfileHandle = new DRSProfileHandle();
-                        try
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to create a DRS session so we can get the DRS settings.");
+                        using (var drsHelper = _nvapiApiHelper.CreateDrsSession())
                         {
-                            //status = NVAPI.GetCurrentGlobalProfile(drsSessionHandle, out drsProfileHandle);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the profile handle to the global DRS Profile currently in use.");
-                            drsProfileHandle = NVAPI.GetBaseProfile(drsSessionHandle);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the profile handle to the global DRS Profile currently in use.");
-                            
-                            if (drsProfileHandle.IsNull)
+                            if (drsHelper == null)
                             {
-                                // There isn't a custom global profile set yet, so we ignore it
-                                SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DRS_GetCurrentGlobalProfile returned OK, but there was no process handle set. THe DRS Settings may not have been loaded.");
+                                SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Failed to create a DRS session. DRS settings will not be captured.");
                             }
                             else
                             {
-                                // There is a custom global profile set, so we continue
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DRS_GetCurrentGlobalProfile returned OK. We got the DRS Profile Handle for the current global profile");
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully created a DRS session.");
 
-                                // Next, we make a single DRS setting to track the global profile
-                                NVIDIA_DRS_CONFIG drsConfig = new NVIDIA_DRS_CONFIG();
-                                drsConfig.IsBaseProfile = true;
-
-                                // Next we grab the Profile Info and store it
-                                DRSProfileV1 drsProfileInfo = new DRSProfileV1();
-                                drsProfileInfo = NVAPI.GetProfileInfo(drsSessionHandle, drsProfileHandle);
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: NvAPI_DRS_GetProfileInfo returned OK. We got the DRS Profile info for the current global profile. Profile Name is {drsProfileInfo.Name}.");
-                                drsConfig.ProfileInfo = drsProfileInfo;
-                                
-
-                                if (drsProfileInfo.NumberOfSettings > 0)
+                                // Load the DRS Settings into memory
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to load the DRS Settings into memory.");
+                                bool loaded = drsHelper.LoadSettings();
+                                if (!loaded)
                                 {
-                                    // Next we grab the Profile Settings and store them
-                                    List<DRSSettingV1> drsDriverSettings = new List<DRSSettingV1> {};
-                                    //NVDRS_SETTING_V1 drsDriverSetting = new NVDRS_SETTING_V1();
-                                    try 
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the next DRS setting handle from the DRS Profile {drsProfileInfo.Name}.");
-                                        drsDriverSettings = NVAPI.EnumSettings(drsSessionHandle, drsProfileHandle).ToList();
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the next DRS setting handle from the DRS Profile {drsProfileInfo.Name}.");
-                                        drsConfig.DriverSettings = drsDriverSettings.ToList();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the  next DRS setting handle from the DRS Profile {drsProfileInfo.Name}.");
-                                    }
-
-                                    // And then we save the DRS Config to the main config so it gets saved
-                                    myDisplayConfig.DRSSettings.Add(drsConfig);
-
+                                    SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Failed to load DRS settings into memory.");
                                 }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully loaded the DRS Settings into memory.");
 
+                                    // Get the base DRS profile
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to get the base DRS Profile.");
+                                    var baseProfile = drsHelper.GetBaseProfile();
+                                    if (!baseProfile.HasValue)
+                                    {
+                                        SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Failed to get the base DRS profile. The DRS Settings may not have been loaded.");
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the base DRS Profile. Profile Name is {baseProfile.Value.ProfileName}.");
+
+                                        // Create a DRS config entry to track the base profile
+                                        NVIDIA_DRS_CONFIG drsConfig = new NVIDIA_DRS_CONFIG();
+                                        drsConfig.IsBaseProfile = true;
+                                        drsConfig.ProfileInfo = baseProfile.Value;
+
+                                        if (baseProfile.Value.NumOfSettings > 0)
+                                        {
+                                            // Enumerate all settings in the base profile
+                                            try
+                                            {
+                                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Trying to enumerate the DRS settings from the base DRS Profile {baseProfile.Value.ProfileName}.");
+                                                var drsDriverSettings = drsHelper.EnumSettings(baseProfile.Value);
+                                                drsConfig.DriverSettings = drsDriverSettings.ToList();
+                                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully enumerated {drsConfig.DriverSettings.Count} DRS settings from the base DRS Profile {baseProfile.Value.ProfileName}.");
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst enumerating the DRS settings from the base DRS Profile {baseProfile.Value.ProfileName}.");
+                                            }
+
+                                            // Save the DRS Config to the main config so it gets saved
+                                            myDisplayConfig.DRSSettings.Add(drsConfig);
+                                        }
+                                    }
+                                }
                             }
-
-                        }
-                        catch(Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the profile handle to the global DRS Profile currently in use.");
-                        }
-                        finally
-                        {
-                            // Destroy the DRS Session Handle to clean up
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to clean up and destroy our DRS Session Handle");
-                            NVAPI.DestroySession(drsSessionHandle);
                         }
                     }
                     catch (Exception ex)
                     {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the DRS Session Handle so we can get the DRS settings or whilst loading the DRS settings into memory.");
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the DRS settings.");
                     }
 
                     // At this stage we should set the IsInUse flag to report that the NVIDIA config is in Use
@@ -2266,13 +2245,6 @@ namespace DisplayMagicianShared.NVIDIA
                     // Get the display identifiers                
                     myDisplayConfig.DisplayIdentifiers = GetCurrentDisplayIdentifiers(out bool failure);
 
-
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception trying to get the NVIDIA Configuration when we know there is an NVIDIA Physical GPU present.");
-                    // Return the default config to see if we can keep going.
-                    return CreateDefaultConfig();
                 }
             }
             else
@@ -2669,132 +2641,136 @@ namespace DisplayMagicianShared.NVIDIA
                 // Set the DRS Settings only if we need to
                 if (displayConfig.DRSSettings.Count > 0)
                 {
-                    DRSSessionHandle drsSessionHandle = new DRSSessionHandle();
                     try
                     {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to create a DRS Session Handle.");
-                        drsSessionHandle = NVAPI.CreateSession();
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully created a DRS Session Handle.");
-
-                        // Load the current DRS Settings into memory
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to load the current DRS settings into memory.");
-                        NVAPI.LoadSettings(drsSessionHandle);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully loaded the current DRS settings into memory.");
-
-
-                        // Now we try to start getting the DRS Settings we need
-                        // Firstly, we get the profile handle to the global DRS Profile currently in use
-                        DRSProfileHandle drsProfileHandle = new DRSProfileHandle();
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to get the base DRS profile handle.");
-                        drsProfileHandle = NVAPI.GetBaseProfile(drsSessionHandle);
-                        if (drsProfileHandle.IsNull)
+                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to create a DRS session.");
+                        using (var drsHelper = _nvapiApiHelper.CreateDrsSession())
                         {
-                            // There isn't a custom global profile set yet, so we ignore it
-                            SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: NvAPI_DRS_GetCurrentGlobalProfile returned OK, but there was no process handle set. The DRS Settings may not have been loaded.");
-                        }
-                        else
-                        {
-                            // There is a custom global profile, so we continue
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_DRS_GetCurrentGlobalProfile returned OK. We got the DRS Profile Handle for the current global profile");
-
-                            // Next, we go through all the settings we have in the saved profile, and we change the current profile settings to be the same
-                            if (displayConfig.DRSSettings.Count > 0)
+                            if (drsHelper == null)
                             {
-                                bool needToSave = false;
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: There are {displayConfig.DRSSettings.Count} stored DRS settings in the base DRS profile so we need to process them");
+                                SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: Failed to create a DRS session. DRS settings will not be applied.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully created a DRS session.");
 
-                                try
+                                // Load the current DRS Settings into memory
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to load the current DRS settings into memory.");
+                                bool loaded = drsHelper.LoadSettings();
+                                if (!loaded)
                                 {
-                                    // Get the Base Profiles from the stored config and the active config
-                                    NVIDIA_DRS_CONFIG storedBaseProfile = displayConfig.DRSSettings.Find(p => p.IsBaseProfile == true);
-                                    NVIDIA_DRS_CONFIG activeBaseProfile = ActiveDisplayConfig.DRSSettings.Find(p => p.IsBaseProfile == true);
-                                    foreach (var drsSetting in storedBaseProfile.DriverSettings)
-                                    {
-                                        for (int i = 0; i < activeBaseProfile.DriverSettings.Count; i++)
-                                        {
-                                            DRSSettingV1 currentSetting = activeBaseProfile.DriverSettings[i];
+                                    SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: Failed to load the current DRS settings into memory.");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully loaded the current DRS settings into memory.");
 
-                                            // If the setting is also in the active base profile (it should be!), then we set it.
-                                            if (drsSetting.Id == currentSetting.Id)
+                                    // Get the base DRS profile
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to get the base DRS profile.");
+                                    var baseProfile = drsHelper.GetBaseProfile();
+                                    if (!baseProfile.HasValue)
+                                    {
+                                        SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: Failed to get the base DRS profile. The DRS Settings may not have been loaded.");
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully got the base DRS Profile.");
+
+                                        // Go through all the settings we have in the saved profile, and change the current profile settings to be the same
+                                        if (displayConfig.DRSSettings.Count > 0)
+                                        {
+                                            bool needToSave = false;
+                                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: There are {displayConfig.DRSSettings.Count} stored DRS settings in the base DRS profile so we need to process them");
+
+                                            try
                                             {
-                                                if (drsSetting.CurrentValue.Equals(currentSetting.CurrentValue))
+                                                // Get the Base Profiles from the stored config and the active config
+                                                NVIDIA_DRS_CONFIG storedBaseProfile = displayConfig.DRSSettings.Find(p => p.IsBaseProfile == true);
+                                                NVIDIA_DRS_CONFIG activeBaseProfile = ActiveDisplayConfig.DRSSettings.Find(p => p.IsBaseProfile == true);
+                                                foreach (var drsSetting in storedBaseProfile.DriverSettings)
                                                 {
-                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: '{currentSetting.Name}' ({currentSetting.Id}) is set to the same value as the one we want, so skipping changing it.");
+                                                    for (int i = 0; i < activeBaseProfile.DriverSettings.Count; i++)
+                                                    {
+                                                        NVAPIDrsSettingDto currentSetting = activeBaseProfile.DriverSettings[i];
+
+                                                        // If the setting is also in the active base profile (it should be!), then we set it.
+                                                        if (drsSetting.SettingId == currentSetting.SettingId)
+                                                        {
+                                                            // Use the DTO's built-in Equals to compare setting values
+                                                            // NOTE: This compares ALL fields including current values across all types (DWORD/string/binary)
+                                                            if (drsSetting.Equals(currentSetting))
+                                                            {
+                                                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: '{currentSetting.SettingName}' ({currentSetting.SettingId}) is set to the same value as the one we want, so skipping changing it.");
+                                                            }
+                                                            else
+                                                            {
+                                                                try
+                                                                {
+                                                                    drsHelper.SetSetting(baseProfile.Value, drsSetting);
+                                                                    needToSave = true;
+                                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We changed setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) using NVAPIDrsHelper.SetSetting()");
+                                                                }
+                                                                catch (Exception ex)
+                                                                {
+                                                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused whilst changing setting '{currentSetting.SettingName}' ({currentSetting.SettingId}).");
+                                                                }
+                                                            }
+                                                            break;
+                                                        }
+                                                    }
                                                 }
-                                                else
+
+                                                // Now go through and revert any unset settings to defaults. This guards against new settings being added by other profiles
+                                                // after we've created a display profile. If we didn't do this those newer settings would stay set.
+                                                foreach (var currentSetting in activeBaseProfile.DriverSettings)
                                                 {
+                                                    // Skip any settings that we've already set
+                                                    if (storedBaseProfile.DriverSettings.Exists(ds => ds.SettingId == currentSetting.SettingId))
+                                                    {
+                                                        continue;
+                                                    }
+
                                                     try
                                                     {
-                                                        NVAPI.SetSetting(drsSessionHandle, drsProfileHandle, drsSetting);
+                                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to restore DRS setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default.");
+                                                        drsHelper.RestoreProfileDefaultSetting(baseProfile.Value, currentSetting.SettingId);
                                                         needToSave = true;
-                                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We changed setting '{currentSetting.Name}' ({currentSetting.Id}) from {currentSetting.CurrentValue} to {drsSetting.CurrentValue} using NvAPI_DRS_SetSetting()");
+                                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We restored active setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default value using NVAPIDrsHelper.RestoreProfileDefaultSetting()");
                                                     }
                                                     catch (Exception ex)
                                                     {
-                                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused whilst changing setting '{currentSetting.Name}' ({currentSetting.Id}) from {currentSetting.CurrentValue} to {drsSetting.CurrentValue}.");
+                                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to restore setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default.");
                                                     }
                                                 }
-                                                break;
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to find base profiles in either the stored or active display configs.");
+                                            }
+
+                                            // Save the Settings if needed
+                                            if (needToSave)
+                                            {
+                                                try
+                                                {
+                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to save the current DRS settings.");
+                                                    drsHelper.SaveSettings();
+                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We successfully saved the current DRS Settings.");
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to save the current DRS settings.");
+                                                }
                                             }
                                         }
-                                    }
-
-                                    // Now go through and revert any unset settings to defaults. This guards against new settings being added by other profiles
-                                    // after we've created a display profile. If we didn't do this those newer settings would stay set.                                        
-                                    foreach (var currentSetting in activeBaseProfile.DriverSettings)
-                                    {
-                                        // Skip any settings that we've already set
-                                        if (storedBaseProfile.DriverSettings.Exists(ds => ds.Id == currentSetting.Id))
-                                        {
-                                            continue;
-                                        }
-
-                                        try
-                                        {
-                                            // TODO: Need to create this function within the NVAPI codebase we ported from NvAPIWrapper code
-                                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to restore the DRS settings to the defaults.");
-                                            NVAPI.RestoreDefaults(drsSessionHandle, drsProfileHandle, currentSetting.Id);
-                                            needToSave = true;
-                                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We changed active setting '{currentSetting.Name}' ({currentSetting.Id}) from {currentSetting.CurrentValue} to it's default  value using NvAPI_DRS_RestoreProfileDefaultSetting()");
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to find base profiles in either the stored or active display configs.");
-                                        }
-
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to find base profiles in either the stored or active display configs.");
-                                }
-
-                                // Next we save the Settings if needed
-                                if (needToSave)
-                                {
-                                    // Save the current DRS Settings as we changed them
-                                    try
-                                    {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to save the current DRS settings.");
-                                        NVAPI.SaveSettings(drsSessionHandle);
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We successfully saved the current DRS Settings.");
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to save the current DRS settings.");
                                     }
                                 }
                             }
                         }
-
-
                     }
-                    finally
+                    catch (Exception ex)
                     {
-                        // Destroy the DRS Session Handle to clean up
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to destroy the DRS Session handle.");
-                        NVAPI.DestroySession(drsSessionHandle);
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully destroyed our DRS Session Handle");
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception occurred whilst applying the DRS settings.");
                     }
                 }
 
