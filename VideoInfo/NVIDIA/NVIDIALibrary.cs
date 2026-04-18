@@ -2487,190 +2487,191 @@ namespace DisplayMagicianShared.NVIDIA
 
             if (_initialised)
             {
-                // Remove any custom NVIDIA Colour settings
-                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want to turn off colour if it's default set colour.");
-                foreach (var physicalGPU in displayConfig.PhysicalAdapters)
+                // We want to check if we need to apply a NVIDIA Surround (Mosaic) config
+                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Testing whether the display configuration uses NVIDIA Surround");
+                if (displayConfig.MosaicConfig.IsMosaicEnabled)
                 {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Processing settings for Physical GPU #{physicalGPU.Key}");
-                    NVIDIA_PER_ADAPTER_CONFIG myAdapter = physicalGPU.Value;
-                    string myAdapterIndex = physicalGPU.Key;
-                    foreach (var displayDict in myAdapter.Displays)
+                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: The display configuration we want to use has NVIDIA Surround (Mosaic) enabled");
+                    if (displayConfig.MosaicConfig.Equals(ActiveDisplayConfig.MosaicConfig))
                     {
-                        NVIDIA_PER_DISPLAY_CONFIG myDisplay = displayDict.Value;
-                        string displayKey = displayDict.Key;
-
-                        // Parse displayId from the composite key for connected display check
-                        // Key format: "{adapterDeviceID}|{manufacturerName}|{productCode}|{displayId}"
-                        UInt32 displayId = 0;
-                        if (displayKey.Contains("|"))
+                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Mosaic current config is exactly the same as the one we want, so skipping applying the Mosaic config as we already have the right one!");
+                    }                    
+                    else
+                    {
+             
+                        // If we are on a non-Mosaic profile now, then we need to set a 1x1 display grid just to wake up the displays properly
+                        if (!ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
                         {
-                            var parts = displayKey.Split('|');
-                            if (parts.Length >= 4) UInt32.TryParse(parts[3], out displayId);
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: The current display configuration does not have NVIDIA Surround (Mosaic) enabled, so we need to set a 1x1 mosaic matrix to ensure that all displays are awake.");
+                            TurnOffMosaic(delayInMs);
                         }
                         else
                         {
-                            UInt32.TryParse(displayKey, out displayId);
+                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: The current display configuration does have a NVIDIA Surround (Mosaic) enabled, so we will skip setting the 1x1 mosaice grid.");
                         }
 
-                        if (!_allConnectedDisplayIds.Contains(displayId))
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Display {displayId} doesn't exist in this setup, so skipping changing any NVIDIA display Settings.");
-                            continue;
-                        }
-
-                        /*// Remove any custom NVIDIA Colour settings
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want to turn off colour if it's user set colour.");
-
-                        ColorDataV5 colorData = (ColorDataV5)myDisplay.ColorData;
+                        // Now that the Mosaic is turned off, we can apply the new Mosaic Topology
+                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Next we apply the wanted Mosaic config now");
                         try
                         {
-                            ColorDataV5 activeColorData = (ColorDataV5)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].ColorData;
-                            // If the setting for this display is not the same as we want, then we set it to NV_COLOR_SELECTION_POLICY_BEST_QUALITY
-                            if (activeColorData.SelectionPolicy != ColorDataSelectionPolicy.BestQuality)
+                            using (var mosaicHelper = _nvapiApiHelper.GetMosaicHelper())
                             {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want to turn off NVIDIA customer colour settings for display {displayId}.");
-
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want the standard colour settings to be {colorData.SelectionPolicy.ToString()} for Mosaic display {displayId}.");
-                                // Force the colorData to be NV_COLOR_SELECTION_POLICY_BEST_QUALITY so that we return the color control to Windows
-                                // We will change the colorData to whatever is required later on
-                                //colorData = myDisplay.ColorData;
-                                //TODO - Fix this color data so that it can be written to.
-
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want the standard colour settings to be {colorData.SelectionPolicy.ToString()} and they are currently {activeColorData.SelectionPolicy.ToString()} for Mosaic display {displayId}.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want to turn off standard colour mode for Mosaic display {displayId}.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want standard colour settings Color selection policy {colorData.SelectionPolicy.ToString()} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want standard colour settings BPC {colorData.DesktopColorDepth} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want standard colour settings colour format {colorData.ColorFormat} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want standard colour settings colourimetry {colorData.Colorimetry} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want standard colour settings colour depth {colorData.ColorDepth} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want standard colour settings dynamic range {colorData.DynamicRange} for Mosaic display {displayId}");
-
-                                // Set the command as a 'SET'
-                                //colorData.Cmd = NV_COLOR_CMD.NV_COLOR_CMD_SET;
-                                // TODO - set the command to set the color data!
-                                try
-                                {
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to remove any custom NVIDIA Color settings.");
-                                    ColorDataV5 newColorData = new ColorDataV5(ColorDataCommand.Set,ColorDataFormat.Default,ColorDataColorimetry.Default, ColorDataDynamicRange.Auto, ColorDataDepth.Default, ColorDataSelectionPolicy.Default, ColorDataDesktopDepth.Default);
-
-                                    NVAPI.ColorControl(displayId, ref newColorData);
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully removed any custom NVIDIA Color settings. BPC is set to {colorData.DesktopColorDepth.ToString()}. Color Format is set to {colorData.ColorFormat.ToString("G")}. Colorimetry is set to {colorData.Colorimetry.ToString("G")}. Color Selection Policy is set to {colorData.SelectionPolicy.ToString()}. Color Depth is set to {colorData.ColorDepth.ToString()}. Dynamic Range is set to {colorData.DynamicRange.ToString()}");
-                                    switch (colorData.SelectionPolicy)
-                                    {
-                                        case ColorDataSelectionPolicy.User:
-                                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Color Selection Policy is set to NV_COLOR_SELECTION_POLICY_USER so the color settings have been set by the user in the NVIDIA Control Panel.");
-                                            break;
-                                        case ColorDataSelectionPolicy.BestQuality: // Also matches NV_COLOR_SELECTION_POLICY_DEFAULT as it is 1
-                                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Color Selection Policy is set to NV_COLOR_SELECTION_POLICY_BEST_QUALITY so the color settings are being handled by the Windows OS.");
-                                            break;
-                                        case ColorDataSelectionPolicy.Unknown:
-                                            SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: Color Selection Policy is set to NV_COLOR_SELECTION_POLICY_UNKNOWN so the color settings aren't being handled by either the Windows OS or the NVIDIA Setup!");
-                                            break;
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst finding out if the GPU is from the Quadro range.");
-                                }
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want only want to turn off custom NVIDIA colour settings if needed for display {displayId}, and that currently isn't required. Skipping changing NVIDIA colour mode.");
+                                // If we get here then the display is valid, so now we actually apply the new Mosaic Topology
+                                mosaicHelper.SetDisplayGrids(displayConfig.MosaicConfig.MosaicGridTopologies, 0);
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids returned OK.");
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
+                                Thread.Sleep(delayInMs * 3);
                             }
                         }
                         catch (Exception ex)
                         {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused while turning off prior NVIDIA specific colour settings for display {displayId}.");
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception: The GPU DisplayGrid could not be made. SetDisplayGrids() returned error message {ex.Message}");
+                            return false;
                         }
 
-                        // Remove any custom NVIDIA HDR Colour settings
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want to turn off HDR colour if it's user set HDR colour.");
+                    }
 
-                        HDRColorDataV2 hdrColorData = (HDRColorDataV2)myDisplay.HdrColorData;
-                        try
-                        {
+                }
+                else if (!displayConfig.MosaicConfig.IsMosaicEnabled && ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
+                {
+                    // We are on a Mosaic profile now, and we need to change to a non-Mosaic profile
+                    TurnOffMosaic(delayInMs);
 
-                            // if it's not the same HDR we want, then we turn off HDR (and will apply it if needed later on in SetActiveOverride)
-                            HDRColorDataV2 activeHdrColorData = (HDRColorDataV2)ActiveDisplayConfig.PhysicalAdapters[myAdapterIndex].Displays[displayId].HdrColorData;
-                            if (activeHdrColorData.HDRMode != ColorDataHDRMode.Off)
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want to turn on custom HDR mode for display {displayId}.");
-
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: HDR mode is currently {activeHdrColorData.HDRMode.ToString()} for Mosaic display {displayId}.");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want HDR settings BPC  {hdrColorData.ColorDepth} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want HDR settings HDR Colour Format {hdrColorData.ColorFormat} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want HDR settings HDR dynamic range {hdrColorData.DynamicRange} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want HDR settings HDR Mode {hdrColorData.HDRMode} for Mosaic display {displayId}");
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want HDR settings Mastering Display Data {hdrColorData.MasteringDisplayData} for Mosaic display {displayId}");
-                                // Apply the HDR removal
-                                HDRColorDataV2 newHdrColorData = new HDRColorDataV2(ColorDataHDRCommand.Set, ColorDataHDRMode.Off);                                
-                                NVAPI.HDRColorControl(displayId, ref newHdrColorData);
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Disp_HdrColorControl returned OK. We just successfully turned off the HDR mode for Mosaic display {displayId}.");                                
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We want only want to turn off custom NVIDIA HDR settings if needed for display {displayId}, and that currently isn't required. Skipping changing NVIDIA HDR mode.");
-                            }
-
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused while turning off prior NVIDIA HDR colour settings for display {displayId}.");
-                        } */
-                    } 
+                }
+                else if (!displayConfig.MosaicConfig.IsMosaicEnabled && !ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
+                {
+                    // We are on a non-Mosaic profile now, and we are changing to a non-Mosaic profile
+                    // so there is nothing to do as far as NVIDIA is concerned!
+                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We are on a non-Mosaic profile now, and we are changing to a non-Mosaic profile so there is no need to modify Mosaic settings!");
                 }
 
-                // If we get to here and there are no displays connected, then we need to return, as all the following settings back out custom settings per display
-                // which are obviously not needed if the screens are off!
-                /*if (!ActiveDisplayConfig.IsInUse)
+            }
+            else
+            {
+                SharedLogger.logger.Info($"NVIDIALibrary/SetActiveConfig: Tried to run SetActiveConfig but the NVIDIA NvAPI library isn't initialised! This generally means you don't have a NVIDIA video card in your machine.");
+            }
+
+            return true;
+        }
+
+        public bool TurnOffMosaic(int delayInMs)
+        {
+            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Mosaic config that is currently set is no longer needed. Removing Mosaic config.");
+
+            try
+            {
+                using (var mosaicHelper = _nvapiApiHelper.GetMosaicHelper())
                 {
-                    // we need to return true as everything is working as it should!
-                    return true;
-                }*/
+                    // First attempt: Create 1x1 grids for each display and apply them
+                    SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Trying to set a 1x1 DisplayGrid to disable Mosaic.");
+                    NVAPIMosaicGridTopologiesDto? individualScreensTopology = CreateSingleScreenMosaicTopology(mosaicHelper);
+                    if (individualScreensTopology.HasValue)
+                    {
+                        try
+                        {
+                            mosaicHelper.SetDisplayGrids(individualScreensTopology.Value, 0);
+                            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: NvAPI_Mosaic_SetDisplayGrids returned OK.");
+                            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
+                            Thread.Sleep(delayInMs * 3);
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/TurnOffMosaic: Exception while trying to set a 1x1 DisplayGrid using SetDisplayGrids.");
+                        }
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Warn($"NVIDIALibrary/TurnOffMosaic: Could not create a 1x1 DisplayGrid topology. Will try EnableCurrentTopo(false) instead.");
+                    }
+
+                    // Check if Mosaic is still on after the first attempt
+                    NVAPIMosaicCurrentTopoDto? currentTopo = mosaicHelper.GetCurrentTopo();
+                    bool mosaicStillOn = currentTopo.HasValue && currentTopo.Value.TopoBrief.Enabled;
+
+                    if (mosaicStillOn)
+                    {
+                        // If the Mosaic is still on, then the last mosaic disable failed, so we need to then try turning it off using EnableCurrentTopo(false)
+                        SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Previous attempt to turn off Mosaic failed. Now trying to use EnableCurrentTopo(false) to disable Mosaic instead.");
+                        try
+                        {
+                            mosaicHelper.EnableCurrentTopo(false);
+                            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: EnableCurrentTopo(false) returned OK.");
+                            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
+                            Thread.Sleep(delayInMs * 3);
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/TurnOffMosaic: Exception while trying to disable Mosaic using EnableCurrentTopo(false).");
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Mosaic successfully disabled using SetDisplayGrids method.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Error(ex, $"NVIDIALibrary/TurnOffMosaic: Exception while trying to turn off Mosaic.");
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool SetActiveConfigOverride(NVIDIA_DISPLAY_CONFIG displayConfig, int delayInMs)
+        {
+
+            if (_initialised)
+            {
+
+                // We need to first update the active config to make sure it's set
+                UpdateActiveConfig();
 
                 // Set the DRS Settings only if we need to
                 if (displayConfig.DRSSettings.Count > 0)
                 {
                     try
                     {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to create a DRS session.");
+                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to create a DRS session.");
                         using (var drsHelper = _nvapiApiHelper.CreateDrsSession())
                         {
                             if (drsHelper == null)
                             {
-                                SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: Failed to create a DRS session. DRS settings will not be applied.");
+                                SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfigOverride: Failed to create a DRS session. DRS settings will not be applied.");
                             }
                             else
                             {
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully created a DRS session.");
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Successfully created a DRS session.");
 
                                 // Load the current DRS Settings into memory
-                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to load the current DRS settings into memory.");
+                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to load the current DRS settings into memory.");
                                 bool loaded = drsHelper.LoadSettings();
                                 if (!loaded)
                                 {
-                                    SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: Failed to load the current DRS settings into memory.");
+                                    SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfigOverride: Failed to load the current DRS settings into memory.");
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully loaded the current DRS settings into memory.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Successfully loaded the current DRS settings into memory.");
 
                                     // Get the base DRS profile
-                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to get the base DRS profile.");
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to get the base DRS profile.");
                                     var baseProfile = drsHelper.GetBaseProfile();
                                     if (!baseProfile.HasValue)
                                     {
-                                        SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfig: Failed to get the base DRS profile. The DRS Settings may not have been loaded.");
+                                        SharedLogger.logger.Warn($"NVIDIALibrary/SetActiveConfigOverride: Failed to get the base DRS profile. The DRS Settings may not have been loaded.");
                                     }
                                     else
                                     {
-                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Successfully got the base DRS Profile.");
+                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Successfully got the base DRS Profile.");
 
                                         // Go through all the settings we have in the saved profile, and change the current profile settings to be the same
                                         if (displayConfig.DRSSettings.Count > 0)
                                         {
                                             bool needToSave = false;
-                                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: There are {displayConfig.DRSSettings.Count} stored DRS settings in the base DRS profile so we need to process them");
+                                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: There are {displayConfig.DRSSettings.Count} stored DRS settings in the base DRS profile so we need to process them");
 
                                             try
                                             {
@@ -2698,7 +2699,7 @@ namespace DisplayMagicianShared.NVIDIA
 
                                                             if (currentValueMatches)
                                                             {
-                                                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: '{currentSetting.SettingName}' ({currentSetting.SettingId}) current value already matches the desired value, so skipping changing it.");
+                                                                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: '{currentSetting.SettingName}' ({currentSetting.SettingId}) current value already matches the desired value, so skipping changing it.");
                                                             }
                                                             else
                                                             {
@@ -2706,11 +2707,11 @@ namespace DisplayMagicianShared.NVIDIA
                                                                 {
                                                                     drsHelper.SetSetting(baseProfile.Value, drsSetting);
                                                                     needToSave = true;
-                                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We changed setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) using NVAPIDrsHelper.SetSetting()");
+                                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We changed setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) using NVAPIDrsHelper.SetSetting()");
                                                                 }
                                                                 catch (Exception ex)
                                                                 {
-                                                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception caused whilst changing setting '{currentSetting.SettingName}' ({currentSetting.SettingId}).");
+                                                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception caused whilst changing setting '{currentSetting.SettingName}' ({currentSetting.SettingId}).");
                                                                 }
                                                             }
                                                             break;
@@ -2730,20 +2731,20 @@ namespace DisplayMagicianShared.NVIDIA
 
                                                     try
                                                     {
-                                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to restore DRS setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default.");
+                                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to restore DRS setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default.");
                                                         drsHelper.RestoreProfileDefaultSetting(baseProfile.Value, currentSetting.SettingId);
                                                         needToSave = true;
-                                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We restored active setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default value using NVAPIDrsHelper.RestoreProfileDefaultSetting()");
+                                                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We restored active setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default value using NVAPIDrsHelper.RestoreProfileDefaultSetting()");
                                                     }
                                                     catch (Exception ex)
                                                     {
-                                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to restore setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default.");
+                                                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception while trying to restore setting '{currentSetting.SettingName}' ({currentSetting.SettingId}) to its default.");
                                                     }
                                                 }
                                             }
                                             catch (Exception ex)
                                             {
-                                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to find base profiles in either the stored or active display configs.");
+                                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception while trying to find base profiles in either the stored or active display configs.");
                                             }
 
                                             // Save the Settings if needed
@@ -2751,13 +2752,13 @@ namespace DisplayMagicianShared.NVIDIA
                                             {
                                                 try
                                                 {
-                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Attempting to save the current DRS settings.");
+                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: Attempting to save the current DRS settings.");
                                                     drsHelper.SaveSettings();
-                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We successfully saved the current DRS Settings.");
+                                                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfigOverride: We successfully saved the current DRS Settings.");
                                                 }
                                                 catch (Exception ex)
                                                 {
-                                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception while trying to save the current DRS settings.");
+                                                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception while trying to save the current DRS settings.");
                                                 }
                                             }
                                         }
@@ -2768,262 +2769,9 @@ namespace DisplayMagicianShared.NVIDIA
                     }
                     catch (Exception ex)
                     {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception occurred whilst applying the DRS settings.");
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception occurred whilst applying the DRS settings.");
                     }
                 }
-
-                // Now we've set the color the way we want it, lets do the thing
-                // We want to check if we need to apply a NVIDIA Surround (Mosaic) config
-                SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Testing whether the display configuration uses NVIDIA Surround");
-                // 
-                if (displayConfig.MosaicConfig.IsMosaicEnabled)
-                {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: The display configuration we want to use has NVIDIA Surround (Mosaic) enabled");
-                    if (displayConfig.MosaicConfig.Equals(ActiveDisplayConfig.MosaicConfig))
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Mosaic current config is exactly the same as the one we want, so skipping applying the Mosaic config as we already have the right one!");
-                    }                    
-                    else
-                    {
-             
-                        // If we are on a non-Moasic profile now, then we need to set a 1x1 display grid just to wake up the displays properly
-                        if (!ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: The current display configuration does not have NVIDIA Surround (Mosaic) enabled, so we need to set a 1x1 mosaic matrix to ensure that all displays are awake.");
-                            TurnOffMosaic(delayInMs);
-                        }
-                        else
-                        {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: The current display configuration does have a NVIDIA Surround (Mosaic) enabled, so we will skip setting the 1x1 mosaice grid.");
-                        }
-
-                        // Now that the Mosaic is turned off, we can apply the new Mosaic Topology
-                        //NV_MOSAIC_SETDISPLAYTOPO_FLAGS setTopoFlags = NV_MOSAIC_SETDISPLAYTOPO_FLAGS.MAXIMIZE_PERFORMANCE;
-                        SetDisplayTopologyFlag setTopoFlags = SetDisplayTopologyFlag.NoFlag;
-
-                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Next we apply the wanted Mosaic config now");
-                        try
-                        {
-                            // If we get here then the display is valid, so now we actually apply the new Mosaic Topology
-                            NVAPI.SetDisplayGrids(displayConfig.MosaicConfig.MosaicGridTopos, setTopoFlags);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids returned OK.");
-                            SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
-                            Thread.Sleep(delayInMs * 3);
-                        }
-                        catch (NVIDIAApiException nex)
-                        {
-                            SharedLogger.logger.Error(nex, $"NVIDIALibrary/SetActiveConfig: NVIDIAApiException: The GPU DisplayGrid could not be made. SetDisplayGrids() returned error status {nex.Status}");
-                            return false;
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/SetActiveConfig: Exception: The GPU DisplayGrid could not be made. SetDisplayGrids() returned error message {ex.Message}");
-                            return false;
-                        }
-
-                    }
-
-                }
-                else if (!displayConfig.MosaicConfig.IsMosaicEnabled && ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
-                {
-                    // We are on a Mosaic profile now, and we need to change to a non-Mosaic profile
-                    TurnOffMosaic(delayInMs);
-
-                }
-                else if (!displayConfig.MosaicConfig.IsMosaicEnabled && !ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
-                {
-                    // We are on a non-Mosaic profile now, and we are changing to a non-Mosaic profile
-                    // so there is nothing to do as far as NVIDIA is concerned!
-                    SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: We are on a non-Mosaic profile now, and we are changing to a non-Mosaic profile so there is no need to modify Mosaic settings!");
-                }
-
-                // If the NVIDIA topology has changed, then we need to refresh our active config so it stays valid. 
-                //if (logicalGPURefreshNeeded)
-                //{
-                //    UpdateActiveConfig();
-                //}
-
-
-            }
-            else
-            {
-                SharedLogger.logger.Info($"NVIDIALibrary/SetActiveConfig: Tried to run SetActiveConfig but the NVIDIA NvAPI library isn't initialised! This generally means you don't have a NVIDIA video card in your machine.");
-                //throw new NVIDIALibraryException($"Tried to run SetActiveConfig but the NVIDIA NvAPI library isn't initialised!");
-            }
-
-            return true;
-        }
-
-        public bool TurnOffMosaic(int delayInMs)
-        {
-            // We need to disable the Mosaic Topology
-            SetDisplayTopologyFlag setTopoFlags = SetDisplayTopologyFlag.NoFlag;
-
-            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Mosaic config that is currently set is no longer needed. Removing Mosaic config.");
-            GridTopologyV2[] individualScreensTopology = CreateSingleScreenMosaicTopology();
-
-            // If we get here then the display is valid, so now we actually apply the new Mosaic Topology
-            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout.");
-            try
-            {
-                NVAPI.SetDisplayGrids(individualScreensTopology, setTopoFlags);
-            }
-            catch (NVIDIAApiException nex)
-            {
-                if (nex.Status == Status.Ok)
-                {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: NvAPI_Mosaic_SetDisplayGrids returned OK.");
-                    SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
-                    Thread.Sleep(delayInMs * 3);
-                }
-                else if (nex.Status == Status.NoActiveSLITopology)
-                {
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: No matching GPU topologies could be found. NvAPI_Mosaic_SetDisplayGrids() returned error code NoActiveSLITopology");
-                    return false;
-                }
-                else if (nex.Status == Status.TopologyNotPossible)
-                {
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: The topology passed in is not currently possible. NvAPI_Mosaic_SetDisplayGrids() returned error code TopologyNotPossible");
-                    return false;
-                }
-                else if (nex.Status == Status.InvalidDisplayId)
-                {
-                    SharedLogger.logger.Warn(nex, $"NVIDIALibrary/TurnOffMosaic: The Display ID of the first display is not currently possible to use. NvAPI_Mosaic_SetDisplayGrids() returned error code InvalidDisplayId. Trying again with the next display.");
-                    return false;
-                }
-                else if (nex.Status == Status.InvalidArgument)
-                {
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: One or more arguments passed in are invalid. NvAPI_Mosaic_SetDisplayGrids() returned error code InvalidArgument");
-                    return false;
-                }
-                else if (nex.Status == Status.ApiNotInitialized)
-                {
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: The NvAPI API needs to be initialized first. NvAPI_Mosaic_SetDisplayGrids() returned error code ApiNotInitialized");
-                    return false;
-                }
-                else if (nex.Status == Status.NoImplementation)
-                {
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: This entry point not available in this NVIDIA Driver. NvAPI_Mosaic_SetDisplayGrids() returned error code NoImplementation");
-                    return false;
-                }
-                else if (nex.Status == Status.IncompatibleStructureVersion)
-                {
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: The version of the structure passed in is not compatible with this entrypoint. NvAPI_Mosaic_SetDisplayGrids() returned error code IncompatibleStructureVersion");
-                    return false;
-                }
-                else if (nex.Status == Status.ModeChangeFailed)
-                {
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: There was an error changing the display mode. NvAPI_Mosaic_SetDisplayGrids() returned error code ModeChangeFailed");
-                    return false;
-                }
-                else if (nex.Status == Status.Error)
-                {
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: A miscellaneous error occurred. NvAPI_Mosaic_SetDisplayGrids() returned error code Error");
-                    return false;
-                }
-                else
-                {
-                    // If we get here, we may have an error, or it may have worked successfully! So we need to check again :( 
-                    SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: NVIDIAApiException while trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout.");
-                }
-            }
-            catch (Exception ex)
-            {
-                // If we get here, we may have an error, or it may have worked successfully! So we need to check again :( 
-                SharedLogger.logger.Error(ex, $"NVIDIALibrary/TurnOffMosaic: General Exception while trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_SetDisplayGrids mosaic layout."); ;
-            }
-            // If we get here, it may or it may not have worked successfully! So we need to check again :( 
-            // We don't want to do a full ceck, so we do a quick check instead.
-            if (MosaicIsOn())
-            {
-                // If the Mosaic is still on, then the last mosaic disable failed, so we need to then try turning it off this using NvAPI_Mosaic_EnableCurrentTopo(0)
-                SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Previous attempt to turn off Mosaic. Now trying to use NvAPI_Mosaic_EnableCurrentTopo to disable Mosaic instead.");
-                try
-                {
-                    NVAPI.EnableCurrentTopology(false);
-                }
-                catch (NVIDIAApiException nex)
-                {
-                    if (nex.Status == Status.Ok)
-                    {
-                        SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: NvAPI_Mosaic_SetDisplayGrids attempt 2 returned OK.");
-                        SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Waiting {delayInMs * 3}  milliseconds to let the Mosaic display change take place before continuing");
-                        Thread.Sleep(delayInMs * 3);
-                    }
-                    else if (nex.Status == Status.NoActiveSLITopology)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: No matching GPU topologies could be found. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code NoActiveSLITopology");
-                        return false;
-                    }
-                    else if (nex.Status == Status.TopologyNotPossible)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: The topology passed in is not currently possible. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code TopologyNotPossible");
-                        return false;
-                    }
-                    else if (nex.Status == Status.InvalidDisplayId)
-                    {
-                        SharedLogger.logger.Warn(nex, $"NVIDIALibrary/TurnOffMosaic: The Display ID of the first display is not currently possible to use. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code InvalidDisplayId. Trying again with the next display.");
-                        return false;
-                    }
-                    else if (nex.Status == Status.InvalidArgument)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: One or more arguments passed in are invalid. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code InvalidArgument");
-                        return false;
-                    }
-                    else if (nex.Status == Status.ApiNotInitialized)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: The NvAPI API needs to be initialized first. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code ApiNotInitialized");
-                        return false;
-                    }
-                    else if (nex.Status == Status.NoImplementation)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: This entry point not available in this NVIDIA Driver. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code NoImplementation");
-                        return false;
-                    }
-                    else if (nex.Status == Status.IncompatibleStructureVersion)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: The version of the structure passed in is not compatible with this entrypoint. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code IncompatibleStructureVersion");
-                        return false;
-                    }
-                    else if (nex.Status == Status.ModeChangeFailed)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: There was an error changing the display mode. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code ModeChangeFailed");
-                        return false;
-                    }
-                    else if (nex.Status == Status.Error)
-                    {
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: A miscellaneous error occurred. NvAPI_Mosaic_EnableCurrentTopo() attempt 2 returned error code Error");
-                        return false;
-                    }
-                    else
-                    {
-                        // If we get here, we may have an error, or it may have worked successfully! 
-                        SharedLogger.logger.Error(nex, $"NVIDIALibrary/TurnOffMosaic: NVIDIAApiException while trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_EnableCurrentTopo attempt 2 mosaic layout.");
-                        return false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // If we get here, we may have an error, or it may have worked successfully!
-                    SharedLogger.logger.Error(ex, $"NVIDIALibrary/TurnOffMosaic: General Exception while trying to set a 1x1 DisplayGrid for the NvAPI_Mosaic_EnableCurrentTopo attempt 2 mosaic layout.");
-                    return false;
-                }
-            }
-            else
-            {
-                SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Mosaic successfully disabled using SetDisplayGrids method.");
-            }
-            return true;
-        }
-
-        public bool SetActiveConfigOverride(NVIDIA_DISPLAY_CONFIG displayConfig, int delayInMs)
-        {
-
-            if (_initialised)
-            {
-
-                // We need to first update the active config to make sure it's set
-                UpdateActiveConfig();
 
                 // Go through the physical adapters
                 foreach (var physicalGPU in displayConfig.PhysicalAdapters)
@@ -3880,106 +3628,50 @@ namespace DisplayMagicianShared.NVIDIA
         //     return stringToReturn;
         // }
 
-        public static GridTopologyV2[] CreateSingleScreenMosaicTopology()
+        public NVAPIMosaicGridTopologiesDto? CreateSingleScreenMosaicTopology(NVAPIMosaicHelper mosaicHelper)
         {
 
-            // Get Current Mosaic Grid settings using the Grid topologies fnumbers we got before
-            GridTopologyV2[] mosaicGridTopos = new GridTopologyV2[0];
+            // Get Current Mosaic Grid settings
+            NVAPIMosaicGridTopologiesDto? mosaicGridTopologies = null;
             try
             {
                 SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Attempting to get the current mosaic grid settings from the NVIDIA Driver.");
-                mosaicGridTopos = NVAPI.EnumDisplayGrids();
+                mosaicGridTopologies = mosaicHelper.EnumDisplayGrids();
                 SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Successfully got the current mosaic grid settings from the NVIDIA Driver.");
             }
             catch (Exception ex)
             {
                 SharedLogger.logger.Warn(ex, $"NVIDIALibrary/CreateSingleScreenMosaicTopology: Exception getting the current mosaic grid settings from the NVIDIA Driver.");
+                return null;
             }
 
-            // Sum up all the screens we have
-            //int totalScreenCount = mosaicGridTopos.Select(tp => tp.Displays).Sum(d => d.Count());
-            List<GridTopologyV2> screensToReturn = new List<GridTopologyV2>();
-
-            foreach (GridTopologyV2 gridTopo in mosaicGridTopos)
+            if (!mosaicGridTopologies.HasValue)
             {
-                // Get Current Mosaic Display Topology settings using the Grid topologies numbers we got before
-                //NV_MOSAIC_TOPO myGridTopo = gridTopo;
-                DisplaySettingsV2[] mosaicDisplaySettings = new DisplaySettingsV2[0];
-                try
-                {
-                    SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Attempting to get the current mosaic display modes for the current mosaic grid topology from the NVIDIA Driver.");
-                    mosaicDisplaySettings = NVAPI.EnumDisplayModes(gridTopo);
-                    SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Successfully got the current mosaic display modes for the current mosaic grid topology from the NVIDIA Driver.");
-                }
-                catch (Exception ex)
-                {
-                    SharedLogger.logger.Warn(ex, $"NVIDIALibrary/CreateSingleScreenMosaicTopology: Exception getting the current mosaic display modes for the current mosaic grid topology from the NVIDIA Driver.");
-                }
+                SharedLogger.logger.Warn($"NVIDIALibrary/CreateSingleScreenMosaicTopology: No mosaic grid topologies were returned from the NVIDIA Driver.");
+                return null;
+            }
 
-                for (int displayIndexToUse = 0; displayIndexToUse < gridTopo.Displays.Count(); displayIndexToUse++)
+            List<NVAPIMosaicGridTopoDto> screensToReturn = new List<NVAPIMosaicGridTopoDto>();
+
+            foreach (NVAPIMosaicGridTopoDto gridTopo in mosaicGridTopologies.Value.Grids)
+            {
+                for (int displayIndexToUse = 0; displayIndexToUse < gridTopo.Displays.Length; displayIndexToUse++)
                 {
-                    GridTopologyDisplayV2[] displayArray = new GridTopologyDisplayV2[1];
+                    NVAPIMosaicGridTopoDisplayDto[] displayArray = new NVAPIMosaicGridTopoDisplayDto[1];
                     displayArray[0] = gridTopo.Displays[displayIndexToUse];
 
-                    SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Creating new Grid Topology with multiple 1x1 grids based on each display in the current Moasiac grid. This will separate each display on its own.");
-                    GridTopologyV2 thisScreen = new GridTopologyV2(1,1, displayArray, gridTopo.DisplaySettings,false,false,false,false,false,false);
+                    SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Creating new Grid Topology with multiple 1x1 grids based on each display in the current Mosaic grid. This will separate each display on its own.");
+                    NVAPIMosaicGridTopoDto thisScreen = new NVAPIMosaicGridTopoDto(
+                        1, 1,
+                        gridTopo.ApplyWithBezelCorrect, gridTopo.ImmersiveGaming, gridTopo.BaseMosaic,
+                        gridTopo.DriverReloadAllowed, gridTopo.AcceleratePrimaryDisplay, gridTopo.PixelShift,
+                        displayArray, gridTopo.DisplaySettings);
 
                     screensToReturn.Add(thisScreen);
                 }
-
             }
 
-            return screensToReturn.ToArray();
-        }
-
-        public static bool ListOfArraysEqual(List<Rectangle[]> a1, List<Rectangle[]> a2)
-        {
-            if (a1.Count == a2.Count)
-            {
-                for (int i = 0; i < a1.Count; i++)
-                {
-                    if (a1[i].Length == a2[i].Length)
-                    {
-                        for (int j = 0; j < a1[i].Length; j++)
-                        {
-                            if (!a1[i][j].Equals(a2[i][j]))
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public static bool ListOfArraysEqual(List<ViewPortF[]> a1, List<ViewPortF[]> a2)
-        {
-            if (a1.Count == a2.Count)
-            {
-                for (int i = 0; i < a1.Count; i++)
-                {
-                    if (a1[i].Length == a2[i].Length)
-                    {
-                        for (int j = 0; j < a1[i].Length; j++)
-                        {
-                            if (!a1[i][j].Equals(a2[i][j]))
-                            {
-                                return false;
-                            }
-                        }
-                    }
-                }
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return new NVAPIMosaicGridTopologiesDto(screensToReturn.ToArray());
         }
 
 
