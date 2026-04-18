@@ -965,7 +965,6 @@ namespace DisplayMagicianShared.NVIDIA
         public List<NV_MONITOR_CONN_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
         public List<uint> _allConnectedDisplayIds = new List<uint>();
-        private bool _mosaic_supported = true;
 
         // To detect redundant calls
         private bool _disposed = false;
