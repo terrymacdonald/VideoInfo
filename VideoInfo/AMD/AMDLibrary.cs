@@ -2912,6 +2912,10 @@ namespace DisplayMagicianShared.AMD
             var sb = new StringBuilder();
 
             sb.AppendLine("****** AMD VIDEO CARDS *******");
+            sb.AppendLine($"IsInUse: {displayConfig.IsInUse}");
+            sb.AppendLine($"IsCloned: {displayConfig.IsCloned}");
+            sb.AppendLine($"IsEyefinity: {displayConfig.IsEyefinity}");
+            sb.AppendLine();
 
             // GPUs
             try
@@ -2953,6 +2957,8 @@ namespace DisplayMagicianShared.AMD
                 var display = kvp.Value;
                 sb.AppendLine($"Display UniqueId: {display.UniqueID}");
                 sb.AppendLine($"Name: {display.Name}");
+                sb.AppendLine($"ManufacturerID: {display.ManufacturerID}");
+                sb.AppendLine($"EDID: {display.EDID}");
                 sb.AppendLine($"GPU UniqueId: {display.GpuUniqueID}");
                 sb.AppendLine($"Type: {display.Type} ");
                 sb.AppendLine($"Connector: {display.ConnectorType}");
@@ -3039,6 +3045,51 @@ namespace DisplayMagicianShared.AMD
             }
 
             sb.AppendLine();
+
+            // Eyefinity Desktop (ADLX)
+            sb.AppendLine("AMD EYEFINITY DESKTOP (ADLX)");
+            if (displayConfig.IsEyefinity)
+            {
+                var ef = displayConfig.EyefinityDesktop;
+                sb.AppendLine($"  Rows: {ef.Rows} Columns: {ef.Columns}");
+                sb.AppendLine($"  Orientation: {ef.Orientation}");
+                sb.AppendLine($"  Size: {ef.SizeWidth}x{ef.SizeHeight}");
+                sb.AppendLine($"  TopLeft: ({ef.TopLeftX},{ef.TopLeftY})");
+            }
+            else
+            {
+                sb.AppendLine("  Not in use");
+            }
+            sb.AppendLine();
+
+            // Desktops
+            sb.AppendLine("AMD DESKTOPS");
+            if (displayConfig.Desktops != null && displayConfig.Desktops.Count > 0)
+            {
+                int deskIdx = 0;
+                foreach (var desktop in displayConfig.Desktops)
+                {
+                    sb.AppendLine($"  Desktop #{deskIdx}: Type={desktop.Type} Orientation={desktop.Orientation} Size={desktop.SizeWidth}x{desktop.SizeHeight} TopLeft=({desktop.TopLeftX},{desktop.TopLeftY}) Displays={desktop.NumberOfDisplays}");
+                    deskIdx++;
+                }
+            }
+            else
+            {
+                sb.AppendLine("  No desktops stored.");
+            }
+            sb.AppendLine();
+
+            // Display Identifiers
+            if (displayConfig.DisplayIdentifiers != null && displayConfig.DisplayIdentifiers.Count > 0)
+            {
+                sb.AppendLine("AMD DISPLAY IDENTIFIERS");
+                foreach (var id in displayConfig.DisplayIdentifiers)
+                {
+                    sb.AppendLine($"  {id}");
+                }
+                sb.AppendLine();
+            }
+
             sb.AppendLine();
 
             return sb.ToString();

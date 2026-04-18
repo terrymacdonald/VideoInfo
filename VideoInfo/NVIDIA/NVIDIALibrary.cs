@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 using Windows.Devices.I2c.Provider;
 using Windows.Graphics;
 using Windows.Storage.Provider;
@@ -2250,235 +2251,246 @@ namespace DisplayMagicianShared.NVIDIA
 
         public string PrintActiveConfig()
         {
-            string stringToReturn = "";
-
-            // Get the current config
             NVIDIA_DISPLAY_CONFIG displayConfig = ActiveDisplayConfig;
+            var sb = new StringBuilder();
 
-            stringToReturn += $"****** NVIDIA VIDEO CARDS *******\n";
+            sb.AppendLine("****** NVIDIA VIDEO CARDS *******");
 
-            // // Enumerate all the Physical GPUs
-            // PhysicalGPUHandle[] physicalGpus = new PhysicalGPUHandle[NvConstants.NV_MAX_PHYSICAL_GPUS];
-            // uint physicalGpuCount = 0;
-            // try 
-            // {
-            //     SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to get the physical GPU count.");
-            //     physicalGpus = NVAPI.EnumPhysicalGPUs();
-            //     SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NvAPI_EnumPhysicalGPUs returned {physicalGpuCount} Physical GPUs");
-            //     stringToReturn += $"Number of NVIDIA Video cards found: {physicalGpuCount}\n";
-            // }
-            // catch (Exception ex)
-            // {
-            //     SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the physical GPU count.");
-            // }
-        
-            // // This check is to make sure that if there aren't any physical GPUS then we exit!
-            // if (physicalGpuCount == 0)
-            // {
-            //     // Print out that there aren't any video cards detected
-            //     stringToReturn += "No NVIDIA Video Cards detected.\n\n";
-            //     SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: No NVIDIA Videocards detected");
-            //     return stringToReturn;
-            // }
+            if (displayConfig.PhysicalAdapters.Count == 0)
+            {
+                sb.AppendLine("No NVIDIA Video Cards detected.");
+                sb.AppendLine();
+                return sb.ToString();
+            }
 
-            // // Go through the Physical GPUs one by one
-            // for (uint physicalGpuIndex = 0; physicalGpuIndex < physicalGpuCount; physicalGpuIndex++)
-            // {
-            //     //We want to get the name of the physical device
-            //     string gpuName = "";
-            //     try
-            //     {
-            //         SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to get the physical GPU name for GPU #{physicalGpuIndex}.");
-            //         gpuName = NVAPI.GetFullName(physicalGpus[physicalGpuIndex]);
-            //         SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Successfully got the physical GPU name for GPU #{physicalGpuIndex}. The GPU Full Name is {gpuName}");
-            //         stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is a {gpuName}\n";
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst getting the physical GPU name for GPU #{physicalGpuIndex}.");
-            //     }
+            sb.AppendLine($"Number of NVIDIA adapters found: {displayConfig.PhysicalAdapters.Count}");
+            sb.AppendLine();
 
-            //     //This function retrieves the Quadro status for the GPU (1 if Quadro, 0 if GeForce)
-            //     bool quadroStatus = false;
-            //     try
-            //     {
-            //         SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: Attempting to find out if the GPU is from the Quadro range.");
-            //         quadroStatus = NVAPI.GetQuadroStatus(physicalGpus[physicalGpuIndex]);
-            //         if (quadroStatus)
-            //         {
-            //             SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NVIDIA Video Card is one from the GeForce range");
-            //             stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is in the GeForce range\n";
-            //         }
-            //         else                     {
-            //             SharedLogger.logger.Trace($"NVIDIALibrary/PrintActiveConfig: NVIDIA Video Card is NOT one from the Quadro range");
-            //             stringToReturn += $"NVIDIA Video card #{physicalGpuIndex} is NOT in the Quadro range\n";
-            //         }
-            //     }
-            //     catch (Exception ex)
-            //     {
-            //         SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception occurred whilst finding out if the GPU is from the Quadro range.");
-            //     }
-            // }
+            // Physical Adapters
+            foreach (var physicalGPU in displayConfig.PhysicalAdapters)
+            {
+                string adapterKey = physicalGPU.Key;
+                NVIDIA_PER_ADAPTER_CONFIG myAdapter = physicalGPU.Value;
 
-            // stringToReturn += $"\n****** NVIDIA SURROUND/MOSAIC *******\n";
-            // if (displayConfig.MosaicConfig.IsMosaicEnabled)
-            // {
-            //     stringToReturn += $"NVIDIA Surround/Mosaic is Enabled\n";
-            //     if (displayConfig.MosaicConfig.MosaicGridTopos.Length > 1)
-            //     {
-            //         stringToReturn += $"There are {displayConfig.MosaicConfig.MosaicGridTopos.Length} NVIDIA Surround/Mosaic Grid Topologies in use.\n";
-            //     }
-            //     if (displayConfig.MosaicConfig.MosaicGridTopos.Length == 1)
-            //     {
-            //         stringToReturn += $"There is 1 NVIDIA Surround/Mosaic Grid Topology in use.\n";
-            //     }
-            //     else
-            //     {
-            //         stringToReturn += $"There are no NVIDIA Surround/Mosaic Grid Topologies in use.\n";
-            //     }
+                sb.AppendLine($"Adapter: {adapterKey}");
+                sb.AppendLine($"  Name: {myAdapter.FullName}");
+                sb.AppendLine($"  AdapterID: {myAdapter.AdapterID}");
+                sb.AppendLine($"  IsQuadro: {myAdapter.IsQuadro}");
+                sb.AppendLine($"  HasLogicalGPU: {myAdapter.HasLogicalGPU}");
+                sb.AppendLine($"  SystemType: {myAdapter.SystemType}");
+                sb.AppendLine($"  GPUType: {myAdapter.GPUType}");
+                sb.AppendLine($"  BusType: {myAdapter.BusType}");
+                sb.AppendLine($"  BusId: {myAdapter.BusId} BusSlotId: {myAdapter.BusSlotId}");
+                sb.AppendLine($"  PciIdentifiers: {myAdapter.PciIdentifiers}");
+                sb.AppendLine($"  VbiosVersion: {myAdapter.VbiosVersionString}");
+                sb.AppendLine($"  DisplayCount: {myAdapter.DisplayCount}");
+                sb.AppendLine();
 
-            //     int count = 0;
-            //     foreach (GridTopologyV2 gridTopology in displayConfig.MosaicConfig.MosaicGridTopos)
-            //     {
-            //         stringToReturn += $"NOTE: This Surround/Mosaic screen will be treated as a single display by Windows.\n";
-            //         stringToReturn += $"The NVIDIA Surround/Mosaic Grid Topology #{count} is {gridTopology.Rows} Rows x {gridTopology.Columns} Columns\n";
-            //         stringToReturn += $"The NVIDIA Surround/Mosaic Grid Topology #{count} involves {gridTopology.Displays.Count()} Displays\n";
-            //         count++;
-            //     }
-            // }
-            // else
-            // {
-            //     stringToReturn += $"NVIDIA Surround/Mosaic is Disabled\n";
-            // }
+                // Per-display settings
+                foreach (var displayDict in myAdapter.Displays)
+                {
+                    string displayKey = displayDict.Key;
+                    NVIDIA_PER_DISPLAY_CONFIG myDisplay = displayDict.Value;
 
-            // // Start printing out things for the physical GPU
-            // foreach (KeyValuePair<UInt32, NVIDIA_PER_ADAPTER_CONFIG> physicalGPU in displayConfig.PhysicalAdapters)
-            // {
-            //     stringToReturn += $"\n****** NVIDIA PHYSICAL ADAPTER {physicalGPU.Key} *******\n";
+                    sb.AppendLine($"  Display: {displayKey}");
+                    sb.AppendLine($"    DisplayId: {myDisplay.DisplayId}");
+                    sb.AppendLine($"    ConnectorType: {myDisplay.ConnectorType}");
+                    sb.AppendLine($"    IsActive: {myDisplay.IsActive} IsConnected: {myDisplay.IsConnected} IsPhysicallyConnected: {myDisplay.IsPhysicallyConnected}");
+                    sb.AppendLine($"    IsCluster: {myDisplay.IsCluster} IsDynamic: {myDisplay.IsDynamic} IsMultiStreamRootNode: {myDisplay.IsMultiStreamRootNode}");
+                    sb.AppendLine($"    IsOSVisible: {myDisplay.IsOSVisible} IsWfd: {myDisplay.IsWfd}");
 
-            //     NVIDIA_PER_ADAPTER_CONFIG myAdapter = physicalGPU.Value;
+                    // Color Data
+                    if (myDisplay.HasColorData)
+                    {
+                        sb.AppendLine($"    ColorData: {myDisplay.ColorData}");
+                    }
 
-            //     foreach (KeyValuePair<UInt32, NVIDIA_PER_DISPLAY_CONFIG> myDisplayItem in myAdapter.Displays)
-            //     {
-            //         string displayId = myDisplayItem.Key.ToString();
-            //         NVIDIA_PER_DISPLAY_CONFIG myDisplay = myDisplayItem.Value;
+                    // HDR Capabilities and Color Data
+                    if (myDisplay.HasNvHdrEnabled)
+                    {
+                        sb.AppendLine($"    HdrCapabilities: {myDisplay.HdrCapabilities}");
+                        sb.AppendLine($"    HdrColorData: {myDisplay.HdrColorData}");
+                    }
 
-            //         stringToReturn += $"\n****** NVIDIA PER DISPLAY CONFIG {displayId} *******\n";
+                    // Adaptive Sync
+                    if (myDisplay.HasAdaptiveSync)
+                    {
+                        sb.AppendLine($"    AdaptiveSyncConfig: {myDisplay.AdaptiveSyncConfig}");
+                    }
 
-            //         stringToReturn += $"\n****** NVIDIA COLOR CONFIG *******\n";
-            //         ColorDataV5 colorData = (ColorDataV5)myDisplay.ColorData;
-            //         stringToReturn += $"Display {displayId} BPC is {colorData.DesktopColorDepth.ToString()}.\n";
-            //         stringToReturn += $"Display {displayId} ColorFormat is {colorData.ColorFormat.ToString("G")}.\n";
-            //         stringToReturn += $"Display {displayId} Colorimetry is {colorData.Colorimetry.ToString("G")}.\n";
-            //         stringToReturn += $"Display {displayId} ColorSelectionPolicy is {colorData.SelectionPolicy.Value.ToString()}.\n";
-            //         stringToReturn += $"Display {displayId} Depth is {colorData.ColorDepth.ToString()}.\n";
-            //         stringToReturn += $"Display {displayId} DynamicRange is {colorData.DynamicRange.ToString()}.\n";
+                    // Custom Displays
+                    if (myDisplay.HasCustomDisplay)
+                    {
+                        sb.AppendLine($"    CustomDisplays: {myDisplay.CustomDisplays.Count} custom display(s)");
+                        for (int i = 0; i < myDisplay.CustomDisplays.Count; i++)
+                        {
+                            sb.AppendLine($"      CustomDisplay[{i}]: {myDisplay.CustomDisplays[i]}");
+                        }
+                    }
 
-            //         // Start printing out HDR things
-            //         stringToReturn += $"\n****** NVIDIA HDR CONFIG *******\n";
-            //         if (myDisplay.HasNvHdrEnabled)
-            //         {
-            //             stringToReturn += $"NVIDIA HDR is Enabled\n";
-            //             if (displayConfig.MosaicConfig.MosaicGridTopos.Length == 1)
-            //             {
-            //                 stringToReturn += $"There is 1 NVIDIA HDR devices in use.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"There are no NVIDIA HDR devices in use.\n";
-            //             }
+                    // DisplayPort Info
+                    if (myDisplay.HasDisplayPortInfo)
+                    {
+                        sb.AppendLine($"    DisplayPortInfo: {myDisplay.DisplayPortInfo}");
+                    }
 
-            //             HDRCapabilitiesV3 hdrCap = (HDRCapabilitiesV3)myDisplay.HdrCapabilities;
+                    // Virtual Refresh Rate
+                    if (myDisplay.HasVirtualRefreshRate)
+                    {
+                        sb.AppendLine($"    VirtualRefreshRateData: {myDisplay.VirtualRefreshRateData}");
+                    }
 
-            //             if (hdrCap.IsDolbyVisionSupported)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports DolbyVision HDR.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support DolbyVision HDR.\n";
-            //             }
-            //             if (hdrCap.IsST2084EOTFSupported)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports ST2084EOTF HDR Mode.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support ST2084EOTF HDR Mode.\n";
-            //             }
-            //             if (hdrCap.IsTraditionalHDRGammaSupported)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports Traditional HDR Gamma.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support Traditional HDR Gamma.\n";
-            //             }
-            //             if (hdrCap.IsEDRSupported)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports EDR.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support EDR.\n";
-            //             }
-            //             if (hdrCap.IsTraditionalSDRGammaSupported)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports SDR Gamma.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support SDR Gamma.\n";
-            //             }
-            //             if (hdrCap.IsDolbyVisionSupported)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports Dolby Vision.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support Dolby Vision.\n";
-            //             }
-            //             if (hdrCap.isHdr10PlusSupported)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports HDR10Plus.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support HDR10Plus.\n";
-            //             }
-            //             if (hdrCap.isHdr10PlusGamingSupported)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports HDR10Plus Gaming.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support HDR10Plus Gaming.\n";
-            //             }
-            //             if (hdrCap.IsDriverDefaultHDRParametersExpanded)
-            //             {
-            //                 stringToReturn += $"Display {displayId} supports driver default HDR Parameters expanded.\n";
-            //             }
-            //             else
-            //             {
-            //                 stringToReturn += $"Display {displayId} DOES NOT support driver default HDR Parameters expanded.\n";
-            //             }
+                    // Preferred Stereo Display
+                    if (myDisplay.HasPreferredStereoDisplay)
+                    {
+                        sb.AppendLine($"    PreferredStereoDisplay: {myDisplay.PreferredStereoDisplay}");
+                    }
 
-            //         }
-            //         else
-            //         {
-            //             stringToReturn += $"NVIDIA HDR is Disabled (HDR may still be enabled within Windows itself)\n";
-            //         }
-            //     }
-            // }
+                    // Source Color Space
+                    if (myDisplay.HasSourceColorSpace)
+                    {
+                        sb.AppendLine($"    SourceColorSpace: {myDisplay.SourceColorSpace}");
+                    }
 
-            // // I have to disable this as NvAPI_DRS_EnumAvailableSettingIds function can't be found within the NVAPI.DLL
-            // // It's looking like it is a problem with the NVAPI.DLL rather than with my code, but I need to do more testing to be sure.
-            // // Disabling this for now.
-            // //stringToReturn += DumpAllDRSSettings();
+                    // Source HDR Metadata
+                    if (myDisplay.HasSourceHdrMetadata)
+                    {
+                        sb.AppendLine($"    SourceHdrMetadata: {myDisplay.SourceHdrMetadata}");
+                    }
 
-            // stringToReturn += $"\n\n";
+                    // Output Mode
+                    if (myDisplay.HasOutputMode)
+                    {
+                        sb.AppendLine($"    OutputMode: {myDisplay.OutputMode}");
+                    }
 
-            return stringToReturn;
+                    // HDR Tone Mapping
+                    if (myDisplay.HasHdrToneMapping)
+                    {
+                        sb.AppendLine($"    HdrToneMapping: {myDisplay.HdrToneMapping}");
+                    }
+
+                    // InfoFrame Data
+                    if (myDisplay.HasInfoFrameData)
+                    {
+                        sb.AppendLine($"    InfoFrameData: {myDisplay.InfoFrameData}");
+                    }
+
+                    // Monitor Capabilities
+                    if (myDisplay.HasMonitorCapabilities)
+                    {
+                        sb.AppendLine($"    MonitorCapabilities: {myDisplay.MonitorCapabilities}");
+                    }
+
+                    // Monitor Color Capabilities
+                    if (myDisplay.HasMonitorColorCapabilities)
+                    {
+                        sb.AppendLine($"    MonitorColorCapabilities: {myDisplay.MonitorColorCapabilities}");
+                    }
+
+                    // HDMI Support Info
+                    if (myDisplay.HasHdmiSupportInfo)
+                    {
+                        sb.AppendLine($"    HdmiSupportInfo: {myDisplay.HdmiSupportInfo}");
+                    }
+
+                    // VRR Info
+                    if (myDisplay.HasVrrInfo)
+                    {
+                        sb.AppendLine($"    VrrInfo: {myDisplay.VrrInfo}");
+                    }
+
+                    // Display Colorimetry
+                    if (myDisplay.HasDisplayColorimetry)
+                    {
+                        sb.AppendLine($"    DisplayColorimetry: {myDisplay.DisplayColorimetry}");
+                    }
+
+                    // Display ID Info
+                    if (myDisplay.HasDisplayIdInfo)
+                    {
+                        sb.AppendLine($"    DisplayIdInfo: {myDisplay.DisplayIdInfo}");
+                    }
+
+                    // Timing
+                    if (myDisplay.HasTiming)
+                    {
+                        sb.AppendLine($"    Timing: {myDisplay.Timing}");
+                    }
+
+                    // Scanout Configuration
+                    if (myDisplay.HasScanoutConfiguration)
+                    {
+                        sb.AppendLine($"    ScanoutConfiguration: {myDisplay.ScanoutConfiguration}");
+                    }
+
+                    sb.AppendLine();
+                }
+            }
+
+            // Mosaic Config
+            sb.AppendLine("NVIDIA SURROUND/MOSAIC");
+            if (displayConfig.MosaicConfig.IsMosaicEnabled)
+            {
+                sb.AppendLine("NVIDIA Surround/Mosaic is Enabled");
+                sb.AppendLine($"  CurrentTopo: {displayConfig.MosaicConfig.MosaicCurrentTopo}");
+                if (displayConfig.MosaicConfig.MosaicGridTopologies.Grids != null)
+                {
+                    sb.AppendLine($"  Grid Topologies: {displayConfig.MosaicConfig.MosaicGridTopologies.Grids.Length}");
+                    int gridIdx = 0;
+                    foreach (var grid in displayConfig.MosaicConfig.MosaicGridTopologies.Grids)
+                    {
+                        sb.AppendLine($"  Grid #{gridIdx}: {grid.Rows} Rows x {grid.Columns} Columns, Displays={grid.Displays?.Length ?? 0}");
+                        sb.AppendLine($"    BezelCorrect={grid.ApplyWithBezelCorrect} ImmersiveGaming={grid.ImmersiveGaming} BaseMosaic={grid.BaseMosaic}");
+                        sb.AppendLine($"    DriverReloadAllowed={grid.DriverReloadAllowed} AcceleratePrimaryDisplay={grid.AcceleratePrimaryDisplay} PixelShift={grid.PixelShift}");
+                        sb.AppendLine($"    DisplaySettings: {grid.DisplaySettings}");
+                        gridIdx++;
+                    }
+                }
+            }
+            else
+            {
+                sb.AppendLine("NVIDIA Surround/Mosaic is Disabled");
+            }
+            sb.AppendLine();
+
+            // DRS Settings
+            sb.AppendLine("NVIDIA DRS SETTINGS");
+            if (displayConfig.DRSSettings != null && displayConfig.DRSSettings.Count > 0)
+            {
+                foreach (var drsConfig in displayConfig.DRSSettings)
+                {
+                    sb.AppendLine($"  Profile: {drsConfig.ProfileInfo} (IsBaseProfile={drsConfig.IsBaseProfile})");
+                    if (drsConfig.DriverSettings != null)
+                    {
+                        sb.AppendLine($"  Settings count: {drsConfig.DriverSettings.Count}");
+                        foreach (var setting in drsConfig.DriverSettings)
+                        {
+                            sb.AppendLine($"    {setting.SettingName} ({setting.SettingId}): Type={setting.SettingType} Dword={setting.CurrentDwordValue} String={setting.CurrentStringValue}");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                sb.AppendLine("  No DRS settings stored.");
+            }
+            sb.AppendLine();
+
+            // Display Names
+            if (displayConfig.DisplayNames != null && displayConfig.DisplayNames.Count > 0)
+            {
+                sb.AppendLine("NVIDIA DISPLAY NAMES");
+                foreach (var kvp in displayConfig.DisplayNames)
+                {
+                    sb.AppendLine($"  {kvp.Key}: {kvp.Value}");
+                }
+                sb.AppendLine();
+            }
+
+            sb.AppendLine();
+
+            return sb.ToString();
         }
 
         public bool SetActiveConfig(NVIDIA_DISPLAY_CONFIG displayConfig, int delayInMs)

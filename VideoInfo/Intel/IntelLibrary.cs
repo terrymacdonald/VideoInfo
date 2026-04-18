@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using EDIDParser;
 using Windows.Graphics.Display;
@@ -1432,62 +1433,128 @@ namespace DisplayMagicianShared.Intel
 
         public string PrintActiveConfig()
         {
-            string stringToReturn = "";
-
-            // Get the current config
             INTEL_DISPLAY_CONFIG displayConfig = ActiveDisplayConfig;
+            var sb = new StringBuilder();
 
-            stringToReturn += $"****** INTEL VIDEO CARDS *******\n";
+            sb.AppendLine("****** INTEL VIDEO CARDS *******");
 
-            return stringToReturn;
+            if (displayConfig.PhysicalAdapters.Count == 0)
+            {
+                sb.AppendLine("No Intel Video Cards detected.");
+                sb.AppendLine();
+                return sb.ToString();
+            }
 
-            // if (_initialised && _igclApiHandle != null)
-            // {
-            //     ctl_result_t status = ctl_result_t.CTL_RESULT_SUCCESS;
+            sb.AppendLine($"Number of Intel adapters found: {displayConfig.PhysicalAdapters.Count}");
+            sb.AppendLine($"Combined Display in use: {displayConfig.CombinedDisplayIsInUse}");
+            sb.AppendLine();
 
-            //     // Enumerate Intel adapters
-            //     SWIGTYPE_p_unsigned_int pAdapterCount = IGCL.new_igcl_uint32P();
-            //     IGCL.igcl_uint32P_assign(pAdapterCount, 0);
-                
-            //     status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, null);
-            //     uint adapterCount = IGCL.igcl_uint32P_value(pAdapterCount);
-                
-            //     if (status == ctl_result_t.CTL_RESULT_SUCCESS && adapterCount > 0)
-            //     {
-            //         stringToReturn += $"Found {adapterCount} Intel adapter(s)\n\n";
+            // Physical Adapters
+            foreach (var adapterKvp in displayConfig.PhysicalAdapters)
+            {
+                string adapterKey = adapterKvp.Key;
+                INTEL_ADAPTER myAdapter = adapterKvp.Value;
 
-            //         SWIGTYPE_p_p__ctl_device_adapter_handle_t ppAdapters = IGCL.new_deviceAdapterHandleP();
-            //         status = IGCL.IGCL_EnumerateAdapters(_igclApiHandle, pAdapterCount, ppAdapters);
-                    
-            //         if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-            //         {
-            //             IntPtr adaptersPtr = IGCL.deviceAdapterHandleP_value(ppAdapters);
+                sb.AppendLine($"Adapter: {adapterKey}");
+                sb.AppendLine($"  Name: {myAdapter.Name}");
+                sb.AppendLine($"  AdapterID: {myAdapter.AdapterID}");
+                sb.AppendLine($"  AdapterIndex: {myAdapter.AdapterIndex}");
+                sb.AppendLine($"  AdapterProperties: {myAdapter.AdapterProperties}");
+                sb.AppendLine($"  CombinedDisplayIsSupported: {myAdapter.CombinedDisplayIsSupported}");
+                sb.AppendLine($"  IsCombinedDisplay: {myAdapter.IsCombinedDisplay}");
+                if (myAdapter.IsCombinedDisplay)
+                {
+                    sb.AppendLine($"  CombinedDisplay: {myAdapter.CombinedDisplay}");
+                }
+                sb.AppendLine();
+            }
 
-            //             for (uint adapterIdx = 0; adapterIdx < adapterCount; adapterIdx++)
-            //             {
-            //                 IntPtr hAdapter = Marshal.ReadIntPtr(adaptersPtr, (int)(adapterIdx * IntPtr.Size));
+            // Displays
+            sb.AppendLine("INTEL DISPLAYS");
+            foreach (var displayKvp in displayConfig.Displays)
+            {
+                string displayKey = displayKvp.Key;
+                INTEL_DISPLAY_WITH_SETTINGS display = displayKvp.Value;
 
-            //                 ctl_device_adapter_properties_t adapterProps = IGCL.new_adapterPropertiesP();
-            //                 status = IGCL.IGCL_GetAdapterProperties(hAdapter, adapterProps);
-                            
-            //                 if (status == ctl_result_t.CTL_RESULT_SUCCESS)
-            //                 {
-            //                     stringToReturn += $"Adapter #{adapterIdx}\n";
-            //                     stringToReturn += $"  Name: {adapterProps.name}\n";
-            //                     stringToReturn += $"  PCI Vendor ID: 0x{adapterProps.pci_vendor_id:X4}\n";
-            //                     stringToReturn += $"  PCI Device ID: 0x{adapterProps.pci_device_id:X4}\n";
-            //                     stringToReturn += $"  Driver Version: {adapterProps.driver_version}\n";
-            //                     stringToReturn += $"  Device Type: {adapterProps.device_type}\n";
-            //                     stringToReturn += $"  Graphics Properties: {adapterProps.graphics_adapter_properties}\n\n";
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
+                sb.AppendLine($"Display: {displayKey}");
+                sb.AppendLine($"  Name: {display.Name}");
+                sb.AppendLine($"  DisplayDeviceID: {display.DisplayDeviceID}");
+                sb.AppendLine($"  DeviceID: {display.DeviceID}");
+                sb.AppendLine($"  DisplayIndex: {display.DisplayIndex} AdapterIndex: {display.AdapterIndex}");
+                sb.AppendLine($"  IsActive: {display.IsActive}");
+                sb.AppendLine($"  Resolution: {display.ResolutionWidth}x{display.ResolutionHeight} @ {display.RefreshRateHz}Hz");
+                sb.AppendLine($"  DisplayProperties: {display.DisplayProperties}");
+                sb.AppendLine($"  DisplayTiming: {display.DisplayTiming}");
 
-            // stringToReturn += $"\n\n";
+                // Integer Scaling
+                sb.AppendLine($"  IntegerScaling: Supported={display.IsSupportedIntegerScaling} Enabled={display.IsEnabledIntegerScaling} Type={display.IntegerScalingType}");
+                sb.AppendLine($"  RetroScalingSettings: {display.RetroScalingSettings}");
+                sb.AppendLine($"  RetroScalingCaps: {display.RetroScalingCaps}");
 
-            // return stringToReturn;
+                // GPU Scaling
+                sb.AppendLine($"  GPUScaling: Supported={display.IsSupportedGPUScaling} Enabled={display.IsEnabledGPUScaling} Type={display.ScalingType}");
+                sb.AppendLine($"  ScalingSettings: {display.ScalingSettings}");
+                sb.AppendLine($"  ScalingCaps: {display.ScalingCaps}");
+
+                // Image Sharpening
+                sb.AppendLine($"  ImageSharpening: Supported={display.IsSupportedImageSharpening} Enabled={display.IsEnabledImageSharpening} FilterType={display.SharpeningFilterType} Intensity={display.SharpeningIntensity}");
+                sb.AppendLine($"  SharpnessSettings: {display.SharpnessSettings}");
+                sb.AppendLine($"  SharpnessCaps: {display.SharpnessCaps}");
+
+                // Display Settings
+                if (display.IsSupportedDisplaySettings)
+                {
+                    sb.AppendLine($"  DisplaySettings: {display.DisplaySettings}");
+                }
+
+                // Wire Format
+                if (display.IsSupportedWireFormat)
+                {
+                    sb.AppendLine($"  WireFormat: {display.WireFormat}");
+                }
+
+                // Brightness
+                sb.AppendLine($"  Brightness: {display.Brightness}");
+
+                // Power Optimization
+                sb.AppendLine($"  PowerOptimization: Supported={display.IsSupportedPowerOptimization} Enabled={display.IsEnabledPowerOptimization}");
+                sb.AppendLine($"  PowerOptimizationSettings: {display.PowerOptimizationSettings}");
+                sb.AppendLine($"  PowerOptimizationCaps: {display.PowerOptimizationCaps}");
+
+                // LACE Config
+                sb.AppendLine($"  LaceConfig: Enabled={display.IsEnabledLaceConfig} Config={display.LaceConfig}");
+
+                // Software PSR
+                sb.AppendLine($"  SoftwarePsr: Enabled={display.IsEnabledSoftwarePsrSettings} Settings={display.SoftwarePsrSettings}");
+
+                // Dynamic Contrast Enhancement
+                sb.AppendLine($"  DynamicContrastEnhancement: Supported={display.IsSupportedDynamicContrastEnhancement} Settings={display.DynamicContrastEnhancement}");
+
+                // Intel Arc Sync
+                sb.AppendLine($"  IntelArcSync: Supported={display.IsSupportedIntelArcSync} MonitorParams={display.IntelArcSyncMonitorParams} Profile={display.IntelArcSyncProfile}");
+
+                // Genlock
+                sb.AppendLine($"  GenlockArgs: {display.GenlockArgs}");
+
+                // Adapter Display Encoder Properties
+                sb.AppendLine($"  AdapterDisplayEncoderProperties: {display.AdapterDisplayEncoderProperties}");
+
+                // Custom Modes
+                sb.AppendLine($"  CustomModeArgs: {display.CustomModeArgs}");
+                if (display.CustomModes != null && display.CustomModes.Length > 0)
+                {
+                    for (int i = 0; i < display.CustomModes.Length; i++)
+                    {
+                        sb.AppendLine($"    CustomMode[{i}]: {display.CustomModes[i]}");
+                    }
+                }
+
+                sb.AppendLine();
+            }
+
+            sb.AppendLine();
+
+            return sb.ToString();
         }
 
         public bool SetActiveConfig(INTEL_DISPLAY_CONFIG displayConfig, int delayInMs)
