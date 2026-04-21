@@ -6728,69 +6728,934 @@
             Illumination value DTO.
             </summary>
         </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto">
+            <summary>
+            Per-device illumination info DTO, wrapping <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_DEVICE_INFO_V1"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.Type">
+            <summary>Type of illumination device.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.CtrlModeMask">
+            <summary>Bitmask of supported control modes.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.DataRawBytes">
+            <summary>
+            Raw bytes for the type-discriminated union <c>data</c> field (64 bytes).
+            Interpret using <see cref="P:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.Type"/> to select the appropriate union member.
+            </summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.#ctor(NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_TYPE,System.UInt32,System.Byte[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.FromNative(NVAPIWrapper._NV_GPU_CLIENT_ILLUM_DEVICE_INFO_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_DEVICE_INFO_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_DEVICE_INFO_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.Equals(NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.op_Equality(NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto,NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto.op_Inequality(NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto,NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto)">
+            <summary>Inequality operator.</summary>
+        </member>
         <member name="T:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto">
             <summary>
             Illumination device info params DTO.
             </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.NumIllumDevices">
+            <summary>Number of illumination devices reported.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.Devices">
+            <summary>Per-device illumination info array (up to 32 entries).</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.#ctor(System.UInt32,NVAPIWrapper.NVAPIGpuIllumDeviceInfoDto[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.FromNative(NVAPIWrapper._NV_GPU_CLIENT_ILLUM_DEVICE_INFO_PARAMS_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_DEVICE_INFO_PARAMS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_DEVICE_INFO_PARAMS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.Equals(NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.op_Equality(NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto,NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto.op_Inequality(NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto,NVAPIWrapper.NVAPIGpuIllumDeviceInfoParamsDto)">
+            <summary>Inequality operator.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto">
+            <summary>
+            Per-device illumination control DTO, wrapping <see cref="T:NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_V1"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.Type">
+            <summary>Type of illumination device.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.SyncEnabled">
+            <summary>True if device synchronization is enabled.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.SyncTimestampMs">
+            <summary>Sync timestamp in milliseconds.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.#ctor(NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_TYPE,System.Boolean,System.UInt64)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.FromNative(NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.Equals(NVAPIWrapper.NVAPIGpuIllumDeviceControlDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.op_Equality(NVAPIWrapper.NVAPIGpuIllumDeviceControlDto,NVAPIWrapper.NVAPIGpuIllumDeviceControlDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlDto.op_Inequality(NVAPIWrapper.NVAPIGpuIllumDeviceControlDto,NVAPIWrapper.NVAPIGpuIllumDeviceControlDto)">
+            <summary>Inequality operator.</summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto">
             <summary>
             Illumination device control params DTO.
             </summary>
         </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.NumIllumDevices">
+            <summary>Number of illumination devices for control.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.Devices">
+            <summary>Per-device illumination control array (up to 32 entries).</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.#ctor(System.UInt32,NVAPIWrapper.NVAPIGpuIllumDeviceControlDto[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.FromNative(NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_PARAMS_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_PARAMS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper.NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_PARAMS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.Equals(NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.op_Equality(NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto,NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto.op_Inequality(NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto,NVAPIWrapper.NVAPIGpuIllumDeviceControlParamsDto)">
+            <summary>Inequality operator.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto">
+            <summary>
+            Per-zone illumination info DTO, wrapping <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_INFO_V1"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.Type">
+            <summary>Type of illumination zone.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.IllumDeviceIdx">
+            <summary>Index of the illumination device this zone belongs to.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.ProvIdx">
+            <summary>Index of the illumination provider for this zone.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.ZoneLocation">
+            <summary>Physical location of the zone on the GPU or card.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.DataRawBytes">
+            <summary>
+            Raw bytes for the type-discriminated union <c>data</c> field (64 bytes).
+            Interpret using <see cref="P:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.Type"/> to select the appropriate union member.
+            </summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.#ctor(NVAPIWrapper.NV_GPU_CLIENT_ILLUM_ZONE_TYPE,System.Byte,System.Byte,NVAPIWrapper.NV_GPU_CLIENT_ILLUM_ZONE_LOCATION,System.Byte[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.FromNative(NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_INFO_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_INFO_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_INFO_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.Equals(NVAPIWrapper.NVAPIGpuIllumZoneInfoDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.op_Equality(NVAPIWrapper.NVAPIGpuIllumZoneInfoDto,NVAPIWrapper.NVAPIGpuIllumZoneInfoDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoDto.op_Inequality(NVAPIWrapper.NVAPIGpuIllumZoneInfoDto,NVAPIWrapper.NVAPIGpuIllumZoneInfoDto)">
+            <summary>Inequality operator.</summary>
+        </member>
         <member name="T:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto">
             <summary>
             Illumination zone info params DTO.
             </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.NumIllumZones">
+            <summary>Number of illumination zones reported.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.Zones">
+            <summary>Per-zone illumination info array (up to 32 entries).</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.#ctor(System.UInt32,NVAPIWrapper.NVAPIGpuIllumZoneInfoDto[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.FromNative(NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_INFO_PARAMS_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_INFO_PARAMS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_INFO_PARAMS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.Equals(NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.op_Equality(NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto,NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto.op_Inequality(NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto,NVAPIWrapper.NVAPIGpuIllumZoneInfoParamsDto)">
+            <summary>Inequality operator.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIGpuIllumZoneControlDto">
+            <summary>
+            Per-zone illumination control DTO, wrapping <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_V1"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.Type">
+            <summary>Type of illumination zone.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.CtrlMode">
+            <summary>Control mode for this illumination zone.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.DataRawBytes">
+            <summary>
+            Raw bytes for the type-discriminated union <c>data</c> field (64 bytes).
+            Interpret using <see cref="P:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.Type"/> to select the appropriate union member.
+            </summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.#ctor(NVAPIWrapper.NV_GPU_CLIENT_ILLUM_ZONE_TYPE,NVAPIWrapper.NV_GPU_CLIENT_ILLUM_CTRL_MODE,System.Byte[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuIllumZoneControlDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.FromNative(NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.Equals(NVAPIWrapper.NVAPIGpuIllumZoneControlDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.op_Equality(NVAPIWrapper.NVAPIGpuIllumZoneControlDto,NVAPIWrapper.NVAPIGpuIllumZoneControlDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlDto.op_Inequality(NVAPIWrapper.NVAPIGpuIllumZoneControlDto,NVAPIWrapper.NVAPIGpuIllumZoneControlDto)">
+            <summary>Inequality operator.</summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto">
             <summary>
             Illumination zone control params DTO.
             </summary>
         </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.IsDefault">
+            <summary>True if default lighting values should be applied.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.NumIllumZonesControl">
+            <summary>Number of illumination zones for control.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.Zones">
+            <summary>Per-zone illumination control array (up to 32 entries).</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.#ctor(System.Boolean,System.UInt32,NVAPIWrapper.NVAPIGpuIllumZoneControlDto[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.FromNative(NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_PARAMS_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_PARAMS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_PARAMS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.Equals(NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.op_Equality(NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto,NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto.op_Inequality(NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto,NVAPIWrapper.NVAPIGpuIllumZoneControlParamsDto)">
+            <summary>Inequality operator.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIPstateClockEntryDto">
+            <summary>
+            Per-clock entry DTO for a P-state, wrapping <see cref="T:NVAPIWrapper.NV_GPU_PSTATE20_CLOCK_ENTRY_V1"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.DomainId">
+            <summary>Clock domain identifier.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.TypeId">
+            <summary>Clock type (single frequency or frequency range).</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.IsEditable">
+            <summary>True if this clock entry is editable.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.FreqDeltaValue">
+            <summary>Current frequency delta adjustment in kHz.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.FreqDeltaMin">
+            <summary>Minimum allowed frequency delta in kHz.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.FreqDeltaMax">
+            <summary>Maximum allowed frequency delta in kHz.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.MinFreqKHz">
+            <summary>
+            Minimum frequency in kHz. For <c>SINGLE</c> type, this is the single frequency value
+            (overlaps <c>data.single.freq_kHz</c>). For <c>RANGE</c> type, this is the minimum.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.MaxFreqKHz">
+            <summary>Maximum frequency in kHz; valid only for <c>RANGE</c> type.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.RangeVoltageDomainId">
+            <summary>Voltage domain identifier; valid only for <c>RANGE</c> type.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.RangeMinVoltageUv">
+            <summary>Minimum voltage in microvolts; valid only for <c>RANGE</c> type.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateClockEntryDto.RangeMaxVoltageUv">
+            <summary>Maximum voltage in microvolts; valid only for <c>RANGE</c> type.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateClockEntryDto.#ctor(NVAPIWrapper._NV_GPU_PUBLIC_CLOCK_ID,NVAPIWrapper.NV_GPU_PERF_PSTATE20_CLOCK_TYPE_ID,System.Boolean,System.Int32,System.Int32,System.Int32,System.UInt32,System.UInt32,NVAPIWrapper._NV_GPU_PERF_VOLTAGE_INFO_DOMAIN_ID,System.UInt32,System.UInt32)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIPstateClockEntryDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateClockEntryDto.FromNative(NVAPIWrapper.NV_GPU_PSTATE20_CLOCK_ENTRY_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper.NV_GPU_PSTATE20_CLOCK_ENTRY_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateClockEntryDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper.NV_GPU_PSTATE20_CLOCK_ENTRY_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateClockEntryDto.Equals(NVAPIWrapper.NVAPIPstateClockEntryDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateClockEntryDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateClockEntryDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateClockEntryDto.op_Equality(NVAPIWrapper.NVAPIPstateClockEntryDto,NVAPIWrapper.NVAPIPstateClockEntryDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateClockEntryDto.op_Inequality(NVAPIWrapper.NVAPIPstateClockEntryDto,NVAPIWrapper.NVAPIPstateClockEntryDto)">
+            <summary>Inequality operator.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto">
+            <summary>
+            Base voltage entry DTO for a P-state, wrapping <see cref="T:NVAPIWrapper.NV_GPU_PSTATE20_BASE_VOLTAGE_ENTRY_V1"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.DomainId">
+            <summary>Voltage domain identifier.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.IsEditable">
+            <summary>True if this voltage entry is editable.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.VoltUv">
+            <summary>Base voltage in microvolts.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.VoltDeltaValue">
+            <summary>Current voltage delta adjustment in microvolts.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.VoltDeltaMin">
+            <summary>Minimum allowed voltage delta in microvolts.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.VoltDeltaMax">
+            <summary>Maximum allowed voltage delta in microvolts.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.#ctor(NVAPIWrapper._NV_GPU_PERF_VOLTAGE_INFO_DOMAIN_ID,System.Boolean,System.UInt32,System.Int32,System.Int32,System.Int32)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.FromNative(NVAPIWrapper.NV_GPU_PSTATE20_BASE_VOLTAGE_ENTRY_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper.NV_GPU_PSTATE20_BASE_VOLTAGE_ENTRY_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper.NV_GPU_PSTATE20_BASE_VOLTAGE_ENTRY_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.Equals(NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.op_Equality(NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto,NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto.op_Inequality(NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto,NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto)">
+            <summary>Inequality operator.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIPstateInfoDto">
+            <summary>
+            Per-pstate info DTO, wrapping the anonymous pstate struct within <see cref="T:NVAPIWrapper._NV_GPU_PERF_PSTATES20_INFO_V2"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateInfoDto.PstateId">
+            <summary>P-state identifier.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateInfoDto.IsEditable">
+            <summary>True if this P-state is editable.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateInfoDto.Clocks">
+            <summary>Clock entries for this P-state (up to 8).</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIPstateInfoDto.BaseVoltages">
+            <summary>Base voltage entries for this P-state (up to 4).</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateInfoDto.#ctor(NVAPIWrapper._NV_GPU_PERF_PSTATE_ID,System.Boolean,NVAPIWrapper.NVAPIPstateClockEntryDto[],NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIPstateInfoDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateInfoDto.FromNative(NVAPIWrapper._NV_GPU_PERF_PSTATES20_INFO_V2._pstates_e__Struct)">
+            <summary>Creates a DTO from the anonymous native pstate struct within <see cref="T:NVAPIWrapper._NV_GPU_PERF_PSTATES20_INFO_V2"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateInfoDto.ToNative">
+            <summary>Converts this DTO back to the anonymous native pstate struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateInfoDto.Equals(NVAPIWrapper.NVAPIPstateInfoDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateInfoDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateInfoDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateInfoDto.op_Equality(NVAPIWrapper.NVAPIPstateInfoDto,NVAPIWrapper.NVAPIPstateInfoDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIPstateInfoDto.op_Inequality(NVAPIWrapper.NVAPIPstateInfoDto,NVAPIWrapper.NVAPIPstateInfoDto)">
+            <summary>Inequality operator.</summary>
+        </member>
         <member name="T:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto">
             <summary>
             P-states (Pstates20) DTO.
             </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.IsEditable">
+            <summary>True if the P-state configuration is editable.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.NumPstates">
+            <summary>Number of P-states reported.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.NumClocks">
+            <summary>Number of clocks per P-state.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.NumBaseVoltages">
+            <summary>Number of base voltages per P-state.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.Pstates">
+            <summary>P-state info array (up to 16 entries).</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.OvNumVoltages">
+            <summary>Number of over-voltage entries.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.OvVoltages">
+            <summary>Over-voltage entries (up to 4).</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.#ctor(System.Boolean,System.UInt32,System.UInt32,System.UInt32,NVAPIWrapper.NVAPIPstateInfoDto[],System.UInt32,NVAPIWrapper.NVAPIPstateBaseVoltageEntryDto[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.FromNative(NVAPIWrapper._NV_GPU_PERF_PSTATES20_INFO_V2)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_PERF_PSTATES20_INFO_V2"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_PERF_PSTATES20_INFO_V2"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.Equals(NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.op_Equality(NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto,NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto.op_Inequality(NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto,NVAPIWrapper.NVAPIGpuPerfPstates20InfoDto)">
+            <summary>Inequality operator.</summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto">
             <summary>
             Virtualization info DTO.
             </summary>
         </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.VirtualizationMode">
+            <summary>The GPU virtualization mode.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.#ctor(NVAPIWrapper._NV_VIRTUALIZATION_MODE)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.FromNative(NVAPIWrapper._NV_GPU_VIRTUALIZATION_INFO)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_VIRTUALIZATION_INFO"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_VIRTUALIZATION_INFO"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.Equals(NVAPIWrapper.NVAPIGpuVirtualizationInfoDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.op_Equality(NVAPIWrapper.NVAPIGpuVirtualizationInfoDto,NVAPIWrapper.NVAPIGpuVirtualizationInfoDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVirtualizationInfoDto.op_Inequality(NVAPIWrapper.NVAPIGpuVirtualizationInfoDto,NVAPIWrapper.NVAPIGpuVirtualizationInfoDto)">
+            <summary>Inequality operator.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPILicenseFeatureDetailsDto">
+            <summary>
+            Per-feature license details DTO, wrapping <see cref="T:NVAPIWrapper._NV_LICENSE_FEATURE_DETAILS_V4"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.Version">
+            <summary>Version of the feature details struct as returned by NVAPI.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.IsEnabled">
+            <summary>True if the license is currently enabled.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.IsFeatureEnabled">
+            <summary>True if the feature is enabled.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.FeatureCode">
+            <summary>Feature code identifying the licensable feature type.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.LicenseInfo">
+            <summary>License info string (up to 128 characters).</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.ProductName">
+            <summary>Product name string (up to 128 characters).</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.LicenseExpiry">
+            <summary>License expiry date and time details.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.#ctor(System.UInt32,System.Boolean,System.Boolean,NVAPIWrapper._NV_LICENSE_FEATURE_TYPE,System.String,System.String,NVAPIWrapper._NV_LICENSE_EXPIRY_DETAILS)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPILicenseFeatureDetailsDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.FromNative(NVAPIWrapper._NV_LICENSE_FEATURE_DETAILS_V4)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_LICENSE_FEATURE_DETAILS_V4"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_LICENSE_FEATURE_DETAILS_V4"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.Equals(NVAPIWrapper.NVAPILicenseFeatureDetailsDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.op_Equality(NVAPIWrapper.NVAPILicenseFeatureDetailsDto,NVAPIWrapper.NVAPILicenseFeatureDetailsDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicenseFeatureDetailsDto.op_Inequality(NVAPIWrapper.NVAPILicenseFeatureDetailsDto,NVAPIWrapper.NVAPILicenseFeatureDetailsDto)">
+            <summary>Inequality operator.</summary>
+        </member>
         <member name="T:NVAPIWrapper.NVAPILicensableFeaturesDto">
             <summary>
             Licensable features DTO.
             </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicensableFeaturesDto.IsLicenseSupported">
+            <summary>True if GPU licensing is supported.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicensableFeaturesDto.LicensableFeatureCount">
+            <summary>Number of licensable features reported.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicensableFeaturesDto.Signature">
+            <summary>License signature string (up to 128 characters).</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPILicensableFeaturesDto.LicenseDetails">
+            <summary>Array of up to 3 per-feature license details.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.#ctor(System.Boolean,System.UInt32,System.String,NVAPIWrapper.NVAPILicenseFeatureDetailsDto[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPILicensableFeaturesDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.FromNative(NVAPIWrapper._NV_LICENSABLE_FEATURES_V4)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_LICENSABLE_FEATURES_V4"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_LICENSABLE_FEATURES_V4"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.Equals(NVAPIWrapper.NVAPILicensableFeaturesDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.op_Equality(NVAPIWrapper.NVAPILicensableFeaturesDto,NVAPIWrapper.NVAPILicensableFeaturesDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPILicensableFeaturesDto.op_Inequality(NVAPIWrapper.NVAPILicensableFeaturesDto,NVAPIWrapper.NVAPILicensableFeaturesDto)">
+            <summary>Inequality operator.</summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIEncoderStatisticsDto">
             <summary>
             Encoder statistics DTO.
             </summary>
         </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderStatisticsDto.SessionsCount">
+            <summary>Number of active encoder sessions.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderStatisticsDto.AverageFps">
+            <summary>Average frames per second across all sessions.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderStatisticsDto.AverageLatency">
+            <summary>Average encode latency in microseconds across all sessions.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.#ctor(System.UInt32,System.UInt32,System.UInt32)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIEncoderStatisticsDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.FromNative(NVAPIWrapper._NV_ENCODER_STATISTICS_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_ENCODER_STATISTICS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_ENCODER_STATISTICS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.Equals(NVAPIWrapper.NVAPIEncoderStatisticsDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.op_Equality(NVAPIWrapper.NVAPIEncoderStatisticsDto,NVAPIWrapper.NVAPIEncoderStatisticsDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderStatisticsDto.op_Inequality(NVAPIWrapper.NVAPIEncoderStatisticsDto,NVAPIWrapper.NVAPIEncoderStatisticsDto)">
+            <summary>Inequality operator.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto">
+            <summary>
+            Per-session encoder info DTO, wrapping <see cref="T:NVAPIWrapper._NV_ENCODER_PER_SESSION_INFO_V1"/>.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.SessionId">
+            <summary>Unique encoder session identifier.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.ProcessId">
+            <summary>OS process ID that owns this session.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.VgpuInstance">
+            <summary>vGPU instance identifier (0 for non-vGPU).</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.CodecType">
+            <summary>Codec type used by this session.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.HResolution">
+            <summary>Horizontal resolution of the encoded stream.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.VResolution">
+            <summary>Vertical resolution of the encoded stream.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.AverageEncodeFps">
+            <summary>Average encode frame rate for this session.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.AverageEncodeLatency">
+            <summary>Average encode latency in microseconds for this session.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.#ctor(System.UInt32,System.UInt32,System.UInt32,NVAPIWrapper._NV_ENCODER_TYPE,System.UInt32,System.UInt32,System.UInt32,System.UInt32)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.FromNative(NVAPIWrapper._NV_ENCODER_PER_SESSION_INFO_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_ENCODER_PER_SESSION_INFO_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.Equals(NVAPIWrapper.NVAPIEncoderPerSessionInfoDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.op_Equality(NVAPIWrapper.NVAPIEncoderPerSessionInfoDto,NVAPIWrapper.NVAPIEncoderPerSessionInfoDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderPerSessionInfoDto.op_Inequality(NVAPIWrapper.NVAPIEncoderPerSessionInfoDto,NVAPIWrapper.NVAPIEncoderPerSessionInfoDto)">
+            <summary>Inequality operator.</summary>
+        </member>
         <member name="T:NVAPIWrapper.NVAPIEncoderSessionsInfoDto">
             <summary>
             Encoder sessions info DTO.
             </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.SessionsCount">
+            <summary>Number of active encoder sessions.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.Sessions">
+            <summary>Per-session encoder info array; may be empty if no sessions are active.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.#ctor(System.UInt32,NVAPIWrapper.NVAPIEncoderPerSessionInfoDto[])">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIEncoderSessionsInfoDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.FromNative(NVAPIWrapper._NV_ENCODER_SESSIONS_INFO_V1)">
+            <summary>
+            Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_ENCODER_SESSIONS_INFO_V1"/> struct,
+            dereferencing the <c>pSessionInfo</c> pointer while the native struct is still valid.
+            </summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.Equals(NVAPIWrapper.NVAPIEncoderSessionsInfoDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.op_Equality(NVAPIWrapper.NVAPIEncoderSessionsInfoDto,NVAPIWrapper.NVAPIEncoderSessionsInfoDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIEncoderSessionsInfoDto.op_Inequality(NVAPIWrapper.NVAPIEncoderSessionsInfoDto,NVAPIWrapper.NVAPIEncoderSessionsInfoDto)">
+            <summary>Inequality operator.</summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIGpuVrReadyDto">
             <summary>
             VR Ready DTO.
             </summary>
         </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuVrReadyDto.IsVRReady">
+            <summary>True if the GPU is VR-ready.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.#ctor(System.Boolean)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuVrReadyDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.FromNative(NVAPIWrapper._NV_GPU_VR_READY_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_VR_READY_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_VR_READY_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.Equals(NVAPIWrapper.NVAPIGpuVrReadyDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.op_Equality(NVAPIWrapper.NVAPIGpuVrReadyDto,NVAPIWrapper.NVAPIGpuVrReadyDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuVrReadyDto.op_Inequality(NVAPIWrapper.NVAPIGpuVrReadyDto,NVAPIWrapper.NVAPIGpuVrReadyDto)">
+            <summary>Inequality operator.</summary>
+        </member>
         <member name="T:NVAPIWrapper.NVAPIGpuGspInfoDto">
             <summary>
             GSP info DTO.
             </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuGspInfoDto.FirmwareVersion">
+            <summary>GSP firmware version string (null-terminated ASCII, up to 64 bytes).</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.#ctor(System.String)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPIGpuGspInfoDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.FromNative(NVAPIWrapper._NV_GPU_GSP_INFO_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper._NV_GPU_GSP_INFO_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper._NV_GPU_GSP_INFO_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.Equals(NVAPIWrapper.NVAPIGpuGspInfoDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.op_Equality(NVAPIWrapper.NVAPIGpuGspInfoDto,NVAPIWrapper.NVAPIGpuGspInfoDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPIGpuGspInfoDto.op_Inequality(NVAPIWrapper.NVAPIGpuGspInfoDto,NVAPIWrapper.NVAPIGpuGspInfoDto)">
+            <summary>Inequality operator.</summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPINvLinkCapsDto">
             <summary>
             NVLINK caps DTO.
             </summary>
         </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkCapsDto.CapsTbl">
+            <summary>NVLINK capabilities bitmask table.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkCapsDto.LowestNvlinkVersion">
+            <summary>Lowest supported NVLink version.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkCapsDto.HighestNvlinkVersion">
+            <summary>Highest supported NVLink version.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkCapsDto.LowestNciVersion">
+            <summary>Lowest supported NCI version.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkCapsDto.HighestNciVersion">
+            <summary>Highest supported NCI version.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkCapsDto.LinkMask">
+            <summary>Bitmask of active NVLink links.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.#ctor(System.UInt32,System.Byte,System.Byte,System.Byte,System.Byte,System.UInt32)">
+            <summary>Initializes a new instance of <see cref="T:NVAPIWrapper.NVAPINvLinkCapsDto"/>.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.FromNative(NVAPIWrapper.NVLINK_GET_CAPS_V1)">
+            <summary>Creates a DTO from the native <see cref="T:NVAPIWrapper.NVLINK_GET_CAPS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.CreateDefault">
+            <summary>Creates a default (zeroed) DTO with the correct version field.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.ToNative">
+            <summary>Converts this DTO back to the native <see cref="T:NVAPIWrapper.NVLINK_GET_CAPS_V1"/> struct.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.Equals(NVAPIWrapper.NVAPINvLinkCapsDto)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.op_Equality(NVAPIWrapper.NVAPINvLinkCapsDto,NVAPIWrapper.NVAPINvLinkCapsDto)">
+            <summary>Equality operator.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkCapsDto.op_Inequality(NVAPIWrapper.NVAPINvLinkCapsDto,NVAPIWrapper.NVAPINvLinkCapsDto)">
+            <summary>Inequality operator.</summary>
+        </member>
         <member name="T:NVAPIWrapper.NVAPINvLinkStatusDto">
             <summary>
             NVLINK status DTO.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkStatusDto.Version">
+            <summary>NVLINK_GET_STATUS_V2.version</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkStatusDto.LinkMask">
+            <summary>NVLINK_GET_STATUS_V2.linkMask</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPINvLinkStatusDto.LinkInfo">
+            <summary>NVLINK_GET_STATUS_V2.linkInfo (array of 32)</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPINvLinkStatusInfoDto">
+            <summary>
+            NVLINK_LINK_STATUS_INFO_V2 DTO.
+            </summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPINvLinkDeviceInfoDto">
+            <summary>
+            NVLINK_DEVICE_INFO_V1 DTO.
             </summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIGpuInfoDto">
