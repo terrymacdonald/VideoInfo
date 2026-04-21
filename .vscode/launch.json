@@ -17,6 +17,34 @@
             "request": "launch",
             "projectPath": "${workspaceFolder}\\VideoInfo\\VideoInfo.csproj",
             "launchConfigurationId": "TargetFramework=;VideoInfo equal cfg1"
+        },
+        {
+            "name": "C#: VideoInfo [VideoInfo load cfg1]",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\VideoInfo\\VideoInfo.csproj",
+            "launchConfigurationId": "TargetFramework=;VideoInfo load cfg1"
+        },
+        {
+            "name": "C#: VideoInfo [VideoInfo save cfg2]",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\VideoInfo\\VideoInfo.csproj",
+            "launchConfigurationId": "TargetFramework=;VideoInfo save cfg2"
+        },
+        {
+            "name": "C#: VideoInfo [VideoInfo equal cfg2]",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\VideoInfo\\VideoInfo.csproj",
+            "launchConfigurationId": "TargetFramework=;VideoInfo equal cfg2"
+        },
+        {
+            "name": "C#: VideoInfo [VideoInfo load cfg2]",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}\\VideoInfo\\VideoInfo.csproj",
+            "launchConfigurationId": "TargetFramework=;VideoInfo load cfg2"
         }
     ]
 }
