@@ -2710,7 +2710,7 @@
         </member>
         <member name="P:NVAPIWrapper.NVAPIDisplayConfigPathDto.OsAdapterLuid">
             <summary>
-            OS adapter LUID value for non-NVIDIA adapters, or null if not present.
+            OS adapter LUID value for non-NVIDIA adapters, or 0 if not present.
             </summary>
         </member>
         <member name="P:NVAPIWrapper.NVAPIDisplayConfigPathDto.SourceModeInfo">
@@ -2723,7 +2723,7 @@
             Target configurations for this path.
             </summary>
         </member>
-        <member name="M:NVAPIWrapper.NVAPIDisplayConfigPathDto.#ctor(System.UInt32,System.UInt32,System.Boolean,System.Nullable{System.Int64},System.Nullable{NVAPIWrapper.NVAPIDisplayConfigSourceModeDto},NVAPIWrapper.NVAPIDisplayConfigTargetDto[])">
+        <member name="M:NVAPIWrapper.NVAPIDisplayConfigPathDto.#ctor(System.UInt32,System.UInt32,System.Boolean,System.Int64,System.Nullable{NVAPIWrapper.NVAPIDisplayConfigSourceModeDto},NVAPIWrapper.NVAPIDisplayConfigTargetDto[])">
             <summary>
             Create a display path configuration.
             </summary>
@@ -2872,6 +2872,144 @@
             Compare target info values.
             </summary>
         </member>
+        <member name="T:NVAPIWrapper.NVAPITimingExtDto">
+            <summary>
+            Managed representation of the NV_TIMINGEXT extended timing information.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingExtDto.Flag">
+            <summary>Timing flags.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingExtDto.Rr">
+            <summary>Refresh rate in Hz.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingExtDto.Rrx1k">
+            <summary>Refresh rate in 1/1000 Hz.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingExtDto.Aspect">
+            <summary>Aspect ratio.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingExtDto.Rep">
+            <summary>Repetition factor.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingExtDto.Status">
+            <summary>Timing status.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingExtDto.Name">
+            <summary>Timing name (null-terminated ASCII, up to 40 bytes). Empty string when no name is present.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingExtDto.#ctor(System.UInt32,System.UInt16,System.UInt32,System.UInt32,System.UInt16,System.UInt32,System.String)">
+            <summary>Create timing ext info.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingExtDto.FromNative(NVAPIWrapper.tagNV_TIMINGEXT)">
+            <summary>
+            Create a DTO from a native timing ext struct.
+            </summary>
+            <param name="native">Native timing ext struct.</param>
+            <returns>Timing ext DTO.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingExtDto.ToNative">
+            <summary>
+            Convert this DTO to a native timing ext struct.
+            </summary>
+            <returns>Native timing ext struct.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingExtDto.Equals(NVAPIWrapper.NVAPITimingExtDto)">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingExtDto.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingExtDto.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingExtDto.op_Equality(NVAPIWrapper.NVAPITimingExtDto,NVAPIWrapper.NVAPITimingExtDto)">
+            <summary>Compare timing ext values.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingExtDto.op_Inequality(NVAPIWrapper.NVAPITimingExtDto,NVAPIWrapper.NVAPITimingExtDto)">
+            <summary>Compare timing ext values.</summary>
+        </member>
+        <member name="T:NVAPIWrapper.NVAPITimingDto">
+            <summary>
+            Managed representation of NV_TIMING display timing parameters.
+            </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.HVisible">
+            <summary>Horizontal visible pixels.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.HBorder">
+            <summary>Horizontal border pixels.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.HFrontPorch">
+            <summary>Horizontal front porch pixels.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.HSyncWidth">
+            <summary>Horizontal sync width pixels.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.HTotal">
+            <summary>Horizontal total pixels.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.HSyncPol">
+            <summary>Horizontal sync polarity.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.VVisible">
+            <summary>Vertical visible lines.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.VBorder">
+            <summary>Vertical border lines.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.VFrontPorch">
+            <summary>Vertical front porch lines.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.VSyncWidth">
+            <summary>Vertical sync width lines.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.VTotal">
+            <summary>Vertical total lines.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.VSyncPol">
+            <summary>Vertical sync polarity.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.Interlaced">
+            <summary>Non-zero if interlaced.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.Pclk">
+            <summary>Pixel clock in 10 kHz units.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPITimingDto.Etc">
+            <summary>Extended timing information.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingDto.#ctor(System.UInt16,System.UInt16,System.UInt16,System.UInt16,System.UInt16,System.Byte,System.UInt16,System.UInt16,System.UInt16,System.UInt16,System.UInt16,System.Byte,System.UInt16,System.UInt32,NVAPIWrapper.NVAPITimingExtDto)">
+            <summary>Create timing info.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingDto.FromNative(NVAPIWrapper._NV_TIMING)">
+            <summary>
+            Create a DTO from a native timing struct.
+            </summary>
+            <param name="native">Native timing struct.</param>
+            <returns>Timing DTO.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingDto.ToNative">
+            <summary>
+            Convert this DTO to a native timing struct.
+            </summary>
+            <returns>Native timing struct.</returns>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingDto.Equals(NVAPIWrapper.NVAPITimingDto)">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingDto.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingDto.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingDto.op_Equality(NVAPIWrapper.NVAPITimingDto,NVAPIWrapper.NVAPITimingDto)">
+            <summary>Compare timing values.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPITimingDto.op_Inequality(NVAPIWrapper.NVAPITimingDto,NVAPIWrapper.NVAPITimingDto)">
+            <summary>Compare timing values.</summary>
+        </member>
         <member name="T:NVAPIWrapper.NVAPIDisplayConfigAdvancedTargetDto">
             <summary>
             Managed representation of advanced target configuration.
@@ -2910,7 +3048,7 @@
         <member name="P:NVAPIWrapper.NVAPIDisplayConfigAdvancedTargetDto.Timing">
             <summary>Detailed timing.</summary>
         </member>
-        <member name="M:NVAPIWrapper.NVAPIDisplayConfigAdvancedTargetDto.#ctor(NVAPIWrapper._NV_ROTATE,NVAPIWrapper._NV_SCALING,System.UInt32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,NVAPIWrapper._NV_GPU_CONNECTOR_TYPE,NVAPIWrapper._NV_DISPLAY_TV_FORMAT,NVAPIWrapper._NV_TIMING_OVERRIDE,NVAPIWrapper._NV_TIMING)">
+        <member name="M:NVAPIWrapper.NVAPIDisplayConfigAdvancedTargetDto.#ctor(NVAPIWrapper._NV_ROTATE,NVAPIWrapper._NV_SCALING,System.UInt32,System.Boolean,System.Boolean,System.Boolean,System.Boolean,NVAPIWrapper._NV_GPU_CONNECTOR_TYPE,NVAPIWrapper._NV_DISPLAY_TV_FORMAT,NVAPIWrapper._NV_TIMING_OVERRIDE,NVAPIWrapper.NVAPITimingDto)">
             <summary>Create advanced target info.</summary>
         </member>
         <member name="M:NVAPIWrapper.NVAPIDisplayConfigAdvancedTargetDto.FromNative(NVAPIWrapper._NV_DISPLAYCONFIG_PATH_ADVANCED_TARGET_INFO_V1)">
@@ -3043,45 +3181,6 @@
         <member name="M:NVAPIWrapper.NVAPITimingInputDto.op_Inequality(NVAPIWrapper.NVAPITimingInputDto,NVAPIWrapper.NVAPITimingInputDto)">
             <summary>Compare timing input DTOs.</summary>
         </member>
-        <member name="T:NVAPIWrapper.NVAPITimingDto">
-            <summary>
-            DTO for timing output data.
-            </summary>
-        </member>
-        <member name="P:NVAPIWrapper.NVAPITimingDto.Timing">
-            <summary>Timing data.</summary>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPITimingDto.#ctor(NVAPIWrapper._NV_TIMING)">
-            <summary>Create a timing DTO.</summary>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPITimingDto.FromNative(NVAPIWrapper._NV_TIMING)">
-            <summary>
-            Create a DTO from a native timing struct.
-            </summary>
-            <param name="native">Native timing.</param>
-            <returns>Timing DTO.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPITimingDto.ToNative">
-            <summary>
-            Convert this DTO to a native timing struct.
-            </summary>
-            <returns>Native timing.</returns>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPITimingDto.Equals(NVAPIWrapper.NVAPITimingDto)">
-            <inheritdoc />
-        </member>
-        <member name="M:NVAPIWrapper.NVAPITimingDto.Equals(System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:NVAPIWrapper.NVAPITimingDto.GetHashCode">
-            <inheritdoc />
-        </member>
-        <member name="M:NVAPIWrapper.NVAPITimingDto.op_Equality(NVAPIWrapper.NVAPITimingDto,NVAPIWrapper.NVAPITimingDto)">
-            <summary>Compare timing DTOs.</summary>
-        </member>
-        <member name="M:NVAPIWrapper.NVAPITimingDto.op_Inequality(NVAPIWrapper.NVAPITimingDto,NVAPIWrapper.NVAPITimingDto)">
-            <summary>Compare timing DTOs.</summary>
-        </member>
         <member name="T:NVAPIWrapper.NVAPIMonitorCapabilitiesDto">
             <summary>
             DTO for monitor capabilities.
@@ -3127,7 +3226,7 @@
             </summary>
         </member>
         <member name="P:NVAPIWrapper.NVAPIMonitorColorCapabilitiesDto.Capabilities">
-            <summary>Color capability entries.</summary>
+            <summary>Color capability entries. Empty array when no capabilities are present.</summary>
         </member>
         <member name="M:NVAPIWrapper.NVAPIMonitorColorCapabilitiesDto.#ctor(NVAPIWrapper._NV_MONITOR_COLOR_DATA[])">
             <summary>Create a monitor color capabilities DTO.</summary>
@@ -4635,10 +4734,10 @@
             <param name="isPredefinedValid">Whether the predefined value is valid.</param>
             <param name="predefinedDwordValue">Predefined DWORD value.</param>
             <param name="currentDwordValue">Current DWORD value.</param>
-            <param name="predefinedStringValue">Predefined string value.</param>
-            <param name="currentStringValue">Current string value.</param>
-            <param name="predefinedBinaryValue">Predefined binary value.</param>
-            <param name="currentBinaryValue">Current binary value.</param>
+            <param name="predefinedStringValue">Predefined string value. Null is treated as empty string.</param>
+            <param name="currentStringValue">Current string value. Null is treated as empty string.</param>
+            <param name="predefinedBinaryValue">Predefined binary value. Null is treated as an empty array.</param>
+            <param name="currentBinaryValue">Current binary value. Null is treated as an empty array.</param>
         </member>
         <member name="M:NVAPIWrapper.NVAPIDrsSettingDto.CreateDword(System.UInt32,System.UInt32,System.Nullable{System.UInt32},System.String,NVAPIWrapper._NVDRS_SETTING_LOCATION,System.Boolean,System.Boolean)">
             <summary>
@@ -7643,10 +7742,49 @@
             <summary>NVLINK_GET_STATUS_V2.version</summary>
         </member>
         <member name="P:NVAPIWrapper.NVAPINvLinkStatusDto.LinkMask">
-            <summary>NVLINK_GET_STATUS_V2.linkMask</summary>
+            <summary>NVLINK_GET_STATUS_V2.linkMask — bitmask of active links (bit i = link i is in use).</summary>
         </member>
         <member name="P:NVAPIWrapper.NVAPINvLinkStatusDto.LinkInfo">
-            <summary>NVLINK_GET_STATUS_V2.linkInfo (array of 32)</summary>
+            <summary>
+            Active link info entries, one per set bit in <see cref="P:NVAPIWrapper.NVAPINvLinkStatusDto.LinkMask"/> (ordered by ascending link index).
+            Only links that are active per the bitmask are stored, keeping the list compact.
+            </summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.#ctor(System.UInt32,System.UInt32,System.Collections.Generic.List{NVAPIWrapper.NVAPINvLinkStatusInfoDto})">
+            <summary>Create an NVLINK status DTO.</summary>
+            <param name="version">Structure version.</param>
+            <param name="linkMask">Bitmask of active links.</param>
+            <param name="linkInfo">Active link info entries (one per set bit in linkMask, ascending).</param>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.FromNative(NVAPIWrapper.NVLINK_GET_STATUS_V2)">
+            <summary>
+            Create a DTO from a native NVLINK status struct. Only entries for bits set in
+            <paramref name="native"/>.linkMask are included in <see cref="P:NVAPIWrapper.NVAPINvLinkStatusDto.LinkInfo"/>.
+            </summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.CreateDefault">
+            <summary>Create a default (no active links) NVLINK status DTO.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.ToNative">
+            <summary>
+            Convert this DTO back to a native struct. List entries are placed at the native indices
+            corresponding to set bits in <see cref="P:NVAPIWrapper.NVAPINvLinkStatusDto.LinkMask"/> (ascending order); all other slots are default.
+            </summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.Equals(NVAPIWrapper.NVAPINvLinkStatusDto)">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.op_Equality(NVAPIWrapper.NVAPINvLinkStatusDto,NVAPIWrapper.NVAPINvLinkStatusDto)">
+            <summary>Compare NVLINK status DTOs.</summary>
+        </member>
+        <member name="M:NVAPIWrapper.NVAPINvLinkStatusDto.op_Inequality(NVAPIWrapper.NVAPINvLinkStatusDto,NVAPIWrapper.NVAPINvLinkStatusDto)">
+            <summary>Compare NVLINK status DTOs.</summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPINvLinkStatusInfoDto">
             <summary>
@@ -7672,6 +7810,12 @@
             <summary>
             GPU board info DTO.
             </summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuBoardInfoDto.BoardNumber">
+            <summary>Board number as a string. Empty string when not present.</summary>
+        </member>
+        <member name="P:NVAPIWrapper.NVAPIGpuBoardInfoDto.BoardNumberRaw">
+            <summary>Raw board number bytes. Empty array when not present.</summary>
         </member>
         <member name="T:NVAPIWrapper.NVAPIGpuEccConfigurationInfoDto">
             <summary>

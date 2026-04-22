@@ -803,6 +803,7 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The NvLinkStatus structs don't match!");
                     return false;
                 }
+                // Broken needs fixing!
                 if (!DisplayConfig.Equals(other.DisplayConfig))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The DisplayConfig structs don't match!");
@@ -813,6 +814,7 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The ArchInfo structs don't match!");
                     return false;
                 }
+                // Broken needs fixing!
                 if (!BoardInfo.Equals(other.BoardInfo))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_PER_ADAPTER_CONFIG/Equals: The BoardInfo structs don't match!");
