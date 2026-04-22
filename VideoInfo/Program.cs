@@ -493,6 +493,10 @@ namespace VideoInfo
                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Successfully parsed {filename} as JSON.");
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
+                    // Create the old adapter ID to new adapter ID map by looking at the display names of the adapters in the saved windows config and the current windows config
+                    Dictionary<ulong, ulong> adapterOldToNewMap = winLibrary.GetAdapterIdMap(ref myDisplayConfig.WindowsConfig);
+                    // Patch the display configs for NVIDIA and Windows based on the new adapter IDs
+                    nvidiaLibrary.PatchNVIDADisplayConfig(ref myDisplayConfig.NVIDIAConfig, adapterOldToNewMap);
                     winLibrary.PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
                 }
                 catch (Exception ex)

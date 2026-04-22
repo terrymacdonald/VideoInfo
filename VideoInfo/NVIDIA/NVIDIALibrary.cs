@@ -3814,6 +3814,70 @@ namespace DisplayMagicianShared.NVIDIA
             }
         }
 
+        public void PatchNVIDADisplayConfig(ref NVIDIA_DISPLAY_CONFIG savedDisplayConfig, Dictionary<ulong, ulong> adapterOldToNewMap)
+        {
+
+            try
+            {
+                // Update the AdapterLuid in the DisplayIdInfo with the current adapter id
+                SharedLogger.logger.Trace($"NVIDIALibrary/PatchNVIDADisplayConfig: Going through the display adapters to update the adapter id");
+                string[] currentPAKeys = savedDisplayConfig.PhysicalAdapters.Keys.ToArray();
+                var currentPALength = savedDisplayConfig.PhysicalAdapters.Count;
+                for (int i = 0; i < currentPALength; i++)
+                {
+                    var displaysList = savedDisplayConfig.PhysicalAdapters[currentPAKeys[i]].Displays.Values.ToList();
+                    if (displaysList != null && displaysList.Count > 0)
+                    {
+                        for (int j = 0; j < displaysList.Count; j++)
+                        {
+                            var displayIdInfo = displaysList[j];
+                            var displayIdInfoAdapterLuid = displayIdInfo.DisplayIdInfo.AdapterLuid;
+
+                            if (adapterOldToNewMap.ContainsKey((ulong)displayIdInfoAdapterLuid))
+                            {
+                                // We get here if there is a matching adapter
+                                var newAdapterValue = adapterOldToNewMap[(ulong)displayIdInfoAdapterLuid];
+                                displayIdInfo.DisplayIdInfo.AdapterLuid = (long)newAdapterValue;
+                                SharedLogger.logger.Trace($"WinLibrary/PatchNVIDADisplayConfig: Updated DisplayIdInfo for display {displayIdInfo.DisplayId} from adapter {displayIdInfo.AdapterLuid.Value} to adapter {newAdapterValue} instead.");
+                            }
+                            else
+                            {
+                                // if there isn't a matching adapter, then we just pick the first current one and hope that works!
+                                // (it is highly likely to... its only if the user has multiple graphics cards with some weird config it may break)
+                                var newAdapterValue = currentAdapterMap.First().Key;
+                                SharedLogger.logger.Warn($"WinLibrary/PatchNVIDADisplayConfig: Uh Oh. Adapter {displayIdInfo.AdapterLuid.Value} didn't have a current match! It's possible the adapter was swapped or disabled. Attempting to use adapter {newAdapterValue} instead.");
+                                displayIdInfo.AdapterLuid = AdapterValueToLUID(newAdapterValue);
+                            }
+                            displaysList[j] = displayIdInfo;
+                        }
+                    }
+                    
+                    oldAdapterValue = currentKeys[i];
+                    // Change the Dictionary Key AdapterIDs
+                    if (adapterOldToNewMap.ContainsKey(oldAdapterValue))
+                    {
+                        // We get here if there is a matching adapter
+                        newAdapterValue = adapterOldToNewMap[oldAdapterValue];
+
+                        // Skip if we've already replaced something!
+                        if (!savedDisplayConfig.DisplayAdapters.ContainsKey(newAdapterValue))
+                        {
+                            // Add a new dictionary key with the old value
+                            savedDisplayConfig.DisplayAdapters.Add(newAdapterValue, savedDisplayConfig.DisplayAdapters[oldAdapterValue]);
+                            // Remove the old dictionary key
+                            savedDisplayConfig.DisplayAdapters.Remove(oldAdapterValue);
+                        }
+                        SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated DisplayAdapter from adapter {oldAdapterValue} to adapter {newAdapterValue} instead.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Error(ex, "WinLibrary/PatchWindowsDisplayConfig: Exception while going through the display adapters update the adapter ids");
+            }
+        }
+
+
     }
 
 
