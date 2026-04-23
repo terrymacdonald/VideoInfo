@@ -6685,6 +6685,15 @@
             </summary>
             <returns>HDCP support status DTO, or null if unavailable.</returns>
         </member>
+        <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetOutputIdFromDisplayId(System.UInt32)">
+            <summary>
+            Get the GPU output ID corresponding to a display ID.
+            This uses NvAPI_SYS_GetGpuAndOutputIdFromDisplayId, which works even in
+            surround/mosaic mode and returns the physical output ID needed for EDID retrieval.
+            </summary>
+            <param name="displayId">Display ID to resolve.</param>
+            <returns>Output ID (single-bit mask), or null if unavailable.</returns>
+        </member>
         <member name="M:NVAPIWrapper.NVAPIPhysicalGpuHelper.GetEdid(System.UInt32)">
             <summary>
             Get EDID data for a GPU output.
