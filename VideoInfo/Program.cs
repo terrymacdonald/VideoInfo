@@ -184,10 +184,10 @@ namespace VideoInfo
                                     delayInMs = 500;
                                 }
                             }
-                            else if (args[i].StartsWith("--newEyefinity", StringComparison.OrdinalIgnoreCase))
+                            else if (args[i].StartsWith("--oldEyefinity", StringComparison.OrdinalIgnoreCase))
                             {
-                                SharedLogger.logger.Debug($"VideoInfo/Main: The newEyefinity command was provided, so we will use the newer ADLX Eyefinity to apply the display settings rather than ADL2.");
-                                useADLEyefinity = false;
+                                SharedLogger.logger.Debug($"VideoInfo/Main: The oldEyefinity command was provided, so we will use the older ADL2 Eyefinity to apply the display settings rather than ADLX.");
+                                useADLEyefinity = true;
                             }
                             else
                             {

@@ -6,7 +6,7 @@
     },
     "VideoInfo load cfg1": {
       "commandName": "Project",
-      "commandLineArgs": "load display-config1.cfg --oldEyefinity"
+      "commandLineArgs": "load display-config1.cfg"
     },
     "VideoInfo save cfg2": {
       "commandName": "Project",
