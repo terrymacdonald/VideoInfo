@@ -1861,8 +1861,7 @@ namespace DisplayMagicianShared.AMD
                     if (_activeDisplayConfig == null)
                     {
                         _activeDisplayConfig = CreateDefaultConfig();
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Exception getting the ADLX System Services");
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Disposing the ADLXHelper to avoid memory leaks");
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: The active AMD Display Configuration is null. Disposing the ADLXHelper to avoid memory leaks");
                         _adlxHelper.Dispose();
                         SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Setting ADLXHelper to null");
                         _adlxHelper = null;

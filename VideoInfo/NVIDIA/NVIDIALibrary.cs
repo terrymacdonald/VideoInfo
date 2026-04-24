@@ -699,7 +699,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public NVAPIGpuHdcpSupportStatusDto HdcpSupportStatus;
 
-        public UInt32 DisplayCount;
+        public int DisplayCount;
         public Dictionary<string, NVIDIA_PER_DISPLAY_CONFIG> Displays;
 
         public NVIDIA_PER_ADAPTER_CONFIG()
@@ -872,6 +872,7 @@ namespace DisplayMagicianShared.NVIDIA
         // generating the profile icon.
         public Dictionary<string, string> DisplayNames;
         public List<string> DisplayIdentifiers;
+        public int DisplayCount;
 
         public NVIDIA_DISPLAY_CONFIG()
         {
@@ -882,6 +883,7 @@ namespace DisplayMagicianShared.NVIDIA
             DRSSettings = new List<NVIDIA_DRS_CONFIG>();
             DisplayNames = new Dictionary<string, string>();
             DisplayIdentifiers = new List<string>();
+            DisplayCount = 0;
         }
 
         public override bool Equals(object obj) => obj is NVIDIA_DISPLAY_CONFIG other && this.Equals(other);
@@ -925,6 +927,11 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DisplayIdentifiers lists don't match!");
                     return false;
                 }
+                if (DisplayCount != other.DisplayCount)
+                {
+                    SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DisplayCount fields don't match!");
+                    return false;
+                }
 
                 // If we make it here then the two configs are equal
                 return true;
@@ -939,7 +946,7 @@ namespace DisplayMagicianShared.NVIDIA
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCloned, MosaicConfig, PhysicalAdapters, DisplayIdentifiers, DRSSettings).GetHashCode();
+            return (IsInUse, IsCloned, MosaicConfig, PhysicalAdapters, DisplayIdentifiers, DRSSettings, DisplayCount).GetHashCode();
         }
         public static bool operator ==(NVIDIA_DISPLAY_CONFIG lhs, NVIDIA_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
 
@@ -1053,6 +1060,26 @@ namespace DisplayMagicianShared.NVIDIA
             }
             SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Automatically getting the NVIDIA Display Configuration");
             _activeDisplayConfig = GetActiveConfig();
+
+            // If we failed to get the display config, then we can't continue to use the library, so we dispose of it to avoid memory leaks and exit
+            if (_activeDisplayConfig == null)
+            {
+                _activeDisplayConfig = CreateDefaultConfig();
+                SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: The active NVIDIA Display Configuration is null. Disposing the NVAPIHelper to avoid memory leaks");
+                _nvapiApiHelper.Dispose();
+                SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Setting NVAPIHelper to null");
+                _nvapiApiHelper = null;
+                _initialised = false;
+                return;
+            }
+
+            // If we got a display config, but there are no displays, then we continue
+            if (_activeDisplayConfig.Value.DisplayCount == 0 )
+            {
+                SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: No displays connected to the NVIDIA GPU, so returning an empty display configuration");
+                return;
+            }
+
             SharedLogger.logger.Trace($"NVIDIALibrary/NVIDIALibrary: Automatically getting the NVIDIA Connected Display Identifiers");
             _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
         
@@ -1186,6 +1213,8 @@ namespace DisplayMagicianShared.NVIDIA
             myDefaultConfig.DisplayIdentifiers = new List<string>();
             myDefaultConfig.IsCloned = false;
             myDefaultConfig.IsInUse = false;
+            myDefaultConfig.DisplayCount = 0;
+
 
             return myDefaultConfig;
         }
@@ -1272,8 +1301,9 @@ namespace DisplayMagicianShared.NVIDIA
                     }
                 }
 
-                // If we get here we have more than one NVIDIA GPU adapter
+                // If we get here we have one or more NVIDIA GPU adapter
                 // Go through each adapter
+                int displayCount = 0;
                 foreach (var adapter in adapters)
                 {
                     adapterNum++;
@@ -2084,7 +2114,9 @@ namespace DisplayMagicianShared.NVIDIA
                     }
 
                     // Set the display count for this adapter
-                    myAdapter.DisplayCount = (UInt32)myAdapter.Displays.Count;
+                    myAdapter.DisplayCount = myAdapter.Displays.Count;
+                    // Set the total number of displays
+                    myDisplayConfig.DisplayCount += myAdapter.DisplayCount;
 
                     // Add the adapter to the config
                     if (!myDisplayConfig.PhysicalAdapters.ContainsKey(adapterDeviceID))
