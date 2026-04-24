@@ -1051,6 +1051,12 @@ namespace DisplayMagicianShared.Intel
 
                         // Set basic info                     
                         newDisplay.DisplayProperties = displayProperties;
+                        // Derive connector type gating booleans. DP and HDMI support the full IGCL feature set;
+                        // other types (DVI, CRT/VGA, MIPI internal panel, INVALID) do not.
+                        bool isDisplayPort        = displayProperties.Type == ctl_display_output_types_t.CTL_DISPLAY_OUTPUT_TYPES_DISPLAYPORT;
+                        bool isHdmi               = displayProperties.Type == ctl_display_output_types_t.CTL_DISPLAY_OUTPUT_TYPES_HDMI;
+                        bool isDigitalWithProtocol = isDisplayPort || isHdmi;
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Display {logDisplayId} output type is {displayProperties.Type}. isDisplayPort={isDisplayPort}, isHdmi={isHdmi}, isDigitalWithProtocol={isDigitalWithProtocol}.");
                         // make up a adapter DeviceID that includes the PCI device and subsystem IDs that we can match on.
                         newDisplay.DeviceID = adapterDeviceID;
                         
@@ -1173,21 +1179,23 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         // GET IMAGE SHARPENING SETTINGS
                         //------------------------------------
-
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            (newDisplay.SharpnessCaps,newDisplay.SharpnessFilterProperties) = display.GetSharpnessCaps();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got sharpness caps for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
-                            newDisplay.SharpnessSettings = display.GetCurrentSharpness();
-                            newDisplay.IsSupportedImageSharpening = newDisplay.SharpnessCaps.SupportedFilterFlags != 0;
-                            newDisplay.IsEnabledImageSharpening = newDisplay.SharpnessSettings.Enable;
-                            newDisplay.SharpeningFilterType = (ctl_sharpness_filter_type_flag_t)newDisplay.SharpnessSettings.FilterType;
-                            newDisplay.SharpeningIntensity = newDisplay.SharpnessSettings.Intensity;
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Image sharpening settings for display {logDisplayId}: Enabled={newDisplay.SharpnessSettings.Enable}, FilterType={newDisplay.SharpnessSettings.FilterType}, Intensity={newDisplay.SharpnessSettings.Intensity}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting image sharpening settings for display {logDisplayId} on adapter {adapterNum}.");
+                            try
+                            {
+                                (newDisplay.SharpnessCaps,newDisplay.SharpnessFilterProperties) = display.GetSharpnessCaps();
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got sharpness caps for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                                newDisplay.SharpnessSettings = display.GetCurrentSharpness();
+                                newDisplay.IsSupportedImageSharpening = newDisplay.SharpnessCaps.SupportedFilterFlags != 0;
+                                newDisplay.IsEnabledImageSharpening = newDisplay.SharpnessSettings.Enable;
+                                newDisplay.SharpeningFilterType = (ctl_sharpness_filter_type_flag_t)newDisplay.SharpnessSettings.FilterType;
+                                newDisplay.SharpeningIntensity = newDisplay.SharpnessSettings.Intensity;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Image sharpening settings for display {logDisplayId}: Enabled={newDisplay.SharpnessSettings.Enable}, FilterType={newDisplay.SharpnessSettings.FilterType}, Intensity={newDisplay.SharpnessSettings.Intensity}");
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting image sharpening settings for display {logDisplayId} on adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
@@ -1250,60 +1258,69 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         // GET INTEL ARC SYNC SETTINGS
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            newDisplay.IntelArcSyncMonitorParams = display.GetIntelArcSyncInfoForMonitor();
-                            newDisplay.IsSupportedIntelArcSync = newDisplay.IntelArcSyncMonitorParams.IsIntelArcSyncSupported;
-                            newDisplay.IntelArcSyncProfile = display.GetIntelArcSyncProfile();
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Intel Arc Sync settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Intel Arc Sync settings for display {logDisplayId} on adapter {adapterNum}.");
+                            try
+                            {
+                                newDisplay.IntelArcSyncMonitorParams = display.GetIntelArcSyncInfoForMonitor();
+                                newDisplay.IsSupportedIntelArcSync = newDisplay.IntelArcSyncMonitorParams.IsIntelArcSyncSupported;
+                                newDisplay.IntelArcSyncProfile = display.GetIntelArcSyncProfile();
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Intel Arc Sync settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Intel Arc Sync settings for display {logDisplayId} on adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET WIRE FORMAT SETTINGS
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            newDisplay.WireFormat = display.GetWireFormat();
-                            bool wireFormatSupported = false;
-                            var supportedWireFormats = newDisplay.WireFormat.SupportedWireFormat;
-
-                            if (supportedWireFormats != null)
+                            try
                             {
-                                foreach (var supportedWireFormat in supportedWireFormats)
+                                newDisplay.WireFormat = display.GetWireFormat();
+                                bool wireFormatSupported = false;
+                                var supportedWireFormats = newDisplay.WireFormat.SupportedWireFormat;
+
+                                if (supportedWireFormats != null)
                                 {
-                                    if (supportedWireFormat.ColorDepth != 0)
+                                    foreach (var supportedWireFormat in supportedWireFormats)
                                     {
-                                        wireFormatSupported = true;
-                                        break;
+                                        if (supportedWireFormat.ColorDepth != 0)
+                                        {
+                                            wireFormatSupported = true;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
 
-                            newDisplay.IsSupportedWireFormat = wireFormatSupported;
-                            
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got wire format settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting wire format settings for display {logDisplayId} on adapter {adapterNum}.");
+                                newDisplay.IsSupportedWireFormat = wireFormatSupported;
+
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got wire format settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting wire format settings for display {logDisplayId} on adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET DYNAMIC CONTRAST ENHANCEMENT SETTINGS
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            (newDisplay.DynamicContrastEnhancement, newDisplay.DynamicContrastEnhancementHistogram) = display.GetDynamicContrastEnhancement();
-                            newDisplay.IsSupportedDynamicContrastEnhancement = newDisplay.DynamicContrastEnhancement.IsSupported;
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got dynamic contrast enhancement settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting dynamic contrast enhancement settings for display {logDisplayId} on adapter {adapterNum}.");
+                            try
+                            {
+                                (newDisplay.DynamicContrastEnhancement, newDisplay.DynamicContrastEnhancementHistogram) = display.GetDynamicContrastEnhancement();
+                                newDisplay.IsSupportedDynamicContrastEnhancement = newDisplay.DynamicContrastEnhancement.IsSupported;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got dynamic contrast enhancement settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting dynamic contrast enhancement settings for display {logDisplayId} on adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
