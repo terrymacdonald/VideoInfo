@@ -1856,6 +1856,27 @@ namespace DisplayMagicianShared.AMD
 
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Display Configuration");
                     _activeDisplayConfig = GetActiveConfig();
+
+                    // If we failed to get the display config, then we can't continue to use the library, so we dispose of it to avoid memory leaks and exit
+                    if (_activeDisplayConfig == null)
+                    {
+                        _activeDisplayConfig = CreateDefaultConfig();
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Exception getting the ADLX System Services");
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Disposing the ADLXHelper to avoid memory leaks");
+                        _adlxHelper.Dispose();
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Setting ADLXHelper to null");
+                        _adlxHelper = null;
+                        _initialised = false;
+                        return;
+                    }
+
+                    // If we got a display config, but there are no displays, then we continue
+                    if (_activeDisplayConfig.Value.Displays.Count == 0)
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: No displays connected to the AMD GPU, so returning an empty display configuration");
+                        return;
+                    }
+
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Connected Display Identifiers");
                     _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
 
