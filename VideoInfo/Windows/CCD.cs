@@ -62,6 +62,10 @@ namespace DisplayMagicianShared.Windows
                                                             // Supported starting in Windows�10 Fall Creators Update (Version 1709).
         DISPLAYCONFIG_DEVICE_INFO_GET_MONITOR_SPECIALIZATION = 12,
         DISPLAYCONFIG_DEVICE_INFO_SET_MONITOR_SPECIALIZATION = 13,
+        DISPLAYCONFIG_DEVICE_INFO_SET_RESERVED1 = 14,              // Reserved - do not use
+        DISPLAYCONFIG_DEVICE_INFO_GET_ADVANCED_COLOR_INFO_2 = 15,  // Get advanced color info v2 (Windows 11 22H2+) - associated struct not yet publicly documented by Microsoft
+        DISPLAYCONFIG_DEVICE_INFO_SET_HDR_STATE = 16,              // Set HDR state (Windows 11 22H2+) - associated struct not yet publicly documented by Microsoft
+        DISPLAYCONFIG_DEVICE_INFO_SET_WCG_STATE = 17,              // Set Wide Color Gamut state (Windows 11 22H2+) - associated struct not yet publicly documented by Microsoft
         //DISPLAYCONFIG_DEVICE_INFO_FORCE_UINT32 = 0xFFFFFFFF // Only here to 
     }
 
