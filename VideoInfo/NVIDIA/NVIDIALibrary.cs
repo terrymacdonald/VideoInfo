@@ -972,7 +972,6 @@ namespace DisplayMagicianShared.NVIDIA
 
         private bool _initialised = false;
         private NVIDIA_DISPLAY_CONFIG? _activeDisplayConfig;
-        public List<NV_MONITOR_CONN_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
         public List<uint> _allConnectedDisplayIds = new List<uint>();
 
@@ -993,15 +992,6 @@ namespace DisplayMagicianShared.NVIDIA
         static NVIDIALibrary() { }
         public NVIDIALibrary()
         {
-            // Populate the list of ConnectionTypes we want to skip as they don't support querying
-            SkippedColorConnectionTypes = new List<NV_MONITOR_CONN_TYPE>() {
-                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_VGA,
-                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_COMPONENT,
-                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_COMPOSITE,
-                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_SVIDEO,
-                NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_DVI,
-            };
-
             _activeDisplayConfig = CreateDefaultConfig();
             _allConnectedDisplayIdentifiers = new List<string>();
 
@@ -1303,7 +1293,6 @@ namespace DisplayMagicianShared.NVIDIA
 
                 // If we get here we have one or more NVIDIA GPU adapter
                 // Go through each adapter
-                int displayCount = 0;
                 foreach (var adapter in adapters)
                 {
                     adapterNum++;
@@ -1585,6 +1574,23 @@ namespace DisplayMagicianShared.NVIDIA
 
                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Found {displayTotalCount} display(s) on adapter {adapterNum}.");
 
+                    // Build a lookup of connector types per display ID. This gates settings collection
+                    // by connection technology: only DisplayPort and HDMI support the full NVAPI settings
+                    // query API; other types (DVI, VGA, LVDS, etc.) will throw exceptions if those calls
+                    // are attempted on them.
+                    var connectorTypeLookup = new Dictionary<uint, NV_MONITOR_CONN_TYPE>();
+                    try
+                    {
+                        var displayIdDtos = allDisplays ? adapter.GetAllDisplayIds() : adapter.GetConnectedDisplayIds();
+                        foreach (var d in displayIdDtos)
+                            connectorTypeLookup[d.DisplayId] = d.ConnectorType;
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Built connector type lookup with {connectorTypeLookup.Count} entries for adapter {adapterNum}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Warn(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception building connector type lookup for adapter {adapterNum}. Settings requiring DP/HDMI will be skipped for all displays on this adapter.");
+                    }
+
                     foreach (var display in displays)
                     {
                         displayNum++;
@@ -1623,6 +1629,16 @@ namespace DisplayMagicianShared.NVIDIA
                         // Create per-display config
                         NVIDIA_PER_DISPLAY_CONFIG myDisplay = new NVIDIA_PER_DISPLAY_CONFIG();
                         myDisplay.DisplayId = displayId;
+
+                        // Resolve the connector type for this display and derive capability booleans.
+                        // UNKNOWN is the safe default if the lookup fails (safe-by-default: ungated calls only).
+                        myDisplay.ConnectorType = connectorTypeLookup.TryGetValue(displayId, out var connType)
+                            ? connType
+                            : NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_UNKNOWN;
+                        bool isDisplayPort        = myDisplay.ConnectorType == NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_DP;
+                        bool isHdmi               = myDisplay.ConnectorType == NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_HDMI;
+                        bool isDigitalWithProtocol = isDisplayPort || isHdmi;
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Display {displayId} connector type is {myDisplay.ConnectorType}. isDisplayPort={isDisplayPort}, isHdmi={isHdmi}, isDigitalWithProtocol={isDigitalWithProtocol}.");
 
                         //------------------------------------
                         // GET DISPLAY STATUS PROPERTIES
@@ -1670,122 +1686,140 @@ namespace DisplayMagicianShared.NVIDIA
                         //------------------------------------
                         // GET COLOR DATA
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the color data for Display {displayNum} on Adapter {adapterNum}.");
-                            var colorDataInput = new NVAPIDisplayColorDataDto();
-                            var colorDataResult = display.ColorControl(colorDataInput);
-                            if (colorDataResult.HasValue)
+                            try
                             {
-                                myDisplay.ColorData = colorDataResult.Value;
-                                myDisplay.HasColorData = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the color data for Display {displayNum} on Adapter {adapterNum}.");
+                                var colorDataInput = new NVAPIDisplayColorDataDto();
+                                var colorDataResult = display.ColorControl(colorDataInput);
+                                if (colorDataResult.HasValue)
+                                {
+                                    myDisplay.ColorData = colorDataResult.Value;
+                                    myDisplay.HasColorData = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got color data for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got color data for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting color data for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting color data for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET HDR CAPABILITIES
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
-                            var hdrCapsResult = display.GetHdrCapabilities();
-                            if (hdrCapsResult.HasValue)
+                            try
                             {
-                                myDisplay.HdrCapabilities = hdrCapsResult.Value;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                                var hdrCapsResult = display.GetHdrCapabilities();
+                                if (hdrCapsResult.HasValue)
+                                {
+                                    myDisplay.HdrCapabilities = hdrCapsResult.Value;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR capabilities for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET HDR COLOR DATA
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR color data for Display {displayNum} on Adapter {adapterNum}.");
-                            var hdrColorDataInput = new NVAPIHdrColorDataDto();
-                            var hdrColorDataResult = display.HdrColorControl(hdrColorDataInput);
-                            if (hdrColorDataResult.HasValue)
+                            try
                             {
-                                myDisplay.HdrColorData = hdrColorDataResult.Value;
-                                myDisplay.HasNvHdrEnabled = true;
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: HDR color data retrieved for Display {displayNum} on Adapter {adapterNum}.");
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR color data for Display {displayNum} on Adapter {adapterNum}.");
+                                var hdrColorDataInput = new NVAPIHdrColorDataDto();
+                                var hdrColorDataResult = display.HdrColorControl(hdrColorDataInput);
+                                if (hdrColorDataResult.HasValue)
+                                {
+                                    myDisplay.HdrColorData = hdrColorDataResult.Value;
+                                    myDisplay.HasNvHdrEnabled = true;
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: HDR color data retrieved for Display {displayNum} on Adapter {adapterNum}.");
+                                }
+                                else
+                                {
+                                    myDisplay.HasNvHdrEnabled = false;
+                                    SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: HDR color data not available for Display {displayNum} on Adapter {adapterNum}.");
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                myDisplay.HasNvHdrEnabled = false;
-                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: HDR color data not available for Display {displayNum} on Adapter {adapterNum}.");
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR color data for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR color data for Display {displayNum} on Adapter {adapterNum}.");
                         }
 
                         //------------------------------------
                         // GET ADAPTIVE SYNC DATA
                         //------------------------------------
-                        try
+                        if (isDisplayPort)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
-                            var getAdaptiveSyncData = display.GetAdaptiveSyncData();
-                            if (getAdaptiveSyncData.HasValue)
+                            try
                             {
-                                // Store a default Set DTO to indicate adaptive sync is available
-                                myDisplay.AdaptiveSyncConfig = new NVAPIAdaptiveSyncSetDataDto();
-                                myDisplay.HasAdaptiveSync = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
+                                var getAdaptiveSyncData = display.GetAdaptiveSyncData();
+                                if (getAdaptiveSyncData.HasValue)
+                                {
+                                    // Store a default Set DTO to indicate adaptive sync is available
+                                    myDisplay.AdaptiveSyncConfig = new NVAPIAdaptiveSyncSetDataDto();
+                                    myDisplay.HasAdaptiveSync = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Adaptive Sync data for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET DISPLAYPORT INFO
                         //------------------------------------
-                        try
+                        if (isDisplayPort)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
-                            var dpInfoResult = display.GetDisplayPortInfo();
-                            if (dpInfoResult.HasValue)
+                            try
                             {
-                                myDisplay.DisplayPortInfo = dpInfoResult.Value;
-                                myDisplay.HasDisplayPortInfo = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
+                                var dpInfoResult = display.GetDisplayPortInfo();
+                                if (dpInfoResult.HasValue)
+                                {
+                                    myDisplay.DisplayPortInfo = dpInfoResult.Value;
+                                    myDisplay.HasDisplayPortInfo = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting DisplayPort info for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET VIRTUAL REFRESH RATE DATA
                         //------------------------------------
-                        try
+                        if (isDisplayPort)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
-                            var vrrResult = display.GetVirtualRefreshRateData();
-                            if (vrrResult.HasValue)
+                            try
                             {
-                                myDisplay.VirtualRefreshRateData = vrrResult.Value;
-                                myDisplay.HasVirtualRefreshRate = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
+                                var vrrResult = display.GetVirtualRefreshRateData();
+                                if (vrrResult.HasValue)
+                                {
+                                    myDisplay.VirtualRefreshRateData = vrrResult.Value;
+                                    myDisplay.HasVirtualRefreshRate = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Virtual Refresh Rate data for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
@@ -1810,97 +1844,112 @@ namespace DisplayMagicianShared.NVIDIA
                         //------------------------------------
                         // GET SOURCE COLOR SPACE
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Source Color Space for Display {displayNum} on Adapter {adapterNum}.");
-                            var colorSpaceResult = display.GetSourceColorSpace(displayId);
-                            if (colorSpaceResult.HasValue)
+                            try
                             {
-                                myDisplay.SourceColorSpace = colorSpaceResult.Value;
-                                myDisplay.HasSourceColorSpace = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Source Color Space for Display {displayNum} on Adapter {adapterNum}.");
+                                var colorSpaceResult = display.GetSourceColorSpace(displayId);
+                                if (colorSpaceResult.HasValue)
+                                {
+                                    myDisplay.SourceColorSpace = colorSpaceResult.Value;
+                                    myDisplay.HasSourceColorSpace = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Source Color Space '{myDisplay.SourceColorSpace}' for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Source Color Space '{myDisplay.SourceColorSpace}' for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Source Color Space for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Source Color Space for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET SOURCE HDR METADATA
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
-                            var hdrMetadataResult = display.GetSourceHdrMetadata(displayId);
-                            if (hdrMetadataResult.HasValue)
+                            try
                             {
-                                myDisplay.SourceHdrMetadata = hdrMetadataResult.Value;
-                                myDisplay.HasSourceHdrMetadata = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
+                                var hdrMetadataResult = display.GetSourceHdrMetadata(displayId);
+                                if (hdrMetadataResult.HasValue)
+                                {
+                                    myDisplay.SourceHdrMetadata = hdrMetadataResult.Value;
+                                    myDisplay.HasSourceHdrMetadata = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Source HDR Metadata for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET OUTPUT MODE
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Output Mode for Display {displayNum} on Adapter {adapterNum}.");
-                            var outputModeResult = display.GetOutputMode();
-                            if (outputModeResult.HasValue)
+                            try
                             {
-                                myDisplay.OutputMode = outputModeResult.Value;
-                                myDisplay.HasOutputMode = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Output Mode for Display {displayNum} on Adapter {adapterNum}.");
+                                var outputModeResult = display.GetOutputMode();
+                                if (outputModeResult.HasValue)
+                                {
+                                    myDisplay.OutputMode = outputModeResult.Value;
+                                    myDisplay.HasOutputMode = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Output Mode '{myDisplay.OutputMode}' for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Output Mode '{myDisplay.OutputMode}' for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Output Mode for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Output Mode for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET HDR TONE MAPPING
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR Tone Mapping for Display {displayNum} on Adapter {adapterNum}.");
-                            var hdrToneMappingResult = display.GetHdrToneMapping();
-                            if (hdrToneMappingResult.HasValue)
+                            try
                             {
-                                myDisplay.HdrToneMapping = hdrToneMappingResult.Value;
-                                myDisplay.HasHdrToneMapping = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDR Tone Mapping for Display {displayNum} on Adapter {adapterNum}.");
+                                var hdrToneMappingResult = display.GetHdrToneMapping();
+                                if (hdrToneMappingResult.HasValue)
+                                {
+                                    myDisplay.HdrToneMapping = hdrToneMappingResult.Value;
+                                    myDisplay.HasHdrToneMapping = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDR Tone Mapping '{myDisplay.HdrToneMapping}' for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDR Tone Mapping '{myDisplay.HdrToneMapping}' for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR Tone Mapping for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDR Tone Mapping for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET INFOFRAME DATA
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
-                            var infoFrameDataInput = new NVAPIInfoFrameDataDto();
-                            var infoFrameResult = display.InfoFrameControl(infoFrameDataInput);
-                            if (infoFrameResult.HasValue)
+                            try
                             {
-                                myDisplay.InfoFrameData = infoFrameResult.Value;
-                                myDisplay.HasInfoFrameData = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
+                                var infoFrameDataInput = new NVAPIInfoFrameDataDto();
+                                var infoFrameResult = display.InfoFrameControl(infoFrameDataInput);
+                                if (infoFrameResult.HasValue)
+                                {
+                                    myDisplay.InfoFrameData = infoFrameResult.Value;
+                                    myDisplay.HasInfoFrameData = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
@@ -1944,58 +1993,67 @@ namespace DisplayMagicianShared.NVIDIA
                         //------------------------------------
                         // GET HDMI SUPPORT INFO
                         //------------------------------------
-                        try
+                        if (isHdmi)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
-                            var hdmiSupportResult = display.GetHdmiSupportInfo(null);
-                            if (hdmiSupportResult.HasValue)
+                            try
                             {
-                                myDisplay.HdmiSupportInfo = hdmiSupportResult.Value;
-                                myDisplay.HasHdmiSupportInfo = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
+                                var hdmiSupportResult = display.GetHdmiSupportInfo(null);
+                                if (hdmiSupportResult.HasValue)
+                                {
+                                    myDisplay.HdmiSupportInfo = hdmiSupportResult.Value;
+                                    myDisplay.HasHdmiSupportInfo = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting HDMI Support Info for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET VRR INFO
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get VRR Info for Display {displayNum} on Adapter {adapterNum}.");
-                            var vrrInfoResult = display.GetVrrInfo();
-                            if (vrrInfoResult.HasValue)
+                            try
                             {
-                                myDisplay.VrrInfo = vrrInfoResult.Value;
-                                myDisplay.HasVrrInfo = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get VRR Info for Display {displayNum} on Adapter {adapterNum}.");
+                                var vrrInfoResult = display.GetVrrInfo();
+                                if (vrrInfoResult.HasValue)
+                                {
+                                    myDisplay.VrrInfo = vrrInfoResult.Value;
+                                    myDisplay.HasVrrInfo = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got VRR Info for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got VRR Info for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting VRR Info for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting VRR Info for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
                         // GET DISPLAY COLORIMETRY
                         //------------------------------------
-                        try
+                        if (isDigitalWithProtocol)
                         {
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
-                            var colorimetryResult = display.GetColorimetry();
-                            if (colorimetryResult.HasValue)
+                            try
                             {
-                                myDisplay.DisplayColorimetry = colorimetryResult.Value;
-                                myDisplay.HasDisplayColorimetry = true;
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
+                                var colorimetryResult = display.GetColorimetry();
+                                if (colorimetryResult.HasValue)
+                                {
+                                    myDisplay.DisplayColorimetry = colorimetryResult.Value;
+                                    myDisplay.HasDisplayColorimetry = true;
+                                }
+                                SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
                             }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception getting Display Colorimetry for Display {displayNum} on Adapter {adapterNum}.");
+                            }
                         }
 
                         //------------------------------------
@@ -2901,8 +2959,14 @@ namespace DisplayMagicianShared.NVIDIA
                             SharedLogger.logger.Warn(ex, $"NVIDIALibrary/SetActiveConfigOverride: Exception getting active display config for {displayKey}. Will apply all settings unconditionally.");
                         }
 
+                        // Derive connector type gating booleans from the saved display configuration.
+                        // These gate which settings can be applied based on connection technology.
+                        bool isDisplayPort        = myDisplay.ConnectorType == NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_DP;
+                        bool isHdmi               = myDisplay.ConnectorType == NV_MONITOR_CONN_TYPE.NV_MONITOR_CONN_TYPE_HDMI;
+                        bool isDigitalWithProtocol = isDisplayPort || isHdmi;
+
                         // === Color Data ===
-                        if (myDisplay.HasColorData)
+                        if (myDisplay.HasColorData && isDigitalWithProtocol)
                         {
                             try
                             {
@@ -2932,7 +2996,7 @@ namespace DisplayMagicianShared.NVIDIA
                         }
 
                         // === HDR Color Data ===
-                        if (myDisplay.HasNvHdrEnabled)
+                        if (myDisplay.HasNvHdrEnabled && isDigitalWithProtocol)
                         {
                             try
                             {
@@ -2962,7 +3026,7 @@ namespace DisplayMagicianShared.NVIDIA
                         }
 
                         // === Virtual Refresh Rate ===
-                        if (myDisplay.HasVirtualRefreshRate)
+                        if (myDisplay.HasVirtualRefreshRate && isDisplayPort)
                         {
                             try
                             {
@@ -3022,7 +3086,7 @@ namespace DisplayMagicianShared.NVIDIA
                         }
 
                         // === Source Color Space ===
-                        if (myDisplay.HasSourceColorSpace)
+                        if (myDisplay.HasSourceColorSpace && isDigitalWithProtocol)
                         {
                             try
                             {
@@ -3052,7 +3116,7 @@ namespace DisplayMagicianShared.NVIDIA
                         }
 
                         // === Source HDR Metadata ===
-                        if (myDisplay.HasSourceHdrMetadata)
+                        if (myDisplay.HasSourceHdrMetadata && isDigitalWithProtocol)
                         {
                             try
                             {
@@ -3082,7 +3146,7 @@ namespace DisplayMagicianShared.NVIDIA
                         }
 
                         // === Output Mode ===
-                        if (myDisplay.HasOutputMode)
+                        if (myDisplay.HasOutputMode && isDigitalWithProtocol)
                         {
                             try
                             {
@@ -3112,7 +3176,7 @@ namespace DisplayMagicianShared.NVIDIA
                         }
 
                         // === HDR Tone Mapping ===
-                        if (myDisplay.HasHdrToneMapping)
+                        if (myDisplay.HasHdrToneMapping && isDigitalWithProtocol)
                         {
                             try
                             {
@@ -3142,7 +3206,7 @@ namespace DisplayMagicianShared.NVIDIA
                         }
 
                         // === InfoFrame Data ===
-                        if (myDisplay.HasInfoFrameData)
+                        if (myDisplay.HasInfoFrameData && isDigitalWithProtocol)
                         {
                             try
                             {
