@@ -564,14 +564,14 @@ namespace DisplayMagicianShared.Windows
                                 // We get here if there is a matching adapter
                                 newAdapterValue = adapterOldToNewMap[ds.AdapterId.Value];
                                 ds.AdapterId = AdapterValueToLUID(newAdapterValue);
-                                SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated DisplaySource #{i} from adapter {savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId.Value} to adapter {newAdapterValue} instead.");
+                                SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated DisplaySource #{i} from adapter {ds.AdapterId.Value} to adapter {newAdapterValue} instead.");
                             }
                             else
                             {
                                 // if there isn't a matching adapter, then we just pick the first current one and hope that works!
                                 // (it is highly likely to... its only if the user has multiple graphics cards with some weird config it may break)
                                 newAdapterValue = currentAdapterMap.First().Key;
-                                SharedLogger.logger.Warn($"WinLibrary/PatchAdapterIDs: Uh Oh. Adapter {savedDisplayConfig.DisplayHDRStates[i].AdapterId.Value} didn't have a current match in Display Sources! It's possible the adapter was swapped or disabled. Attempting to use adapter {newAdapterValue} instead.");
+                                SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Uh Oh. Adapter {ds.AdapterId.Value} didn't have a current match in Display Sources! It's possible the adapter was swapped or disabled. Attempting to use adapter {newAdapterValue} instead.");
                                 ds.AdapterId = AdapterValueToLUID(newAdapterValue);
                             }
                             dsList[j] = ds;
@@ -632,7 +632,7 @@ namespace DisplayMagicianShared.Windows
             }
             else
             {
-                SharedLogger.logger.Warn($"WinLibrary/GetDPISettings: WARNING - Unabled to get Windows DPI Scaling value for display {pathTargetId}.");
+                SharedLogger.logger.Warn($"WinLibrary/GetDPISettings: WARNING - Unable to get Windows DPI Scaling value for display {pathTargetId}.");
             }
             return sourceDPIScalingInfo;
         }
@@ -641,6 +641,13 @@ namespace DisplayMagicianShared.Windows
         {
             // Get the current settigns as we stand so we know how much we need to adjust by
             DPIScalingInfo currentDPIScalingInfo = GetDPISettings(pathSourceAdapterId, pathSourceId, pathTargetId);
+
+            // Skip doing anything if we're the same DPI!
+            if (suppliedDPIScalingInfo.Current == 0)
+            {
+                SharedLogger.logger.Trace($"WinLibrary/SetDPISettings: DPI setting is not supported for display {pathTargetId}.");
+                return true;
+            }
 
             // Skip doing anything if we're the same DPI!
             if (suppliedDPIScalingInfo.Current == currentDPIScalingInfo.Current)
