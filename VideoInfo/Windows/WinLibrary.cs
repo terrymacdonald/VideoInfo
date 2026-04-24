@@ -1677,8 +1677,8 @@ namespace DisplayMagicianShared.Windows
             }
 
             // Now we go through the Paths to update the LUIDs as per Soroush's suggestion
-            SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Patching the adapter IDs to make the saved config valid");
-            PatchWindowsDisplayConfig(ref displayConfig);
+            //SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Patching the adapter IDs to make the saved config valid");
+            //PatchWindowsDisplayConfig(ref displayConfig);
 
             uint myPathsCount = (uint)displayConfig.DisplayConfigPaths.Length;
             uint myModesCount = (uint)displayConfig.DisplayConfigModes.Length;
@@ -2157,8 +2157,8 @@ namespace DisplayMagicianShared.Windows
             SharedLogger.logger.Trace($"WinLibrary/PatchAdapterIDs: All teh adapters that the display configuration uses are still avilable to use now!");
 
             // Now we go through the Paths to update the LUIDs as per Soroush's suggestion
-            SharedLogger.logger.Trace($"WinLibrary/IsPossibleConfig: Attemptong to patch the saved display configuration's adapter IDs so that it will still work (these change at each boot)");
-            PatchWindowsDisplayConfig(ref displayConfig);
+            //SharedLogger.logger.Trace($"WinLibrary/IsPossibleConfig: Attemptong to patch the saved display configuration's adapter IDs so that it will still work (these change at each boot)");
+            //PatchWindowsDisplayConfig(ref displayConfig);
 
             SharedLogger.logger.Trace($"WinLibrary/IsPossibleConfig: Testing whether the display configuration is valid ");
             // Test whether a specified display configuration is supported on the computer                    
