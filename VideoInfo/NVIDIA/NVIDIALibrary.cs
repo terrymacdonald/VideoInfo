@@ -3808,8 +3808,8 @@ namespace DisplayMagicianShared.NVIDIA
                     SharedLogger.logger.Trace($"NVIDIALibrary/CreateSingleScreenMosaicTopology: Creating new Grid Topology with multiple 1x1 grids based on each display in the current Mosaic grid. This will separate each display on its own.");
                     NVAPIMosaicGridTopoDto thisScreen = new NVAPIMosaicGridTopoDto(
                         1, 1,
-                        gridTopo.ApplyWithBezelCorrect, gridTopo.ImmersiveGaming, gridTopo.BaseMosaic,
-                        gridTopo.DriverReloadAllowed, gridTopo.AcceleratePrimaryDisplay, gridTopo.PixelShift,
+                        false, false, false,
+                        false, false, false,
                         displayArray, gridTopo.DisplaySettings);
 
                     screensToReturn.Add(thisScreen);
