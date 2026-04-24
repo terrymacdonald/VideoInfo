@@ -757,6 +757,26 @@ namespace DisplayMagicianShared.Intel
 
             SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Display Configuration");
             _activeDisplayConfig = GetActiveConfig();
+
+            // If we failed to get the display config, then we can't continue to use the library, so we dispose of it to avoid memory leaks and exit
+            if (_activeDisplayConfig == null)
+            {
+                _activeDisplayConfig = CreateDefaultConfig();
+                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: The active Intel Display Configuration is null. Disposing the IGCL helper to avoid memory leaks");
+                _igclApiHelper.Dispose();
+                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Setting IGCL helper to null");
+                _igclApiHelper = null;
+                _initialised = false;
+                return;
+            }
+
+            // If we got a display config, but there are no displays, then we continue
+            if (_activeDisplayConfig.Value.Displays.Count == 0 )
+            {
+                SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: No displays connected to the Intel GPU, so returning an empty display configuration");
+                return;
+            }
+
             SharedLogger.logger.Trace($"IntelLibrary/IntelLibrary: Automatically getting the Intel Connected Display Identifiers");
             _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
         
