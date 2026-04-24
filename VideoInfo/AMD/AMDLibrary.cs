@@ -1704,7 +1704,6 @@ namespace DisplayMagicianShared.AMD
         private ADLXSystemServicesHelper _adlxSystem;
         //private int _adlxHighestSupportedSystemVersion = 0; // Only the base SystemServices is supported in all versions of ADLX
         private AMD_DISPLAY_CONFIG? _activeDisplayConfig;
-        public List<ADL_DISPLAY_CONNECTION_TYPE> SkippedColorConnectionTypes;
         public List<string> _allConnectedDisplayIdentifiers;
         //public IntPtr hADLXBindingModule = IntPtr.Zero;
         public IntPtr hADLXModule = IntPtr.Zero;
@@ -1714,16 +1713,6 @@ namespace DisplayMagicianShared.AMD
         static AMDLibrary() { }
         public AMDLibrary()
         {
-            // Populate the list of ConnectionTypes we want to skip as they don't support querying
-            SkippedColorConnectionTypes = new List<ADL_DISPLAY_CONNECTION_TYPE> {
-                ADL_DISPLAY_CONNECTION_TYPE.Composite,
-                ADL_DISPLAY_CONNECTION_TYPE.DVI_D,
-                ADL_DISPLAY_CONNECTION_TYPE.DVI_I,
-                ADL_DISPLAY_CONNECTION_TYPE.RCA_3Component,
-                ADL_DISPLAY_CONNECTION_TYPE.SVideo,
-                ADL_DISPLAY_CONNECTION_TYPE.VGA
-            };
-
             _activeDisplayConfig = CreateDefaultConfig();
             try
             {
@@ -2308,6 +2297,13 @@ namespace DisplayMagicianShared.AMD
                         AMD_DISPLAY_WITH_SETTINGS newDisplay = new AMD_DISPLAY_WITH_SETTINGS();
 
                         newDisplay.ConnectorType = display.ConnectorType;
+                        bool isDisplayPort        = newDisplay.ConnectorType == ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_DISPLAYPORT ||
+                                                    newDisplay.ConnectorType == ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_EDP ||
+                                                    newDisplay.ConnectorType == ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_USB_TYPE_C;
+                        bool isHdmi               = newDisplay.ConnectorType == ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_HDMI_TYPE_A ||
+                                                    newDisplay.ConnectorType == ADLX_DISPLAY_CONNECTOR_TYPE.DISPLAY_CONTYPE_HDMI_TYPE_B;
+                        bool isDigitalWithProtocol = isDisplayPort || isHdmi;
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Display {display.UniqueId} connector type is {newDisplay.ConnectorType}. isDisplayPort={isDisplayPort}, isHdmi={isHdmi}, isDigitalWithProtocol={isDigitalWithProtocol}.");
                         newDisplay.Type = display.Type;
                         newDisplay.EDID = display.Edid;
                         newDisplay.ManufacturerID = display.ManufacturerId;
@@ -2332,29 +2328,99 @@ namespace DisplayMagicianShared.AMD
                         newDisplay.GammaInfo = new AMD_GAMMA_INFO(display.GetGamma());
 
                         // Get the gammut information for this display
-                        newDisplay.GamutInfo = new AMD_GAMUT_INFO(display.GetGamut());
+                        if (isDigitalWithProtocol)
+                        {
+                            try
+                            {
+                                newDisplay.GamutInfo = new AMD_GAMUT_INFO(display.GetGamut());
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting Gamut info for display {display.UniqueId}.");
+                            }
+                        }
 
                         // Now get the connectivity experience settings if we can
-                        newDisplay.ConnectivityExperience = new AMD_CONNECTIVITY_EXPERIENCE_INFO(display.GetConnectivityExperience());
+                        if (isDigitalWithProtocol)
+                        {
+                            try
+                            {
+                                newDisplay.ConnectivityExperience = new AMD_CONNECTIVITY_EXPERIENCE_INFO(display.GetConnectivityExperience());
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting Connectivity Experience for display {display.UniqueId}.");
+                            }
+                        }
 
                         // Get the 3DLUT settings for this display
-                        newDisplay.ThreeDLUTSettings = new AMD_3DLUT_INFO(display.GetThreeDLut());                       
+                        if (isDigitalWithProtocol)
+                        {
+                            try
+                            {
+                                newDisplay.ThreeDLUTSettings = new AMD_3DLUT_INFO(display.GetThreeDLut());
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting 3DLUT settings for display {display.UniqueId}.");
+                            }
+                        }
 
                         // TODO: ADLXWrapper Helper Facade does not support custom resolutions properly yet
                         // so we need to skip that for now. Need to fix that in ADLXWrapper later.
 
                         //------------------------------------
                         // Get the current color depth for this display
-                        (newDisplay.IsSupportedColorDepth, newDisplay.ColorDepth) = display.GetColorDepthState();
+                        if (isDigitalWithProtocol)
+                        {
+                            try
+                            {
+                                (newDisplay.IsSupportedColorDepth, newDisplay.ColorDepth) = display.GetColorDepthState();
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting Color Depth for display {display.UniqueId}.");
+                            }
+                        }
 
                         // GET THE FreeSync Settings IF WE CAN
-                        (newDisplay.IsSupportedFreeSync, newDisplay.IsEnabledFreeSync) = display.GetFreeSyncState();
+                        if (isDisplayPort)
+                        {
+                            try
+                            {
+                                (newDisplay.IsSupportedFreeSync, newDisplay.IsEnabledFreeSync) = display.GetFreeSyncState();
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting FreeSync state for display {display.UniqueId}.");
+                            }
+                        }
 
                         // Get the free sync accuracy range if we can
-                        (newDisplay.IsSupportedFreeSyncColorAccuracy,newDisplay.IsEnabledFreeSyncColorAccuracy) = display.GetFreeSyncColorAccuracyState();
+                        if (isDisplayPort)
+                        {
+                            try
+                            {
+                                (newDisplay.IsSupportedFreeSyncColorAccuracy,newDisplay.IsEnabledFreeSyncColorAccuracy) = display.GetFreeSyncColorAccuracyState();
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting FreeSync Color Accuracy state for display {display.UniqueId}.");
+                            }
+                        }
 
                         // Get the dynamic refresh rate control if we can
-                        (newDisplay.IsSupportedDynamicRefreshRateControl, newDisplay.IsEnabledDynamicRefreshRateControl) = display.GetDynamicRefreshRateControlState();
+                        if (isDisplayPort)
+                        {
+                            try
+                            {
+                                (newDisplay.IsSupportedDynamicRefreshRateControl, newDisplay.IsEnabledDynamicRefreshRateControl) = display.GetDynamicRefreshRateControlState();
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting Dynamic Refresh Rate Control state for display {display.UniqueId}.");
+                            }
+                        }
 
                         // Now get teh display blanking settings if we can
                         (newDisplay.IsSupportedDisplayBlanking,newDisplay.IsEnabledDisplayBlanking) = display.GetDisplayBlankingState();
@@ -2366,7 +2432,17 @@ namespace DisplayMagicianShared.AMD
                         (newDisplay.IsSupportedIntegerScaling, newDisplay.IsEnabledIntegerScaling) = display.GetIntegerScalingState();
 
                         // Get the Display Pixel Format settings if we can
-                        (newDisplay.IsSupportedPixelFormat, newDisplay.CurrentPixelFormat) = display.GetPixelFormatState();                        
+                        if (isDigitalWithProtocol)
+                        {
+                            try
+                            {
+                                (newDisplay.IsSupportedPixelFormat, newDisplay.CurrentPixelFormat) = display.GetPixelFormatState();
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting Pixel Format for display {display.UniqueId}.");
+                            }
+                        }                        
                         
                         // Get the Display Scaling Mode if we can
                         (newDisplay.IsSupportedScalingMode, newDisplay.CurrentScalingMode) = display.GetScalingMode();
@@ -2375,7 +2451,17 @@ namespace DisplayMagicianShared.AMD
                         (newDisplay.IsSupportedVSR, newDisplay.IsEnabledVSR) = display.GetVirtualSuperResolutionState();
 
                         // Get the HDCP settings if we can
-                        (newDisplay.IsSupportedHDCP, newDisplay.IsEnabledHDCP) = display.GetHdcpState();
+                        if (isDigitalWithProtocol)
+                        {
+                            try
+                            {
+                                (newDisplay.IsSupportedHDCP, newDisplay.IsEnabledHDCP) = display.GetHdcpState();
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"AMDLibrary/GetAMDDisplayConfig: Exception getting HDCP state for display {display.UniqueId}.");
+                            }
+                        }
 
                         // Get VariBright settings
                         (newDisplay.IsSupportedVariBright, newDisplay.IsEnabledVariBright, newDisplay.VariBrightMode) = display.GetVariBrightState();                                            
