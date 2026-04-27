@@ -1302,6 +1302,42 @@ namespace DisplayMagicianShared.NVIDIA
                     //------------------------------------
                     NVIDIA_PER_ADAPTER_CONFIG myAdapter = new NVIDIA_PER_ADAPTER_CONFIG();
 
+// Try to get the mosaic settings
+                    try
+                    {
+                        // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
+                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the current mosaic topology brief and mosaic display settings.");
+                        var mosaicHelper = _nvapiApiHelper.GetMosaicHelper();
+                        var mosaicDto = mosaicHelper.GetCurrentTopo();
+                        if (!mosaicDto.HasValue)
+                        {
+                            // Mosaic is not enabled/supported, so set the mosaic config to reflect this
+                            myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
+                            myDisplayConfig.MosaicConfig.MosaicCurrentTopo = new  NVAPIMosaicCurrentTopoDto();
+                            myDisplayConfig.MosaicConfig.MosaicGridTopologies = new NVAPIMosaicGridTopologiesDto();
+                        }
+                        else
+                        {
+                            myDisplayConfig.MosaicConfig.IsMosaicEnabled = mosaicDto.Value.TopoBrief.Enabled;
+                            myDisplayConfig.MosaicConfig.MosaicCurrentTopo = mosaicDto.Value;
+                            var mosaicGridToposDto = mosaicHelper.EnumDisplayGrids();
+                            if (mosaicGridToposDto.HasValue)
+                            {   
+                                myDisplayConfig.MosaicConfig.MosaicGridTopologies = mosaicGridToposDto.Value;
+                            }
+                            else
+                            {
+                               SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Failed to grab the mosaic grid toplogy.");
+                            }
+                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the current mosaic toplogy brief and mosaic display settings.");
+
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
+                    }
+
                     // Get the GPU full name
                     try
                     {
@@ -1590,6 +1626,8 @@ namespace DisplayMagicianShared.NVIDIA
                     {
                         SharedLogger.logger.Warn(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception building connector type lookup for adapter {adapterNum}. Settings requiring DP/HDMI will be skipped for all displays on this adapter.");
                     }
+
+                    
 
                     foreach (var display in displays)
                     {
@@ -2192,42 +2230,6 @@ namespace DisplayMagicianShared.NVIDIA
                     else
                     {
                         SharedLogger.logger.Warn($"NVIDIALibrary/GetNVIDIADisplayConfig: Duplicate adapter key '{adapterDeviceID}' detected. Skipping duplicate adapter.");
-                    }
-
-                    // Try to get the mosaic settings
-                    try
-                    {
-                        // Get current Mosaic Topology settings in brief (check whether Mosaic is on)
-                        SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the current mosaic topology brief and mosaic display settings.");
-                        var mosaicHelper = _nvapiApiHelper.GetMosaicHelper();
-                        var mosaicDto = mosaicHelper.GetCurrentTopo();
-                        if (!mosaicDto.HasValue)
-                        {
-                            // Mosaic is not enabled/supported, so set the mosaic config to reflect this
-                            myDisplayConfig.MosaicConfig.IsMosaicEnabled = false;
-                            myDisplayConfig.MosaicConfig.MosaicCurrentTopo = new  NVAPIMosaicCurrentTopoDto();
-                            myDisplayConfig.MosaicConfig.MosaicGridTopologies = new NVAPIMosaicGridTopologiesDto();
-                        }
-                        else
-                        {
-                            myDisplayConfig.MosaicConfig.IsMosaicEnabled = mosaicDto.Value.TopoBrief.Enabled;
-                            myDisplayConfig.MosaicConfig.MosaicCurrentTopo = mosaicDto.Value;
-                            var mosaicGridToposDto = mosaicHelper.EnumDisplayGrids();
-                            if (mosaicGridToposDto.HasValue)
-                            {   
-                                myDisplayConfig.MosaicConfig.MosaicGridTopologies = mosaicGridToposDto.Value;
-                            }
-                            else
-                            {
-                               SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Failed to grab the mosaic grid toplogy.");
-                            }
-                            SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got the current mosaic toplogy brief and mosaic display settings.");
-
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        SharedLogger.logger.Error(ex, $"NVIDIALibrary/GetNVIDIADisplayConfig: Exception caused whilst getting current mosiac topology brief and mosaic display settings.");
                     }
 
                     // Check if there is a cloned display in the current layout by examining the DisplayConfig paths
