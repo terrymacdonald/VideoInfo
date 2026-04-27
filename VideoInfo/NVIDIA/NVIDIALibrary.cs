@@ -1697,7 +1697,9 @@ namespace DisplayMagicianShared.NVIDIA
                                 var colorDataResult = display.ColorControl(colorDataInput);
                                 if (colorDataResult.HasValue)
                                 {
-                                    myDisplay.ColorData = colorDataResult.Value;
+                                    var colorNative = colorDataResult.Value.Data;
+                                    colorNative.cmd = (byte)NV_COLOR_CMD.NV_COLOR_CMD_SET;
+                                    myDisplay.ColorData = NVAPIDisplayColorDataDto.FromNative(colorNative);
                                     myDisplay.HasColorData = true;
                                 }
                                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got color data for Display {displayNum} on Adapter {adapterNum}.");
@@ -1741,7 +1743,9 @@ namespace DisplayMagicianShared.NVIDIA
                                 var hdrColorDataResult = display.HdrColorControl(hdrColorDataInput);
                                 if (hdrColorDataResult.HasValue)
                                 {
-                                    myDisplay.HdrColorData = hdrColorDataResult.Value;
+                                    var hdrNative = hdrColorDataResult.Value.Data;
+                                    hdrNative.cmd = NV_HDR_CMD.NV_HDR_CMD_SET;
+                                    myDisplay.HdrColorData = NVAPIHdrColorDataDto.FromNative(hdrNative);
                                     myDisplay.HasNvHdrEnabled = true;
                                     SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: HDR color data retrieved for Display {displayNum} on Adapter {adapterNum}.");
                                 }
@@ -1943,7 +1947,9 @@ namespace DisplayMagicianShared.NVIDIA
                                 var infoFrameResult = display.InfoFrameControl(infoFrameDataInput);
                                 if (infoFrameResult.HasValue)
                                 {
-                                    myDisplay.InfoFrameData = infoFrameResult.Value;
+                                    var infoNative = infoFrameResult.Value.Data;
+                                    infoNative.cmd = (byte)NV_INFOFRAME_CMD.NV_INFOFRAME_CMD_SET;
+                                    myDisplay.InfoFrameData = NVAPIInfoFrameDataDto.FromNative(infoNative);
                                     myDisplay.HasInfoFrameData = true;
                                 }
                                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Successfully got InfoFrame data for Display {displayNum} on Adapter {adapterNum}.");
