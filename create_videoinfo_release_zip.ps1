@@ -11,11 +11,6 @@ if (-not $scriptRoot) {
 
 Set-Location $scriptRoot
 
-$NVIDIAHeader = Join-Path $scriptRoot "nvapi/nvapi.h"
-if (-not (Test-Path $NVIDIAHeader)) {
-    Write-Host "NVIDIA SDK headers not found. Run ./prepare_nvapi.ps1 first." -ForegroundColor Red
-    exit 1
-}
 
 # ---------------------------------------------------------------------------
 # Versioning (match build_nvidia.ps1: MAJOR/MINOR from VERSION, PATCH = git rev-list --count HEAD)
@@ -41,16 +36,16 @@ try {
 } catch {}
 $version = "$major.$minor.$patch"
 
-$projectPath = Join-Path $scriptRoot "NVAPIWrapper/NVAPIWrapper.csproj"
-Write-Host "Building NVAPIWrapper ($Configuration) version $version..." -ForegroundColor Cyan
+$projectPath = Join-Path $scriptRoot "VideoInfo/VideoInfo.csproj"
+Write-Host "Building VideoInfo ($Configuration) version $version..." -ForegroundColor Cyan
 dotnet build $projectPath -c $Configuration /p:Version=$version /p:AssemblyVersion=$version /p:FileVersion=$version
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build failed; aborting packaging." -ForegroundColor Red
     exit $LASTEXITCODE
 }
 
-$buildOutput = Join-Path $scriptRoot "NVAPIWrapper/bin/$Configuration/net10.0"
-$assemblyPath = Join-Path $buildOutput "NVAPIWrapper.dll"
+$buildOutput = Join-Path $scriptRoot "VideoInfo/bin/$Configuration/net10.0"
+$assemblyPath = Join-Path $buildOutput "VideoInfo.dll"
 if (-not (Test-Path $assemblyPath)) {
     Write-Host "Build output not found at $assemblyPath" -ForegroundColor Red
     exit 1
@@ -63,19 +58,19 @@ if (Test-Path $zipPath) { Remove-Item $zipPath }
 
 $pathsToPack = @()
 $pathsToPack += $assemblyPath
-$pathsToPack += Join-Path $buildOutput "NVAPIWrapper.pdb"
-$pathsToPack += Join-Path $buildOutput "NVAPIWrapper.deps.json"
-$pathsToPack += Join-Path $buildOutput "NVAPIWrapper.xml"
+$pathsToPack += Join-Path $buildOutput "VideoInfo.pdb"
+$pathsToPack += Join-Path $buildOutput "VideoInfo.deps.json"
+$pathsToPack += Join-Path $buildOutput "VideoInfo.xml"
 $pathsToPack += Join-Path $scriptRoot "LICENSE"
 $pathsToPack += Join-Path $scriptRoot "README.md"
-$pathsToPack += Join-Path $scriptRoot "NVAPIWrapper/README.md"
+$pathsToPack += Join-Path $scriptRoot "VideoInfo/README.md"
 $pathsToPack = $pathsToPack | Where-Object { Test-Path $_ }
 
 if ($IncludeSources) {
-    $pathsToPack += (Join-Path $scriptRoot "NVAPIWrapper/cs_generated")
-    $sourceFiles = Get-ChildItem -Path (Join-Path $scriptRoot "NVAPIWrapper") -Filter *.cs -File
+    $pathsToPack += (Join-Path $scriptRoot "VideoInfo/cs_generated")
+    $sourceFiles = Get-ChildItem -Path (Join-Path $scriptRoot "VideoInfo") -Filter *.cs -File
     $pathsToPack += $sourceFiles.FullName
-    $pathsToPack += (Join-Path $scriptRoot "NVAPIWrapper/NVAPIWrapper.csproj")
+    $pathsToPack += (Join-Path $scriptRoot "VideoInfo/VideoInfo.csproj")
 }
 
 $pathsToPack = $pathsToPack | Select-Object -Unique

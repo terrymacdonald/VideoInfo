@@ -23,29 +23,30 @@ Write-Host ""
 # ============================================================================
 Write-Host "Determining version number..." -ForegroundColor Yellow
 
-$csprojPath   = Join-Path $scriptRoot "VideoInfo\VideoInfo.csproj"
-$assemblyVersion = $null
-$fileVersion     = $null
-
-if (Test-Path $csprojPath) {
-    $assemblyMatch = Select-String -Path $csprojPath -Pattern "<AssemblyVersion>([^<]+)" -SimpleMatch -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($assemblyMatch) {
-        $assemblyVersion = $assemblyMatch.Matches[0].Groups[1].Value.Trim()
-    }
-
-    $fileMatch = Select-String -Path $csprojPath -Pattern "<FileVersion>([^<]+)" -SimpleMatch -ErrorAction SilentlyContinue | Select-Object -First 1
-    if ($fileMatch) {
-        $fileVersion = $fileMatch.Matches[0].Groups[1].Value.Trim()
+# ---------------------------------------------------------------------------
+# Versioning (match build_nvidia.ps1: MAJOR/MINOR from VERSION, PATCH = git rev-list --count HEAD)
+# ---------------------------------------------------------------------------
+$versionFile = Join-Path $scriptRoot "VERSION"
+$major = 1
+$minor = 0
+if (Test-Path $versionFile) {
+    foreach ($line in Get-Content $versionFile) {
+        if ($line -match "^MAJOR=(\d+)") { $major = [int]$matches[1] }
+        elseif ($line -match "^MINOR=(\d+)") { $minor = [int]$matches[1] }
     }
 }
+$patch = 0
+try {
+    $gitPath = Get-Command git -ErrorAction SilentlyContinue
+    if ($gitPath) {
+        $commitCount = & git rev-list --count HEAD 2>$null
+        if ($LASTEXITCODE -eq 0 -and $commitCount -match "^\d+$") {
+            $patch = [int]$commitCount
+        }
+    }
+} catch {}
+$version = "$major.$minor.$patch"
 
-if (-not $assemblyVersion) { $assemblyVersion = "1.0.0" }
-if (-not $fileVersion)     { $fileVersion     = $assemblyVersion }
-$version = $assemblyVersion
-
-Write-Host "Version: $version" -ForegroundColor Green
-Write-Host "  AssemblyVersion: $assemblyVersion" -ForegroundColor Gray
-Write-Host "  FileVersion:     $fileVersion" -ForegroundColor Gray
 Write-Host ""
 
 # ============================================================================
@@ -147,7 +148,7 @@ Write-Host "====================================================================
 Write-Host ""
 
 $configuration = "Debug"
-$buildProps = @("/p:Version=$version", "/p:AssemblyVersion=$assemblyVersion", "/p:FileVersion=$fileVersion")
+$buildProps = @("/p:Version=$version", "/p:AssemblyVersion=$version", "/p:FileVersion=$version")
 
 try {
     Write-Host "dotnet clean $solutionPath --configuration $configuration $($buildProps -join ' ')" -ForegroundColor Gray

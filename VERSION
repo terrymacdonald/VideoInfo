@@ -1,0 +1,20 @@
+# VideoInfo Version Configuration
+#
+# This file defines the MAJOR and MINOR version components.
+# The PATCH/build number is automatically calculated from git commit count.
+#
+# Semantic Versioning: MAJOR.MINOR.PATCH
+#   - MAJOR: Increment for incompatible API changes (manually set here)
+#   - MINOR: Increment for new functionality in a backward-compatible manner (manually set here)
+#   - PATCH: Auto-generated from git commit count since last version change (automatically calculated)
+#
+# Example: With MAJOR=1, MINOR=2, and 150 commits since last change of this file? Version 1.2.150
+#
+# To update the version:
+#   1. Edit MAJOR or MINOR values below
+#   2. Commit the change
+#   3. Run build_videoinfo.ps1 (or build in Visual Studio) - it will automatically use the new version with current commit count
+#
+
+MAJOR=2
+MINOR=0
