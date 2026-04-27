@@ -1691,7 +1691,9 @@ namespace DisplayMagicianShared.NVIDIA
                             try
                             {
                                 SharedLogger.logger.Trace($"NVIDIALibrary/GetNVIDIADisplayConfig: Attempting to get the color data for Display {displayNum} on Adapter {adapterNum}.");
-                                var colorDataInput = new NVAPIDisplayColorDataDto();
+                                var colorDataNative = NVAPIDisplayHelper.CreateColorData();
+                                colorDataNative.cmd = (byte)NV_COLOR_CMD.NV_COLOR_CMD_GET;
+                                var colorDataInput = NVAPIDisplayColorDataDto.FromNative(colorDataNative);
                                 var colorDataResult = display.ColorControl(colorDataInput);
                                 if (colorDataResult.HasValue)
                                 {
