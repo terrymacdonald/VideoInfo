@@ -1,7 +1,6 @@
-# Create a release zip for NVAPIWrapper
+# Create a release zip for VideoInfo
 param(
-    [string]$Configuration = "Release",
-    [switch]$IncludeSources
+    [string]$Configuration = "Release"
 )
 
 $scriptRoot = $PSScriptRoot
@@ -11,9 +10,13 @@ if (-not $scriptRoot) {
 
 Set-Location $scriptRoot
 
+Write-Host "============================================================================" -ForegroundColor Cyan
+Write-Host "VideoInfo Release Zip Script" -ForegroundColor Cyan
+Write-Host "============================================================================" -ForegroundColor Cyan
+Write-Host ""
 
 # ---------------------------------------------------------------------------
-# Versioning (match build_nvidia.ps1: MAJOR/MINOR from VERSION, PATCH = git rev-list --count HEAD)
+# Versioning: MAJOR/MINOR from VERSION file, PATCH = git commit count
 # ---------------------------------------------------------------------------
 $versionFile = Join-Path $scriptRoot "VERSION"
 $major = 1
@@ -35,46 +38,79 @@ try {
     }
 } catch {}
 $version = "$major.$minor.$patch"
+Write-Host "Version: $version" -ForegroundColor Green
+Write-Host ""
 
-$projectPath = Join-Path $scriptRoot "VideoInfo/VideoInfo.csproj"
+# ---------------------------------------------------------------------------
+# Build
+# ---------------------------------------------------------------------------
+$projectPath = Join-Path $scriptRoot "VideoInfo\VideoInfo.csproj"
 Write-Host "Building VideoInfo ($Configuration) version $version..." -ForegroundColor Cyan
 dotnet build $projectPath -c $Configuration /p:Version=$version /p:AssemblyVersion=$version /p:FileVersion=$version
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Build failed; aborting packaging." -ForegroundColor Red
     exit $LASTEXITCODE
 }
+Write-Host ""
 
-$buildOutput = Join-Path $scriptRoot "VideoInfo/bin/$Configuration/net10.0"
-$assemblyPath = Join-Path $buildOutput "VideoInfo.dll"
-if (-not (Test-Path $assemblyPath)) {
-    Write-Host "Build output not found at $assemblyPath" -ForegroundColor Red
+# ---------------------------------------------------------------------------
+# Locate build output
+# ---------------------------------------------------------------------------
+$tfm = "net10.0-windows10.0.26100.0"
+$buildOutput = Join-Path $scriptRoot "VideoInfo\bin\$Configuration\$tfm"
+$exePath = Join-Path $buildOutput "VideoInfo.exe"
+if (-not (Test-Path $exePath)) {
+    Write-Host "ERROR: Build output not found at $exePath" -ForegroundColor Red
     exit 1
 }
 
-$artifactsDir = Join-Path $scriptRoot "release-zip"
-New-Item -ItemType Directory -Force -Path $artifactsDir | Out-Null
-$zipPath = Join-Path $artifactsDir "NVAPIWrapper-$version-$Configuration.zip"
-if (Test-Path $zipPath) { Remove-Item $zipPath }
+# ---------------------------------------------------------------------------
+# Stage files into a temp folder
+# ---------------------------------------------------------------------------
+$tempDir = Join-Path $scriptRoot "release-zip-staging"
+if (Test-Path $tempDir) { Remove-Item $tempDir -Recurse -Force }
+New-Item -ItemType Directory -Force -Path $tempDir | Out-Null
 
-$pathsToPack = @()
-$pathsToPack += $assemblyPath
-$pathsToPack += Join-Path $buildOutput "VideoInfo.pdb"
-$pathsToPack += Join-Path $buildOutput "VideoInfo.deps.json"
-$pathsToPack += Join-Path $buildOutput "VideoInfo.xml"
-$pathsToPack += Join-Path $scriptRoot "LICENSE"
-$pathsToPack += Join-Path $scriptRoot "README.md"
-$pathsToPack += Join-Path $scriptRoot "VideoInfo/README.md"
-$pathsToPack = $pathsToPack | Where-Object { Test-Path $_ }
+Write-Host "Staging release files..." -ForegroundColor Cyan
 
-if ($IncludeSources) {
-    $pathsToPack += (Join-Path $scriptRoot "VideoInfo/cs_generated")
-    $sourceFiles = Get-ChildItem -Path (Join-Path $scriptRoot "VideoInfo") -Filter *.cs -File
-    $pathsToPack += $sourceFiles.FullName
-    $pathsToPack += (Join-Path $scriptRoot "VideoInfo/VideoInfo.csproj")
+# Copy all runtime files from the build output, excluding logs, cfg files and pdbs
+Get-ChildItem -Path $buildOutput -File | Where-Object {
+    $_.Extension -notin @('.log', '.pdb') -and
+    $_.Name -notlike '*.cfg'
+} | ForEach-Object {
+    Copy-Item $_.FullName -Destination $tempDir
 }
 
-$pathsToPack = $pathsToPack | Select-Object -Unique
+# Copy the DLL subfolder (native DLLs required at runtime)
+$dllSubDir = Join-Path $buildOutput "DLL"
+if (Test-Path $dllSubDir) {
+    $destDllDir = Join-Path $tempDir "DLL"
+    Copy-Item $dllSubDir -Destination $destDllDir -Recurse
+}
+
+# Copy root-level docs
+foreach ($docFile in @("LICENSE.txt", "README.md")) {
+    $src = Join-Path $scriptRoot $docFile
+    if (Test-Path $src) {
+        Copy-Item $src -Destination $tempDir
+    }
+}
+
+# ---------------------------------------------------------------------------
+# Create the zip
+# ---------------------------------------------------------------------------
+$artifactsDir = Join-Path $scriptRoot "release-zip"
+New-Item -ItemType Directory -Force -Path $artifactsDir | Out-Null
+$zipPath = Join-Path $artifactsDir "VideoInfo-$version-$Configuration.zip"
+if (Test-Path $zipPath) { Remove-Item $zipPath }
 
 Write-Host "Creating $zipPath..." -ForegroundColor Cyan
-Compress-Archive -Path $pathsToPack -DestinationPath $zipPath -Force
-Write-Host "Release zip created at $zipPath" -ForegroundColor Green
+Compress-Archive -Path "$tempDir\*" -DestinationPath $zipPath -Force
+
+# ---------------------------------------------------------------------------
+# Clean up temp folder
+# ---------------------------------------------------------------------------
+Remove-Item $tempDir -Recurse -Force
+
+Write-Host ""
+Write-Host "Release zip created: $zipPath" -ForegroundColor Green
