@@ -42,20 +42,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Update="DLL\ADLXWrapper.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <!-- ADLXWrapper.dll and IGCLWrapper.dll are already copied to root by the <Reference> items above -->
+    <!-- NVAPIWrapper.dll is already copied to root by the <Reference> item above -->
+    <!-- Native DLLs: copy to output root so LoadLibrary() can find them -->
     <None Update="DLL\AMDExportsDll.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="DLL\IGCLWrapper.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>AMDExportsDll.dll</TargetPath>
     </None>
     <None Update="DLL\NVIDIAExportsDll.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>NVIDIAExportsDll.dll</TargetPath>
     </None>
     <None Update="DLL\NVIDIAWrapper.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>NVIDIAWrapper.dll</TargetPath>
     </None>
   </ItemGroup>
 </Project>
