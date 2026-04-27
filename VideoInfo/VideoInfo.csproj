@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>VideoInfo</AssemblyTitle>
     <Product>VideoInfo</Product>
     <Copyright>Copyright © Terry MacDonald 2025</Copyright>

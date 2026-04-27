@@ -113,12 +113,15 @@ namespace VideoInfo
             NLog.LogManager.Configuration = config;
 
             // Start the Log file
-            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v2.0.0");
+            var rawVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            string appVersion = rawVersion != null ? $"{rawVersion.Major}.{rawVersion.Minor}.{rawVersion.Build}" : "unknown";
+            SharedLogger.logger.Info($"VideoInfo/Main: Starting VideoInfo v{appVersion}");
             // Log the commandline options
             SharedLogger.logger.Info($"VideoInfo/Main: cmdline options: {string.Join(" ", args)}");
 
-            Console.WriteLine($"\nVideoInfo v2.0.0");
-            Console.WriteLine($"=================");
+            string appTitle = $"VideoInfo v{appVersion}";
+            Console.WriteLine($"\n{appTitle}");
+            Console.WriteLine(new string('=', appTitle.Length));
             Console.WriteLine($"(c) Terry MacDonald 2024-2025\n");
 
             // Update the configuration
