@@ -70,7 +70,7 @@ namespace DisplayMagicianShared.Intel
         public DisplayPropertiesDto DisplayProperties;
         //public ctl_device_adapter_properties_t DeviceProperties;
         public string DeviceID;
-        public ctl_display_timing_t DisplayTiming;
+        public DisplayTimingDto DisplayTiming;
         public bool IsSupportedWireFormat;
         public WireFormatConfigDto WireFormat;
         public ctl_get_brightness_t Brightness;
@@ -135,7 +135,7 @@ namespace DisplayMagicianShared.Intel
             DisplayProperties = new DisplayPropertiesDto();
             //DeviceProperties = new ctl_device_adapter_properties_t();
             DeviceID = "";
-            DisplayTiming = new ctl_display_timing_t();
+            DisplayTiming = new DisplayTimingDto();
             IsSupportedWireFormat = false;
             WireFormat = new WireFormatConfigDto();
             Brightness = new ctl_get_brightness_t();
@@ -385,7 +385,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DeviceID values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<ctl_display_timing_t>.Default.Equals(DisplayTiming, other.DisplayTiming))
+            if (!EqualityComparer<DisplayTimingDto>.Default.Equals(DisplayTiming, other.DisplayTiming))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayTiming values don't equal each other");
                 return false;
@@ -538,7 +538,7 @@ namespace DisplayMagicianShared.Intel
             IsCombinedDisplay = false;
             //CombinedDisplay = new INTEL_COMBINED_DISPLAY();
             CombinedDisplay = new CombinedDisplayArgsDto();
-            CombinedDisplay.ChildInfos = Array.Empty<CombinedDisplayChildInfoDto>();
+            CombinedDisplay.ChildInfos = new List<CombinedDisplayChildInfoDto>();
             CombinedDisplay.IsSupported = false;
         }
         public override bool Equals(object obj) => obj is INTEL_ADAPTER other && Equals(other);
@@ -1031,7 +1031,7 @@ namespace DisplayMagicianShared.Intel
                             continue;
                         }
 
-                        string logDisplayId = $"{display.Name}|{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                        string logDisplayId = $"{display.Name}|{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId}";
 
                         // Skip inactive displays (inactive displays are not part of the current desktop so are not in use now)
                         if (((uint)displayProperties.DisplayConfigFlags & (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE) != (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE)
@@ -1091,13 +1091,13 @@ namespace DisplayMagicianShared.Intel
                             {
                                 SharedLogger.logger.Error($"IntelLibrary/GetAllConnectedDisplayIdentifiers: ERROR - Failed to get EDID for display Index {displayCount} on Adapter {adapterNum}: {ex.Message}");
                             }
-                            newDisplay.Name = $"Display_{manufacturerCode}_{productCode}_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                            newDisplay.Name = $"Display_{manufacturerCode}_{productCode}_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId}";
                         }
                         catch (Exception ex)
                         {
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {logDisplayId} on adapter {adapterNum}.");
                             // Backup Display name if EDID lookup fails
-                            newDisplay.Name = $"Display_{logDisplayId}_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                            newDisplay.Name = $"Display_{logDisplayId}_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId}";
                         }
 
 
@@ -1106,7 +1106,7 @@ namespace DisplayMagicianShared.Intel
                         //------------------------------------
                         try
                         {
-                            newDisplay.DisplayTiming = display.GetTiming();
+                            newDisplay.DisplayTiming = DisplayTimingDto.FromNative(display.GetTiming());
                             (newDisplay.ResolutionWidth, newDisplay.ResolutionHeight) = display.GetResolution();
                             newDisplay.RefreshRateHz = display.GetRefreshRateHz();
                             newDisplay.IsActive = display.IsActive();
@@ -1374,7 +1374,7 @@ namespace DisplayMagicianShared.Intel
                         // 3. Create a unique Hardware PCI ID + Target ID
                         // Format: VEN_8086&DEV_XXXX&REV_XX-PORT_X
                         
-                        newDisplay.DisplayDeviceID = $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                        newDisplay.DisplayDeviceID = $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId}";
 
                         // Add display to configuration
                         myDisplayConfig.Displays.Add(newDisplay.DisplayDeviceID, newDisplay);
@@ -1597,7 +1597,7 @@ namespace DisplayMagicianShared.Intel
                         CombinedDisplayArgsDto combinedDisplayArgs = desiredAdapter.CombinedDisplay;
                         combinedDisplayArgs.OpType = ctl_combined_display_optype_t.CTL_COMBINED_DISPLAY_OPTYPE_ENABLE;
 
-                        if (combinedDisplayArgs.ChildInfos == null || combinedDisplayArgs.ChildInfos.Length == 0)
+                        if (combinedDisplayArgs.ChildInfos == null || combinedDisplayArgs.ChildInfos.Count == 0)
                         {
                             SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: The desired combined display on adapter {adapterNum} is missing ChildInfos.");
                             return false;
@@ -1733,7 +1733,7 @@ namespace DisplayMagicianShared.Intel
                             continue;
                         }
 
-                        string logDisplayId = $"{display.Name}|{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                        string logDisplayId = $"{display.Name}|{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId}";
 
                         if (((uint)displayProperties.DisplayConfigFlags & (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE) != (uint)ctl_display_config_flag_t.CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE)
                         {
@@ -1741,7 +1741,7 @@ namespace DisplayMagicianShared.Intel
                             continue;
                         }
                     
-                        string displayDeviceId = $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID}";
+                        string displayDeviceId = $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId}";
 
                         if (!displayConfig.Displays.TryGetValue(displayDeviceId, out INTEL_DISPLAY_WITH_SETTINGS storedSettings))
                         {
@@ -2393,7 +2393,7 @@ namespace DisplayMagicianShared.Intel
                             displayProperties.ProtocolConverterType.ToString(),
                             manufacturerCode,
                             productCode,
-                            displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID.ToString("G")                          
+                            displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId.ToString("G")                          
                         };
                         
                         string displayIdentifier = String.Join("#", displayInfo);
@@ -2482,7 +2482,7 @@ namespace DisplayMagicianShared.Intel
                             displayProperties.ProtocolConverterType.ToString(),
                             manufacturerCode,
                             productCode,
-                            displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderID.ToString("G")                          
+                            displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId.ToString("G")                          
                         };
                         
                         string displayIdentifier = String.Join("#", displayInfo);
