@@ -41,6 +41,32 @@
             </summary>
             <returns>Initialized 3D feature get/set struct.</returns>
         </member>
+        <member name="M:IGCLWrapper.IGCL3DHelper.Create3DFeatureGetRequest(IGCLWrapper.ctl_3d_feature_t,IGCLWrapper.ctl_property_value_type_t)">
+            <summary>
+            Create a DTO request for a 3D get operation.
+            </summary>
+            <param name="featureType">Feature to query.</param>
+            <param name="valueType">Expected value type.</param>
+            <returns>Initialized get request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCL3DHelper.Create3DFeatureSetRequest(IGCLWrapper.ctl_3d_feature_t,IGCLWrapper.ctl_property_value_type_t,IGCLWrapper.PropertyDto,System.String,System.Collections.Generic.List{System.Byte})">
+            <summary>
+            Create a DTO request for a 3D set operation.
+            </summary>
+            <param name="featureType">Feature to set.</param>
+            <param name="valueType">Value type for the feature.</param>
+            <param name="value">Feature value payload.</param>
+            <param name="applicationName">Optional application name.</param>
+            <param name="customValue">Optional custom payload bytes.</param>
+            <returns>Initialized set request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCL3DHelper.ValidateSet3DFeatureRequest(IGCLWrapper.ThreeDFeatureGetSetDto)">
+            <summary>
+            Validate a 3D set request to catch accidental default DTO usage.
+            </summary>
+            <param name="request">Request DTO.</param>
+            <exception cref="T:System.ArgumentException">Thrown when request appears to be an accidental default payload.</exception>
+        </member>
         <member name="M:IGCLWrapper.IGCL3DHelper.Are3dFeatureCapsEqual(IGCLWrapper.ctl_3d_feature_caps_t,IGCLWrapper.ctl_3d_feature_caps_t)">
             <summary>
             Compare 3D feature capabilities while ignoring native-only fields.
@@ -915,6 +941,21 @@
             Supported functions bitmask.
             </summary>
         </member>
+        <member name="P:IGCLWrapper.DeviceAdapterPropertiesDto.SupportsDisplay">
+            <summary>
+            True when display APIs are supported.
+            </summary>
+        </member>
+        <member name="P:IGCLWrapper.DeviceAdapterPropertiesDto.Supports3D">
+            <summary>
+            True when 3D APIs are supported.
+            </summary>
+        </member>
+        <member name="P:IGCLWrapper.DeviceAdapterPropertiesDto.SupportsMedia">
+            <summary>
+            True when media APIs are supported.
+            </summary>
+        </member>
         <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.DriverVersion">
             <summary>
             Driver version value.
@@ -963,6 +1004,21 @@
         <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.GraphicsAdapterProperties">
             <summary>
             Graphics adapter properties flags.
+            </summary>
+        </member>
+        <member name="P:IGCLWrapper.DeviceAdapterPropertiesDto.IsIntegratedGraphicsAdapter">
+            <summary>
+            True when the adapter is integrated.
+            </summary>
+        </member>
+        <member name="P:IGCLWrapper.DeviceAdapterPropertiesDto.IsLdaPrimary">
+            <summary>
+            True when this is the primary LDA adapter.
+            </summary>
+        </member>
+        <member name="P:IGCLWrapper.DeviceAdapterPropertiesDto.IsLdaSecondary">
+            <summary>
+            True when this is the secondary LDA adapter.
             </summary>
         </member>
         <member name="F:IGCLWrapper.DeviceAdapterPropertiesDto.Frequency">
@@ -2054,6 +2110,47 @@
             Set display settings using a DTO.
             </summary>
             <param name="settings">Display settings DTO.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.CreateDisplaySettingsGetRequest">
+            <summary>
+            Create a DTO request for display-settings get operations.
+            </summary>
+            <returns>Initialized get request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.CreateDisplaySettingsSetRequest(System.UInt32)">
+            <summary>
+            Create a DTO request for display-settings set operations.
+            </summary>
+            <param name="validFlags">Flags indicating which settings are being changed.</param>
+            <returns>Initialized set request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.CreatePowerOptimizationSettingsGetRequest(System.UInt32)">
+            <summary>
+            Create a DTO request for power-optimization get operations.
+            </summary>
+            <param name="featureFlags">Feature flags to query.</param>
+            <returns>Initialized get request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.CreatePowerOptimizationSettingsSetRequest(System.UInt32)">
+            <summary>
+            Create a DTO request for power-optimization set operations.
+            </summary>
+            <param name="featureFlags">Feature flags to set.</param>
+            <returns>Initialized set request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.ValidateSetDisplaySettingsRequest(IGCLWrapper.DisplaySettingsDto)">
+            <summary>
+            Validate a display-settings set request.
+            </summary>
+            <param name="settings">Settings DTO.</param>
+            <exception cref="T:System.ArgumentException">Thrown when no valid setting flags are provided.</exception>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.ValidateSetPowerOptimizationSettingsRequest(IGCLWrapper.PowerOptimizationSettingsDto)">
+            <summary>
+            Validate a power-optimization set request.
+            </summary>
+            <param name="settings">Settings DTO.</param>
+            <exception cref="T:System.ArgumentException">Thrown when no optimization feature flags are provided.</exception>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.Dispose">
             <summary>
@@ -4328,6 +4425,32 @@
             Create a video processing feature get/set struct with Size and Version initialized.
             </summary>
             <returns>Initialized video processing feature get/set struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLMediaHelper.CreateVideoProcessingFeatureGetRequest(IGCLWrapper.ctl_video_processing_feature_t,IGCLWrapper.ctl_property_value_type_t)">
+            <summary>
+            Create a DTO request for a video-processing get operation.
+            </summary>
+            <param name="featureType">Feature to query.</param>
+            <param name="valueType">Expected value type.</param>
+            <returns>Initialized get request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLMediaHelper.CreateVideoProcessingFeatureSetRequest(IGCLWrapper.ctl_video_processing_feature_t,IGCLWrapper.ctl_property_value_type_t,IGCLWrapper.PropertyDto,System.String,System.Collections.Generic.List{System.Byte})">
+            <summary>
+            Create a DTO request for a video-processing set operation.
+            </summary>
+            <param name="featureType">Feature to set.</param>
+            <param name="valueType">Value type for the feature.</param>
+            <param name="value">Feature value payload.</param>
+            <param name="applicationName">Optional application name.</param>
+            <param name="customValue">Optional custom payload bytes.</param>
+            <returns>Initialized set request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLMediaHelper.ValidateSetVideoProcessingFeatureRequest(IGCLWrapper.VideoProcessingFeatureGetSetDto)">
+            <summary>
+            Validate a video-processing set request to catch accidental default DTO usage.
+            </summary>
+            <param name="request">Request DTO.</param>
+            <exception cref="T:System.ArgumentException">Thrown when request appears to be an accidental default payload.</exception>
         </member>
         <member name="M:IGCLWrapper.IGCLMediaHelper.AreVideoProcessingFeatureCapsEqual(IGCLWrapper.ctl_video_processing_feature_caps_t,IGCLWrapper.ctl_video_processing_feature_caps_t)">
             <summary>
