@@ -1127,9 +1127,12 @@ namespace DisplayMagicianShared.Intel
                         try
                         {
                             newDisplay.PowerOptimizationCaps = display.GetPowerOptimizationCaps();
-                            newDisplay.PowerOptimizationSettings = display.GetPowerOptimizationSetting(newDisplay.PowerOptimizationSettings);
                             newDisplay.IsSupportedPowerOptimization = newDisplay.PowerOptimizationCaps.SupportedFeatures != 0;
-                            newDisplay.IsEnabledPowerOptimization = newDisplay.PowerOptimizationSettings.Enable;
+                            if (newDisplay.IsSupportedPowerOptimization)
+                            {
+                                newDisplay.PowerOptimizationSettings = display.GetPowerOptimizationSetting(newDisplay.PowerOptimizationSettings);
+                                newDisplay.IsEnabledPowerOptimization = newDisplay.PowerOptimizationSettings.Enable;
+                            }
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got power optimization settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                         }
                         catch (Exception ex)
@@ -1187,7 +1190,10 @@ namespace DisplayMagicianShared.Intel
                             {
                                 newDisplay.IntelArcSyncMonitorParams = display.GetIntelArcSyncInfoForMonitor();
                                 newDisplay.IsSupportedIntelArcSync = newDisplay.IntelArcSyncMonitorParams.IsIntelArcSyncSupported;
-                                newDisplay.IntelArcSyncProfile = display.GetIntelArcSyncProfile();
+                                if (newDisplay.IsSupportedIntelArcSync)
+                                {
+                                    newDisplay.IntelArcSyncProfile = display.GetIntelArcSyncProfile();
+                                }
                                 SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got Intel Arc Sync settings for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
                             }
                             catch (Exception ex)
