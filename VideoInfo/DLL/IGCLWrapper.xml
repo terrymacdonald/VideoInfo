@@ -13,14 +13,7 @@
             <summary>
             Get supported 3D feature capabilities for the adapter.
             </summary>
-            <returns>3D feature capabilities struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCL3DHelper.GetSet3DFeatureNative(IGCLWrapper.ctl_3d_feature_getset_t)">
-            <summary>
-            Call the native get/set 3D feature API using the provided struct.
-            </summary>
-            <param name="feature">3D feature get/set struct.</param>
-            <returns>Updated 3D feature get/set struct.</returns>
+            <returns>3D feature capabilities DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCL3DHelper.Get3DFeature(IGCLWrapper.ThreeDFeatureGetSetDto)">
             <summary>
@@ -260,6 +253,26 @@
             Convert this DTO to a native struct (pointers are null; pin at call site).
             </summary>
             <returns>3D feature get/set struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.ThreeDFeatureCapsDto">
+            <summary>
+            DTO for 3D feature capabilities.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.ThreeDFeatureCapsDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.ThreeDFeatureCapsDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.ThreeDFeatureCapsDto.NumSupportedFeatures">
+            <summary>
+            Number of supported features.
+            </summary>
         </member>
         <member name="T:IGCLWrapper.IGCLException">
             <summary>
@@ -529,6 +542,25 @@
             </summary>
             <param name="args">Runtime path arguments.</param>
         </member>
+        <member name="M:IGCLWrapper.IGCLApiHelper.CreateRuntimePathRequest(System.String)">
+            <summary>
+            Create a DTO request for setting the IGCL runtime path.
+            </summary>
+            <param name="runtimePath">Runtime path to use.</param>
+            <returns>Initialized runtime path DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLApiHelper.ValidateSetRuntimePathRequest(IGCLWrapper.RuntimePathArgsDto)">
+            <summary>
+            Validate a runtime path DTO request before invoking the native API.
+            </summary>
+            <param name="args">Runtime path DTO.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLApiHelper.SetRuntimePath(IGCLWrapper.RuntimePathArgsDto)">
+            <summary>
+            Set the IGCL runtime path using a DTO request.
+            </summary>
+            <param name="args">Runtime path DTO.</param>
+        </member>
         <member name="M:IGCLWrapper.IGCLApiHelper.AreRuntimePathArgsEqual(IGCLWrapper.ctl_runtime_path_args_t,IGCLWrapper.ctl_runtime_path_args_t)">
             <summary>
             Compare runtime path arguments while ignoring native-only fields.
@@ -638,29 +670,17 @@
             </summary>
             <returns>Adapter properties DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateDevicesNative">
-            <summary>
-            Enumerate device adapter handles available to this API instance.
-            </summary>
-            <returns>Array of adapter handles.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateDisplayOutputsNative">
             <summary>
             Enumerate display output handles for this adapter.
             </summary>
             <returns>Array of display output handles.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateI2CPinPairsNative">
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.EnumerateI2CPinPairs">
             <summary>
             Enumerate I2C pin pair handles for this adapter.
             </summary>
             <returns>Array of I2C pin pair handles.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetDevicePropertiesNative">
-            <summary>
-            Get device adapter properties for this adapter.
-            </summary>
-            <returns>Adapter properties struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.GetDeviceProperties">
             <summary>
@@ -728,7 +748,7 @@
             <param name="failureAdapter">Adapter handle that failed, if any.</param>
             <returns>Updated genlock args DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.SetDisplayGenlockNative(System.IntPtr[],IGCLWrapper.ctl_genlock_operation_t,IGCLWrapper.GenlockArgsDto,System.IntPtr@)">
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.SetDisplayGenlock(System.IntPtr[],IGCLWrapper.ctl_genlock_operation_t,IGCLWrapper.GenlockArgsDto,System.IntPtr@)">
             <summary>
             Set display genlock settings using a DTO.
             </summary>
@@ -743,6 +763,13 @@
             </summary>
             <param name="args">Linked display adapters args.</param>
         </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.LinkDisplayAdapters(IGCLWrapper.LinkedDisplayAdaptersArgsDto,System.Collections.Generic.IReadOnlyList{System.IntPtr})">
+            <summary>
+            Link display adapters using a DTO request and managed adapter handle list.
+            </summary>
+            <param name="args">Linked display adapters args DTO.</param>
+            <param name="linkedAdapters">Linked adapter handles to submit.</param>
+        </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.UnlinkDisplayAdapters">
             <summary>
             Unlink previously linked display adapters.
@@ -754,12 +781,26 @@
             </summary>
             <returns>Tuple containing args and adapter handles.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLAdapterHelper.WaitForPropertyChange(IGCLWrapper.ctl_wait_property_change_args_t)">
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.GetLinkedDisplayAdaptersDto">
+            <summary>
+            Get linked display adapter information as a DTO.
+            </summary>
+            <returns>Linked display adapters result DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.CreateWaitPropertyChangeRequest(System.UInt32,System.UInt32)">
+            <summary>
+            Create a DTO request for waiting on a property change.
+            </summary>
+            <param name="propertyType">Property type flags to wait on.</param>
+            <param name="timeOutMilliSec">Timeout in milliseconds.</param>
+            <returns>Initialized wait request DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLAdapterHelper.WaitForPropertyChange(IGCLWrapper.WaitPropertyChangeArgsDto)">
             <summary>
             Wait for a property change event.
             </summary>
-            <param name="args">Wait arguments.</param>
-            <returns>Updated wait arguments.</returns>
+            <param name="args">Wait request DTO.</param>
+            <returns>Updated wait request DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLAdapterHelper.ThrowIfDisposed">
             <summary>
@@ -1298,6 +1339,31 @@
             </summary>
             <returns>Genlock args struct.</returns>
         </member>
+        <member name="T:IGCLWrapper.LinkedDisplayAdaptersArgsDto">
+            <summary>
+            DTO for linked display adapters arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.LinkedDisplayAdaptersResultDto">
+            <summary>
+            DTO for linked display adapters query result.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.ApplicationIdDto">
+            <summary>
+            DTO for application identifier data.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.RuntimePathArgsDto">
+            <summary>
+            DTO for runtime path arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.WaitPropertyChangeArgsDto">
+            <summary>
+            DTO for wait property change arguments.
+            </summary>
+        </member>
         <member name="T:IGCLWrapper.IGCLDisplayHelper">
             <summary>
             Display helper facade for IGCL display handles.
@@ -1681,11 +1747,17 @@
             </summary>
             <returns>Display properties DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetTiming">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetTimingNative">
             <summary>
-            Get display timing information.
+            Get display timing information using the native struct.
             </summary>
             <returns>Display timing struct.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetTiming">
+            <summary>
+            Get display timing information as a DTO.
+            </summary>
+            <returns>Display timing DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.IsActive">
             <summary>
@@ -1717,12 +1789,6 @@
             <param name="versionInfo">Version info value.</param>
             <returns>IGCL result code.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetAdapterDisplayEncoderPropertiesNative">
-            <summary>
-            Get adapter display encoder properties using the native struct.
-            </summary>
-            <returns>Adapter display encoder properties struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetAdapterDisplayEncoderProperties">
             <summary>
             Get adapter display encoder properties as a DTO.
@@ -1731,15 +1797,9 @@
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSharpnessCaps">
             <summary>
-            Get sharpness capabilities and filter properties.
+            Get sharpness capabilities and filter properties as a DTO.
             </summary>
-            <returns>Tuple containing caps and filter properties array.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCurrentSharpnessNative">
-            <summary>
-            Get current sharpness settings using the native struct.
-            </summary>
-            <returns>Sharpness settings struct.</returns>
+            <returns>Sharpness capabilities DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCurrentSharpness">
             <summary>
@@ -1747,49 +1807,39 @@
             </summary>
             <returns>Sharpness settings DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetCurrentSharpnessNative(IGCLWrapper.ctl_sharpness_settings_t)">
-            <summary>
-            Set sharpness settings using the native struct.
-            </summary>
-            <param name="settings">Sharpness settings struct.</param>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SetCurrentSharpness(IGCLWrapper.SharpnessSettingsDto)">
             <summary>
             Set sharpness settings using a DTO.
             </summary>
             <param name="settings">Sharpness settings DTO.</param>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.I2CAccess(IGCLWrapper.ctl_i2c_access_args_t@)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.I2CAccess(IGCLWrapper.I2CAccessArgsDto)">
             <summary>
-            Perform I2C access using the provided arguments.
+            Perform I2C access using a DTO.
             </summary>
-            <param name="args">I2C access arguments.</param>
+            <param name="args">I2C access arguments DTO.</param>
+            <returns>Updated I2C access arguments DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.I2CAccessOnPinPair(System.IntPtr,IGCLWrapper.ctl_i2c_access_pinpair_args_t@)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.I2CAccessOnPinPair(System.IntPtr,IGCLWrapper.I2CAccessPinPairArgsDto)">
             <summary>
-            Perform I2C access on a specific pin pair.
+            Perform I2C access on a specific pin pair using a DTO.
             </summary>
             <param name="pinPair">I2C pin pair handle.</param>
-            <param name="args">I2C access arguments.</param>
+            <param name="args">I2C access arguments DTO.</param>
+            <returns>Updated I2C access pin pair arguments DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.AUXAccess(IGCLWrapper.ctl_aux_access_args_t@)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.AUXAccess(IGCLWrapper.AuxAccessArgsDto)">
             <summary>
-            Perform AUX channel access using the provided arguments.
+            Perform AUX channel access using a DTO.
             </summary>
-            <param name="args">AUX access arguments.</param>
+            <param name="args">AUX access arguments DTO.</param>
+            <returns>Updated AUX access arguments DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPowerOptimizationCaps">
             <summary>
-            Get power optimization capability information.
+            Get power optimization capabilities as a DTO.
             </summary>
-            <returns>Power optimization capabilities struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPowerOptimizationSettingNative(IGCLWrapper.ctl_power_optimization_settings_t)">
-            <summary>
-            Get power optimization settings using the native struct.
-            </summary>
-            <param name="settings">Settings request struct.</param>
-            <returns>Updated settings struct.</returns>
+            <returns>Power optimization capabilities DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPowerOptimizationSetting(IGCLWrapper.PowerOptimizationSettingsDto)">
             <summary>
@@ -1798,57 +1848,71 @@
             <param name="settings">Settings request DTO.</param>
             <returns>Updated settings DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetPowerOptimizationSettingNative(IGCLWrapper.ctl_power_optimization_settings_t)">
-            <summary>
-            Set power optimization settings using the native struct.
-            </summary>
-            <param name="settings">Settings struct.</param>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SetPowerOptimizationSetting(IGCLWrapper.PowerOptimizationSettingsDto)">
             <summary>
             Set power optimization settings using a DTO.
             </summary>
             <param name="settings">Settings DTO.</param>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetBrightnessSetting(IGCLWrapper.ctl_set_brightness_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetBrightnessSetting(IGCLWrapper.BrightnessSetDto)">
             <summary>
-            Set display brightness.
+            Set display brightness using a DTO.
             </summary>
-            <param name="brightness">Brightness settings struct.</param>
+            <param name="brightness">Brightness settings DTO.</param>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetBrightnessSetting">
             <summary>
-            Get display brightness.
+            Get display brightness as a DTO.
             </summary>
-            <returns>Brightness settings struct.</returns>
+            <returns>Brightness settings DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationGetConfig(IGCLWrapper.ctl_pixtx_pipe_get_config_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationGetConfigNative(IGCLWrapper.ctl_pixtx_pipe_get_config_t)">
             <summary>
-            Get pixel transformation configuration.
+            Get pixel transformation configuration using native structs.
             </summary>
             <param name="args">Pipe get config arguments.</param>
             <returns>Tuple containing config and block array.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationGetConfig(IGCLWrapper.ctl_pixtx_pipe_get_config_t,IGCLWrapper.ctl_pixtx_block_config_t[])">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationGetConfigNative(IGCLWrapper.ctl_pixtx_pipe_get_config_t,IGCLWrapper.ctl_pixtx_block_config_t[])">
             <summary>
-            Get pixel transformation configuration using the provided blocks.
+            Get pixel transformation configuration using the provided blocks (native structs).
             </summary>
             <param name="args">Pipe get config arguments.</param>
             <param name="blocks">Block configs to query.</param>
             <returns>Tuple containing config and block array.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationSetConfig(IGCLWrapper.ctl_pixtx_pipe_set_config_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationGetConfig(IGCLWrapper.PixtxPipeGetConfigDto)">
             <summary>
-            Set pixel transformation configuration.
+            Get pixel transformation configuration as DTOs (metadata only; LUT sample values require native methods).
             </summary>
-            <param name="args">Pipe set config arguments.</param>
+            <param name="args">Pipe get config DTO.</param>
+            <returns>Pixel transformation get result DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.PanelDescriptorAccess(IGCLWrapper.ctl_panel_descriptor_access_args_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationSetConfig(IGCLWrapper.PixtxPipeSetConfigDto)">
             <summary>
-            Access the panel descriptor using the provided arguments.
+            Set pixel transformation configuration using a DTO (metadata only; LUT sample values require native methods).
+            </summary>
+            <param name="args">Pipe set config DTO.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationSetConfigNative(IGCLWrapper.ctl_pixtx_pipe_set_config_t)">
+            <summary>
+            Set pixel transformation configuration using a native struct (for advanced use cases with raw pointer fields).
+            </summary>
+            <param name="args">Pipe set config native struct.</param>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.PanelDescriptorAccessNative(IGCLWrapper.ctl_panel_descriptor_access_args_t)">
+            <summary>
+            Access the panel descriptor using native arguments.
             </summary>
             <param name="args">Panel descriptor access arguments.</param>
             <returns>Updated panel descriptor access arguments.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.PanelDescriptorAccess(IGCLWrapper.PanelDescriptorAccessArgsDto)">
+            <summary>
+            Access the panel descriptor using a DTO.
+            </summary>
+            <param name="args">Panel descriptor access arguments DTO.</param>
+            <returns>Updated panel descriptor access arguments DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetPanelEdidData">
             <summary>
@@ -1858,9 +1922,9 @@
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSupportedRetroScalingCapability">
             <summary>
-            Get supported retro scaling capabilities.
+            Get supported retro scaling capabilities as a DTO.
             </summary>
-            <returns>Retro scaling capability struct.</returns>
+            <returns>Retro scaling capabilities DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSetRetroScalingNative(IGCLWrapper.ctl_retro_scaling_settings_t)">
             <summary>
@@ -1875,6 +1939,11 @@
             </summary>
             <returns>Retro scaling settings DTO.</returns>
         </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSupportedRetroScalingCapabilityDto">
+            <summary>
+            Get supported retro scaling capabilities (DTO-first convenience alias).
+            </summary>
+        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SetRetroScalingSettings(IGCLWrapper.RetroScalingSettingsDto)">
             <summary>
             Set retro scaling settings using a DTO.
@@ -1883,15 +1952,9 @@
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSupportedScalingCapability">
             <summary>
-            Get supported scaling capabilities.
+            Get supported scaling capabilities as a DTO.
             </summary>
-            <returns>Scaling capability struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCurrentScalingNative">
-            <summary>
-            Get current scaling settings using the native struct.
-            </summary>
-            <returns>Scaling settings struct.</returns>
+            <returns>Scaling capabilities DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCurrentScaling">
             <summary>
@@ -1899,23 +1962,11 @@
             </summary>
             <returns>Scaling settings DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetCurrentScalingNative(IGCLWrapper.ctl_scaling_settings_t)">
-            <summary>
-            Set scaling settings using the native struct.
-            </summary>
-            <param name="settings">Scaling settings struct.</param>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SetCurrentScaling(IGCLWrapper.ScalingSettingsDto)">
             <summary>
             Set scaling settings using a DTO.
             </summary>
             <param name="settings">Scaling settings DTO.</param>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetLACEConfigNative">
-            <summary>
-            Get LACE configuration using the native struct.
-            </summary>
-            <returns>LACE config struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetLACEConfig">
             <summary>
@@ -1923,24 +1974,11 @@
             </summary>
             <returns>LACE config DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetLACEConfigNative(IGCLWrapper.ctl_lace_config_t)">
-            <summary>
-            Set LACE configuration using the native struct.
-            </summary>
-            <param name="config">LACE config struct.</param>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SetLACEConfig(IGCLWrapper.LaceConfigDto)">
             <summary>
             Set LACE configuration using a DTO.
             </summary>
             <param name="config">LACE config DTO.</param>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SoftwarePSRNative(IGCLWrapper.ctl_sw_psr_settings_t)">
-            <summary>
-            Call the software PSR API using the native struct.
-            </summary>
-            <param name="settings">Software PSR settings struct.</param>
-            <returns>Updated software PSR settings struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SoftwarePSR(IGCLWrapper.SwPsrSettingsDto)">
             <summary>
@@ -1948,12 +1986,6 @@
             </summary>
             <param name="settings">Software PSR settings DTO.</param>
             <returns>Updated software PSR settings DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetIntelArcSyncInfoForMonitorNative">
-            <summary>
-            Get Intel Arc Sync info for a monitor using the native struct.
-            </summary>
-            <returns>Monitor params struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetIntelArcSyncInfoForMonitor">
             <summary>
@@ -1969,10 +2001,10 @@
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetMuxProperties(System.IntPtr)">
             <summary>
-            Get mux properties and its display outputs.
+            Get mux properties and display outputs as a DTO.
             </summary>
             <param name="muxHandle">Mux handle.</param>
-            <returns>Tuple containing mux properties and display output handles.</returns>
+            <returns>Mux properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SwitchMux(System.IntPtr,System.IntPtr)">
             <summary>
@@ -1983,22 +2015,29 @@
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetIntelArcSyncProfile">
             <summary>
-            Get Intel Arc Sync profile parameters.
+            Get Intel Arc Sync profile parameters as a DTO.
             </summary>
-            <returns>Arc Sync profile params struct.</returns>
+            <returns>Arc Sync profile parameters DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetIntelArcSyncProfile(IGCLWrapper.ctl_intel_arc_sync_profile_params_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetIntelArcSyncProfile(IGCLWrapper.IntelArcSyncProfileParamsDto)">
             <summary>
-            Set Intel Arc Sync profile parameters.
+            Set Intel Arc Sync profile parameters using a DTO.
             </summary>
-            <param name="parameters">Arc Sync profile params struct.</param>
+            <param name="parameters">Arc Sync profile parameters DTO.</param>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.EdidManagement(IGCLWrapper.ctl_edid_management_args_t)">
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.EdidManagementNative(IGCLWrapper.ctl_edid_management_args_t)">
             <summary>
-            Perform EDID management using the provided arguments.
+            Perform EDID management using native arguments.
             </summary>
             <param name="args">EDID management arguments.</param>
             <returns>Updated EDID management arguments.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.EdidManagement(IGCLWrapper.EdidManagementArgsDto)">
+            <summary>
+            Perform EDID management using a DTO.
+            </summary>
+            <param name="args">EDID management arguments DTO.</param>
+            <returns>Updated EDID management arguments DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetEdidManagement(IGCLWrapper.ctl_edid_type_t)">
             <summary>
@@ -2023,9 +2062,9 @@
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetCustomModes">
             <summary>
-            Get custom display modes.
+            Get custom display modes as DTOs.
             </summary>
-            <returns>Tuple containing updated args and modes.</returns>
+            <returns>Custom mode result DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SetCustomModes(IGCLWrapper.ctl_get_set_custom_mode_args_t,IGCLWrapper.ctl_custom_src_mode_t[])">
             <summary>
@@ -2034,11 +2073,18 @@
             <param name="args">Custom mode args.</param>
             <param name="modes">Custom modes array.</param>
         </member>
+        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetCustomModes(IGCLWrapper.CustomModeArgsDto,System.Collections.Generic.IReadOnlyList{IGCLWrapper.CustomSourceModeDto})">
+            <summary>
+            Set custom display modes using DTOs.
+            </summary>
+            <param name="args">Custom mode args DTO.</param>
+            <param name="modes">Custom mode DTOs.</param>
+        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetVblankTimestamp">
             <summary>
-            Get vblank timestamp information.
+            Get vblank timestamp information as a DTO.
             </summary>
-            <returns>Vblank timestamp args struct.</returns>
+            <returns>Vblank timestamp DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSetDynamicContrastEnhancementNative(IGCLWrapper.ctl_dce_args_t,System.UInt32[])">
             <summary>
@@ -2061,30 +2107,11 @@
             <param name="args">DCE args DTO.</param>
             <param name="histogram">Histogram buffer.</param>
         </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetSetWireFormatNative(IGCLWrapper.ctl_get_set_wire_format_config_t)">
-            <summary>
-            Call the native get/set wire format API using the provided struct.
-            </summary>
-            <param name="args">Wire format args struct.</param>
-            <returns>Updated wire format args struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.GetWireFormatNative">
-            <summary>
-            Get wire format settings.
-            </summary>
-            <returns>Wire format args struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.GetWireFormat">
             <summary>
             Get wire format settings as a DTO.
             </summary>
             <returns>Wire format settings DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLDisplayHelper.SetWireFormatNative(IGCLWrapper.ctl_get_set_wire_format_config_t)">
-            <summary>
-            Set wire format settings using a native struct.
-            </summary>
-            <param name="args">Wire format args struct.</param>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.SetWireFormat(IGCLWrapper.WireFormatConfigDto)">
             <summary>
@@ -3428,16 +3455,135 @@
             </summary>
             <returns>Power optimization settings struct.</returns>
         </member>
+        <member name="T:IGCLWrapper.BrightnessGetDto">
+            <summary>
+            DTO for brightness get arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.BrightnessSetDto">
+            <summary>
+            DTO for brightness set arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.ScalingCapsDto">
+            <summary>
+            DTO for scaling capabilities.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.RetroScalingCapsDto">
+            <summary>
+            DTO for retro scaling capabilities.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PowerOptimizationCapsDto">
+            <summary>
+            DTO for power optimization capabilities.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PropertyRangeInfoDto">
+            <summary>
+            DTO for property range information.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.SharpnessFilterPropertiesDto">
+            <summary>
+            DTO for sharpness filter properties.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.SharpnessCapsDto">
+            <summary>
+            DTO for sharpness capabilities and filter properties.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.IntelArcSyncProfileParamsDto">
+            <summary>
+            DTO for Intel Arc Sync profile params.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.CustomSourceModeDto">
+            <summary>
+            DTO for custom source mode.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.CustomModeArgsDto">
+            <summary>
+            DTO for custom mode args.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.CustomModesResultDto">
+            <summary>
+            DTO for custom mode get results.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.MuxPropertiesDto">
+            <summary>
+            DTO for mux properties and display outputs.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.VblankTimestampArgsDto">
+            <summary>
+            DTO for vblank timestamp args.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.I2CAccessArgsDto">
+            <summary>
+            DTO for I2C access arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.I2CAccessPinPairArgsDto">
+            <summary>
+            DTO for I2C access pin-pair arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.AuxAccessArgsDto">
+            <summary>
+            DTO for AUX channel access arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PanelDescriptorAccessArgsDto">
+            <summary>
+            DTO for panel descriptor access arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.EdidManagementArgsDto">
+            <summary>
+            DTO for EDID management arguments.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixtxColorPrimariesDto">
+            <summary>
+            DTO for pixel transformation color primaries.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixtxPixelFormatDto">
+            <summary>
+            DTO for pixel transformation pixel format.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixtxPipeGetConfigDto">
+            <summary>
+            DTO for pixel transformation pipe get config (metadata only; LUT sample values require native methods).
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixtxBlockConfigDto">
+            <summary>
+            DTO for pixel transformation block config (metadata only; LUT sample values require native methods).
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixtxPipeSetConfigDto">
+            <summary>
+            DTO for pixel transformation pipe set config.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixelTransformationGetResultDto">
+            <summary>
+            DTO result for pixel transformation get config (metadata only; LUT sample values require native methods).
+            </summary>
+        </member>
         <member name="T:IGCLWrapper.IGCLEccHelper">
             <summary>
             ECC helper: properties and state management.
             </summary>
-        </member>
-        <member name="M:IGCLWrapper.IGCLEccHelper.EccGetPropertiesNative">
-            <summary>
-            Get ECC properties using the native struct.
-            </summary>
-            <returns>ECC properties struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLEccHelper.EccGetProperties">
             <summary>
@@ -3447,9 +3593,9 @@
         </member>
         <member name="M:IGCLWrapper.IGCLEccHelper.EccGetState">
             <summary>
-            Get ECC state description.
+            Get ECC state description as a DTO.
             </summary>
-            <returns>ECC state description struct.</returns>
+            <returns>ECC state description DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLEccHelper.EccSetState(IGCLWrapper.ctl_ecc_state_t)">
             <summary>
@@ -3549,17 +3695,17 @@
         </member>
         <member name="M:IGCLWrapper.IGCLEngineHelper.EngineGetProperties(System.IntPtr)">
             <summary>
-            Get engine properties for a handle.
+            Get engine properties as a DTO.
             </summary>
             <param name="engineHandle">Engine handle.</param>
-            <returns>Engine properties struct.</returns>
+            <returns>Engine properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLEngineHelper.EngineGetActivity(System.IntPtr)">
             <summary>
-            Get engine activity stats for a handle.
+            Get engine activity stats as a DTO.
             </summary>
             <param name="engineHandle">Engine handle.</param>
-            <returns>Engine stats struct.</returns>
+            <returns>Engine stats DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLEngineHelper.AreEnginePropertiesEqual(IGCLWrapper.ctl_engine_properties_t,IGCLWrapper.ctl_engine_properties_t)">
             <summary>
@@ -3593,13 +3739,6 @@
             </summary>
             <returns>Read-only list of fan handles.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLFanHelper.FanGetPropertiesNative(System.IntPtr)">
-            <summary>
-            Get fan properties using the native struct.
-            </summary>
-            <param name="fanHandle">Fan handle.</param>
-            <returns>Fan properties struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLFanHelper.FanGetProperties(System.IntPtr)">
             <summary>
             Get fan properties as a DTO.
@@ -3609,10 +3748,10 @@
         </member>
         <member name="M:IGCLWrapper.IGCLFanHelper.FanGetConfig(System.IntPtr)">
             <summary>
-            Get fan configuration.
+            Get fan configuration as a DTO.
             </summary>
             <param name="fanHandle">Fan handle.</param>
-            <returns>Fan config struct.</returns>
+            <returns>Fan config DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLFanHelper.FanSetDefaultMode(System.IntPtr)">
             <summary>
@@ -3620,19 +3759,19 @@
             </summary>
             <param name="fanHandle">Fan handle.</param>
         </member>
-        <member name="M:IGCLWrapper.IGCLFanHelper.FanSetFixedSpeedMode(System.IntPtr,IGCLWrapper.ctl_fan_speed_t)">
+        <member name="M:IGCLWrapper.IGCLFanHelper.FanSetFixedSpeedMode(System.IntPtr,IGCLWrapper.FanSpeedDto)">
             <summary>
-            Set the fan to fixed speed mode.
+            Set the fan to fixed speed mode using a DTO.
             </summary>
             <param name="fanHandle">Fan handle.</param>
-            <param name="speed">Fan speed settings.</param>
+            <param name="speed">Fan speed settings DTO.</param>
         </member>
-        <member name="M:IGCLWrapper.IGCLFanHelper.FanSetSpeedTableMode(System.IntPtr,IGCLWrapper.ctl_fan_speed_table_t)">
+        <member name="M:IGCLWrapper.IGCLFanHelper.FanSetSpeedTableMode(System.IntPtr,IGCLWrapper.FanSpeedTableDto)">
             <summary>
-            Set the fan to speed table mode.
+            Set the fan to speed table mode using a DTO.
             </summary>
             <param name="fanHandle">Fan handle.</param>
-            <param name="table">Fan speed table.</param>
+            <param name="table">Fan speed table DTO.</param>
         </member>
         <member name="M:IGCLWrapper.IGCLFanHelper.FanGetState(System.IntPtr,IGCLWrapper.ctl_fan_speed_units_t)">
             <summary>
@@ -3690,6 +3829,238 @@
             <summary>
             Mark the helper as disposed.
             </summary>
+        </member>
+        <member name="T:IGCLWrapper.FanSpeedDto">
+            <summary>
+            DTO for fan speed.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanSpeedDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanSpeedDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanSpeedDto.Speed">
+            <summary>
+            Speed value.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanSpeedDto.Units">
+            <summary>
+            Speed units.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedDto.Equals(IGCLWrapper.FanSpeedDto)">
+            <summary>
+            Compare fan speeds.
+            </summary>
+            <param name="other">Other speed instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedDto.FromNative(IGCLWrapper.ctl_fan_speed_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Fan speed DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Fan speed struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.FanTempSpeedDto">
+            <summary>
+            DTO for temperature-speed pair in fan table.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanTempSpeedDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanTempSpeedDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanTempSpeedDto.Temperature">
+            <summary>
+            Temperature threshold.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanTempSpeedDto.Speed">
+            <summary>
+            Associated fan speed.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FanTempSpeedDto.Equals(IGCLWrapper.FanTempSpeedDto)">
+            <summary>
+            Compare temperature-speed pairs.
+            </summary>
+            <param name="other">Other pair instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanTempSpeedDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanTempSpeedDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanTempSpeedDto.FromNative(IGCLWrapper.ctl_fan_temp_speed_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Temperature-speed pair DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanTempSpeedDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Temperature-speed pair struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.FanSpeedTableDto">
+            <summary>
+            DTO for fan speed table.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanSpeedTableDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanSpeedTableDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanSpeedTableDto.Table">
+            <summary>
+            Array of temperature-speed points.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedTableDto.Equals(IGCLWrapper.FanSpeedTableDto)">
+            <summary>
+            Compare fan speed tables.
+            </summary>
+            <param name="other">Other table instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedTableDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedTableDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedTableDto.FromNative(IGCLWrapper.ctl_fan_speed_table_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Fan speed table DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanSpeedTableDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Fan speed table struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.FanConfigDto">
+            <summary>
+            DTO for fan configuration.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanConfigDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanConfigDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanConfigDto.Mode">
+            <summary>
+            Current fan mode.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanConfigDto.SpeedFixed">
+            <summary>
+            Fixed speed settings.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FanConfigDto.SpeedTable">
+            <summary>
+            Speed table settings.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FanConfigDto.Equals(IGCLWrapper.FanConfigDto)">
+            <summary>
+            Compare fan configurations.
+            </summary>
+            <param name="other">Other config instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanConfigDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanConfigDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanConfigDto.FromNative(IGCLWrapper.ctl_fan_config_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Fan config DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FanConfigDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Fan config struct.</returns>
         </member>
         <member name="T:IGCLWrapper.FanPropertiesDto">
             <summary>
@@ -3769,12 +4140,6 @@
             Firmware helper: base and component firmware queries, PCIe link speed control.
             </summary>
         </member>
-        <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwarePropertiesNative">
-            <summary>
-            Get firmware properties for the adapter.
-            </summary>
-            <returns>Firmware properties struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwareProperties">
             <summary>
             Get firmware properties for the adapter as a DTO.
@@ -3786,13 +4151,6 @@
             Enumerate firmware component handles for the adapter.
             </summary>
             <returns>Read-only list of firmware component handles.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwareComponentPropertiesNative(System.IntPtr)">
-            <summary>
-            Get firmware component properties.
-            </summary>
-            <param name="firmwareHandle">Firmware component handle.</param>
-            <returns>Firmware component properties struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLFirmwareHelper.GetFirmwareComponentProperties(System.IntPtr)">
             <summary>
@@ -3970,13 +4328,6 @@
             </summary>
             <returns>Read-only list of frequency domain handles.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLFrequencyHelper.FrequencyGetPropertiesNative(System.IntPtr)">
-            <summary>
-            Get frequency domain properties using the native struct.
-            </summary>
-            <param name="freqHandle">Frequency domain handle.</param>
-            <returns>Frequency properties struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLFrequencyHelper.FrequencyGetProperties(System.IntPtr)">
             <summary>
             Get frequency domain properties as a DTO.
@@ -3993,31 +4344,31 @@
         </member>
         <member name="M:IGCLWrapper.IGCLFrequencyHelper.FrequencyGetRange(System.IntPtr)">
             <summary>
-            Get the frequency range for a domain.
+            Get the frequency range for a domain as a DTO.
             </summary>
             <param name="freqHandle">Frequency domain handle.</param>
-            <returns>Frequency range struct.</returns>
+            <returns>Frequency range DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLFrequencyHelper.FrequencySetRange(System.IntPtr,IGCLWrapper.ctl_freq_range_t)">
+        <member name="M:IGCLWrapper.IGCLFrequencyHelper.FrequencySetRange(System.IntPtr,IGCLWrapper.FrequencyRangeDto)">
             <summary>
-            Set the frequency range for a domain.
+            Set the frequency range for a domain using a DTO.
             </summary>
             <param name="freqHandle">Frequency domain handle.</param>
-            <param name="range">Frequency range struct.</param>
+            <param name="range">Frequency range DTO.</param>
         </member>
         <member name="M:IGCLWrapper.IGCLFrequencyHelper.FrequencyGetState(System.IntPtr)">
             <summary>
-            Get the current frequency state.
+            Get the current frequency state as a DTO.
             </summary>
             <param name="freqHandle">Frequency domain handle.</param>
-            <returns>Frequency state struct.</returns>
+            <returns>Frequency state DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLFrequencyHelper.FrequencyGetThrottleTime(System.IntPtr)">
             <summary>
-            Get the throttle time for a frequency domain.
+            Get the throttle time for a frequency domain as a DTO.
             </summary>
             <param name="freqHandle">Frequency domain handle.</param>
-            <returns>Throttle time struct.</returns>
+            <returns>Throttle time DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLFrequencyHelper.CreateFrequencyRangeStruct">
             <summary>
@@ -4061,6 +4412,200 @@
             <summary>
             Mark the helper as disposed.
             </summary>
+        </member>
+        <member name="T:IGCLWrapper.FrequencyRangeDto">
+            <summary>
+            DTO for frequency range.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyRangeDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyRangeDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyRangeDto.Min">
+            <summary>
+            Minimum frequency.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyRangeDto.Max">
+            <summary>
+            Maximum frequency.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyRangeDto.Equals(IGCLWrapper.FrequencyRangeDto)">
+            <summary>
+            Compare frequency ranges.
+            </summary>
+            <param name="other">Other range instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyRangeDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyRangeDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyRangeDto.FromNative(IGCLWrapper.ctl_freq_range_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Frequency range DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyRangeDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Frequency range struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.FrequencyStateDto">
+            <summary>
+            DTO for frequency state.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyStateDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyStateDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyStateDto.CurrentVoltage">
+            <summary>
+            Current voltage.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyStateDto.Request">
+            <summary>
+            Requested frequency.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyStateDto.Tdp">
+            <summary>
+            TDP frequency.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyStateDto.Efficient">
+            <summary>
+            Efficient frequency.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyStateDto.Actual">
+            <summary>
+            Actual frequency.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyStateDto.ThrottleReasons">
+            <summary>
+            Throttle reasons bitmask.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyStateDto.Equals(IGCLWrapper.FrequencyStateDto)">
+            <summary>
+            Compare frequency states.
+            </summary>
+            <param name="other">Other state instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyStateDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyStateDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyStateDto.FromNative(IGCLWrapper.ctl_freq_state_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Frequency state DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyStateDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Frequency state struct.</returns>
+        </member>
+        <member name="T:IGCLWrapper.FrequencyThrottleTimeDto">
+            <summary>
+            DTO for frequency throttle time.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyThrottleTimeDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyThrottleTimeDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyThrottleTimeDto.ThrottleTime">
+            <summary>
+            Throttle time value.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.FrequencyThrottleTimeDto.Timestamp">
+            <summary>
+            Timestamp.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyThrottleTimeDto.Equals(IGCLWrapper.FrequencyThrottleTimeDto)">
+            <summary>
+            Compare frequency throttle times.
+            </summary>
+            <param name="other">Other throttle time instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyThrottleTimeDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyThrottleTimeDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyThrottleTimeDto.FromNative(IGCLWrapper.ctl_freq_throttle_time_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Frequency throttle time DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.FrequencyThrottleTimeDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Frequency throttle time struct.</returns>
         </member>
         <member name="T:IGCLWrapper.FrequencyPropertiesDto">
             <summary>
@@ -4159,13 +4704,6 @@
             </summary>
             <returns>Read-only list of LED handles.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLLedHelper.LedGetPropertiesNative(System.IntPtr)">
-            <summary>
-            Get LED properties using the native struct.
-            </summary>
-            <param name="ledHandle">LED handle.</param>
-            <returns>LED properties struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLLedHelper.LedGetProperties(System.IntPtr)">
             <summary>
             Get LED properties as a DTO.
@@ -4173,26 +4711,12 @@
             <param name="ledHandle">LED handle.</param>
             <returns>LED properties DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLLedHelper.LedGetStateNative(System.IntPtr)">
-            <summary>
-            Get LED state using the native struct.
-            </summary>
-            <param name="ledHandle">LED handle.</param>
-            <returns>LED state struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLLedHelper.LedGetState(System.IntPtr)">
             <summary>
             Get LED state as a DTO.
             </summary>
             <param name="ledHandle">LED handle.</param>
             <returns>LED state DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLLedHelper.LedSetStateNative(System.IntPtr,IGCLWrapper.ctl_led_state_t)">
-            <summary>
-            Set LED state using the native struct.
-            </summary>
-            <param name="ledHandle">LED handle.</param>
-            <param name="state">LED state struct.</param>
         </member>
         <member name="M:IGCLWrapper.IGCLLedHelper.LedSetState(System.IntPtr,IGCLWrapper.LedStateDto)">
             <summary>
@@ -4398,14 +4922,7 @@
             <summary>
             Get supported video processing feature capabilities for the adapter.
             </summary>
-            <returns>Video processing feature capabilities struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLMediaHelper.GetSetVideoProcessingFeatureNative(IGCLWrapper.ctl_video_processing_feature_getset_t)">
-            <summary>
-            Call the native get/set video processing feature API using the provided struct.
-            </summary>
-            <param name="featureGetSet">Video processing feature get/set struct.</param>
-            <returns>Updated video processing feature get/set struct.</returns>
+            <returns>Video processing feature capabilities DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLMediaHelper.GetVideoProcessingFeature(IGCLWrapper.VideoProcessingFeatureGetSetDto)">
             <summary>
@@ -4556,6 +5073,31 @@
             </summary>
             <returns>Video processing feature get/set struct.</returns>
         </member>
+        <member name="T:IGCLWrapper.VideoProcessingFeatureCapsDto">
+            <summary>
+            DTO for video processing feature capabilities.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.VideoProcessingFeatureCapsDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.VideoProcessingFeatureCapsDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.VideoProcessingFeatureCapsDto.NumSupportedFeatures">
+            <summary>
+            Number of supported features.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.VideoProcessingFeatureCapsDto.ReservedFields">
+            <summary>
+            Reserved fields.
+            </summary>
+        </member>
         <member name="T:IGCLWrapper.IGCLMemoryHelper">
             <summary>
             Memory helper: enumerate memory modules and query properties/state/bandwidth.
@@ -4569,24 +5111,24 @@
         </member>
         <member name="M:IGCLWrapper.IGCLMemoryHelper.MemoryGetProperties(System.IntPtr)">
             <summary>
-            Get memory module properties.
+            Get memory module properties as a DTO.
             </summary>
             <param name="memoryHandle">Memory module handle.</param>
-            <returns>Memory properties struct.</returns>
+            <returns>Memory properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLMemoryHelper.MemoryGetState(System.IntPtr)">
             <summary>
-            Get current memory module state.
+            Get current memory module state as a DTO.
             </summary>
             <param name="memoryHandle">Memory module handle.</param>
-            <returns>Memory state struct.</returns>
+            <returns>Memory state DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLMemoryHelper.MemoryGetBandwidth(System.IntPtr)">
             <summary>
-            Get memory bandwidth information.
+            Get memory bandwidth information as a DTO.
             </summary>
             <param name="memoryHandle">Memory module handle.</param>
-            <returns>Memory bandwidth struct.</returns>
+            <returns>Memory bandwidth DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLMemoryHelper.AreMemoryPropertiesEqual(IGCLWrapper.ctl_mem_properties_t,IGCLWrapper.ctl_mem_properties_t)">
             <summary>
@@ -4627,12 +5169,6 @@
             <summary>
             Overclock helper: properties, offsets, limits, telemetry, and reset.
             </summary>
-        </member>
-        <member name="M:IGCLWrapper.IGCLOverclockHelper.GetPropertiesNative">
-            <summary>
-            Get overclock properties using the native struct.
-            </summary>
-            <returns>Overclock properties struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLOverclockHelper.GetProperties">
             <summary>
@@ -4697,13 +5233,13 @@
             <summary>
             Get the GPU lock voltage/frequency pair.
             </summary>
-            <returns>Voltage/frequency pair struct.</returns>
+            <returns>Voltage/frequency pair DTO.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLOverclockHelper.OverclockGpuLockSet(IGCLWrapper.ctl_oc_vf_pair_t)">
+        <member name="M:IGCLWrapper.IGCLOverclockHelper.OverclockGpuLockSet(IGCLWrapper.OcVfPairDto)">
             <summary>
             Set the GPU lock voltage/frequency pair.
             </summary>
-            <param name="pair">Voltage/frequency pair struct.</param>
+            <param name="pair">Voltage/frequency pair DTO.</param>
         </member>
         <member name="M:IGCLWrapper.IGCLOverclockHelper.OverclockVramFrequencyOffsetGet">
             <summary>
@@ -4788,12 +5324,6 @@
             Set the overclock temperature limit (V2).
             </summary>
             <param name="value">Temperature limit value.</param>
-        </member>
-        <member name="M:IGCLWrapper.IGCLOverclockHelper.GetPowerTelemetryNative">
-            <summary>
-            Get power telemetry using the native struct.
-            </summary>
-            <returns>Power telemetry struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLOverclockHelper.GetPowerTelemetry">
             <summary>
@@ -5508,16 +6038,35 @@
             </summary>
             <returns>Power telemetry struct.</returns>
         </member>
+        <member name="T:IGCLWrapper.OcVfPairDto">
+            <summary>
+            DTO for GPU overclock voltage/frequency lock pair.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.OcVfPairDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.OcVfPairDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.OcVfPairDto.Voltage">
+            <summary>
+            Lock voltage in mV.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.OcVfPairDto.Frequency">
+            <summary>
+            Lock frequency in MHz.
+            </summary>
+        </member>
         <member name="T:IGCLWrapper.IGCLPciHelper">
             <summary>
             PCI helper: properties and current state.
             </summary>
-        </member>
-        <member name="M:IGCLWrapper.IGCLPciHelper.PciGetPropertiesNative">
-            <summary>
-            Get PCI properties using the native struct.
-            </summary>
-            <returns>PCI properties struct.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLPciHelper.PciGetProperties">
             <summary>
@@ -5527,9 +6076,9 @@
         </member>
         <member name="M:IGCLWrapper.IGCLPciHelper.PciGetState">
             <summary>
-            Get PCI state.
+            Get PCI state as a DTO.
             </summary>
-            <returns>PCI state struct.</returns>
+            <returns>PCI state DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLPciHelper.ArePciPropertiesEqual(IGCLWrapper.ctl_pci_properties_t,IGCLWrapper.ctl_pci_properties_t)">
             <summary>
@@ -5696,13 +6245,6 @@
             </summary>
             <returns>Read-only list of power domain handles.</returns>
         </member>
-        <member name="M:IGCLWrapper.IGCLPowerHelper.PowerGetPropertiesNative(System.IntPtr)">
-            <summary>
-            Get power domain properties using the native struct.
-            </summary>
-            <param name="powerHandle">Power domain handle.</param>
-            <returns>Power properties struct.</returns>
-        </member>
         <member name="M:IGCLWrapper.IGCLPowerHelper.PowerGetProperties(System.IntPtr)">
             <summary>
             Get power domain properties as a DTO.
@@ -5712,17 +6254,10 @@
         </member>
         <member name="M:IGCLWrapper.IGCLPowerHelper.PowerGetEnergyCounter(System.IntPtr)">
             <summary>
-            Get the power energy counter.
+            Get the power energy counter as a DTO.
             </summary>
             <param name="powerHandle">Power domain handle.</param>
-            <returns>Power energy counter struct.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLPowerHelper.PowerGetLimitsNative(System.IntPtr)">
-            <summary>
-            Get power limits using the native struct.
-            </summary>
-            <param name="powerHandle">Power domain handle.</param>
-            <returns>Power limits struct.</returns>
+            <returns>Power energy counter DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLPowerHelper.PowerGetLimits(System.IntPtr)">
             <summary>
@@ -5730,13 +6265,6 @@
             </summary>
             <param name="powerHandle">Power domain handle.</param>
             <returns>Power limits DTO.</returns>
-        </member>
-        <member name="M:IGCLWrapper.IGCLPowerHelper.PowerSetLimitsNative(System.IntPtr,IGCLWrapper.ctl_power_limits_t)">
-            <summary>
-            Set power limits using the native struct.
-            </summary>
-            <param name="powerHandle">Power domain handle.</param>
-            <param name="limits">Power limits struct.</param>
         </member>
         <member name="M:IGCLWrapper.IGCLPowerHelper.PowerSetLimits(System.IntPtr,IGCLWrapper.PowerLimitsDto)">
             <summary>
@@ -5779,6 +6307,64 @@
             <summary>
             Mark the helper as disposed.
             </summary>
+        </member>
+        <member name="T:IGCLWrapper.PowerEnergyCounterDto">
+            <summary>
+            DTO for power energy counter.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.PowerEnergyCounterDto.Size">
+            <summary>
+            Size of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.PowerEnergyCounterDto.Version">
+            <summary>
+            Version of the native struct.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.PowerEnergyCounterDto.Energy">
+            <summary>
+            Energy value.
+            </summary>
+        </member>
+        <member name="F:IGCLWrapper.PowerEnergyCounterDto.Timestamp">
+            <summary>
+            Timestamp.
+            </summary>
+        </member>
+        <member name="M:IGCLWrapper.PowerEnergyCounterDto.Equals(IGCLWrapper.PowerEnergyCounterDto)">
+            <summary>
+            Compare power energy counters.
+            </summary>
+            <param name="other">Other counter instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerEnergyCounterDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerEnergyCounterDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerEnergyCounterDto.FromNative(IGCLWrapper.ctl_power_energy_counter_t)">
+            <summary>
+            Create a DTO from a native struct.
+            </summary>
+            <param name="native">Native struct.</param>
+            <returns>Power energy counter DTO.</returns>
+        </member>
+        <member name="M:IGCLWrapper.PowerEnergyCounterDto.ToNative">
+            <summary>
+            Convert this DTO to a native struct.
+            </summary>
+            <returns>Power energy counter struct.</returns>
         </member>
         <member name="T:IGCLWrapper.PowerPropertiesDto">
             <summary>
@@ -6073,10 +6659,10 @@
         </member>
         <member name="M:IGCLWrapper.IGCLTemperatureHelper.TemperatureGetProperties(System.IntPtr)">
             <summary>
-            Get temperature sensor properties.
+            Get temperature sensor properties as a DTO.
             </summary>
             <param name="sensorHandle">Temperature sensor handle.</param>
-            <returns>Temperature properties struct.</returns>
+            <returns>Temperature properties DTO.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLTemperatureHelper.TemperatureGetState(System.IntPtr)">
             <summary>
