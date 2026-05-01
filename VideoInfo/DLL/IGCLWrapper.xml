@@ -3525,6 +3525,26 @@
             DTO for vblank timestamp args.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.VblankTimestampArgsDto.Equals(IGCLWrapper.VblankTimestampArgsDto)">
+            <summary>
+            Compare vblank timestamp args while ignoring the timestamp list.
+            </summary>
+            <param name="other">Other instance.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.VblankTimestampArgsDto.Equals(System.Object)">
+            <summary>
+            Compare to another object.
+            </summary>
+            <param name="obj">Object to compare.</param>
+            <returns>True when equal; otherwise, false.</returns>
+        </member>
+        <member name="M:IGCLWrapper.VblankTimestampArgsDto.GetHashCode">
+            <summary>
+            Get a hash code for this instance.
+            </summary>
+            <returns>Hash code value.</returns>
+        </member>
         <member name="T:IGCLWrapper.I2CAccessArgsDto">
             <summary>
             DTO for I2C access arguments.
