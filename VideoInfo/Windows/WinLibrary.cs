@@ -94,8 +94,22 @@ namespace DisplayMagicianShared.Windows
             }
             if (!DevicePath.Equals(other.DevicePath))
             {
-                SharedLogger.logger.Trace($"DISPLAY_SOURCE/Equals: Device Path is not equal.");
-                return false;
+                // If they don't match, it might be because the device path contains an instance id which changes after each reboot, so we ignore the instance id part of the device path and just compare the rest of it.
+                var devicePathParts = DevicePath.Split('#');
+                var otherDevicePathParts = other.DevicePath.Split('#');
+                for (int i = 0; i < Math.Min(devicePathParts.Length, otherDevicePathParts.Length); i++)
+                {
+                    // Skip the troublesome instance ID part of the device path, which is the 2nd part (index 1) if it exists
+                    if (i == 1)
+                    {
+                        continue;
+                    }
+                    if (!devicePathParts[i].Equals(otherDevicePathParts[i]))
+                    {
+                        SharedLogger.logger.Trace($"DISPLAY_SOURCE/Equals: Device Path is not equal.");
+                        return false;
+                    }
+                }
             }
             if (!SourceDPIScalingInfo.Equals(other.SourceDPIScalingInfo)){
                 SharedLogger.logger.Trace($"DISPLAY_SOURCE/Equals: Source DPI Scaling Info is not equal.");
@@ -170,8 +184,26 @@ namespace DisplayMagicianShared.Windows
             }
             if (!DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
             {
-                SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG/Equals: DisplayIdentifiers is not equal.");
-                return false;
+                for(int i = 0; i < Math.Min(DisplayIdentifiers.Count, other.DisplayIdentifiers.Count); i++)
+                {
+                    // If they don't match, it might be because the device path contains an instance id which changes after each reboot, so we ignore the instance id part of the device path and just compare the rest of it.
+                    var displayIdentifierParts = DisplayIdentifiers[i].Split('#');
+                    var otherdisplayIdentifierParts = other.DisplayIdentifiers[i].Split('#');
+               
+                    for (int j = 0; j < Math.Min(displayIdentifierParts.Length, otherdisplayIdentifierParts.Length); j++)
+                    {
+                        // Skip the troublesome instance ID part of the device path, which is the 5th part (index 4) if it exists
+                        if (j == 4)
+                        {
+                            continue;
+                        }
+                        if (!displayIdentifierParts[j].Equals(otherdisplayIdentifierParts[j]))
+                        {
+                            SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG/Equals: Display Identifier {i} is not equal. Value in this config is {DisplayIdentifiers[i]} and value in other config is {other.DisplayIdentifiers[i]}.");
+                            return false;
+                        }
+                    }
+                }
             }
             // Now we need to go through the HDR states comparing vaues, as the order changes if there is a cloned display
             //if (!CollectionComparer.AreEquivalent(DisplayHDRStates, other.DisplayHDRStates))
