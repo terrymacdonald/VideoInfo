@@ -9,7 +9,7 @@
             Wrapper over IADLX3DSettingsServices selecting the highest available interface and exposing change handling.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.#ctor(ADLXWrapper.IADLX3DSettingsServices*,System.Boolean)">
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.#ctor(ADLXWrapper.IADLX3DSettingsServices*,System.Boolean,ADLXWrapper.IADLXSystem*)">
             <summary>
             Creates a 3D settings helper from the native services interface, upgrading to v1/v2 when available.
             </summary>
@@ -44,12 +44,12 @@
             <exception cref="T:ADLXWrapper.ADLXException">If registration fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
         </member>
-        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryGetAll3DSettings(ADLXWrapper.IADLXGPU*,ADLXWrapper.All3DSettingsInfo@)">
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryGetAll3DSettings(ADLXWrapper.IADLXGPU*,ADLXWrapper.All3DSettingsDto@)">
             <summary>
             Tries to get all 3D settings; returns false when unsupported.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.ApplyAll3DSettings(ADLXWrapper.IADLXGPU*,ADLXWrapper.All3DSettingsInfo)">
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.ApplyAll3DSettings(ADLXWrapper.IADLXGPU*,ADLXWrapper.All3DSettingsDto)">
             <summary>
             Applies all provided 3D settings to a GPU (only non-null fields are applied).
             </summary>
@@ -59,12 +59,30 @@
             <exception cref="T:ADLXWrapper.ADLXException">If any underlying call fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
         </member>
-        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryApplyAll3DSettings(ADLXWrapper.IADLXGPU*,ADLXWrapper.All3DSettingsInfo)">
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryApplyAll3DSettings(ADLXWrapper.IADLXGPU*,ADLXWrapper.All3DSettingsDto)">
             <summary>
             Tries to apply all provided 3D settings; returns false when the feature set is unsupported.
             </summary>
         </member>
-        <member name="T:ADLXWrapper.All3DSettingsInfo">
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.GetAll3DSettings(System.Int32)">
+            <summary>Gets all 3D settings for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryGetAll3DSettings(System.Int32,ADLXWrapper.All3DSettingsDto@)">
+            <summary>Tries to get all 3D settings for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.ApplyAll3DSettings(System.Int32,ADLXWrapper.All3DSettingsDto)">
+            <summary>Applies all 3D settings to the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryApplyAll3DSettings(System.Int32,ADLXWrapper.All3DSettingsDto)">
+            <summary>Tries to apply all 3D settings to the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.GetFluidMotionFrames(System.Int32)">
+            <summary>Gets Fluid Motion Frames state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryGetFluidMotionFrames(System.Int32,ADLXWrapper.FluidMotionFramesDto@)">
+            <summary>Tries to get Fluid Motion Frames state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="T:ADLXWrapper.All3DSettingsDto">
             <summary>
             Represents a complete snapshot of all 3D settings for a GPU.
             </summary>
@@ -173,7 +191,7 @@
         </member>
         <member name="T:ADLXWrapper.ADLXDesktop">
             <summary>
-            Flattened desktop façade with identity metadata and display enumeration helpers.
+            Flattened desktop faÃ§ade with identity metadata and display enumeration helpers.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDesktop.#ctor(ADLXWrapper.IADLXDesktopServices*,ADLXWrapper.IADLXDesktop*,ADLXWrapper.IADLXDisplayServices*)">
@@ -184,14 +202,14 @@
             <param name="pDesktop">Native desktop pointer.</param>
             <param name="pDisplayServices">Optional display services pointer used for display queries.</param>
         </member>
-        <member name="M:ADLXWrapper.ADLXDesktop.EnumerateDisplayInfosForDesktop">
+        <member name="M:ADLXWrapper.ADLXDesktop.EnumerateDisplayDtosForDesktop">
             <summary>
             Managed enumeration of display identities on this desktop.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDesktop.EnumerateDisplaysForDesktop">
             <summary>
-            Façade enumeration of displays on this desktop (pointer-free).
+            FaÃ§ade enumeration of displays on this desktop (pointer-free).
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDesktop.AddDesktopListEventListener(ADLXWrapper.DesktopListListenerHandle.OnDesktopListChanged)">
@@ -204,7 +222,7 @@
             Eyefinity grid size (rows, columns) for Eyefinity desktops.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDesktop.EnumerateEyefinityDisplayInfosForDesktop">
+        <member name="M:ADLXWrapper.ADLXDesktop.EnumerateEyefinityDisplayDtosForDesktop">
             <summary>
             Enumerate displays that compose this Eyefinity desktop.
             </summary>
@@ -212,11 +230,6 @@
         <member name="M:ADLXWrapper.ADLXDesktop.GetGPU">
             <summary>
             GPU that drives this desktop (first GPU owning any display on the desktop).
-            </summary>
-        </member>
-        <member name="M:ADLXWrapper.ADLXDesktop.GetDisplayListNative">
-            <summary>
-            Native display list accessor. Caller must dispose returned ComPtr and any retained items.
             </summary>
         </member>
         <member name="T:ADLXWrapper.ADLXDesktopServicesHelper">
@@ -330,7 +343,7 @@
         </member>
         <member name="T:ADLXWrapper.ADLXDisplay">
             <summary>
-            Flattened display façade with identity metadata, support-guarded feature accessors, and native list exposure.
+            Flattened display faÃ§ade with identity metadata, support-guarded feature accessors, and native list exposure.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDisplay.#ctor(ADLXWrapper.IADLXDisplayServices*,ADLXWrapper.IADLXDisplay*,ADLXWrapper.IADLXDesktopServices*)">
@@ -377,21 +390,6 @@
         <member name="M:ADLXWrapper.ADLXDisplay.EnumerateCustomResolutions">
             <summary>
             Enumerate custom resolutions as managed DTOs.
-            </summary>
-        </member>
-        <member name="M:ADLXWrapper.ADLXDisplay.GetCustomResolutionListNative">
-            <summary>
-            Native custom resolution list accessor. Caller must dispose the returned ComPtr and any retained items.
-            </summary>
-        </member>
-        <member name="M:ADLXWrapper.ADLXDisplay.ApplyCustomResolution(ADLXWrapper.IADLXDisplayCustomResolution*,ADLXWrapper.DisplayResolutionInfo)">
-            <summary>
-            Applies a custom resolution using a provided native custom resolution interface.
-            </summary>
-        </member>
-        <member name="M:ADLXWrapper.ADLXDisplay.TryApplyCustomResolution(ADLXWrapper.IADLXDisplayCustomResolution*,ADLXWrapper.DisplayResolutionInfo)">
-            <summary>
-            Tries to apply a custom resolution; returns false when unsupported.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDisplay.GetVirtualSuperResolutionState">
@@ -499,7 +497,7 @@
             Desktop that contains this display (requires desktop services supplied to the display instance).
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplay.GetDesktopInfo">
+        <member name="M:ADLXWrapper.ADLXDisplay.GetDesktopDto">
             <summary>
             Desktop identity that contains this display (requires desktop services supplied to the display instance).
             </summary>
@@ -549,7 +547,7 @@
             Tries to enumerate display facades, returning false if the feature is not supported.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.GetDisplayInfo(ADLXWrapper.IADLXDisplay*)">
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.GetDisplayDto(ADLXWrapper.IADLXDisplay*)">
             <summary>
             Builds a display DTO from a native display pointer.
             </summary>
@@ -698,9 +696,9 @@
             Gets the Gamma settings for a specific display.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyGamma(ADLXWrapper.IADLXDisplayGamma*,ADLXWrapper.GammaInfo)">
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyGamma(ADLXWrapper.IADLXDisplayGamma*,ADLXWrapper.GammaDto)">
             <summary>
-            Applies the settings from a GammaInfo object to the hardware.
+            Applies the settings from a GammaDto object to the hardware.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ReapplyGamma(ADLXWrapper.IADLXDisplayGamma*)">
@@ -713,9 +711,9 @@
             Gets the Gamut settings for a specific display.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyGamut(ADLXWrapper.IADLXDisplayGamut*,ADLXWrapper.GamutInfo)">
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyGamut(ADLXWrapper.IADLXDisplayGamut*,ADLXWrapper.GamutDto)">
             <summary>
-            Applies the settings from a GamutInfo object to the hardware.
+            Applies the settings from a GamutDto object to the hardware.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ReapplyGamut(ADLXWrapper.IADLXDisplayGamut*)">
@@ -728,9 +726,9 @@
             Gets the 3DLUT settings for a specific display.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.Apply3DLUT(ADLXWrapper.IADLXDisplay3DLUT*,ADLXWrapper.ThreeDLUTInfo)">
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.Apply3DLUT(ADLXWrapper.IADLXDisplay3DLUT*,ADLXWrapper.ThreeDLUTDto)">
             <summary>
-            Applies the settings from a ThreeDLUTInfo object to the hardware.
+            Applies the settings from a ThreeDLUTDto object to the hardware.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.Reapply3DLUT(ADLXWrapper.IADLXDisplay3DLUT*)">
@@ -743,9 +741,9 @@
             Gets the Display Connectivity Experience settings for a specific display.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyDisplayConnectivityExperience(ADLXWrapper.IADLXDisplayConnectivityExperience*,ADLXWrapper.ConnectivityExperienceInfo)">
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyDisplayConnectivityExperience(ADLXWrapper.IADLXDisplayConnectivityExperience*,ADLXWrapper.ConnectivityExperienceDto)">
             <summary>
-            Applies the settings from a ConnectivityExperienceInfo object to the hardware.
+            Applies the settings from a ConnectivityExperienceDto object to the hardware.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.SetDisplayConnectivityHDMIQualityDetectionEnabled(ADLXWrapper.IADLXDisplayConnectivityExperience*,System.Boolean)">
@@ -778,7 +776,7 @@
             Enumerates custom resolutions for a display.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyCustomResolution(ADLXWrapper.IADLXDisplayCustomResolution*,ADLXWrapper.DisplayResolutionInfo)">
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyCustomResolution(ADLXWrapper.IADLXDisplayCustomResolution*,ADLXWrapper.DisplayResolutionDto)">
             <summary>
             Applies a custom resolution.
             </summary>
@@ -798,12 +796,12 @@
             Gets the Custom Color settings for a specific display.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyCustomColor(ADLXWrapper.IADLXDisplayCustomColor*,ADLXWrapper.CustomColorInfo)">
+        <member name="M:ADLXWrapper.ADLXDisplayServicesHelper.DisplaySettingsOps.ApplyCustomColor(ADLXWrapper.IADLXDisplayCustomColor*,ADLXWrapper.CustomColorDto)">
             <summary>
-            Applies the settings from a CustomColorInfo object to the hardware.
+            Applies the settings from a CustomColorDto object to the hardware.
             </summary>
         </member>
-        <member name="T:ADLXWrapper.DisplayInfo">
+        <member name="T:ADLXWrapper.DisplayDto">
             <summary>
             Represents the collected information for a display.
             </summary>
@@ -818,9 +816,44 @@
             Safe handle for an unmanaged IADLXDisplaySettingsChangedListener backed by a managed delegate.
             </summary>
         </member>
+        <member name="T:ADLXWrapper.IntRangeDto">
+            <summary>
+            Managed equivalent of ADLX_IntRange. Safe for JSON serialisation; contains no native pointers.
+            </summary>
+        </member>
+        <member name="T:ADLXWrapper.LuidDto">
+            <summary>
+            Managed equivalent of ADLX_LUID. Safe for JSON serialisation; contains no native pointers.
+            </summary>
+        </member>
+        <member name="T:ADLXWrapper.RegammaCoeffDto">
+            <summary>
+            Managed equivalent of ADLX_RegammaCoeff. Safe for JSON serialisation; contains no native pointers.
+            </summary>
+        </member>
+        <member name="T:ADLXWrapper.GammaRampDto">
+            <summary>
+            Managed equivalent of ADLX_GammaRamp (768-entry ushort LUT). Safe for JSON serialisation; contains no native pointers.
+            </summary>
+        </member>
+        <member name="P:ADLXWrapper.GammaRampDto.Values">
+            <summary>
+            The 768 gamma ramp entries. Returns an empty list when the ramp has not been populated.
+            </summary>
+        </member>
+        <member name="T:ADLXWrapper.PointDto">
+            <summary>
+            Managed equivalent of ADLX_Point. Safe for JSON serialisation; contains no native pointers.
+            </summary>
+        </member>
+        <member name="T:ADLXWrapper.GamutColorSpaceDto">
+            <summary>
+            Managed equivalent of ADLX_GamutColorSpace. Safe for JSON serialisation; contains no native pointers.
+            </summary>
+        </member>
         <member name="T:ADLXWrapper.ADLXGPU">
             <summary>
-            Flattened GPU façade with identity metadata and topology listeners.
+            Flattened GPU faÃ§ade with identity metadata and topology listeners.
             </summary>
         </member>
         <member name="M:ADLXWrapper.ADLXGPU.#ctor(ADLXWrapper.IADLXGPU*,ADLXWrapper.IADLXDisplayServices*,ADLXWrapper.IADLXDesktopServices*)">
@@ -870,7 +903,7 @@
             Wrapper over IADLXGPUTuningServices selecting the highest available interface and exposing change handling helpers.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.#ctor(ADLXWrapper.IADLXGPUTuningServices*,System.Boolean)">
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.#ctor(ADLXWrapper.IADLXGPUTuningServices*,System.Boolean,ADLXWrapper.IADLXSystem*)">
             <summary>
             Creates a GPU tuning helper from the native services interface, upgrading to v1 when available.
             </summary>
@@ -910,6 +943,75 @@
         <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryIsAutoTuningSupported(ADLXWrapper.IADLXGPU*,System.Boolean@)">
             <summary>
             Tries to query auto tuning support; returns false when not supported.
+            </summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.GetCapabilities(System.Int32)">
+            <summary>Gets GPU tuning capabilities for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.IsAutoTuningSupported(System.Int32)">
+            <summary>Returns true when auto tuning is supported for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryIsAutoTuningSupported(System.Int32,System.Boolean@)">
+            <summary>Tries to query auto tuning support for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.IsPresetTuningSupported(System.Int32)">
+            <summary>Returns true when preset tuning is supported for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryIsPresetTuningSupported(System.Int32,System.Boolean@)">
+            <summary>Tries to query preset tuning support for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.IsManualGfxTuningSupported(System.Int32)">
+            <summary>Returns true when manual GFX tuning is supported for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryIsManualGfxTuningSupported(System.Int32,System.Boolean@)">
+            <summary>Tries to query manual GFX tuning support for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.IsManualVramTuningSupported(System.Int32)">
+            <summary>Returns true when manual VRAM tuning is supported for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryIsManualVramTuningSupported(System.Int32,System.Boolean@)">
+            <summary>Tries to query manual VRAM tuning support for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.IsManualFanTuningSupported(System.Int32)">
+            <summary>Returns true when manual fan tuning is supported for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryIsManualFanTuningSupported(System.Int32,System.Boolean@)">
+            <summary>Tries to query manual fan tuning support for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.IsManualPowerTuningSupported(System.Int32)">
+            <summary>Returns true when manual power tuning is supported for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryIsManualPowerTuningSupported(System.Int32,System.Boolean@)">
+            <summary>Tries to query manual power tuning support for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.GetManualFanTuning(System.Int32)">
+            <summary>Gets manual fan tuning info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryGetManualFanTuning(System.Int32,ADLXWrapper.ManualFanTuningDto@)">
+            <summary>Tries to get manual fan tuning info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.GetManualVramTuning(System.Int32)">
+            <summary>Gets manual VRAM tuning info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryGetManualVramTuning(System.Int32,ADLXWrapper.ManualVramTuningDto@)">
+            <summary>Tries to get manual VRAM tuning info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.GetManualGfxTuning(System.Int32)">
+            <summary>Gets manual GFX tuning info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryGetManualGfxTuning(System.Int32,ADLXWrapper.ManualGfxTuningDto@)">
+            <summary>Tries to get manual GFX tuning info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.GetPresetTuning(System.Int32)">
+            <summary>Gets preset tuning info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryGetPresetTuning(System.Int32,ADLXWrapper.PresetTuningDto@)">
+            <summary>Tries to get preset tuning info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.ExecuteWithGpuByUniqueId``1(System.Int32,System.Func{System.IntPtr,``0})">
+            <summary>
+            Executes an action with the GPU matching the specified unique id.
+            Internal bridge allowing other helpers (e.g. ADLXPowerTuningServicesHelper) to delegate GPU lookup.
             </summary>
         </member>
         <member name="T:ADLXWrapper.GpuTuningListenerHandle">
@@ -965,7 +1067,7 @@
             Wrapper over IADLXMultimediaServices exposing managed/native accessors and change handling.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.#ctor(ADLXWrapper.IADLXMultimediaServices*,System.Boolean)">
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.#ctor(ADLXWrapper.IADLXMultimediaServices*,System.Boolean,ADLXWrapper.IADLXSystem*)">
             <summary>
             Creates a multimedia services helper from the native services interface.
             </summary>
@@ -1002,7 +1104,7 @@
             Tries to get the native video upscale interface; returns false when unsupported.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TryGetVideoUpscale(ADLXWrapper.IADLXGPU*,ADLXWrapper.VideoUpscaleInfo@)">
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TryGetVideoUpscale(ADLXWrapper.IADLXGPU*,ADLXWrapper.VideoUpscaleDto@)">
             <summary>
             Tries to query video upscale info; returns false when unsupported.
             </summary>
@@ -1022,7 +1124,7 @@
             Tries to get the native video super resolution interface; returns false when unsupported.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TryGetVideoSuperResolution(ADLXWrapper.IADLXGPU*,ADLXWrapper.VideoSuperResolutionInfo@)">
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TryGetVideoSuperResolution(ADLXWrapper.IADLXGPU*,ADLXWrapper.VideoSuperResolutionDto@)">
             <summary>
             Tries to query video super resolution info; returns false when unsupported.
             </summary>
@@ -1031,6 +1133,36 @@
             <summary>
             Tries to set video super resolution enabled; returns false when the feature is unsupported.
             </summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.GetVideoUpscale(System.Int32)">
+            <summary>Gets video upscale info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TryGetVideoUpscale(System.Int32,ADLXWrapper.VideoUpscaleDto@)">
+            <summary>Tries to get video upscale info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.SetVideoUpscaleEnabled(System.Int32,System.Boolean)">
+            <summary>Sets video upscale enabled state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TrySetVideoUpscaleEnabled(System.Int32,System.Boolean)">
+            <summary>Tries to set video upscale enabled state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.SetVideoUpscaleSharpness(System.Int32,System.Int32)">
+            <summary>Sets video upscale sharpness for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TrySetVideoUpscaleSharpness(System.Int32,System.Int32)">
+            <summary>Tries to set video upscale sharpness for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.GetVideoSuperResolution(System.Int32)">
+            <summary>Gets video super resolution info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TryGetVideoSuperResolution(System.Int32,ADLXWrapper.VideoSuperResolutionDto@)">
+            <summary>Tries to get video super resolution info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.SetVideoSuperResolutionEnabled(System.Int32,System.Boolean)">
+            <summary>Sets video super resolution enabled state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.TrySetVideoSuperResolutionEnabled(System.Int32,System.Boolean)">
+            <summary>Tries to set video super resolution enabled state for the GPU with the specified unique id.</summary>
         </member>
         <member name="T:ADLXWrapper.ADLXNative">
             <summary>
@@ -1043,7 +1175,7 @@
             Wrapper over IADLXPerformanceMonitoringServices providing managed/native accessors.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.#ctor(ADLXWrapper.IADLXPerformanceMonitoringServices*,System.Boolean)">
+        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.#ctor(ADLXWrapper.IADLXPerformanceMonitoringServices*,System.Boolean,ADLXWrapper.IADLXSystem*)">
             <summary>
             Creates a performance monitoring helper from the native services interface.
             </summary>
@@ -1082,7 +1214,7 @@
             <exception cref="T:ADLXWrapper.ADLXException">If unsupported or retrieval fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
         </member>
-        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.TryGetGpuMetricsSupport(ADLXWrapper.IADLXGPU*,ADLXWrapper.GpuMetricsSupportInfo@)">
+        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.TryGetGpuMetricsSupport(ADLXWrapper.IADLXGPU*,ADLXWrapper.GpuMetricsSupportDto@)">
             <summary>
             Tries to get GPU metrics support info. Returns false if not supported for this GPU/system.
             </summary>
@@ -1138,6 +1270,24 @@
             <returns>All-metrics snapshot.</returns>
             <exception cref="T:ADLXWrapper.ADLXException">If unsupported or retrieval fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.GetGpuMetricsSupport(System.Int32)">
+            <summary>Gets GPU metrics support info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.TryGetGpuMetricsSupport(System.Int32,ADLXWrapper.GpuMetricsSupportDto@)">
+            <summary>Tries to get GPU metrics support info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.GetCurrentGpuMetrics(System.Int32)">
+            <summary>Gets current GPU metrics snapshot for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.TryGetCurrentGpuMetrics(System.Int32,ADLXWrapper.GpuMetricsSnapshotDto@)">
+            <summary>Tries to get current GPU metrics snapshot for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.EnumerateGpuMetricsHistory(System.Int32,System.Int32,System.Int32)">
+            <summary>Enumerates GPU metrics history for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.TryEnumerateGpuMetricsHistory(System.Int32,System.Int32,System.Int32,System.Collections.Generic.IEnumerable{ADLXWrapper.GpuMetricsSnapshotDto}@)">
+            <summary>Tries to enumerate GPU metrics history for the GPU with the specified unique id.</summary>
         </member>
         <member name="T:ADLXWrapper.ADLXPowerTuningServicesHelper">
             <summary>
@@ -1211,7 +1361,7 @@
             <exception cref="T:ADLXWrapper.ADLXException">If unsupported or retrieval fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
         </member>
-        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplySmartShiftMax(ADLXWrapper.SmartShiftMaxInfo)">
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplySmartShiftMax(ADLXWrapper.SmartShiftMaxDto)">
             <summary>
             Tries to apply SmartShift Max; returns false when the feature is unsupported.
             </summary>
@@ -1223,40 +1373,52 @@
             <exception cref="T:ADLXWrapper.ADLXException">If unsupported or retrieval fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If disposed.</exception>
         </member>
-        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplySmartShiftEco(ADLXWrapper.SmartShiftEcoInfo)">
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplySmartShiftEco(ADLXWrapper.SmartShiftEcoDto)">
             <summary>
             Tries to apply SmartShift Eco; returns false when the feature is unsupported.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.GetManualPowerTuning(ADLXWrapper.ADLXGPUTuningServicesHelper,ADLXWrapper.ADLXInterfaceHandle)">
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.GetManualPowerTuning(System.Int32,ADLXWrapper.ADLXGPUTuningServicesHelper)">
             <summary>
-            Facade-friendly overload to query manual power tuning using managed helpers and GPU handles.
+            Gets manual power tuning info for the GPU with the specified unique id.
             </summary>
-            <param name="tuningHelper">GPU tuning helper.</param>
-            <param name="gpuHandle">GPU handle from facade enumeration.</param>
-            <returns>Manual power tuning info.</returns>
         </member>
-        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplyManualPowerTuning(ADLXWrapper.IADLXManualPowerTuning*,ADLXWrapper.ManualPowerTuningInfo)">
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryGetManualPowerTuning(System.Int32,ADLXWrapper.ADLXGPUTuningServicesHelper,ADLXWrapper.ManualPowerTuningDto@)">
+            <summary>
+            Tries to get manual power tuning info for the GPU with the specified unique id.
+            </summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplyManualPowerTuning(ADLXWrapper.IADLXManualPowerTuning*,ADLXWrapper.ManualPowerTuningDto)">
             <summary>
             Tries to apply manual power tuning to an existing interface; returns false when unsupported.
             </summary>
         </member>
-        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplyManualPowerTuning(ADLXWrapper.IADLXGPUTuningServices*,ADLXWrapper.IADLXGPU*,ADLXWrapper.ManualPowerTuningInfo)">
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplyManualPowerTuning(ADLXWrapper.IADLXGPUTuningServices*,ADLXWrapper.IADLXGPU*,ADLXWrapper.ManualPowerTuningDto)">
             <summary>
             Tries to apply manual power tuning via tuning services; returns false when unsupported.
             </summary>
         </member>
-        <member name="T:ADLXWrapper.SmartShiftMaxInfo">
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.ApplyManualPowerTuning(System.Int32,ADLXWrapper.ADLXGPUTuningServicesHelper,ADLXWrapper.ManualPowerTuningDto)">
+            <summary>
+            Applies manual power tuning settings for the GPU with the specified unique id.
+            </summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXPowerTuningServicesHelper.TryApplyManualPowerTuning(System.Int32,ADLXWrapper.ADLXGPUTuningServicesHelper,ADLXWrapper.ManualPowerTuningDto)">
+            <summary>
+            Tries to apply manual power tuning settings for the GPU with the specified unique id; returns false when unsupported.
+            </summary>
+        </member>
+        <member name="T:ADLXWrapper.SmartShiftMaxDto">
             <summary>
             Represents the collected information for SmartShift Max.
             </summary>
         </member>
-        <member name="T:ADLXWrapper.SmartShiftEcoInfo">
+        <member name="T:ADLXWrapper.SmartShiftEcoDto">
             <summary>
             Represents the collected information for SmartShift Eco.
             </summary>
         </member>
-        <member name="T:ADLXWrapper.ManualPowerTuningInfo">
+        <member name="T:ADLXWrapper.ManualPowerTuningDto">
             <summary>
             Represents the collected information for Manual Power Tuning.
             </summary>
@@ -1590,7 +1752,7 @@
             <exception cref="T:ADLXWrapper.ADLXException">If enumeration is unsupported or fails.</exception>
             <exception cref="T:System.ObjectDisposedException">If the helper has been disposed.</exception>
         </member>
-        <member name="M:ADLXWrapper.ADLXSystemServicesHelper.GetGpuInfo(ADLXWrapper.IADLXGPU*)">
+        <member name="M:ADLXWrapper.ADLXSystemServicesHelper.GetGpuDto(ADLXWrapper.IADLXGPU*)">
             <summary>
             Builds a GPU info DTO from a native GPU pointer.
             </summary>

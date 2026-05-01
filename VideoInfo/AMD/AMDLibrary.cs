@@ -365,43 +365,37 @@ namespace DisplayMagicianShared.AMD
             DynamicContrastRange = dynamicContrastRange;
         }
 
-        public AMD_3DLUT_INFO(ThreeDLUTInfo threeDLUTInfo)
+        public AMD_3DLUT_INFO(ThreeDLUTDto threeDLUTDto)
         {
-            IsSupportedSCE = threeDLUTInfo.IsSceSupported;
-            IsSupportedSCEVividGaming = threeDLUTInfo.IsSceVividGamingSupported;
-            IsSupportedSCEDynamicContrast = threeDLUTInfo.IsSceDynamicContrastSupported;
-            IsSupportedUser3DLUT = threeDLUTInfo.IsUser3DLutSupported;
-            IsCurrentSCEDisabled = threeDLUTInfo.IsCurrentSceDisabled;
-            IsCurrentSCEVividGaming = threeDLUTInfo.IsCurrentSceVividGaming;
-            HasDynamicContrast = threeDLUTInfo.HasDynamicContrast;
-            CurrentDynamicContrastValue = threeDLUTInfo.CurrentDynamicContrast;
+            IsSupportedSCE = threeDLUTDto.IsSceSupported;
+            IsSupportedSCEVividGaming = threeDLUTDto.IsSceVividGamingSupported;
+            IsSupportedSCEDynamicContrast = threeDLUTDto.IsSceDynamicContrastSupported;
+            IsSupportedUser3DLUT = threeDLUTDto.IsUser3DLutSupported;
+            IsCurrentSCEDisabled = threeDLUTDto.IsCurrentSceDisabled;
+            IsCurrentSCEVividGaming = threeDLUTDto.IsCurrentSceVividGaming;
+            HasDynamicContrast = threeDLUTDto.HasDynamicContrast;
+            CurrentDynamicContrastValue = threeDLUTDto.CurrentDynamicContrast;
             DynamicContrastRange = new IntRange
             {
-                Min = threeDLUTInfo.DynamicContrastRange.minValue,
-                Max = threeDLUTInfo.DynamicContrastRange.maxValue,
-                Step = threeDLUTInfo.DynamicContrastRange.step
+                Min = threeDLUTDto.DynamicContrastRange.MinValue,
+                Max = threeDLUTDto.DynamicContrastRange.MaxValue,
+                Step = threeDLUTDto.DynamicContrastRange.Step
             };
         }
 
-        public ThreeDLUTInfo ToThreeDLUTInfo()
+        public ThreeDLUTDto ToThreeDLUTDto()
         {
-            return new ThreeDLUTInfo
-            {
-                IsSceSupported = IsSupportedSCE,
-                IsSceVividGamingSupported = IsSupportedSCEVividGaming,
-                IsSceDynamicContrastSupported = IsSupportedSCEDynamicContrast,
-                IsUser3DLutSupported = IsSupportedUser3DLUT,
-                IsCurrentSceDisabled = IsCurrentSCEDisabled,
-                IsCurrentSceVividGaming = IsCurrentSCEVividGaming,
-                HasDynamicContrast = HasDynamicContrast,
-                CurrentDynamicContrast = CurrentDynamicContrastValue,
-                DynamicContrastRange = new ADLX_IntRange
-                {
-                    minValue = DynamicContrastRange.Min,
-                    maxValue = DynamicContrastRange.Max,
-                    step = DynamicContrastRange.Step
-                }
-            };
+            return new ThreeDLUTDto(
+                isSceSupported: IsSupportedSCE,
+                isSceVividGamingSupported: IsSupportedSCEVividGaming,
+                isSceDynamicContrastSupported: IsSupportedSCEDynamicContrast,
+                isUser3DLutSupported: IsSupportedUser3DLUT,
+                isCurrentSceDisabled: IsCurrentSCEDisabled,
+                isCurrentSceVividGaming: IsCurrentSCEVividGaming,
+                hasDynamicContrast: HasDynamicContrast,
+                currentDynamicContrast: CurrentDynamicContrastValue,
+                dynamicContrastRange: new IntRangeDto(DynamicContrastRange.Min, DynamicContrastRange.Max, DynamicContrastRange.Step)
+            );
         }
 
         public override bool Equals(object obj) => obj is AMD_3DLUT_INFO other && this.Equals(other);
@@ -523,7 +517,7 @@ namespace DisplayMagicianShared.AMD
             RelativeVoltageSwing = relativeVoltageSwing;
         }
 
-        public AMD_CONNECTIVITY_EXPERIENCE_INFO(ConnectivityExperienceInfo ConnExp)
+        public AMD_CONNECTIVITY_EXPERIENCE_INFO(ConnectivityExperienceDto ConnExp)
         {
             IsHdmiQualityDetectionSupported = ConnExp.IsHdmiQualityDetectionSupported;
             IsHdmiQualityDetectionEnabled = ConnExp.IsHdmiQualityDetectionEnabled;
@@ -535,19 +529,18 @@ namespace DisplayMagicianShared.AMD
             RelativeVoltageSwing = ConnExp.RelativeVoltageSwing;
         }
 
-        public ConnectivityExperienceInfo ToConnectivityExperienceInfo()
+        public ConnectivityExperienceDto ToConnectivityExperienceDto()
         {
-            return new ConnectivityExperienceInfo
-            {
-                IsHdmiQualityDetectionSupported = IsHdmiQualityDetectionSupported,
-                IsHdmiQualityDetectionEnabled = IsHdmiQualityDetectionEnabled,
-                IsDpLinkRateSupported = IsDpLinkRateSupported,
-                DpLinkRate = DpLinkRate,
-                IsRelativePreEmphasisSupported = IsRelativePreEmphasisSupported,
-                RelativePreEmphasis = RelativePreEmphasis,
-                IsRelativeVoltageSwingSupported = IsRelativeVoltageSwingSupported,
-                RelativeVoltageSwing = RelativeVoltageSwing
-            };
+            return new ConnectivityExperienceDto(
+                isHdmiQualityDetectionSupported: IsHdmiQualityDetectionSupported,
+                isHdmiQualityDetectionEnabled: IsHdmiQualityDetectionEnabled,
+                isDpLinkRateSupported: IsDpLinkRateSupported,
+                dpLinkRate: DpLinkRate,
+                isRelativePreEmphasisSupported: IsRelativePreEmphasisSupported,
+                relativePreEmphasis: RelativePreEmphasis,
+                isRelativeVoltageSwingSupported: IsRelativeVoltageSwingSupported,
+                relativeVoltageSwing: RelativeVoltageSwing
+            );
         }   
 
         public override bool Equals(object obj) => obj is AMD_CONNECTIVITY_EXPERIENCE_INFO other && this.Equals(other);
@@ -628,24 +621,19 @@ namespace DisplayMagicianShared.AMD
             BlueY = blueY;
         }
 
-        public AMD_GAMUT_COLOR_SPACE(ADLX_GamutColorSpace gamutColorSpace)
+        public AMD_GAMUT_COLOR_SPACE(GamutColorSpaceDto gamutColorSpace)
         {
-            RedX = gamutColorSpace.red.x;
-            RedY = gamutColorSpace.red.y;
-            GreenX = gamutColorSpace.green.x;
-            GreenY = gamutColorSpace.green.y;
-            BlueX = gamutColorSpace.blue.x;
-            BlueY = gamutColorSpace.blue.y;
+            RedX = gamutColorSpace.Red.X;
+            RedY = gamutColorSpace.Red.Y;
+            GreenX = gamutColorSpace.Green.X;
+            GreenY = gamutColorSpace.Green.Y;
+            BlueX = gamutColorSpace.Blue.X;
+            BlueY = gamutColorSpace.Blue.Y;
         }
 
-        public ADLX_GamutColorSpace ToGamutColorSpace()
+        public GamutColorSpaceDto ToGamutColorSpaceDto()
         {
-            return new ADLX_GamutColorSpace
-            {
-                red = new ADLX_Point { x = RedX, y = RedY },
-                green = new ADLX_Point { x = GreenX, y = GreenY },
-                blue = new ADLX_Point { x = BlueX, y = BlueY }
-            };
+            return new GamutColorSpaceDto(new PointDto(RedX, RedY), new PointDto(GreenX, GreenY), new PointDto(BlueX, BlueY));
         }
 
         public override bool Equals(object obj) => obj is AMD_GAMUT_COLOR_SPACE other && this.Equals(other);
@@ -731,8 +719,8 @@ namespace DisplayMagicianShared.AMD
                              bool isCurrent5000K, bool isCurrent6500K, bool isCurrent7500K, bool isCurrent9300K,
                              bool isCurrentCustomWhitePoint, bool isCurrent709, bool isCurrent601,
                              bool isCurrentAdobe, bool isCurrentCieRgb, bool isCurrent2020,
-                             bool isCurrentCustomColorSpace, ADLX_GamutColorSpace currentGamutSpace,
-                             ADLX_Point whitePoint,  bool hasWhitePoint)
+                             bool isCurrentCustomColorSpace, GamutColorSpaceDto currentGamutSpace,
+                             PointDto whitePoint,  bool hasWhitePoint)
         {
             IsWhitePointSupported = isWhitePointSupported;
             IsGamutSupported = isGamutSupported;
@@ -748,53 +736,52 @@ namespace DisplayMagicianShared.AMD
             IsCurrent2020 = isCurrent2020;
             IsCurrentCustomColorSpace = isCurrentCustomColorSpace;
             CurrentGamutSpace = new AMD_GAMUT_COLOR_SPACE(currentGamutSpace);
-            WhitePointX = whitePoint.x;
-            WhitePointY = whitePoint.y;
+            WhitePointX = whitePoint.X;
+            WhitePointY = whitePoint.Y;
             HasWhitePoint = hasWhitePoint;
         }
 
-        public AMD_GAMUT_INFO(GamutInfo gamutInfo)
+        public AMD_GAMUT_INFO(GamutDto gamutDto)
         {
-            IsWhitePointSupported = gamutInfo.IsWhitePointSupported;
-            IsGamutSupported = gamutInfo.IsGamutSupported;
-            IsCurrent5000K = gamutInfo.IsCurrent5000K;
-            IsCurrent6500K = gamutInfo.IsCurrent6500K;
-            IsCurrent7500K = gamutInfo.IsCurrent7500K;
-            IsCurrent9300K = gamutInfo.IsCurrent9300K;
-            IsCurrentCustomWhitePoint = gamutInfo.IsCurrentCustomWhitePoint;
-            IsCurrent709 = gamutInfo.IsCurrent709;
-            IsCurrent601 = gamutInfo.IsCurrent601;
-            IsCurrentAdobe = gamutInfo.IsCurrentAdobe;
-            IsCurrentCieRgb = gamutInfo.IsCurrentCieRgb;
-            IsCurrent2020 = gamutInfo.IsCurrent2020;
-            IsCurrentCustomColorSpace = gamutInfo.IsCurrentCustomColorSpace;
-            CurrentGamutSpace = new AMD_GAMUT_COLOR_SPACE(gamutInfo.CurrentGamutSpace);
-            WhitePointX = gamutInfo.WhitePoint.x;
-            WhitePointY = gamutInfo.WhitePoint.y;
-            HasWhitePoint = gamutInfo.HasWhitePoint;
+            IsWhitePointSupported = gamutDto.IsWhitePointSupported;
+            IsGamutSupported = gamutDto.IsGamutSupported;
+            IsCurrent5000K = gamutDto.IsCurrent5000K;
+            IsCurrent6500K = gamutDto.IsCurrent6500K;
+            IsCurrent7500K = gamutDto.IsCurrent7500K;
+            IsCurrent9300K = gamutDto.IsCurrent9300K;
+            IsCurrentCustomWhitePoint = gamutDto.IsCurrentCustomWhitePoint;
+            IsCurrent709 = gamutDto.IsCurrent709;
+            IsCurrent601 = gamutDto.IsCurrent601;
+            IsCurrentAdobe = gamutDto.IsCurrentAdobe;
+            IsCurrentCieRgb = gamutDto.IsCurrentCieRgb;
+            IsCurrent2020 = gamutDto.IsCurrent2020;
+            IsCurrentCustomColorSpace = gamutDto.IsCurrentCustomColorSpace;
+            CurrentGamutSpace = new AMD_GAMUT_COLOR_SPACE(gamutDto.CurrentGamutSpace);
+            WhitePointX = gamutDto.WhitePoint.X;
+            WhitePointY = gamutDto.WhitePoint.Y;
+            HasWhitePoint = gamutDto.HasWhitePoint;
         }
 
-        public GamutInfo ToGamutInfo()
+        public GamutDto ToGamutDto()
         {
-            return new GamutInfo
-            {
-                IsWhitePointSupported = IsWhitePointSupported,
-                IsGamutSupported = IsGamutSupported,
-                IsCurrent5000K = IsCurrent5000K,
-                IsCurrent6500K = IsCurrent6500K,
-                IsCurrent7500K = IsCurrent7500K,
-                IsCurrent9300K = IsCurrent9300K,
-                IsCurrentCustomWhitePoint = IsCurrentCustomWhitePoint,
-                IsCurrent709 = IsCurrent709,
-                IsCurrent601 = IsCurrent601,
-                IsCurrentAdobe = IsCurrentAdobe,
-                IsCurrentCieRgb = IsCurrentCieRgb,
-                IsCurrent2020 = IsCurrent2020,
-                IsCurrentCustomColorSpace = IsCurrentCustomColorSpace,
-                CurrentGamutSpace = CurrentGamutSpace.ToGamutColorSpace(),
-                WhitePoint = new ADLX_Point { x = WhitePointX, y = WhitePointY },
-                HasWhitePoint = HasWhitePoint
-            };
+            return new GamutDto(
+                isWhitePointSupported: IsWhitePointSupported,
+                isGamutSupported: IsGamutSupported,
+                isCurrent5000K: IsCurrent5000K,
+                isCurrent6500K: IsCurrent6500K,
+                isCurrent7500K: IsCurrent7500K,
+                isCurrent9300K: IsCurrent9300K,
+                isCurrentCustomWhitePoint: IsCurrentCustomWhitePoint,
+                isCurrent709: IsCurrent709,
+                isCurrent601: IsCurrent601,
+                isCurrentAdobe: IsCurrentAdobe,
+                isCurrentCieRgb: IsCurrentCieRgb,
+                isCurrent2020: IsCurrent2020,
+                isCurrentCustomColorSpace: IsCurrentCustomColorSpace,
+                currentGamutSpace: CurrentGamutSpace.ToGamutColorSpaceDto(),
+                whitePoint: new PointDto(WhitePointX, WhitePointY),
+                hasWhitePoint: HasWhitePoint
+            );
         }
 
         public override bool Equals(object obj) => obj is AMD_GAMUT_INFO other && this.Equals(other);
@@ -862,25 +849,18 @@ namespace DisplayMagicianShared.AMD
             gamma = gammaValue;
         }
 
-        public AMD_REGAMMA_COEFFICIENT(ADLX_RegammaCoeff regammaCoeff)
+        public AMD_REGAMMA_COEFFICIENT(RegammaCoeffDto regammaCoeffDto)
         {
-            coefficientA0 = regammaCoeff.coefficientA0;
-            coefficientA1 = regammaCoeff.coefficientA1;
-            coefficientA2 = regammaCoeff.coefficientA2;
-            coefficientA3 = regammaCoeff.coefficientA3;
-            gamma = regammaCoeff.gamma;
+            coefficientA0 = regammaCoeffDto.CoefficientA0;
+            coefficientA1 = regammaCoeffDto.CoefficientA1;
+            coefficientA2 = regammaCoeffDto.CoefficientA2;
+            coefficientA3 = regammaCoeffDto.CoefficientA3;
+            gamma = regammaCoeffDto.Gamma;
         }
 
-        public ADLX_RegammaCoeff ToRegammaCoeff()
+        public RegammaCoeffDto ToRegammaCoeffDto()
         {
-            return new ADLX_RegammaCoeff
-            {
-                coefficientA0 = coefficientA0,
-                coefficientA1 = coefficientA1,
-                coefficientA2 = coefficientA2,
-                coefficientA3 = coefficientA3,
-                gamma = gamma
-            };
+            return new RegammaCoeffDto(coefficientA0, coefficientA1, coefficientA2, coefficientA3, gamma);
         }
 
         public override bool Equals(object obj) => obj is AMD_REGAMMA_COEFFICIENT other && this.Equals(other);
@@ -930,24 +910,14 @@ namespace DisplayMagicianShared.AMD
             Gamma = gammaValues;
         }
 
-        public AMD_GAMMA_RAMP(ADLX_GammaRamp gammaRamp)
+        public AMD_GAMMA_RAMP(GammaRampDto gammaRampDto)
         {
-            Gamma = new List<ushort>();
-            foreach(var gammaEntry in gammaRamp.gamma)
-            {
-                Gamma.Add(gammaEntry);
-            }            
-
+            Gamma = new List<ushort>(gammaRampDto.Values);
         }
 
-        public ADLX_GammaRamp ToGammaRamp()
+        public GammaRampDto ToGammaRampDto()
         {
-            ADLX_GammaRamp gammaRamp = new ADLX_GammaRamp();
-            for (int i = 0; i < Gamma.Count; i++)
-            {
-                gammaRamp.gamma[i] = Gamma[i];
-            }
-            return gammaRamp;
+            return new GammaRampDto(Gamma);
         }
 
         public override bool Equals(object obj) => obj is AMD_GAMMA_RAMP other && this.Equals(other);
@@ -1004,9 +974,9 @@ namespace DisplayMagicianShared.AMD
 
         public AMD_GAMMA_INFO(bool isSupported, bool isCurrentReGammaSRGB, bool isCurrentReGammaBT709,
                              bool isCurrentReGammaPQ, bool isCurrentReGammaPQ2084, bool isCurrentReGamma36,
-                             bool hasRegammaCoefficient, ADLX_RegammaCoeff regammaCoefficient,
-                             bool hasReGammaRamp, ADLX_GammaRamp reGammaRamp,
-                             bool hasDeGammaRamp, ADLX_GammaRamp deGammaRamp)
+                             bool hasRegammaCoefficient, RegammaCoeffDto regammaCoefficient,
+                             bool hasReGammaRamp, GammaRampDto reGammaRamp,
+                             bool hasDeGammaRamp, GammaRampDto deGammaRamp)
         {
             IsSupported = isSupported;
             IsCurrentReGammaSRGB = isCurrentReGammaSRGB;
@@ -1022,39 +992,38 @@ namespace DisplayMagicianShared.AMD
             DeGammaRamp = new AMD_GAMMA_RAMP(deGammaRamp);
         }
 
-        public AMD_GAMMA_INFO(GammaInfo gammaInfo)
+        public AMD_GAMMA_INFO(GammaDto gammaDto)
         {
-            IsSupported = gammaInfo.IsSupported;
-            IsCurrentReGammaSRGB = gammaInfo.IsCurrentReGammaSRGB;
-            IsCurrentReGammaBT709 = gammaInfo.IsCurrentReGammaBT709;
-            IsCurrentReGammaPQ = gammaInfo.IsCurrentReGammaPQ;
-            IsCurrentReGammaPQ2084 = gammaInfo.IsCurrentReGammaPQ2084;
-            IsCurrentReGamma36 = gammaInfo.IsCurrentReGamma36;
-            HasRegammaCoefficient = gammaInfo.HasRegammaCoefficient;
-            RegammaCoefficient = new AMD_REGAMMA_COEFFICIENT(gammaInfo.RegammaCoefficient);
-            HasReGammaRamp = gammaInfo.HasReGammaRamp;
-            ReGammaRamp = new AMD_GAMMA_RAMP(gammaInfo.ReGammaRamp);
-            HasDeGammaRamp = gammaInfo.HasDeGammaRamp;
-            DeGammaRamp = new AMD_GAMMA_RAMP(gammaInfo.DeGammaRamp);
+            IsSupported = gammaDto.IsSupported;
+            IsCurrentReGammaSRGB = gammaDto.IsCurrentReGammaSRGB;
+            IsCurrentReGammaBT709 = gammaDto.IsCurrentReGammaBT709;
+            IsCurrentReGammaPQ = gammaDto.IsCurrentReGammaPQ;
+            IsCurrentReGammaPQ2084 = gammaDto.IsCurrentReGammaPQ2084;
+            IsCurrentReGamma36 = gammaDto.IsCurrentReGamma36;
+            HasRegammaCoefficient = gammaDto.HasRegammaCoefficient;
+            RegammaCoefficient = new AMD_REGAMMA_COEFFICIENT(gammaDto.RegammaCoefficient);
+            HasReGammaRamp = gammaDto.HasReGammaRamp;
+            ReGammaRamp = new AMD_GAMMA_RAMP(gammaDto.ReGammaRamp);
+            HasDeGammaRamp = gammaDto.HasDeGammaRamp;
+            DeGammaRamp = new AMD_GAMMA_RAMP(gammaDto.DeGammaRamp);
         }
 
-        public GammaInfo ToGammaInfo()
+        public GammaDto ToGammaDto()
         {
-            return new GammaInfo
-            {
-                IsSupported = IsSupported,
-                IsCurrentReGammaSRGB = IsCurrentReGammaSRGB,
-                IsCurrentReGammaBT709 = IsCurrentReGammaBT709,
-                IsCurrentReGammaPQ = IsCurrentReGammaPQ,
-                IsCurrentReGammaPQ2084 = IsCurrentReGammaPQ2084,
-                IsCurrentReGamma36 = IsCurrentReGamma36,
-                HasRegammaCoefficient = HasRegammaCoefficient,
-                RegammaCoefficient = RegammaCoefficient.ToRegammaCoeff(),
-                HasReGammaRamp = HasReGammaRamp,
-                ReGammaRamp = ReGammaRamp.ToGammaRamp(),
-                HasDeGammaRamp = HasDeGammaRamp,
-                DeGammaRamp = DeGammaRamp.ToGammaRamp()
-            };
+            return new GammaDto(
+                isSupported: IsSupported,
+                isCurrentReGammaSRGB: IsCurrentReGammaSRGB,
+                isCurrentReGammaBT709: IsCurrentReGammaBT709,
+                isCurrentReGammaPQ: IsCurrentReGammaPQ,
+                isCurrentReGammaPQ2084: IsCurrentReGammaPQ2084,
+                isCurrentReGamma36: IsCurrentReGamma36,
+                hasRegammaCoefficient: HasRegammaCoefficient,
+                regammaCoefficient: RegammaCoefficient.ToRegammaCoeffDto(),
+                hasReGammaRamp: HasReGammaRamp,
+                reGammaRamp: ReGammaRamp.ToGammaRampDto(),
+                hasDeGammaRamp: HasDeGammaRamp,
+                deGammaRamp: DeGammaRamp.ToGammaRampDto()
+            );
         }
 
         public override bool Equals(object obj) => obj is AMD_GAMMA_INFO other && this.Equals(other);
@@ -1172,36 +1141,35 @@ namespace DisplayMagicianShared.AMD
             IsTemperatureSupported = isTemperatureSupported;
             Temperature = temperature;
         }
-        public AMD_CUSTOM_COLOR_INFO(CustomColorInfo customColorInfo)
+        public AMD_CUSTOM_COLOR_INFO(CustomColorDto customColorDto)
         {
-            IsSupported = customColorInfo.IsSupported;
-            IsHueSupported = customColorInfo.IsHueSupported;
-            Hue = customColorInfo.Hue;
-            IsSaturationSupported = customColorInfo.IsSaturationSupported;
-            Saturation = customColorInfo.Saturation;
-            IsBrightnessSupported = customColorInfo.IsBrightnessSupported;
-            Brightness = customColorInfo.Brightness;
-            IsContrastSupported = customColorInfo.IsContrastSupported;
-            Contrast = customColorInfo.Contrast;
-            IsTemperatureSupported = customColorInfo.IsTemperatureSupported;
-            Temperature = customColorInfo.Temperature;
+            IsSupported = customColorDto.IsSupported;
+            IsHueSupported = customColorDto.IsHueSupported;
+            Hue = customColorDto.Hue;
+            IsSaturationSupported = customColorDto.IsSaturationSupported;
+            Saturation = customColorDto.Saturation;
+            IsBrightnessSupported = customColorDto.IsBrightnessSupported;
+            Brightness = customColorDto.Brightness;
+            IsContrastSupported = customColorDto.IsContrastSupported;
+            Contrast = customColorDto.Contrast;
+            IsTemperatureSupported = customColorDto.IsTemperatureSupported;
+            Temperature = customColorDto.Temperature;
         }
-        public  CustomColorInfo ToCustomColorInfo()
+        public CustomColorDto ToCustomColorDto()
         {
-            return new CustomColorInfo
-            {
-                IsSupported = IsSupported,
-                IsHueSupported = IsHueSupported,
-                Hue = Hue,
-                IsSaturationSupported = IsSaturationSupported,
-                Saturation = Saturation,
-                IsBrightnessSupported = IsBrightnessSupported,
-                Brightness = Brightness,
-                IsContrastSupported = IsContrastSupported,
-                Contrast = Contrast,
-                IsTemperatureSupported = IsTemperatureSupported,
-                Temperature = Temperature
-            };
+            return new CustomColorDto(
+                isSupported: IsSupported,
+                isHueSupported: IsHueSupported,
+                hue: Hue,
+                isSaturationSupported: IsSaturationSupported,
+                saturation: Saturation,
+                isBrightnessSupported: IsBrightnessSupported,
+                brightness: Brightness,
+                isContrastSupported: IsContrastSupported,
+                contrast: Contrast,
+                isTemperatureSupported: IsTemperatureSupported,
+                temperature: Temperature
+            );
         }   
         public override bool Equals(object obj) => obj is AMD_CUSTOM_COLOR_INFO other && this.Equals(other);
         public bool Equals(AMD_CUSTOM_COLOR_INFO other)
@@ -3482,7 +3450,7 @@ namespace DisplayMagicianShared.AMD
                         if (!currentCustomColor.Equals(stored.CustomColorInfo))
                         {
                             SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: CustomColor differs for display {display.UniqueId}, applying stored values.");
-                            display.ApplyCustomColor(stored.CustomColorInfo.ToCustomColorInfo());
+                            display.ApplyCustomColor(stored.CustomColorInfo.ToCustomColorDto());
                         }
                         else
                         {
@@ -3534,7 +3502,7 @@ namespace DisplayMagicianShared.AMD
                         if (!currentConn.Equals(stored.ConnectivityExperience))
                         {
                             SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Connectivity experience differs for display {display.UniqueId}, applying.");
-                            display.ApplyConnectivityExperience(stored.ConnectivityExperience.ToConnectivityExperienceInfo());
+                            display.ApplyConnectivityExperience(stored.ConnectivityExperience.ToConnectivityExperienceDto());
                         }
                         else
                         {
