@@ -1561,6 +1561,52 @@ namespace DisplayMagicianShared.AMD
         public static bool operator !=(AMD_DISPLAY lhs, AMD_DISPLAY rhs) => !(lhs == rhs);
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct AMD_GPU_WITH_SETTINGS : IEquatable<AMD_GPU_WITH_SETTINGS>
+    {
+        public All3DSettingsDto? ThreeDSettings;
+        public VideoUpscaleDto? VideoUpscale;
+        public VideoSuperResolutionDto? VideoSuperResolution;
+
+        public AMD_GPU_WITH_SETTINGS()
+        {
+            ThreeDSettings = null;
+            VideoUpscale = null;
+            VideoSuperResolution = null;
+        }
+
+        public override bool Equals(object obj) => obj is AMD_GPU_WITH_SETTINGS other && this.Equals(other);
+
+        public bool Equals(AMD_GPU_WITH_SETTINGS other)
+        {
+            if (!Nullable.Equals(ThreeDSettings, other.ThreeDSettings))
+            {
+                SharedLogger.logger.Trace($"AMD_GPU_WITH_SETTINGS/Equals: The ThreeDSettings values don't equal each other");
+                return false;
+            }
+            if (!Nullable.Equals(VideoUpscale, other.VideoUpscale))
+            {
+                SharedLogger.logger.Trace($"AMD_GPU_WITH_SETTINGS/Equals: The VideoUpscale values don't equal each other");
+                return false;
+            }
+            if (!Nullable.Equals(VideoSuperResolution, other.VideoSuperResolution))
+            {
+                SharedLogger.logger.Trace($"AMD_GPU_WITH_SETTINGS/Equals: The VideoSuperResolution values don't equal each other");
+                return false;
+            }
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return (ThreeDSettings, VideoUpscale, VideoSuperResolution).GetHashCode();
+        }
+
+        public static bool operator ==(AMD_GPU_WITH_SETTINGS lhs, AMD_GPU_WITH_SETTINGS rhs) => lhs.Equals(rhs);
+
+        public static bool operator !=(AMD_GPU_WITH_SETTINGS lhs, AMD_GPU_WITH_SETTINGS rhs) => !(lhs == rhs);
+    }
+
 
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_DISPLAY_CONFIG : IEquatable<AMD_DISPLAY_CONFIG>
@@ -1573,6 +1619,7 @@ namespace DisplayMagicianShared.AMD
         public Dictionary<ulong,AMD_DISPLAY_WITH_SETTINGS> Displays;
         public AMD_SLS_CONFIG Adl2SlsConfig;
         public List<string> DisplayIdentifiers;
+        public Dictionary<string, AMD_GPU_WITH_SETTINGS> GPUs;
 
         public AMD_DISPLAY_CONFIG()
         {
@@ -1584,6 +1631,7 @@ namespace DisplayMagicianShared.AMD
             Displays = new Dictionary<ulong,AMD_DISPLAY_WITH_SETTINGS>();
             Adl2SlsConfig = new AMD_SLS_CONFIG();
             DisplayIdentifiers = new List<string>();
+            GPUs = new Dictionary<string, AMD_GPU_WITH_SETTINGS>();
         }
 
         public override bool Equals(object obj) => obj is AMD_DISPLAY_CONFIG other && this.Equals(other);
@@ -1629,12 +1677,17 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The DisplayIdentifiers values don't equal each other");
                 return false;
             }
+            if (!GPUs.SequenceEqual(other.GPUs))
+            {
+                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The GPUs values don't equal each other");
+                return false;
+            }
             return true;
         }
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCloned, Desktops, IsEyefinity, EyefinityDesktop, Displays, Adl2SlsConfig, DisplayIdentifiers).GetHashCode();
+            return (IsInUse, IsCloned, Desktops, IsEyefinity, EyefinityDesktop, Displays, Adl2SlsConfig, DisplayIdentifiers, GPUs).GetHashCode();
         }
 
         public static bool operator ==(AMD_DISPLAY_CONFIG lhs, AMD_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
@@ -2968,7 +3021,70 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Error($"AMDLibrary/GetAMDDisplayConfig: ERROR - Tried to run GetAMDDisplayConfig but the AMD ADL library isn't initialised!");
                 return CreateDefaultConfig();
             }
-            
+
+            // Read per-GPU 3D settings (keyed by stable hardware identity, not session UniqueId)
+            try
+            {
+                var threeDServices = _adlxSystem.Get3DSettingsServices();
+                var gpusFor3D = _adlxSystem.EnumerateADLXGPUs();
+                foreach (var gpu in gpusFor3D)
+                {
+                    string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                    if (!myDisplayConfig.GPUs.TryGetValue(gpuKey, out var gpuSettings))
+                        gpuSettings = new AMD_GPU_WITH_SETTINGS();
+                    if (threeDServices.TryGetAll3DSettings(gpu.UniqueId, out var settings3D))
+                    {
+                        gpuSettings.ThreeDSettings = settings3D;
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Read 3D settings for GPU {gpuKey}.");
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Could not read 3D settings for GPU {gpuKey}, skipping.");
+                    }
+                    myDisplayConfig.GPUs[gpuKey] = gpuSettings;
+                }
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Warn(ex, "AMDLibrary/GetAMDDisplayConfig: Failed to read per-GPU 3D settings via ADLX.");
+            }
+
+            // Read per-GPU multimedia settings
+            try
+            {
+                var mmServices = _adlxSystem.GetMultimediaServices();
+                var gpusForMm = _adlxSystem.EnumerateADLXGPUs();
+                foreach (var gpu in gpusForMm)
+                {
+                    string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                    if (!myDisplayConfig.GPUs.TryGetValue(gpuKey, out var gpuSettings))
+                        gpuSettings = new AMD_GPU_WITH_SETTINGS();
+                    if (mmServices.TryGetVideoUpscale(gpu.UniqueId, out var videoUpscale))
+                    {
+                        gpuSettings.VideoUpscale = videoUpscale;
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Read VideoUpscale for GPU {gpuKey}.");
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Could not read VideoUpscale for GPU {gpuKey}, skipping.");
+                    }
+                    if (mmServices.TryGetVideoSuperResolution(gpu.UniqueId, out var videoSuperResolution))
+                    {
+                        gpuSettings.VideoSuperResolution = videoSuperResolution;
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Read VideoSuperResolution for GPU {gpuKey}.");
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Could not read VideoSuperResolution for GPU {gpuKey}, skipping.");
+                    }
+                    myDisplayConfig.GPUs[gpuKey] = gpuSettings;
+                }
+            }
+            catch (Exception ex)
+            {
+                SharedLogger.logger.Warn(ex, "AMDLibrary/GetAMDDisplayConfig: Failed to read per-GPU multimedia settings via ADLX.");
+            }
+
             // Return the configuration
             return myDisplayConfig;
         }
@@ -3013,6 +3129,56 @@ namespace DisplayMagicianShared.AMD
                     sb.AppendLine($"WindowsDriver: {id.AMDWindowsDriverVersion}");
                     sb.AppendLine($"DeviceId: {id.DeviceId} SubSystem: {id.SubSystemId} SubVendor: {id.SubSystemVendorId} Revision: {id.RevisionId}");
                     sb.AppendLine($"PNP: {id.PNPString}");
+
+                    // Per-GPU settings (3D and multimedia) from stored config
+                    string gpuKey = $"{id.DeviceId}_{id.SubSystemId}_{id.SubSystemVendorId}_{id.RevisionId}";
+                    if (displayConfig.GPUs.TryGetValue(gpuKey, out var gpuSettings))
+                    {
+                        if (gpuSettings.ThreeDSettings.HasValue)
+                        {
+                            var s3d = gpuSettings.ThreeDSettings.Value;
+                            sb.AppendLine($"3D AntiLag: Supported={s3d.AntiLag?.IsSupported} Enabled={s3d.AntiLag?.IsEnabled} Level={s3d.AntiLag?.Level}");
+                            sb.AppendLine($"3D Chill: Supported={s3d.Chill?.IsSupported} Enabled={s3d.Chill?.IsEnabled} MinFPS={s3d.Chill?.MinFPS} MaxFPS={s3d.Chill?.MaxFPS}");
+                            sb.AppendLine($"3D Boost: Supported={s3d.Boost?.IsSupported} Enabled={s3d.Boost?.IsEnabled} MinRes={s3d.Boost?.MinResolution}");
+                            sb.AppendLine($"3D RadeonImageSharpening: Supported={s3d.ImageSharpening?.IsSupported} Enabled={s3d.ImageSharpening?.IsEnabled} Sharpness={s3d.ImageSharpening?.Sharpness}");
+                            sb.AppendLine($"3D EnhancedSync: Supported={s3d.EnhancedSync?.IsSupported} Enabled={s3d.EnhancedSync?.IsEnabled}");
+                            sb.AppendLine($"3D WaitForVerticalRefresh: Supported={s3d.WaitForVerticalRefresh?.IsSupported} Mode={s3d.WaitForVerticalRefresh?.Mode}");
+                            sb.AppendLine($"3D FrameRateTargetControl: Supported={s3d.FrameRateTargetControl?.IsSupported} Enabled={s3d.FrameRateTargetControl?.IsEnabled} FPS={s3d.FrameRateTargetControl?.Fps}");
+                            sb.AppendLine($"3D AntiAliasing: Supported={s3d.AntiAliasing?.IsSupported} Mode={s3d.AntiAliasing?.Mode}");
+                            sb.AppendLine($"3D MorphologicalAntiAliasing: Supported={s3d.MorphologicalAntiAliasing?.IsSupported} Enabled={s3d.MorphologicalAntiAliasing?.IsEnabled}");
+                            sb.AppendLine($"3D AnisotropicFiltering: Supported={s3d.AnisotropicFiltering?.IsSupported} Level={s3d.AnisotropicFiltering?.Level}");
+                            sb.AppendLine($"3D Tessellation: Supported={s3d.Tessellation?.IsSupported} Mode={s3d.Tessellation?.Mode} Level={s3d.Tessellation?.Level}");
+                            sb.AppendLine($"3D FluidMotionFrames: Supported={s3d.FluidMotionFrames?.IsSupported} Enabled={s3d.FluidMotionFrames?.IsEnabled}");
+                            sb.AppendLine($"3D RadeonSuperResolution: Supported={s3d.RadeonSuperResolution?.IsSupported} Enabled={s3d.RadeonSuperResolution?.IsEnabled}");
+                            sb.AppendLine($"3D ImageSharpenDesktop: Supported={s3d.ImageSharpenDesktop?.IsSupported} Enabled={s3d.ImageSharpenDesktop?.IsEnabled}");
+                        }
+                        else
+                        {
+                            sb.AppendLine("3D Settings: not available");
+                        }
+                        if (gpuSettings.VideoUpscale.HasValue)
+                        {
+                            var vu = gpuSettings.VideoUpscale.Value;
+                            sb.AppendLine($"MM VideoUpscale: Supported={vu.IsSupported} Enabled={vu.IsEnabled} Sharpness={vu.Sharpness} SharpnessRange=({vu.SharpnessRange.MinValue},{vu.SharpnessRange.MaxValue},{vu.SharpnessRange.Step})");
+                        }
+                        else
+                        {
+                            sb.AppendLine("MM VideoUpscale: not available");
+                        }
+                        if (gpuSettings.VideoSuperResolution.HasValue)
+                        {
+                            var vsr = gpuSettings.VideoSuperResolution.Value;
+                            sb.AppendLine($"MM VideoSuperResolution: Supported={vsr.IsSupported} Enabled={vsr.IsEnabled}");
+                        }
+                        else
+                        {
+                            sb.AppendLine("MM VideoSuperResolution: not available");
+                        }
+                    }
+                    else
+                    {
+                        sb.AppendLine("GPU settings: not stored for this GPU");
+                    }
                     sb.AppendLine();
                 }
             }
@@ -3754,6 +3920,102 @@ namespace DisplayMagicianShared.AMD
                         SharedLogger.logger.Error(ex, $"AMDLibrary/SetActiveConfigOverride: Error applying settings for display {display.UniqueId}");
                         return false;
                     }
+                }
+
+                // Apply per-GPU 3D settings (keyed by stable hardware identity)
+                try
+                {
+                    var threeDServices = _adlxSystem.Get3DSettingsServices();
+                    var gpusFor3D = _adlxSystem.EnumerateADLXGPUs();
+                    foreach (var gpu in gpusFor3D)
+                    {
+                        string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                        if (!displayConfig.GPUs.TryGetValue(gpuKey, out var storedGpu))
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No stored GPU settings for GPU {gpuKey}, skipping.");
+                            continue;
+                        }
+                        if (storedGpu.ThreeDSettings.HasValue)
+                        {
+                            if (threeDServices.TryApplyAll3DSettings(gpu.UniqueId, storedGpu.ThreeDSettings.Value))
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Applied 3D settings for GPU {gpuKey}.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to apply 3D settings for GPU {gpuKey}.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No stored 3D settings for GPU {gpuKey}, skipping.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SharedLogger.logger.Warn(ex, "AMDLibrary/SetActiveConfigOverride: Failed to apply per-GPU 3D settings via ADLX.");
+                }
+
+                // Apply per-GPU multimedia settings
+                try
+                {
+                    var mmServices = _adlxSystem.GetMultimediaServices();
+                    var gpusForMm = _adlxSystem.EnumerateADLXGPUs();
+                    foreach (var gpu in gpusForMm)
+                    {
+                        string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                        if (!displayConfig.GPUs.TryGetValue(gpuKey, out var storedGpu))
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No stored GPU settings for GPU {gpuKey}, skipping multimedia.");
+                            continue;
+                        }
+                        if (storedGpu.VideoUpscale.HasValue && storedGpu.VideoUpscale.Value.IsSupported)
+                        {
+                            if (mmServices.TrySetVideoUpscaleEnabled(gpu.UniqueId, storedGpu.VideoUpscale.Value.IsEnabled))
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Set VideoUpscale enabled={storedGpu.VideoUpscale.Value.IsEnabled} for GPU {gpuKey}.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to set VideoUpscale enabled for GPU {gpuKey}.");
+                            }
+                            if (storedGpu.VideoUpscale.Value.IsEnabled)
+                            {
+                                if (mmServices.TrySetVideoUpscaleSharpness(gpu.UniqueId, storedGpu.VideoUpscale.Value.Sharpness))
+                                {
+                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Set VideoUpscale sharpness={storedGpu.VideoUpscale.Value.Sharpness} for GPU {gpuKey}.");
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to set VideoUpscale sharpness for GPU {gpuKey}.");
+                                }
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VideoUpscale not supported or not stored for GPU {gpuKey}, skipping.");
+                        }
+                        if (storedGpu.VideoSuperResolution.HasValue && storedGpu.VideoSuperResolution.Value.IsSupported)
+                        {
+                            if (mmServices.TrySetVideoSuperResolutionEnabled(gpu.UniqueId, storedGpu.VideoSuperResolution.Value.IsEnabled))
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: Set VideoSuperResolution enabled={storedGpu.VideoSuperResolution.Value.IsEnabled} for GPU {gpuKey}.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to set VideoSuperResolution enabled for GPU {gpuKey}.");
+                            }
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: VideoSuperResolution not supported or not stored for GPU {gpuKey}, skipping.");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SharedLogger.logger.Warn(ex, "AMDLibrary/SetActiveConfigOverride: Failed to apply per-GPU multimedia settings via ADLX.");
                 }
             }
             else
