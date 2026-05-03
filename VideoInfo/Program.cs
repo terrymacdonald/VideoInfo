@@ -122,7 +122,7 @@ namespace VideoInfo
             string appTitle = $"VideoInfo v{appVersion}";
             Console.WriteLine($"\n{appTitle}");
             Console.WriteLine(new string('=', appTitle.Length));
-            Console.WriteLine($"(c) Terry MacDonald 2024-2025\n");
+            Console.WriteLine($"(c) Terry MacDonald 2024-{DateTime.Now.ToString("yyyy", CultureInfo.InvariantCulture)}\n");
 
             // Update the configuration
             nvidiaLibrary = NVIDIALibrary.GetLibrary();
