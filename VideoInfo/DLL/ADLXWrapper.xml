@@ -15,6 +15,7 @@
             </summary>
             <param name="services">Native 3D settings services pointer.</param>
             <param name="addRef">True to AddRef the pointer for this helper.</param>
+            <param name="system">Optional system pointer for GPU lookup by unique id. Not ref-counted.</param>
         </member>
         <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.Get3DSettingsServicesHandle">
             <summary>
@@ -75,6 +76,42 @@
         </member>
         <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryApplyAll3DSettings(System.Int32,ADLXWrapper.All3DSettingsDto)">
             <summary>Tries to apply all 3D settings to the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.GetChill(System.Int32)">
+            <summary>Gets Chill state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryGetChill(System.Int32,ADLXWrapper.ChillDto@)">
+            <summary>Tries to get Chill state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.ApplyChill(System.Int32,ADLXWrapper.ChillDto)">
+            <summary>Applies Chill settings to the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryApplyChill(System.Int32,ADLXWrapper.ChillDto)">
+            <summary>Tries to apply Chill settings to the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.GetMorphologicalAntiAliasing(System.Int32)">
+            <summary>Gets MorphologicalAntiAliasing state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryGetMorphologicalAntiAliasing(System.Int32,ADLXWrapper.MorphologicalAntiAliasingDto@)">
+            <summary>Tries to get MorphologicalAntiAliasing state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.ApplyMorphologicalAntiAliasing(System.Int32,ADLXWrapper.MorphologicalAntiAliasingDto)">
+            <summary>Applies MorphologicalAntiAliasing settings to the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryApplyMorphologicalAntiAliasing(System.Int32,ADLXWrapper.MorphologicalAntiAliasingDto)">
+            <summary>Tries to apply MorphologicalAntiAliasing settings to the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.GetImageSharpenDesktop(System.Int32)">
+            <summary>Gets ImageSharpenDesktop state for the GPU with the specified unique id. Requires driver support for IADLX3DSettingsServices2.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryGetImageSharpenDesktop(System.Int32,ADLXWrapper.ImageSharpenDesktopDto@)">
+            <summary>Tries to get ImageSharpenDesktop state for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.ApplyImageSharpenDesktop(System.Int32,ADLXWrapper.ImageSharpenDesktopDto)">
+            <summary>Applies ImageSharpenDesktop settings to the GPU with the specified unique id. Requires driver support for IADLX3DSettingsServices2.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.TryApplyImageSharpenDesktop(System.Int32,ADLXWrapper.ImageSharpenDesktopDto)">
+            <summary>Tries to apply ImageSharpenDesktop settings to the GPU with the specified unique id.</summary>
         </member>
         <member name="M:ADLXWrapper.ADLX3DSettingsServicesHelper.GetFluidMotionFrames(System.Int32)">
             <summary>Gets Fluid Motion Frames state for the GPU with the specified unique id.</summary>
@@ -909,6 +946,7 @@
             </summary>
             <param name="services">Native GPU tuning services pointer.</param>
             <param name="addRef">True to AddRef the pointer for this helper.</param>
+            <param name="system">Optional system pointer for GPU lookup by unique id. Not ref-counted.</param>
         </member>
         <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.GetGPUTuningServicesHandle">
             <summary>
@@ -1008,6 +1046,12 @@
         <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryGetPresetTuning(System.Int32,ADLXWrapper.PresetTuningDto@)">
             <summary>Tries to get preset tuning info for the GPU with the specified unique id.</summary>
         </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.GetSmartAccessMemory(System.Int32)">
+            <summary>Gets AMD SmartAccess Memory info for the GPU with the specified unique id.</summary>
+        </member>
+        <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.TryGetSmartAccessMemory(System.Int32,ADLXWrapper.SmartAccessMemoryDto@)">
+            <summary>Tries to get AMD SmartAccess Memory info for the GPU with the specified unique id.</summary>
+        </member>
         <member name="M:ADLXWrapper.ADLXGPUTuningServicesHelper.ExecuteWithGpuByUniqueId``1(System.Int32,System.Func{System.IntPtr,``0})">
             <summary>
             Executes an action with the GPU matching the specified unique id.
@@ -1073,6 +1117,7 @@
             </summary>
             <param name="services">Native multimedia services pointer.</param>
             <param name="addRef">True to AddRef the pointer for this helper.</param>
+            <param name="system">Optional system pointer for GPU lookup by unique id. Not ref-counted.</param>
         </member>
         <member name="M:ADLXWrapper.ADLXMultimediaServicesHelper.GetMultimediaServicesNative">
             <summary>
@@ -1181,6 +1226,7 @@
             </summary>
             <param name="services">Native performance monitoring services pointer.</param>
             <param name="addRef">True to AddRef the pointer for this helper.</param>
+            <param name="system">Optional system pointer for GPU lookup by unique id. Not ref-counted.</param>
         </member>
         <member name="M:ADLXWrapper.ADLXPerformanceMonitoringServicesHelper.GetPerformanceMonitoringServicesNative">
             <summary>
