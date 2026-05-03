@@ -1767,30 +1767,7 @@ namespace DisplayMagicianShared.AMD
                         SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX DLL. You need to download and install the AMD Adrenalin software from the AMD support website in order to fully support AMD hardware.");
                         return;
                     }
-
-                    // Attempt to load the Custom ADLX Binding DLL
-                    /*SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Attempting to load the AMD ADLXWrapper DLL {AMD_ADLX_BINDING_DLL} so we can access the AMD ADLX DLL from C#");
-                    hADLXBindingModule = LoadLibrary(AMD_ADLX_BINDING_DLL);
-                    if (hADLXBindingModule != IntPtr.Zero)
-                    {
-                        // Attempt to get the address of a non-existent function to verify the DLL is loaded
-                        // IntPtr procAddress = GetProcAddress(hModule, "fakefunction");
-                        // If GetProcAddress returns IntPtr.Zero, the function doesn't exist, which is expected
-                        // The key point is that LoadLibrary succeeded, indicating the DLL is present
-                        // Free the loaded library if we're exiting now, to avoid memory leaks
-                        //FreeLibrary(hModule);
-
-                        // Successfully loaded our custom ADLX Binding DLL, which means it's installed!
-                        _initialised = true;
-                        SharedLogger.logger.Trace("AMDLibrary/AMDLibrary: We successfully loaded our custom AMD ADLX Binding DLL! We can use the AMD ADLX API");
-                    }
-                    else
-                    {
-                        // LoadLibrary failed, DLL is not available
-                        _initialised = false;
-                        SharedLogger.logger.Error("AMDLibrary/AMDLibrary: Failed to load the AMD ADLX Binding DLL.");
-                        return;
-                    }*/
+                    
                 }
                 catch (Exception ex)
                 {
