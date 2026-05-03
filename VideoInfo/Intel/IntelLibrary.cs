@@ -457,6 +457,12 @@ namespace DisplayMagicianShared.Intel
         public bool IsCombinedDisplay;
         //public INTEL_COMBINED_DISPLAY CombinedDisplay;
         public CombinedDisplayArgsDto CombinedDisplay;
+        // Per-adapter 3D feature settings
+        public bool IsSupportedThreeDSettings;
+        public List<ThreeDFeatureGetSetDto> ThreeDSettings;
+        // Per-adapter video processing (media) settings
+        public bool IsSupportedVideoProcessing;
+        public List<VideoProcessingFeatureGetSetDto> VideoProcessingSettings;
 
         public INTEL_ADAPTER()
         {
@@ -470,6 +476,10 @@ namespace DisplayMagicianShared.Intel
             CombinedDisplay = new CombinedDisplayArgsDto();
             CombinedDisplay.ChildInfos = new List<CombinedDisplayChildInfoDto>();
             CombinedDisplay.IsSupported = false;
+            IsSupportedThreeDSettings = false;
+            ThreeDSettings = new List<ThreeDFeatureGetSetDto>();
+            IsSupportedVideoProcessing = false;
+            VideoProcessingSettings = new List<VideoProcessingFeatureGetSetDto>();
         }
         public override bool Equals(object obj) => obj is INTEL_ADAPTER other && Equals(other);
         
@@ -510,12 +520,32 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The CombinedDisplay values don't equal each other");
                 return false;
             }
+            if (IsSupportedThreeDSettings != other.IsSupportedThreeDSettings)
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The IsSupportedThreeDSettings values don't equal each other");
+                return false;
+            }
+            if (!(ThreeDSettings ?? new List<ThreeDFeatureGetSetDto>()).SequenceEqual(other.ThreeDSettings ?? new List<ThreeDFeatureGetSetDto>()))
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The ThreeDSettings values don't equal each other");
+                return false;
+            }
+            if (IsSupportedVideoProcessing != other.IsSupportedVideoProcessing)
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The IsSupportedVideoProcessing values don't equal each other");
+                return false;
+            }
+            if (!(VideoProcessingSettings ?? new List<VideoProcessingFeatureGetSetDto>()).SequenceEqual(other.VideoProcessingSettings ?? new List<VideoProcessingFeatureGetSetDto>()))
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The VideoProcessingSettings values don't equal each other");
+                return false;
+            }
             return true;
         }
 
         public override int GetHashCode()
         {
-            return (AdapterID, Name, AdapterIndex, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, CombinedDisplay).GetHashCode();
+            return (AdapterID, Name, AdapterIndex, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, CombinedDisplay, IsSupportedThreeDSettings, ThreeDSettings?.Count, IsSupportedVideoProcessing, VideoProcessingSettings?.Count).GetHashCode();
         }
 
         public static bool operator ==(INTEL_ADAPTER lhs, INTEL_ADAPTER rhs) => lhs.Equals(rhs);
@@ -880,7 +910,7 @@ namespace DisplayMagicianShared.Intel
                     adapterNum++;
                     // Get adapter properties
                     var adapterProperties = adapter.GetProperties();
-                    var adapterDeviceID = $"{adapter.Name}|{adapterProperties.PciDeviceId.ToString("G")}|{adapterProperties.PciSubsysId.ToString("G")}";
+                    var adapterDeviceID = $"{adapterProperties.PciVendorId:X4}_{adapterProperties.PciDeviceId:X4}_{adapterProperties.PciSubsysVendorId:X4}_{adapterProperties.PciSubsysId:X4}_{adapterProperties.RevId:X2}";
 
                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}({adapterProperties.Name}), PCI Device ID: 0x{adapterProperties.PciDeviceId:X4}, device type {adapterProperties.DeviceType} ({adapterNum}/{adapterTotalCount}");                    
 
@@ -933,6 +963,135 @@ namespace DisplayMagicianShared.Intel
                     catch (Exception ex)
                     {
                         SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting Combined Display settings for adapter {adapterNum}.");
+                    }
+
+                    //------------------------------------
+                    // READ PER-ADAPTER 3D SETTINGS
+                    //------------------------------------
+                    try
+                    {
+                        var threeDHelper = _igclApiHelper.Get3DHelper(adapter);
+                        var threeDCaps = threeDHelper.GetSupported3DCapabilities();
+                        if (threeDCaps.NumSupportedFeatures > 0)
+                        {
+                            newAdapter.IsSupportedThreeDSettings = true;
+                            // Attempt to read each known settable 3D feature. Value types are based on the Intel
+                            // IGCL specification for each feature. If a feature is not supported by the current
+                            // adapter, the IGCLException is caught and the feature is skipped gracefully.
+                            (ctl_3d_feature_t feature, ctl_property_value_type_t valueType)[] features3D = new[]
+                            {
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_FRAME_PACING,              ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_BOOL),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_ENDURANCE_GAMING,          ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_ENUM),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_FRAME_LIMIT,               ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_UINT32),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_ANISOTROPIC,               ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_ENUM),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_CMAA,                      ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_ENUM),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_TEXTURE_FILTERING_QUALITY, ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_ENUM),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_ADAPTIVE_TESSELLATION,     ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_BOOL),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_SHARPENING_FILTER,         ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_FLOAT),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_MSAA,                      ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_ENUM),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_GAMING_FLIP_MODES,         ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_ENUM),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_ADAPTIVE_SYNC_PLUS,        ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_BOOL),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_LOW_LATENCY,               ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_ENUM),
+                                (ctl_3d_feature_t.CTL_3D_FEATURE_FRAME_GENERATION,          ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_BOOL),
+                            };
+                            foreach (var (featureType, valueType) in features3D)
+                            {
+                                try
+                                {
+                                    var getRequest = IGCL3DHelper.Create3DFeatureGetRequest(featureType, valueType);
+                                    var result = threeDHelper.Get3DFeature(getRequest);
+                                    newAdapter.ThreeDSettings.Add(result);
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got 3D feature {featureType} for adapter {adapterNum}");
+                                }
+                                catch (IGCLException ex) when (
+                                    ex.Result == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_FEATURE ||
+                                    ex.Result == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_VERSION ||
+                                    ex.Result == ctl_result_t.CTL_RESULT_ERROR_INVALID_OPERATION_TYPE ||
+                                    ex.Result == ctl_result_t.CTL_RESULT_ERROR_INVALID_ARGUMENT)
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: 3D feature {featureType} not supported for adapter {adapterNum}, skipping.");
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting 3D feature {featureType} for adapter {adapterNum}.");
+                                }
+                            }
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got {newAdapter.ThreeDSettings.Count} 3D feature(s) for adapter {adapterNum}");
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No 3D features supported for adapter {adapterNum}");
+                        }
+                    }
+                    catch (IGCLException ex)
+                    {
+                        SharedLogger.logger.Warn(ex, $"IntelLibrary/GetIntelDisplayConfig: IGCLException getting 3D capabilities for adapter {adapterNum}, skipping.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Warn(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting 3D capabilities for adapter {adapterNum}, skipping.");
+                    }
+
+                    //------------------------------------
+                    // READ PER-ADAPTER VIDEO PROCESSING (MEDIA) SETTINGS
+                    //------------------------------------
+                    try
+                    {
+                        var mediaHelper = _igclApiHelper.GetMediaHelper(adapter);
+                        var mediaCaps = mediaHelper.GetSupportedVideoProcessingCapabilities();
+                        if (mediaCaps.NumSupportedFeatures > 0)
+                        {
+                            newAdapter.IsSupportedVideoProcessing = true;
+                            // Attempt to read each known video processing feature. Most video processing features
+                            // are simple boolean enable/disable flags. Features that are not supported are
+                            // skipped gracefully via exception handling.
+                            ctl_video_processing_feature_t[] mediaFeatures = new[]
+                            {
+                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_FILM_MODE_DETECTION,
+                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_NOISE_REDUCTION,
+                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_SHARPNESS,
+                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_ADAPTIVE_CONTRAST_ENHANCEMENT,
+                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_SUPER_RESOLUTION,
+                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_STANDARD_COLOR_CORRECTION,
+                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_TOTAL_COLOR_CORRECTION,
+                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_SKIN_TONE_ENHANCEMENT,
+                            };
+                            foreach (var featureType in mediaFeatures)
+                            {
+                                try
+                                {
+                                    var getRequest = IGCLMediaHelper.CreateVideoProcessingFeatureGetRequest(featureType, ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_BOOL);
+                                    var result = mediaHelper.GetVideoProcessingFeature(getRequest);
+                                    newAdapter.VideoProcessingSettings.Add(result);
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got video processing feature {featureType} for adapter {adapterNum}");
+                                }
+                                catch (IGCLException ex) when (
+                                    ex.Result == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_FEATURE ||
+                                    ex.Result == ctl_result_t.CTL_RESULT_ERROR_UNSUPPORTED_VERSION ||
+                                    ex.Result == ctl_result_t.CTL_RESULT_ERROR_INVALID_OPERATION_TYPE ||
+                                    ex.Result == ctl_result_t.CTL_RESULT_ERROR_INVALID_ARGUMENT)
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Video processing feature {featureType} not supported for adapter {adapterNum}, skipping.");
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting video processing feature {featureType} for adapter {adapterNum}.");
+                                }
+                            }
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got {newAdapter.VideoProcessingSettings.Count} video processing feature(s) for adapter {adapterNum}");
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No video processing features supported for adapter {adapterNum}");
+                        }
+                    }
+                    catch (IGCLException ex)
+                    {
+                        SharedLogger.logger.Warn(ex, $"IntelLibrary/GetIntelDisplayConfig: IGCLException getting video processing capabilities for adapter {adapterNum}, skipping.");
+                    }
+                    catch (Exception ex)
+                    {
+                        SharedLogger.logger.Warn(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting video processing capabilities for adapter {adapterNum}, skipping.");
                     }
 
                     // Add adapter to config
@@ -1362,6 +1521,26 @@ namespace DisplayMagicianShared.Intel
                 {
                     sb.AppendLine($"  CombinedDisplay: {myAdapter.CombinedDisplay}");
                 }
+                // 3D Settings
+                sb.AppendLine($"  IsSupportedThreeDSettings: {myAdapter.IsSupportedThreeDSettings}");
+                if (myAdapter.IsSupportedThreeDSettings && myAdapter.ThreeDSettings != null && myAdapter.ThreeDSettings.Count > 0)
+                {
+                    sb.AppendLine($"  ThreeDSettings ({myAdapter.ThreeDSettings.Count} feature(s)):");
+                    for (int i = 0; i < myAdapter.ThreeDSettings.Count; i++)
+                    {
+                        sb.AppendLine($"    3DFeature[{i}]: Feature={myAdapter.ThreeDSettings[i].FeatureType} ValueType={myAdapter.ThreeDSettings[i].ValueType} Value={myAdapter.ThreeDSettings[i].Value}");
+                    }
+                }
+                // Video Processing Settings
+                sb.AppendLine($"  IsSupportedVideoProcessing: {myAdapter.IsSupportedVideoProcessing}");
+                if (myAdapter.IsSupportedVideoProcessing && myAdapter.VideoProcessingSettings != null && myAdapter.VideoProcessingSettings.Count > 0)
+                {
+                    sb.AppendLine($"  VideoProcessingSettings ({myAdapter.VideoProcessingSettings.Count} feature(s)):");
+                    for (int i = 0; i < myAdapter.VideoProcessingSettings.Count; i++)
+                    {
+                        sb.AppendLine($"    VideoProcessingFeature[{i}]: Feature={myAdapter.VideoProcessingSettings[i].FeatureType} ValueType={myAdapter.VideoProcessingSettings[i].ValueType} Value={myAdapter.VideoProcessingSettings[i].Value}");
+                    }
+                }
                 sb.AppendLine();
             }
 
@@ -1472,7 +1651,7 @@ namespace DisplayMagicianShared.Intel
                     adapterNum++;
 
                     var adapterProperties = adapter.GetProperties();
-                    string adapterDeviceID = $"{adapter.Name}|{adapterProperties.PciDeviceId.ToString("G")}|{adapterProperties.PciSubsysId.ToString("G")}";
+                    string adapterDeviceID = $"{adapterProperties.PciVendorId:X4}_{adapterProperties.PciDeviceId:X4}_{adapterProperties.PciSubsysVendorId:X4}_{adapterProperties.PciSubsysId:X4}_{adapterProperties.RevId:X2}";
 
                     if (!displayConfig.PhysicalAdapters.TryGetValue(adapterDeviceID, out INTEL_ADAPTER desiredAdapter))
                     {
@@ -2186,6 +2365,98 @@ namespace DisplayMagicianShared.Intel
                         if (delayInMs > 0)
                         {
                             Thread.Sleep(delayInMs);
+                        }
+                    }
+
+                    // Compute the adapter device ID to look up stored adapter settings
+                    string adapterDeviceId = $"{adapterProperties.PciVendorId:X4}_{adapterProperties.PciDeviceId:X4}_{adapterProperties.PciSubsysVendorId:X4}_{adapterProperties.PciSubsysId:X4}_{adapterProperties.RevId:X2}";
+                    bool hasStoredAdapter = displayConfig.PhysicalAdapters.TryGetValue(adapterDeviceId, out INTEL_ADAPTER storedAdapter);
+
+                    //------------------------------------
+                    // APPLY PER-ADAPTER 3D SETTINGS IF NEEDED
+                    //------------------------------------
+                    if (hasStoredAdapter && storedAdapter.IsSupportedThreeDSettings &&
+                        storedAdapter.ThreeDSettings != null && storedAdapter.ThreeDSettings.Count > 0)
+                    {
+                        try
+                        {
+                            var threeDHelper = _igclApiHelper.Get3DHelper(adapter);
+                            foreach (var stored3DFeature in storedAdapter.ThreeDSettings)
+                            {
+                                try
+                                {
+                                    var currentRequest = IGCL3DHelper.Create3DFeatureGetRequest(stored3DFeature.FeatureType, stored3DFeature.ValueType);
+                                    var currentFeature = threeDHelper.Get3DFeature(currentRequest);
+                                    if (!currentFeature.Equals(stored3DFeature))
+                                    {
+                                        var setRequest = stored3DFeature;
+                                        setRequest.Set = true;
+                                        threeDHelper.Set3DFeature(setRequest);
+                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set 3D feature {stored3DFeature.FeatureType} for adapter {adapterNum}");
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: 3D feature {stored3DFeature.FeatureType} already at desired value for adapter {adapterNum}, skipping");
+                                    }
+                                }
+                                catch (IGCLException ex) when (IsUnsupportedResult(ex.Result))
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: 3D feature {stored3DFeature.FeatureType} not supported by current hardware for adapter {adapterNum}, skipping");
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying 3D feature {stored3DFeature.FeatureType} for adapter {adapterNum}");
+                                    success = false;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Warn(ex, $"IntelLibrary/SetActiveConfigOverride: Exception applying 3D settings for adapter {adapterNum}, skipping.");
+                        }
+                    }
+
+                    //------------------------------------
+                    // APPLY PER-ADAPTER VIDEO PROCESSING (MEDIA) SETTINGS IF NEEDED
+                    //------------------------------------
+                    if (hasStoredAdapter && storedAdapter.IsSupportedVideoProcessing &&
+                        storedAdapter.VideoProcessingSettings != null && storedAdapter.VideoProcessingSettings.Count > 0)
+                    {
+                        try
+                        {
+                            var mediaHelper = _igclApiHelper.GetMediaHelper(adapter);
+                            foreach (var storedMediaFeature in storedAdapter.VideoProcessingSettings)
+                            {
+                                try
+                                {
+                                    var currentRequest = IGCLMediaHelper.CreateVideoProcessingFeatureGetRequest(storedMediaFeature.FeatureType, storedMediaFeature.ValueType);
+                                    var currentFeature = mediaHelper.GetVideoProcessingFeature(currentRequest);
+                                    if (!currentFeature.Equals(storedMediaFeature))
+                                    {
+                                        var setRequest = storedMediaFeature;
+                                        setRequest.Set = true;
+                                        mediaHelper.SetVideoProcessingFeature(setRequest);
+                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set video processing feature {storedMediaFeature.FeatureType} for adapter {adapterNum}");
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Video processing feature {storedMediaFeature.FeatureType} already at desired value for adapter {adapterNum}, skipping");
+                                    }
+                                }
+                                catch (IGCLException ex) when (IsUnsupportedResult(ex.Result))
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Video processing feature {storedMediaFeature.FeatureType} not supported by current hardware for adapter {adapterNum}, skipping");
+                                }
+                                catch (Exception ex)
+                                {
+                                    SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying video processing feature {storedMediaFeature.FeatureType} for adapter {adapterNum}");
+                                    success = false;
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Warn(ex, $"IntelLibrary/SetActiveConfigOverride: Exception applying video processing settings for adapter {adapterNum}, skipping.");
                         }
                     }
                 }
