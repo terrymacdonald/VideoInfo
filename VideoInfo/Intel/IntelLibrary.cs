@@ -2620,8 +2620,7 @@ namespace DisplayMagicianShared.Intel
             }
             else
             {
-                SharedLogger.logger.Error($"IntelLibrary/GetCurrentDisplayIdentifiers: ERROR - Tried to get Displays but the Intel IGCL library isn't initialised!");
-                throw new IntelLibraryException($"Tried to get Displays but the Intel IGCL library isn't initialised!");
+                SharedLogger.logger.Warn($"IntelLibrary/GetCurrentDisplayIdentifiers: Tried to get Displays but the Intel IGCL library isn't initialised!");
             }
 
             // Sort the display identifiers
@@ -2709,8 +2708,7 @@ namespace DisplayMagicianShared.Intel
             }
             else
             {
-                SharedLogger.logger.Error($"IntelLibrary/GetCurrentDisplaGetAllConnectedDisplayIdentifiersyIdentifiers: ERROR - Tried to get Displays but the Intel IGCL library isn't initialised!");
-                throw new IntelLibraryException($"Tried to get Displays but the Intel IGCL library isn't initialised!");
+                SharedLogger.logger.Warn($"IntelLibrary/GetCurrentDisplaGetAllConnectedDisplayIdentifiersyIdentifiers: Tried to get Displays but the Intel IGCL library isn't initialised!");
             }
 
             // Sort the display identifiers

@@ -4207,8 +4207,7 @@ namespace DisplayMagicianShared.AMD
             }
             else
             {
-                SharedLogger.logger.Error($"AMDLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the AMD ADLX library isn't initialised!");
-                throw new AMDLibraryException($"Tried to get Displays but the AMD ADLX library isn't initialised!");
+                SharedLogger.logger.Warn($"AMDLibrary/GetSomeDisplayIdentifiers: Tried to get Displays but the AMD ADLX library isn't initialised!");
             }
 
             // Sort the display identifiers
@@ -4331,8 +4330,7 @@ namespace DisplayMagicianShared.AMD
             }
             else
             {
-                SharedLogger.logger.Error($"AMDLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the AMD ADLX library isn't initialised!");
-                throw new AMDLibraryException($"Tried to get Displays but the AMD ADLX library isn't initialised!");
+                SharedLogger.logger.Warn($"AMDLibrary/GetSomeDisplayIdentifiers: Tried to get Displays but the AMD ADLX library isn't initialised!");
             }
 
             // Sort the display identifiers

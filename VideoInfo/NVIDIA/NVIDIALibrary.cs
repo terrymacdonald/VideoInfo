@@ -3800,8 +3800,7 @@ namespace DisplayMagicianShared.NVIDIA
             }
             else
             {
-                SharedLogger.logger.Error($"NVIDIALibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the NVIDIA NVAPI library isn't initialised!");
-                throw new NVIDIALibraryException($"Tried to get Displays but the NVIDIA NVAPI library isn't initialised!");
+                SharedLogger.logger.Warn($"NVIDIALibrary/GetSomeDisplayIdentifiers: Tried to get Displays but the NVIDIA NVAPI library isn't initialised!");
             }
 
             // Sort the display identifiers
