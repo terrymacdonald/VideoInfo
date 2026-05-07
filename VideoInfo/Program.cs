@@ -281,9 +281,28 @@ namespace VideoInfo
                     SharedLogger.logger.Debug($"VideoInfo/Main: showing currently connected display ids as currentids command was provided");
                     Console.WriteLine("The current display identifiers are:");
                     SharedLogger.logger.Info($"VideoInfo/Main: The current display identifiers are:");
+                    Console.WriteLine("  [NVIDIA]");
                     foreach (string displayId in nvidiaLibrary.CurrentDisplayIdentifiers)
                     {
-                        Console.WriteLine(@displayId);
+                        Console.WriteLine($"  {displayId}");
+                        SharedLogger.logger.Info($@"{displayId}");
+                    }
+                    Console.WriteLine("  [AMD]");
+                    foreach (string displayId in amdLibrary.CurrentDisplayIdentifiers)
+                    {
+                        Console.WriteLine($"  {displayId}");
+                        SharedLogger.logger.Info($@"{displayId}");
+                    }
+                    Console.WriteLine("  [Intel]");
+                    foreach (string displayId in intelLibrary.CurrentDisplayIdentifiers)
+                    {
+                        Console.WriteLine($"  {displayId}");
+                        SharedLogger.logger.Info($@"{displayId}");
+                    }
+                    Console.WriteLine("  [Windows]");
+                    foreach (string displayId in winLibrary.CurrentDisplayIdentifiers)
+                    {
+                        Console.WriteLine($"  {displayId}");
                         SharedLogger.logger.Info($@"{displayId}");
                     }
                 }
@@ -292,9 +311,28 @@ namespace VideoInfo
                     SharedLogger.logger.Debug($"VideoInfo/Main: showing all display ids as allids command was provided");
                     Console.WriteLine("All connected display identifiers are:");
                     SharedLogger.logger.Info($"VideoInfo/Main: All connected display identifiers are:");
-                    foreach (string displayId in nvidiaLibrary.GetAllConnectedDisplayIdentifiers(out bool failure))
+                    Console.WriteLine("  [NVIDIA]");
+                    foreach (string displayId in nvidiaLibrary.GetAllConnectedDisplayIdentifiers(out bool nvidiaFailure))
                     {
-                        Console.WriteLine(@displayId);
+                        Console.WriteLine($"  {displayId}");
+                        SharedLogger.logger.Info($@"{displayId}");
+                    }
+                    Console.WriteLine("  [AMD]");
+                    foreach (string displayId in amdLibrary.GetAllConnectedDisplayIdentifiers(out bool amdFailure))
+                    {
+                        Console.WriteLine($"  {displayId}");
+                        SharedLogger.logger.Info($@"{displayId}");
+                    }
+                    Console.WriteLine("  [Intel]");
+                    foreach (string displayId in intelLibrary.GetAllConnectedDisplayIdentifiers(out bool intelFailure))
+                    {
+                        Console.WriteLine($"  {displayId}");
+                        SharedLogger.logger.Info($@"{displayId}");
+                    }
+                    Console.WriteLine("  [Windows]");
+                    foreach (string displayId in winLibrary.GetAllConnectedDisplayIdentifiers())
+                    {
+                        Console.WriteLine($"  {displayId}");
                         SharedLogger.logger.Info($@"{displayId}");
                     }
                 }
