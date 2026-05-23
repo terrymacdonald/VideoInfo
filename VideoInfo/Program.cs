@@ -680,7 +680,7 @@ namespace VideoInfo
                         // we enable all connected displays in Windows first just to be sure.
                         if (myDisplayConfig.NVIDIAConfig.MosaicConfig.IsMosaicEnabled)
                         {
-                            SharedLogger.logger.Trace($"ProfileItem/SetActive: NVIDIA Surround/Mosaic Display required – enabling all connected displays so NvAPI can see them as active outputs.");
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: NVIDIA Surround/Mosaic Display required – enabling all connected displays so NvAPI can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
@@ -712,7 +712,7 @@ namespace VideoInfo
                         // we enable all connected displays in Windows first just to be sure.
                         if (myDisplayConfig.AMDConfig.IsEyefinity)
                         {
-                            SharedLogger.logger.Trace($"ProfileItem/SetActive: AMD Eyefinity Display required – enabling all connected displays so ADLX can see them as active outputs.");
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: AMD Eyefinity Display required – enabling all connected displays so ADLX can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
@@ -744,7 +744,7 @@ namespace VideoInfo
                         // we enable all connected displays in Windows first just to be sure.
                         if (myDisplayConfig.IntelConfig.CombinedDisplayIsInUse)
                         {
-                            SharedLogger.logger.Trace($"ProfileItem/SetActive: Intel Combined Display required – enabling all connected displays so IGCL can see them as active outputs.");
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Intel Combined Display required – enabling all connected displays so IGCL can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
