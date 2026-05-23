@@ -718,6 +718,16 @@ namespace VideoInfo
 
                     if (applyIntelSettings)
                     {
+                        /// If a Combined Display is required, all source monitors must be active
+                        // (CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE) before IGCL can create it.
+                        // A previous profile may have disabled one of the required monitors, so
+                        // we enable all connected displays in Windows first just to be sure.
+                        if (myDisplayConfig.IntelConfig.CombinedDisplayIsInUse)
+                        {
+                            SharedLogger.logger.Trace($"ProfileItem/SetActive: Intel Combined Display required – enabling all connected displays so IGCL can see them as active outputs.");
+                            WinLibrary.EnableAllConnectedDisplays();
+                            Thread.Sleep(delayInMs);
+                        }
                         Console.Write($"Attempting to apply Intel display config from {filename}...");
                         itWorkedforIntel = intelLibrary.SetActiveConfig(myDisplayConfig.IntelConfig, delayInMs);
                         Thread.Sleep(delayInMs); // Give it a second to wake up the displays
