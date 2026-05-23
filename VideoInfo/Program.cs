@@ -674,6 +674,16 @@ namespace VideoInfo
 
                     if (applyNVIDIASettings)
                     {
+                        // If a Surround/Mosaic Display is required, all source monitors must be active
+                        // before NvAPI can create it.
+                        // A previous profile may have disabled one of the required monitors, so
+                        // we enable all connected displays in Windows first just to be sure.
+                        if (myDisplayConfig.NVIDIAConfig.MosaicConfig.IsMosaicEnabled)
+                        {
+                            SharedLogger.logger.Trace($"ProfileItem/SetActive: NVIDIA Surround/Mosaic Display required – enabling all connected displays so NvAPI can see them as active outputs.");
+                            WinLibrary.EnableAllConnectedDisplays();
+                            Thread.Sleep(delayInMs);
+                        }
                         Console.Write($"Attempting to apply NVIDIA display config from {filename}...");
                         itWorkedforNVIDIA = nvidiaLibrary.SetActiveConfig(myDisplayConfig.NVIDIAConfig, delayInMs);
                         Thread.Sleep(delayInMs); // Give it a second to wake up the displays
@@ -696,6 +706,16 @@ namespace VideoInfo
 
                     if (applyAMDSettings)
                     {
+                        /// If an Eyefinity Display is required, all source monitors must be active
+                        // before ADLX can create it.
+                        // A previous profile may have disabled one of the required monitors, so
+                        // we enable all connected displays in Windows first just to be sure.
+                        if (myDisplayConfig.AMDConfig.IsEyefinity)
+                        {
+                            SharedLogger.logger.Trace($"ProfileItem/SetActive: AMD Eyefinity Display required – enabling all connected displays so ADLX can see them as active outputs.");
+                            WinLibrary.EnableAllConnectedDisplays();
+                            Thread.Sleep(delayInMs);
+                        }
                         Console.Write($"Attempting to apply AMD display config from {filename}...");
                         itWorkedforAMD = amdLibrary.SetActiveConfig(myDisplayConfig.AMDConfig, useADLEyefinity, delayInMs);
                         Thread.Sleep(delayInMs); // Give it a second to wake up the displays
