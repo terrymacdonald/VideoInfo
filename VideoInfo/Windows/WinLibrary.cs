@@ -159,7 +159,7 @@ namespace DisplayMagicianShared.Windows
         public override bool Equals(object obj) => obj is WINDOWS_DISPLAY_CONFIG other && this.Equals(other);
         public bool Equals(WINDOWS_DISPLAY_CONFIG other)
         {
-            if (!IsCloned == other.IsCloned)
+            if (IsCloned != other.IsCloned)
             {
                 SharedLogger.logger.Trace($"WINDOWS_DISPLAY_CONFIG/Equals: IsCloned is not equal.");
                 return false;
@@ -271,10 +271,15 @@ namespace DisplayMagicianShared.Windows
         {
             // The WinLibrary was initialised, but doesn't need to be freed.
             SharedLogger.logger.Trace("WinLibrary/~WinLibrary: Destroying Windows CCD library interface");
+            Dispose(false);
         }
 
         // Public implementation of Dispose pattern callable by consumers.
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         // Protected implementation of Dispose pattern.
         protected virtual void Dispose(bool disposing)
@@ -471,8 +476,17 @@ namespace DisplayMagicianShared.Windows
                         // We get here if there is a matching adapter
                         newAdapterValue = adapterOldToNewMap[savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId.Value];
                         savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
-                        newAdapterValue = adapterOldToNewMap[savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId.Value];
-                        savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
+                        if (adapterOldToNewMap.ContainsKey(savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId.Value))
+                        {
+                            newAdapterValue = adapterOldToNewMap[savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId.Value];
+                            savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
+                        }
+                        else
+                        {
+                            newAdapterValue = currentAdapterMap.First().Key;
+                            SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Uh Oh. Target adapter {savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId.Value} for path #{i} didn't have a current match! Attempting to use adapter {newAdapterValue} instead.");
+                            savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
+                        }
                         SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated DisplayConfig Path #{i} from adapter {savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId.Value} to adapter {newAdapterValue} instead.");
                     }
                     else
@@ -534,7 +548,7 @@ namespace DisplayMagicianShared.Windows
                         // Change the Mode AdapterID
                         if (adapterOldToNewMap.ContainsKey(savedDisplayConfig.DisplayHDRStates[i].AdapterId.Value))
                         {
-                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: adapterOldToNewMap contains adapter {savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId.Value} so using the new adapter ID of {newAdapterValue} instead.");
+                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: adapterOldToNewMap contains adapter {hdrInfo.AdapterId.Value} so using the new adapter ID of {newAdapterValue} instead.");
                             // We get here if there is a matching adapter
                             newAdapterValue = adapterOldToNewMap[savedDisplayConfig.DisplayHDRStates[i].AdapterId.Value];
                             hdrInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
@@ -542,7 +556,7 @@ namespace DisplayMagicianShared.Windows
                             hdrInfo.AdvancedColorInfo.Header.AdapterId = AdapterValueToLUID(newAdapterValue);
                             newAdapterValue = adapterOldToNewMap[savedDisplayConfig.DisplayHDRStates[i].SDRWhiteLevel.Header.AdapterId.Value];
                             hdrInfo.SDRWhiteLevel.Header.AdapterId = AdapterValueToLUID(newAdapterValue);
-                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated Display HDR state #{i} from adapter {savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId.Value} to adapter {newAdapterValue} instead.");
+                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated Display HDR state #{i} from adapter {hdrInfo.AdapterId.Value} to adapter {newAdapterValue} instead.");
                         }
                         else
                         {
@@ -738,12 +752,12 @@ namespace DisplayMagicianShared.Windows
 
         }
 
-        public bool UpdateActiveConfig(bool fastScan = true)
+        public bool UpdateActiveConfig()
         {
             SharedLogger.logger.Trace($"WinLibrary/UpdateActiveConfig: Updating the currently active config");
             try
             {
-                _activeDisplayConfig = GetActiveConfig(fastScan);
+                _activeDisplayConfig = GetActiveConfig();
                 _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers();
             }
             catch (Exception ex)
@@ -755,19 +769,15 @@ namespace DisplayMagicianShared.Windows
             return true;
         }
 
-        public WINDOWS_DISPLAY_CONFIG GetActiveConfig(bool fastScan = true)
+        public WINDOWS_DISPLAY_CONFIG GetActiveConfig()
         {
             SharedLogger.logger.Trace($"WinLibrary/GetActiveConfig: Getting the currently active config");
             // We'll leave virtual refresh rate aware until we can reliably detect Windows 11 versions.
-            return GetWindowsDisplayConfig(QDC.QDC_ONLY_ACTIVE_PATHS, fastScan);
+            return GetWindowsDisplayConfig(QDC.QDC_ONLY_ACTIVE_PATHS);
         }
 
-        private WINDOWS_DISPLAY_CONFIG GetWindowsDisplayConfig(QDC selector = QDC.QDC_ONLY_ACTIVE_PATHS, bool fastScan = true)
+        private WINDOWS_DISPLAY_CONFIG GetWindowsDisplayConfig(QDC selector = QDC.QDC_ONLY_ACTIVE_PATHS)
         {
-
-            // Forcing fastscan to stop the taskbar location scanning delaying the user experience
-            // TODO: Find a replacement method of doing the taskbar location detection. Microsoft may have made things easier in Windows 11 by now....
-            fastScan = true;
 
             // Prepare the empty windows display config
             WINDOWS_DISPLAY_CONFIG windowsDisplayConfig = CreateDefaultConfig();
@@ -886,14 +896,22 @@ namespace DisplayMagicianShared.Windows
                 // Get the Windows Scaling DPI per display
                 DPIScalingInfo sourceDPIScalingInfo = GetDPISettings(paths[i].SourceInfo.AdapterId, paths[i].SourceInfo.Id, paths[i].TargetInfo.Id);
 
-                // Derive connector type gating booleans using positive allow-listing.
-                // Only DISPLAYPORT and HDMI connections support advanced colour / HDR / SDR white level queries.
-                // The old block-list missed LVDS, SDI, Miracast, INDIRECT_VIRTUAL (NV Surround), UDI, and OTHER;
-                // positive gating is safe-by-default and handles all edge cases automatically.
-                bool isDisplayPort        = paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EXTERNAL ||
-                                            paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_DISPLAYPORT_EMBEDDED;
-                bool isHdmi               = paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HDMI;
-                bool isDigitalWithProtocol = isDisplayPort || isHdmi;
+                // Derive connector type gating booleans using a block-list of analogue/legacy connectors.
+                // DisplayConfigGetDeviceInfo(GET_ADVANCED_COLOR_INFO) works on any digital path including
+                // internal/eDP panels (DISPLAYCONFIG_OUTPUT_TECHNOLOGY_INTERNAL), embedded DisplayPort,
+                // HDMI, DVI, UDI, Miracast, and indirect virtual displays.
+                // We only skip the query for connectors that are inherently analogue and have never
+                // supported colour-space communication: VGA/HD15, S-Video, composite, component, D-JPN, SDI,
+                // SDTV dongle, and LVDS (old analogue flat-panel signalling).
+                bool isAnalogueConnector = paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_HD15 ||
+                                           paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SVIDEO ||
+                                           paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_COMPOSITE_VIDEO ||
+                                           paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_COMPONENT_VIDEO ||
+                                           paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_D_JPN ||
+                                           paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDI ||
+                                           paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_SDTVDONGLE ||
+                                           paths[i].TargetInfo.OutputTechnology == DISPLAYCONFIG_VIDEO_OUTPUT_TECHNOLOGY.DISPLAYCONFIG_OUTPUT_TECHNOLOGY_LVDS;
+                bool isDigitalWithProtocol = !isAnalogueConnector;
 
                 // get display source name
                 var sourceInfo = new DISPLAYCONFIG_SOURCE_DEVICE_NAME();

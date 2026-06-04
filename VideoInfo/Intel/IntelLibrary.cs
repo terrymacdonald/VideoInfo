@@ -745,11 +745,15 @@ namespace DisplayMagicianShared.Intel
         ~IntelLibrary()
         {
             SharedLogger.logger.Trace("IntelLibrary/~IntelLibrary: Destroying IGCL Library");
-            Dispose(true);
+            Dispose(false);
         }
 
         // Public implementation of Dispose pattern callable by consumers.
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         // Protected implementation of Dispose pattern.
         protected virtual void Dispose(bool disposing)
@@ -1129,7 +1133,6 @@ namespace DisplayMagicianShared.Intel
                             continue;
                         }
 
-                        displayCount++;
                         SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing display {displayCount}/{displayTotalCount} on adapter {adapterNum}");
 
                         // Create display with settings
@@ -1140,12 +1143,18 @@ namespace DisplayMagicianShared.Intel
 
                         // Set basic info                     
                         newDisplay.DisplayProperties = displayProperties;
-                        // Derive connector type gating booleans. DP and HDMI support the full IGCL feature set;
-                        // other types (DVI, CRT/VGA, MIPI internal panel, INVALID) do not.
+                        // Derive connector type gating booleans.
+                        // isDisplayPort / isHdmi gate protocol-specific features (Arc Sync = DP/HDMI VRR, HDMI quality, etc.).
+                        // isMipi covers the internal laptop panel (MIPI-DSI/eDP via IGCL).
+                        // isDigitalWithProtocol covers all digital outputs that support colour/feature APIs:
+                        //   DP, HDMI, MIPI (internal panel), and DVI.
+                        // CRT and INVALID are the only types excluded.
                         bool isDisplayPort        = displayProperties.Type == ctl_display_output_types_t.CTL_DISPLAY_OUTPUT_TYPES_DISPLAYPORT;
                         bool isHdmi               = displayProperties.Type == ctl_display_output_types_t.CTL_DISPLAY_OUTPUT_TYPES_HDMI;
-                        bool isDigitalWithProtocol = isDisplayPort || isHdmi;
-                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Display {logDisplayId} output type is {displayProperties.Type}. isDisplayPort={isDisplayPort}, isHdmi={isHdmi}, isDigitalWithProtocol={isDigitalWithProtocol}.");
+                        bool isMipi               = displayProperties.Type == ctl_display_output_types_t.CTL_DISPLAY_OUTPUT_TYPES_MIPI;
+                        bool isDvi                = displayProperties.Type == ctl_display_output_types_t.CTL_DISPLAY_OUTPUT_TYPES_DVI;
+                        bool isDigitalWithProtocol = isDisplayPort || isHdmi || isMipi || isDvi;
+                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Display {logDisplayId} output type is {displayProperties.Type}. isDisplayPort={isDisplayPort}, isHdmi={isHdmi}, isMipi={isMipi}, isDvi={isDvi}, isDigitalWithProtocol={isDigitalWithProtocol}.");
                         // make up a adapter DeviceID that includes the PCI device and subsystem IDs that we can match on.
                         newDisplay.DeviceID = adapterDeviceID;
                         
@@ -2620,7 +2629,8 @@ namespace DisplayMagicianShared.Intel
             }
             else
             {
-                SharedLogger.logger.Warn($"IntelLibrary/GetCurrentDisplayIdentifiers: Tried to get Displays but the Intel IGCL library isn't initialised!");
+                SharedLogger.logger.Error($"IntelLibrary/GetCurrentDisplayIdentifiers: ERROR - Tried to get Displays but the Intel IGCL library isn't initialised!");
+                throw new IntelLibraryException($"Tried to get Displays but the Intel IGCL library isn't initialised!");
             }
 
             // Sort the display identifiers
@@ -2708,7 +2718,8 @@ namespace DisplayMagicianShared.Intel
             }
             else
             {
-                SharedLogger.logger.Warn($"IntelLibrary/GetCurrentDisplaGetAllConnectedDisplayIdentifiersyIdentifiers: Tried to get Displays but the Intel IGCL library isn't initialised!");
+                SharedLogger.logger.Error($"IntelLibrary/GetCurrentDisplaGetAllConnectedDisplayIdentifiersyIdentifiers: ERROR - Tried to get Displays but the Intel IGCL library isn't initialised!");
+                throw new IntelLibraryException($"Tried to get Displays but the Intel IGCL library isn't initialised!");
             }
 
             // Sort the display identifiers

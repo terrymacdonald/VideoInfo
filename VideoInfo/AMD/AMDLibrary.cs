@@ -53,7 +53,7 @@ namespace DisplayMagicianShared.AMD
             BezelModePercent= 0;
         }
 
-        public override bool Equals(object obj) => obj is AMD_SLS_CONFIG other && this.Equals(other);
+        public override bool Equals(object obj) => obj is AMD_SLSMAP_CONFIG other && this.Equals(other);
 
         public bool Equals(AMD_SLSMAP_CONFIG other)
         => SLSMap == other.SLSMap &&
@@ -272,7 +272,7 @@ namespace DisplayMagicianShared.AMD
         {
             if (Rows != other.Rows)
             {
-                SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Rows: The Rows values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Equals: The Rows values don't equal each other");
                 return false;
             }
             if (Columns != other.Columns)
@@ -411,6 +411,11 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsSupportedSCEVividGaming values don't equal each other");
                 return false;
             }
+            if (IsSupportedSCEDynamicContrast != other.IsSupportedSCEDynamicContrast)
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsSupportedSCEDynamicContrast values don't equal each other");
+                return false;
+            }
             if (IsSupportedUser3DLUT != other.IsSupportedUser3DLUT)
             {
                 SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsSupportedUser3DLUT values don't equal each other");
@@ -424,6 +429,11 @@ namespace DisplayMagicianShared.AMD
             if (IsCurrentSCEVividGaming != other.IsCurrentSCEVividGaming)
             {
                 SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The IsCurrentSCEVividGaming values don't equal each other");
+                return false;
+            }
+            if (HasDynamicContrast != other.HasDynamicContrast)
+            {
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The HasDynamicContrast values don't equal each other");
                 return false;
             }
             if (CurrentDynamicContrastValue != other.CurrentDynamicContrastValue)
@@ -1902,7 +1912,11 @@ namespace DisplayMagicianShared.AMD
         }
 
         // Public implementation of Dispose pattern callable by consumers.
-        public void Dispose() => Dispose(true);
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         // Protected implementation of Dispose pattern.
         protected virtual void Dispose(bool disposing)
@@ -4207,7 +4221,8 @@ namespace DisplayMagicianShared.AMD
             }
             else
             {
-                SharedLogger.logger.Warn($"AMDLibrary/GetSomeDisplayIdentifiers: Tried to get Displays but the AMD ADLX library isn't initialised!");
+                SharedLogger.logger.Error($"AMDLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the AMD ADLX library isn't initialised!");
+                throw new AMDLibraryException($"Tried to get Displays but the AMD ADLX library isn't initialised!");
             }
 
             // Sort the display identifiers
@@ -4330,7 +4345,8 @@ namespace DisplayMagicianShared.AMD
             }
             else
             {
-                SharedLogger.logger.Warn($"AMDLibrary/GetSomeDisplayIdentifiers: Tried to get Displays but the AMD ADLX library isn't initialised!");
+                SharedLogger.logger.Error($"AMDLibrary/GetSomeDisplayIdentifiers: ERROR - Tried to get Displays but the AMD ADLX library isn't initialised!");
+                throw new AMDLibraryException($"Tried to get Displays but the AMD ADLX library isn't initialised!");
             }
 
             // Sort the display identifiers
