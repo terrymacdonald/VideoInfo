@@ -891,6 +891,7 @@ namespace VideoInfo
                     else
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Windows CCD display settings within {filename} were NOT applied correctly, so skipping setting the overrides.");
+                        errorApplyingSomething = true;
                     }
 
                     // Give the final error if there are any

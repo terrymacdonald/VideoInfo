@@ -483,20 +483,13 @@ namespace DisplayMagicianShared.Windows
                         }
                         else
                         {
-                            newAdapterValue = currentAdapterMap.First().Key;
-                            SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Uh Oh. Target adapter {savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId.Value} for path #{i} didn't have a current match! Attempting to use adapter {newAdapterValue} instead.");
-                            savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
+                            SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Target adapter {savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId.Value} for path #{i} did not have a current adapter-map match. Leaving the saved target adapter ID unchanged so SetDisplayConfig can validate the original cross-adapter path instead of replacing it with the wrong adapter.");
                         }
                         SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated DisplayConfig Path #{i} from adapter {savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId.Value} to adapter {newAdapterValue} instead.");
                     }
                     else
                     {
-                        // if there isn't a matching adapter, then we just pick the first current one and hope that works!
-                        // (it is highly likely to... its only if the user has multiple graphics cards with some weird config it may break)
-                        newAdapterValue = currentAdapterMap.First().Key;
-                        SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Uh Oh. Adapter {savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId.Value} didn't have a current match! It's possible the adapter was swapped or disabled. Attempting to use adapter {newAdapterValue} instead.");
-                        savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
-                        savedDisplayConfig.DisplayConfigPaths[i].TargetInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
+                        SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Source adapter {savedDisplayConfig.DisplayConfigPaths[i].SourceInfo.AdapterId.Value} for path #{i} did not have a current adapter-map match. Leaving the saved source and target adapter IDs unchanged; replacing them with the first current adapter can corrupt cross-adapter clone/extend profiles.");
                     }
                 }
             }
@@ -522,11 +515,7 @@ namespace DisplayMagicianShared.Windows
                     }
                     else
                     {
-                        // if there isn't a matching adapter, then we just pick the first current one and hope that works!
-                        // (it is highly likely to... its only if the user has multiple graphics cards with some weird config it may break)
-                        newAdapterValue = currentAdapterMap.First().Key;
-                        SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Uh Oh. Adapter {savedDisplayConfig.DisplayConfigModes[i].AdapterId.Value} didn't have a current match! It's possible the adapter was swapped or disabled. Attempting to use adapter {newAdapterValue} instead.");
-                        savedDisplayConfig.DisplayConfigModes[i].AdapterId = AdapterValueToLUID(newAdapterValue);
+                        SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Mode adapter {savedDisplayConfig.DisplayConfigModes[i].AdapterId.Value} for mode #{i} did not have a current adapter-map match. Leaving the saved adapter ID unchanged so Windows can validate the original mode relationship.");
                     }
                 }
             }
@@ -545,28 +534,38 @@ namespace DisplayMagicianShared.Windows
                     for (int i = 0; i < savedDisplayConfig.DisplayHDRStates.Count; i++)
                     {
                         ADVANCED_HDR_INFO_PER_PATH hdrInfo = savedDisplayConfig.DisplayHDRStates[i];
-                        // Change the Mode AdapterID
-                        if (adapterOldToNewMap.ContainsKey(savedDisplayConfig.DisplayHDRStates[i].AdapterId.Value))
+                        // Change the HDR adapter IDs, but only where we have a confident old-to-new mapping.
+                        // In hybrid clone states Windows can expose a cross-adapter target without returning
+                        // the dGPU adapter in GetAllAdapterIDs(). Replacing an unmatched NVIDIA adapter with
+                        // the first current adapter corrupts the saved topology, so unmatched IDs are left alone.
+                        if (adapterOldToNewMap.TryGetValue(hdrInfo.AdapterId.Value, out newAdapterValue))
                         {
-                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: adapterOldToNewMap contains adapter {hdrInfo.AdapterId.Value} so using the new adapter ID of {newAdapterValue} instead.");
-                            // We get here if there is a matching adapter
-                            newAdapterValue = adapterOldToNewMap[savedDisplayConfig.DisplayHDRStates[i].AdapterId.Value];
                             hdrInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
-                            newAdapterValue = adapterOldToNewMap[savedDisplayConfig.DisplayHDRStates[i].AdvancedColorInfo.Header.AdapterId.Value];
-                            hdrInfo.AdvancedColorInfo.Header.AdapterId = AdapterValueToLUID(newAdapterValue);
-                            newAdapterValue = adapterOldToNewMap[savedDisplayConfig.DisplayHDRStates[i].SDRWhiteLevel.Header.AdapterId.Value];
-                            hdrInfo.SDRWhiteLevel.Header.AdapterId = AdapterValueToLUID(newAdapterValue);
-                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated Display HDR state #{i} from adapter {hdrInfo.AdapterId.Value} to adapter {newAdapterValue} instead.");
+                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated Display HDR state #{i} adapter to {newAdapterValue}.");
                         }
                         else
                         {
-                            // if there isn't a matching adapter, then we just pick the first current one and hope that works!
-                            // (it is highly likely to... its only if the user has multiple graphics cards with some weird config it may break)
-                            newAdapterValue = currentAdapterMap.First().Key;
-                            SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Uh Oh. Adapter {savedDisplayConfig.DisplayHDRStates[i].AdapterId.Value} didn't have a current match! It's possible the adapter was swapped or disabled. Attempting to use adapter {newAdapterValue} instead.");
-                            hdrInfo.AdapterId = AdapterValueToLUID(newAdapterValue);
+                            SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: HDR adapter {hdrInfo.AdapterId.Value} for HDR state #{i} did not have a current adapter-map match. Leaving it unchanged.");
+                        }
+
+                        if (adapterOldToNewMap.TryGetValue(hdrInfo.AdvancedColorInfo.Header.AdapterId.Value, out newAdapterValue))
+                        {
                             hdrInfo.AdvancedColorInfo.Header.AdapterId = AdapterValueToLUID(newAdapterValue);
+                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated AdvancedColorInfo HDR adapter for state #{i} to {newAdapterValue}.");
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: AdvancedColorInfo HDR adapter {hdrInfo.AdvancedColorInfo.Header.AdapterId.Value} for HDR state #{i} did not have a current adapter-map match. Leaving it unchanged.");
+                        }
+
+                        if (adapterOldToNewMap.TryGetValue(hdrInfo.SDRWhiteLevel.Header.AdapterId.Value, out newAdapterValue))
+                        {
                             hdrInfo.SDRWhiteLevel.Header.AdapterId = AdapterValueToLUID(newAdapterValue);
+                            SharedLogger.logger.Trace($"WinLibrary/PatchWindowsDisplayConfig: Updated SDRWhiteLevel HDR adapter for state #{i} to {newAdapterValue}.");
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: SDRWhiteLevel HDR adapter {hdrInfo.SDRWhiteLevel.Header.AdapterId.Value} for HDR state #{i} did not have a current adapter-map match. Leaving it unchanged.");
                         }
                         savedDisplayConfig.DisplayHDRStates[i] = hdrInfo;
                     }
@@ -604,11 +603,7 @@ namespace DisplayMagicianShared.Windows
                             }
                             else
                             {
-                                // if there isn't a matching adapter, then we just pick the first current one and hope that works!
-                                // (it is highly likely to... its only if the user has multiple graphics cards with some weird config it may break)
-                                newAdapterValue = currentAdapterMap.First().Key;
-                                SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Uh Oh. Adapter {ds.AdapterId.Value} didn't have a current match in Display Sources! It's possible the adapter was swapped or disabled. Attempting to use adapter {newAdapterValue} instead.");
-                                ds.AdapterId = AdapterValueToLUID(newAdapterValue);
+                                SharedLogger.logger.Warn($"WinLibrary/PatchWindowsDisplayConfig: Display source adapter {ds.AdapterId.Value} did not have a current adapter-map match. Leaving the saved adapter ID unchanged.");
                             }
                             dsList[j] = ds;
                         }
