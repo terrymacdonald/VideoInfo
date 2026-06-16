@@ -523,7 +523,6 @@ namespace VideoInfo
             if (!string.IsNullOrWhiteSpace(json))
             {
                 SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Contents exist within {filename} so trying to read them as JSON.");
-                Console.WriteLine($"Reading display configuration from {filename}...");
                 try
                 {
                     myDisplayConfig = JsonConvert.DeserializeObject<VIDEOINFO_DISPLAY_CONFIG>(json, new JsonSerializerSettings
@@ -535,8 +534,7 @@ namespace VideoInfo
                         ObjectCreationHandling = ObjectCreationHandling.Replace
                     });
                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Successfully parsed {filename} as JSON.");
-                    Console.WriteLine($"Successfully parsed {filename} as JSON.");
-
+                    
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
                     // Create the old adapter ID to new adapter ID map by looking at the display names of the adapters in the saved windows config and the current windows config
                     Dictionary<ulong, ulong> adapterOldToNewMap = winLibrary.GetAdapterIdMap(ref myDisplayConfig.WindowsConfig);
@@ -572,26 +570,21 @@ namespace VideoInfo
                     if (nvidiaLibrary.IsInstalled)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA NvAPI DLL is available to use on this computer.");
-                        Console.WriteLine("The NVIDIA NvAPI DLL is available to use on this computer.");
                         if (myDisplayConfig.NVIDIAConfig.IsInUse)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings are used in this display profile.");
-                            Console.WriteLine("The NVIDIA display settings are used in this display profile.");
                             if (myDisplayConfig.NVIDIAConfig.DisplayIdentifiers.Count > 0)
                             {
                                 SharedLogger.logger.Trace($"VideoInfo/loadFromFile: There are {myDisplayConfig.NVIDIAConfig.DisplayIdentifiers.Count} displays connected to the NVIDIA video card.");
-                                Console.WriteLine($"There are {myDisplayConfig.NVIDIAConfig.DisplayIdentifiers.Count} displays connected to the NVIDIA video card.");
-
                                 if (nvidiaLibrary.IsPossibleConfig(myDisplayConfig.NVIDIAConfig))
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} are possible to use right now, so we'll use attempt to use them shortly.");
-                                    Console.WriteLine($"The NVIDIA display settings within {filename} are possible to use right now, so we'll attempt to use them shortly.");
                                     applyNVIDIASettings = true;
                                 }
                                 else
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were NOT possible to be applied.");
-                                    Console.WriteLine($"The NVIDIA display settings within {filename} were NOT possible to be applied.");
+                                    Console.WriteLine($"The NVIDIA display settings within {filename} are NOT possible to be applied.");
                                 }
                             }
                             else
@@ -614,33 +607,26 @@ namespace VideoInfo
 
                     if (amdLibrary.IsInstalled)
                     {
-                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD ADL DLL is available to use on this computer.");
-                        Console.WriteLine("The AMD ADL DLL is available to use on this computer.");
                         if (myDisplayConfig.AMDConfig.IsInUse)
                         {
-                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings are used in this display profile.");
-                            Console.WriteLine("The AMD display settings are used in this display profile.");
-
                             if (myDisplayConfig.AMDConfig.DisplayIdentifiers.Count > 0)
                             {
                                 SharedLogger.logger.Trace($"VideoInfo/loadFromFile: There are {myDisplayConfig.AMDConfig.DisplayIdentifiers.Count} displays connected to the AMD video card.");
-                                Console.WriteLine($"There are {myDisplayConfig.AMDConfig.DisplayIdentifiers.Count} displays connected to the AMD video card.");
                                 if (amdLibrary.IsPossibleConfig(myDisplayConfig.AMDConfig))
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} are possible to use right now, so we'll use attempt to use them.");
-                                    Console.WriteLine($"The AMD display settings within {filename} are possible to use right now, so we'll attempt to use them.");
                                     applyAMDSettings = true;
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were NOT possible to be applied.");
-                                    Console.WriteLine($"The AMD display settings within {filename} were NOT possible to be applied.");
+                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} are NOT possible to be applied.");
+                                    Console.WriteLine($"The AMD display settings within {filename} are NOT possible to be applied.");
                                 }
                             }
                             else
                             {
                                 SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display settings as the AMD library isn't installed.");
-                        Console.WriteLine("Skipping applying AMD display settings as the AMD library isn't installed.");
+                                Console.WriteLine("Skipping applying AMD display settings as the AMD library isn't installed.");
                             }
                         }
                         else
@@ -659,26 +645,21 @@ namespace VideoInfo
                     if (intelLibrary.IsInstalled)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel IGCL DLL is available to use on this computer.");
-                        Console.WriteLine("The Intel IGCL DLL is available to use on this computer.");
                         if (myDisplayConfig.IntelConfig.IsInUse)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel display settings are used in this display profile.");
-                            Console.WriteLine("The Intel display settings are used in this display profile.");
                             if (myDisplayConfig.IntelConfig.DisplayIdentifiers.Count > 0)
                             {
                                 SharedLogger.logger.Trace($"VideoInfo/loadFromFile: There are {myDisplayConfig.IntelConfig.DisplayIdentifiers.Count} displays connected to the Intel video card.");
-                                Console.WriteLine($"There are {myDisplayConfig.IntelConfig.DisplayIdentifiers.Count} displays connected to the Intel video card.");
-
                                 if (intelLibrary.IsPossibleConfig(myDisplayConfig.IntelConfig))
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel display settings within {filename} are possible to use right now, so we'll use attempt to use them shortly.");
-                                    Console.WriteLine($"The Intel display settings within {filename} are possible to use right now, so we'll attempt to use them shortly.");
                                     applyIntelSettings = true;
                                 }
                                 else
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel display settings within {filename} were NOT possible to be applied.");
-                                    Console.WriteLine($"The Intel display settings within {filename} were NOT possible to be applied.");
+                                    Console.WriteLine($"The Intel display settings within {filename} are NOT possible to be applied.");
                                 }
                             }
                             else
@@ -709,16 +690,16 @@ namespace VideoInfo
                         if (myDisplayConfig.NVIDIAConfig.MosaicConfig.IsMosaicEnabled)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: NVIDIA Surround/Mosaic Display required – enabling all connected displays so NvAPI can see them as active outputs.");
-                            Console.WriteLine("NVIDIA Surround/Mosaic Display required - enabling all connected displays so NvAPI can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
+                        Console.Write($"Applying NVIDIA display settings...");
                         itWorkedforNVIDIA = nvidiaLibrary.SetActiveConfig(myDisplayConfig.NVIDIAConfig, delayInMs);
                         Thread.Sleep(delayInMs); // Give it a second to wake up the displays
                         if (itWorkedforNVIDIA)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were sucessfully applied.");
-                            Console.WriteLine($"The NVIDIA display settings within {filename} were successfully applied.");
+                            Console.WriteLine($"Done.");
                         }
                         else
                         {
@@ -743,16 +724,16 @@ namespace VideoInfo
                         if (myDisplayConfig.AMDConfig.IsEyefinity)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: AMD Eyefinity Display required – enabling all connected displays so ADLX can see them as active outputs.");
-                            Console.WriteLine("AMD Eyefinity Display required - enabling all connected displays so ADLX can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
+                        Console.Write($"Applying AMD display settings...");
                         itWorkedforAMD = amdLibrary.SetActiveConfig(myDisplayConfig.AMDConfig, useADLEyefinity, delayInMs);
                         Thread.Sleep(delayInMs); // Give it a second to wake up the displays
                         if (itWorkedforAMD)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were sucessfully applied.");
-                            Console.WriteLine($"The AMD display settings within {filename} were successfully applied.");
+                            Console.WriteLine($"Done.");
                         }
                         else
                         {
@@ -776,19 +757,18 @@ namespace VideoInfo
                         if (myDisplayConfig.IntelConfig.CombinedDisplayIsInUse)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Intel Combined Display required – enabling all connected displays so IGCL can see them as active outputs.");
-                            Console.WriteLine("Intel Combined Display required - enabling all connected displays so IGCL can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
 
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Attempting to apply Intel display config from {filename}...");
-                        Console.WriteLine($"Attempting to apply Intel display config from {filename}...");
+                        Console.Write($"Applying Intel display settings...");
                         itWorkedforIntel = intelLibrary.SetActiveConfig(myDisplayConfig.IntelConfig, delayInMs);
                         Thread.Sleep(delayInMs); // Give it a second to wake up the displays
                         if (itWorkedforIntel)
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel display settings within {filename} were sucessfully applied.");
-                            Console.WriteLine($"The Intel display settings within {filename} were successfully applied.");
+                            Console.WriteLine($"Done.");
                         }
                         else
                         {
@@ -812,7 +792,6 @@ namespace VideoInfo
                                                  // if other changes were made, then ets update the screens so Windows knows whats happening
                                                  // NVIDIA and AMD make such large changes to the available screens in windows, we need to do this.
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: NVIDIA, AMD or Intel display settings within {filename} were applied successfully, so updating Windows Active Config so it knows of the changes made.");
-                        Console.WriteLine($"NVIDIA, AMD or Intel display settings within {filename} were applied successfully, so updating Windows Active Config so it knows of the changes made.");
                         winLibrary.UpdateActiveConfig();
                     }
 
@@ -833,13 +812,13 @@ namespace VideoInfo
                             if (itWorkedforNVIDIA)
                             {
                                 SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Attempting to apply 2nd part of the NVIDIA display config from {filename}...");
-                                Console.WriteLine($"Attempting to apply 2nd part of the NVIDIA display config from {filename}...");
+                                Console.Write($"Attempting to apply 2nd part of the NVIDIA display config from {filename}...");
                                 itWorkedforNVIDIAOverride = nvidiaLibrary.SetActiveConfigOverride(myDisplayConfig.NVIDIAConfig, delayInMs);
                                 Thread.Sleep(delayInMs);
                                 if (itWorkedforNVIDIAOverride)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings that override windows within {filename} were applied correctly.");
-                                    Console.WriteLine($"The NVIDIA display settings that override windows within {filename} were applied correctly.");
+                                    Console.WriteLine($"Done.");
                                 }
                                 else
                                 {
@@ -873,13 +852,13 @@ namespace VideoInfo
                             if (itWorkedforAMD)
                             {
                                 SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Attempting to apply 2nd part of the AMD display config from {filename}...");
-                                Console.WriteLine($"Attempting to apply 2nd part of the AMD display config from {filename}...");
+                                Console.Write($"Attempting to apply 2nd part of the AMD display config from {filename}...");
                                 itWorkedforAMDOverride = amdLibrary.SetActiveConfigOverride(myDisplayConfig.AMDConfig, delayInMs);
                                 Thread.Sleep(delayInMs);
                                 if (itWorkedforAMDOverride)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings that override windows within {filename} were applied correctly.");
-                                    Console.WriteLine($"The AMD display settings that override windows within {filename} were applied correctly.");
+                                    Console.WriteLine($"Done.");
                                 }
                                 else
                                 {
@@ -913,13 +892,13 @@ namespace VideoInfo
                             if (itWorkedforIntel)
                             {
                                 SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Attempting to apply 2nd part of the Intel display config from {filename}...");
-                                Console.WriteLine($"Attempting to apply 2nd part of the Intel display config from {filename}...");
+                                Console.Write($"Attempting to apply 2nd part of the Intel display config from {filename}...");
                                 itWorkedforIntelOverride = intelLibrary.SetActiveConfigOverride(myDisplayConfig.IntelConfig, delayInMs);
                                 Thread.Sleep(delayInMs);
                                 if (itWorkedforIntelOverride)
                                 {
                                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel display settings that override windows within {filename} were applied correctly.");
-                                    Console.WriteLine($"The Intel display settings that override windows within {filename} were applied correctly.");
+                                    Console.WriteLine($"Done.");
                                 }
                                 else
                                 {
@@ -1041,7 +1020,11 @@ namespace VideoInfo
                     SharedLogger.logger.Trace($"VideoInfo/possibleFromFile: Successfully parsed {filename} as JSON.");
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
+                    // Create the old adapter ID to new adapter ID map by looking at the display names of the adapters in the saved windows config and the current windows config
+                    Dictionary<ulong, ulong> adapterOldToNewMap = winLibrary.GetAdapterIdMap(ref myDisplayConfig.WindowsConfig);
+                    // Patch the display configs for NVIDIA and Windows based on the new adapter IDs
+                    nvidiaLibrary.PatchNVIDADisplayConfig(ref myDisplayConfig.NVIDIAConfig, adapterOldToNewMap);
+                    winLibrary.PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
                 }
                 catch (Exception ex)
                 {
@@ -1115,7 +1098,11 @@ namespace VideoInfo
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref displayConfig.WindowsConfig);
+                    // Create the old adapter ID to new adapter ID map by looking at the display names of the adapters in the saved windows config and the current windows config
+                    Dictionary<ulong, ulong> adapterOldToNewMap = winLibrary.GetAdapterIdMap(ref myDisplayConfig.WindowsConfig);
+                    // Patch the display configs for NVIDIA and Windows based on the new adapter IDs
+                    nvidiaLibrary.PatchNVIDADisplayConfig(ref myDisplayConfig.NVIDIAConfig, adapterOldToNewMap);
+                    winLibrary.PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
                 }
                 catch (Exception ex)
                 {
@@ -1137,7 +1124,11 @@ namespace VideoInfo
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref otherDisplayConfig.WindowsConfig);
+                    // Create the old adapter ID to new adapter ID map by looking at the display names of the adapters in the saved windows config and the current windows config
+                    Dictionary<ulong, ulong> adapterOldToNewMap = winLibrary.GetAdapterIdMap(ref myDisplayConfig.WindowsConfig);
+                    // Patch the display configs for NVIDIA and Windows based on the new adapter IDs
+                    nvidiaLibrary.PatchNVIDADisplayConfig(ref myDisplayConfig.NVIDIAConfig, adapterOldToNewMap);
+                    winLibrary.PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
                 }
                 catch (Exception ex)
                 {
@@ -1196,7 +1187,11 @@ namespace VideoInfo
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref displayConfig.WindowsConfig);
+                    // Create the old adapter ID to new adapter ID map by looking at the display names of the adapters in the saved windows config and the current windows config
+                    Dictionary<ulong, ulong> adapterOldToNewMap = winLibrary.GetAdapterIdMap(ref myDisplayConfig.WindowsConfig);
+                    // Patch the display configs for NVIDIA and Windows based on the new adapter IDs
+                    nvidiaLibrary.PatchNVIDADisplayConfig(ref myDisplayConfig.NVIDIAConfig, adapterOldToNewMap);
+                    winLibrary.PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
                 }
                 catch (Exception ex)
                 {
