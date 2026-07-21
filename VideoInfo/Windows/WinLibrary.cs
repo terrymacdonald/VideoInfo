@@ -772,8 +772,13 @@ namespace DisplayMagicianShared.Windows
         public WINDOWS_DISPLAY_CONFIG GetActiveConfig()
         {
             SharedLogger.logger.Trace($"WinLibrary/GetActiveConfig: Getting the currently active config");
-            // We'll leave virtual refresh rate aware until we can reliably detect Windows 11 versions.
-            return GetWindowsDisplayConfig(QDC.QDC_ONLY_ACTIVE_PATHS);
+            QDC selector = QDC.QDC_ONLY_ACTIVE_PATHS;
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+            {
+                selector |= QDC.QDC_VIRTUAL_MODE_AWARE | QDC.QDC_VIRTUAL_REFRESH_RATE_AWARE;
+            }
+
+            return GetWindowsDisplayConfig(selector);
         }
 
         private WINDOWS_DISPLAY_CONFIG GetWindowsDisplayConfig(QDC selector = QDC.QDC_ONLY_ACTIVE_PATHS)
@@ -787,6 +792,14 @@ namespace DisplayMagicianShared.Windows
             int pathCount = 0;
             int modeCount = 0;
             WIN32STATUS err = CCDImport.GetDisplayConfigBufferSizes(selector, out pathCount, out modeCount);
+            if ((selector & QDC.QDC_VIRTUAL_REFRESH_RATE_AWARE) == QDC.QDC_VIRTUAL_REFRESH_RATE_AWARE &&
+                (err == WIN32STATUS.ERROR_INVALID_PARAMETER || err == WIN32STATUS.ERROR_NOT_SUPPORTED))
+            {
+                SharedLogger.logger.Warn($"WinLibrary/GetWindowsDisplayConfig: DRR-aware GetDisplayConfigBufferSizes returned WIN32STATUS {err}. Retrying without DRR-aware flags.");
+                selector &= ~(QDC.QDC_VIRTUAL_MODE_AWARE | QDC.QDC_VIRTUAL_REFRESH_RATE_AWARE);
+                err = CCDImport.GetDisplayConfigBufferSizes(selector, out pathCount, out modeCount);
+            }
+
             if (err != WIN32STATUS.ERROR_SUCCESS)
             {
                 SharedLogger.logger.Error($"WinLibrary/GetWindowsDisplayConfig: ERROR - GetDisplayConfigBufferSizes returned WIN32STATUS {err} when trying to get the maximum path and mode sizes");
@@ -797,6 +810,23 @@ namespace DisplayMagicianShared.Windows
             var paths = new DISPLAYCONFIG_PATH_INFO[pathCount];
             var modes = new DISPLAYCONFIG_MODE_INFO[modeCount];
             err = CCDImport.QueryDisplayConfig(selector, ref pathCount, paths, ref modeCount, modes, IntPtr.Zero);
+            if ((selector & QDC.QDC_VIRTUAL_REFRESH_RATE_AWARE) == QDC.QDC_VIRTUAL_REFRESH_RATE_AWARE &&
+                (err == WIN32STATUS.ERROR_INVALID_PARAMETER || err == WIN32STATUS.ERROR_NOT_SUPPORTED))
+            {
+                SharedLogger.logger.Warn($"WinLibrary/GetWindowsDisplayConfig: DRR-aware QueryDisplayConfig returned WIN32STATUS {err}. Retrying without DRR-aware flags.");
+                selector &= ~(QDC.QDC_VIRTUAL_MODE_AWARE | QDC.QDC_VIRTUAL_REFRESH_RATE_AWARE);
+                err = CCDImport.GetDisplayConfigBufferSizes(selector, out pathCount, out modeCount);
+                if (err != WIN32STATUS.ERROR_SUCCESS)
+                {
+                    SharedLogger.logger.Error($"WinLibrary/GetWindowsDisplayConfig: ERROR - GetDisplayConfigBufferSizes returned WIN32STATUS {err} when retrying without DRR-aware flags");
+                    throw new WinLibraryException($"GetDisplayConfigBufferSizes returned WIN32STATUS {err} when retrying without DRR-aware flags");
+                }
+
+                paths = new DISPLAYCONFIG_PATH_INFO[pathCount];
+                modes = new DISPLAYCONFIG_MODE_INFO[modeCount];
+                err = CCDImport.QueryDisplayConfig(selector, ref pathCount, paths, ref modeCount, modes, IntPtr.Zero);
+            }
+
             if (err == WIN32STATUS.ERROR_INSUFFICIENT_BUFFER)
             {
                 SharedLogger.logger.Warn($"WinLibrary/GetWindowsDisplayConfig: The displays were modified between GetDisplayConfigBufferSizes and QueryDisplayConfig so we need to get the buffer sizes again.");
@@ -1357,6 +1387,8 @@ namespace DisplayMagicianShared.Windows
             foreach (var path in displayConfig.DisplayConfigPaths)
             {
                 stringToReturn += $"----++++==== Path ====++++----\n";
+                bool isDynamicRefreshRateEnabled = path.Flags.HasFlag(DISPLAYCONFIG_PATH_FLAGS.DISPLAYCONFIG_PATH_BOOST_REFRESH_RATE);
+                SharedLogger.logger.Trace($"WinLibrary/PrintActiveConfig: Dynamic Refresh Rate enabled: {isDynamicRefreshRateEnabled} for target {path.TargetInfo.Id}.");
 
                 // get display source name
                 var sourceInfo = new DISPLAYCONFIG_SOURCE_DEVICE_NAME();
@@ -1418,6 +1450,7 @@ namespace DisplayMagicianShared.Windows
                     stringToReturn += $" Monitor Device Path: {targetInfo.MonitorDevicePath}\n";
                     stringToReturn += $" Monitor Friendly Device Name: {targetInfo.MonitorFriendlyDeviceName}\n";
                     stringToReturn += $" Output Technology: {targetInfo.OutputTechnology}\n";
+                    stringToReturn += $" Dynamic Refresh Rate Enabled: {isDynamicRefreshRateEnabled}\n";
                     stringToReturn += $"\n";
                 }
                 else
@@ -1738,11 +1771,30 @@ namespace DisplayMagicianShared.Windows
 
             uint myPathsCount = (uint)displayConfig.DisplayConfigPaths.Length;
             uint myModesCount = (uint)displayConfig.DisplayConfigModes.Length;
+            SDC validateFlags = SDC.DISPLAYMAGICIAN_VALIDATE;
+            SDC setFlags = SDC.DISPLAYMAGICIAN_SET;
+            SDC topologyOnlyFlags = SDC.SDC_APPLY | SDC.SDC_TOPOLOGY_SUPPLIED | SDC.SDC_ALLOW_CHANGES;
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+            {
+                validateFlags |= SDC.SDC_VIRTUAL_MODE_AWARE | SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE;
+                setFlags |= SDC.SDC_VIRTUAL_MODE_AWARE | SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE;
+                topologyOnlyFlags |= SDC.SDC_VIRTUAL_MODE_AWARE | SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE;
+            }
 
             // First we need to validate the display config            
             SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to validate the supplied display configuration with {myPathsCount} display config paths and {myModesCount} modes.");
             // Now set the specified display configuration for this computer                    
-            WIN32STATUS err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, SDC.DISPLAYMAGICIAN_VALIDATE);
+            WIN32STATUS err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, validateFlags);
+            if ((validateFlags & SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE) == SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE &&
+                (err == WIN32STATUS.ERROR_INVALID_PARAMETER || err == WIN32STATUS.ERROR_NOT_SUPPORTED))
+            {
+                SharedLogger.logger.Warn($"WinLibrary/SetActiveConfig: DRR-aware SetDisplayConfig validation returned WIN32STATUS {err}. Retrying without DRR-aware flags.");
+                validateFlags = SDC.DISPLAYMAGICIAN_VALIDATE;
+                setFlags = SDC.DISPLAYMAGICIAN_SET;
+                topologyOnlyFlags = SDC.SDC_APPLY | SDC.SDC_TOPOLOGY_SUPPLIED | SDC.SDC_ALLOW_CHANGES;
+                err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, validateFlags);
+            }
+
             if (err == WIN32STATUS.ERROR_SUCCESS)
             {
                 displayConfigPassedValidation = true;
@@ -1784,7 +1836,16 @@ namespace DisplayMagicianShared.Windows
                 // Try and apply the validated display config
                 SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set the display configuration with {myPathsCount} display config paths and {myModesCount} modes.");
                 // Now set the specified display configuration for this computer                    
-                err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, SDC.DISPLAYMAGICIAN_SET);
+                err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, setFlags);
+                if ((setFlags & SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE) == SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE &&
+                    (err == WIN32STATUS.ERROR_INVALID_PARAMETER || err == WIN32STATUS.ERROR_NOT_SUPPORTED))
+                {
+                    SharedLogger.logger.Warn($"WinLibrary/SetActiveConfig: DRR-aware SetDisplayConfig apply returned WIN32STATUS {err}. Retrying without DRR-aware flags.");
+                    setFlags = SDC.DISPLAYMAGICIAN_SET;
+                    topologyOnlyFlags = SDC.SDC_APPLY | SDC.SDC_TOPOLOGY_SUPPLIED | SDC.SDC_ALLOW_CHANGES;
+                    err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, setFlags);
+                }
+
                 if (err == WIN32STATUS.ERROR_SUCCESS)
                 {
                     displayConfigAppliedSuccessfully = true;
@@ -1825,7 +1886,16 @@ namespace DisplayMagicianShared.Windows
                 Thread.Sleep(delayInMs*2);
                 SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set the display configuration A SECOND TIME with {myPathsCount} display config paths and {myModesCount} modes. Sometimes it doesn't work the first time!");
                 // Try it again, because in some systems it doesn't work at the first try
-                err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, SDC.DISPLAYMAGICIAN_SET);
+                err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, setFlags);
+                if ((setFlags & SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE) == SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE &&
+                    (err == WIN32STATUS.ERROR_INVALID_PARAMETER || err == WIN32STATUS.ERROR_NOT_SUPPORTED))
+                {
+                    SharedLogger.logger.Warn($"WinLibrary/SetActiveConfig: Retry. DRR-aware SetDisplayConfig apply returned WIN32STATUS {err}. Retrying without DRR-aware flags.");
+                    setFlags = SDC.DISPLAYMAGICIAN_SET;
+                    topologyOnlyFlags = SDC.SDC_APPLY | SDC.SDC_TOPOLOGY_SUPPLIED | SDC.SDC_ALLOW_CHANGES;
+                    err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, setFlags);
+                }
+
                 if (err == WIN32STATUS.ERROR_SUCCESS)
                 {
                     displayConfigAppliedSuccessfully = true;
@@ -1869,7 +1939,15 @@ namespace DisplayMagicianShared.Windows
 
                 SharedLogger.logger.Trace($"WinLibrary/SetActiveConfig: Attempting to set the display configuration A THIRD TIME, this time just supplying {myPathsCount} display config paths and letting Windows figure out the best modes to use. This may work but is hit and miss.");
                 // Try it again, because in some systems it doesn't work at the first try
-                err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, SDC.SDC_APPLY | SDC.SDC_TOPOLOGY_SUPPLIED | SDC.SDC_ALLOW_CHANGES);
+                err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, topologyOnlyFlags);
+                if ((topologyOnlyFlags & SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE) == SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE &&
+                    (err == WIN32STATUS.ERROR_INVALID_PARAMETER || err == WIN32STATUS.ERROR_NOT_SUPPORTED))
+                {
+                    SharedLogger.logger.Warn($"WinLibrary/SetActiveConfig: Retry 2. DRR-aware SetDisplayConfig apply returned WIN32STATUS {err}. Retrying without DRR-aware flags.");
+                    topologyOnlyFlags = SDC.SDC_APPLY | SDC.SDC_TOPOLOGY_SUPPLIED | SDC.SDC_ALLOW_CHANGES;
+                    err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, topologyOnlyFlags);
+                }
+
                 if (err == WIN32STATUS.ERROR_SUCCESS)
                 {
                     displayConfigAppliedSuccessfully = true;
@@ -2220,7 +2298,21 @@ namespace DisplayMagicianShared.Windows
             // Test whether a specified display configuration is supported on the computer                    
             uint myPathsCount = (uint)displayConfig.DisplayConfigPaths.Length;
             uint myModesCount = (uint)displayConfig.DisplayConfigModes.Length;
-            WIN32STATUS err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, SDC.DISPLAYMAGICIAN_VALIDATE);
+            SDC validateFlags = SDC.DISPLAYMAGICIAN_VALIDATE;
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000))
+            {
+                validateFlags |= SDC.SDC_VIRTUAL_MODE_AWARE | SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE;
+            }
+
+            WIN32STATUS err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, validateFlags);
+            if ((validateFlags & SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE) == SDC.SDC_VIRTUAL_REFRESH_RATE_AWARE &&
+                (err == WIN32STATUS.ERROR_INVALID_PARAMETER || err == WIN32STATUS.ERROR_NOT_SUPPORTED))
+            {
+                SharedLogger.logger.Warn($"WinLibrary/IsPossibleConfig: DRR-aware SetDisplayConfig validation returned WIN32STATUS {err}. Retrying without DRR-aware flags.");
+                validateFlags = SDC.DISPLAYMAGICIAN_VALIDATE;
+                err = CCDImport.SetDisplayConfig(myPathsCount, displayConfig.DisplayConfigPaths, myModesCount, displayConfig.DisplayConfigModes, validateFlags);
+            }
+
             if (err == WIN32STATUS.ERROR_SUCCESS)
             {
                 SharedLogger.logger.Trace($"WinLibrary/IsPossibleConfig: SetDisplayConfig validated that the display configuration is valid and can be used!");
