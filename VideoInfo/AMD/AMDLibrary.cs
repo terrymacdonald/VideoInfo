@@ -964,7 +964,7 @@ namespace DisplayMagicianShared.AMD
 
     public struct AMD_GAMMA_RAMP : IEquatable<AMD_GAMMA_RAMP>
     {
-        public List<ushort> Gamma { get; init; }        
+        public List<ushort> Gamma { get; set; }        
         public AMD_GAMMA_RAMP()
         {
             Gamma = new List<ushort>();
@@ -1017,9 +1017,9 @@ namespace DisplayMagicianShared.AMD
         public bool HasRegammaCoefficient { get; init; }
         public AMD_REGAMMA_COEFFICIENT RegammaCoefficient { get; init; }
         public bool HasReGammaRamp { get; init; }
-        public AMD_GAMMA_RAMP ReGammaRamp { get; init; }
+        public AMD_GAMMA_RAMP ReGammaRamp { get; set; }
         public bool HasDeGammaRamp { get; init; }
-        public AMD_GAMMA_RAMP DeGammaRamp { get; init; }
+        public AMD_GAMMA_RAMP DeGammaRamp { get; set; }
 
         public AMD_GAMMA_INFO()
         {

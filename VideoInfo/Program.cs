@@ -494,6 +494,9 @@ namespace VideoInfo
             myDisplayConfig.IntelConfig = intelLibrary.ActiveDisplayConfig;
             myDisplayConfig.WindowsConfig = winLibrary.ActiveDisplayConfig;
 
+            // Ensure no null collection/string/array fields are written to the JSON file.
+            NormalizeCollections(myDisplayConfig);
+
             SharedLogger.logger.Trace($"VideoInfo/saveToFile: Attempting to convert the current Active Config objects to JSON format");
             // Save the object to file!
             try
@@ -564,6 +567,7 @@ namespace VideoInfo
                         ObjectCreationHandling = ObjectCreationHandling.Replace
                     });
                     SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Successfully parsed {filename} as JSON.");
+                    NormalizeCollections(myDisplayConfig);
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
                     // Create the old adapter ID to new adapter ID map by looking at the display names of the adapters in the saved windows config and the current windows config
@@ -976,6 +980,210 @@ namespace VideoInfo
 
         }
 
+        /// <summary>
+        /// Recursively walks a deserialized object graph and replaces any null collection or
+        /// dictionary fields/properties with empty instances. Structs are reassigned after
+        /// normalization so that nested fixes propagate back to their parent objects.
+        /// </summary>
+        static void NormalizeCollections(object obj, HashSet<object> visited = null)
+        {
+            if (obj == null)
+                return;
+
+            // Treat strings and primitive types as leaf nodes.
+            Type type = obj.GetType();
+            if (obj is string || type.IsPrimitive || type.IsEnum || type == typeof(decimal))
+                return;
+
+            if (visited == null)
+                visited = new HashSet<object>();
+            if (!visited.Add(obj))
+                return;
+
+            // Dictionaries: normalize each value and reassign value-type values.
+            if (obj is System.Collections.IDictionary dictionary)
+            {
+                var keys = dictionary.Keys.Cast<object>().ToList();
+                foreach (var key in keys)
+                {
+                    var value = dictionary[key];
+                    if (value == null)
+                        continue;
+
+                    NormalizeCollections(value, visited);
+                    if (value.GetType().IsValueType)
+                        dictionary[key] = value;
+                }
+                return;
+            }
+
+            // Lists/arrays: normalize each element and reassign value-type elements.
+            if (obj is System.Collections.IList list)
+            {
+                for (int i = 0; i < list.Count; i++)
+                {
+                    var item = list[i];
+                    if (item == null)
+                        continue;
+
+                    NormalizeCollections(item, visited);
+                    if (item.GetType().IsValueType)
+                        list[i] = item;
+                }
+                return;
+            }
+
+            // Other enumerables (e.g. HashSet<T> via non-IList interface) - normalize elements only.
+            if (obj is System.Collections.IEnumerable enumerable)
+            {
+                foreach (var item in enumerable)
+                {
+                    if (item != null)
+                        NormalizeCollections(item, visited);
+                }
+                return;
+            }
+
+            // For classes and structs, normalize public instance fields and properties.
+            if (type.IsClass || type.IsValueType)
+            {
+                var fields = type.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                foreach (var field in fields)
+                {
+                    var fieldType = field.FieldType;
+                    var value = field.GetValue(obj);
+
+                    if (value == null)
+                    {
+                        if (fieldType == typeof(string))
+                        {
+                            field.SetValue(obj, string.Empty);
+                        }
+                        else if (fieldType.IsArray && fieldType.GetElementType() != null)
+                        {
+                            field.SetValue(obj, Array.CreateInstance(fieldType.GetElementType(), 0));
+                        }
+                        else if (IsNormalizableCollectionType(fieldType))
+                        {
+                            var empty = CreateEmptyCollection(fieldType);
+                            if (empty != null)
+                                field.SetValue(obj, empty);
+                        }
+                    }
+                    else
+                    {
+                        NormalizeCollections(value, visited);
+                        if (fieldType.IsValueType)
+                            field.SetValue(obj, value);
+                    }
+                }
+
+                var properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                    .Where(p => p.CanRead && p.CanWrite && p.GetIndexParameters().Length == 0);
+                foreach (var property in properties)
+                {
+                    var propType = property.PropertyType;
+                    object value;
+                    try
+                    {
+                        value = property.GetValue(obj);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    if (value == null)
+                    {
+                        if (propType == typeof(string))
+                        {
+                            try { property.SetValue(obj, string.Empty); }
+                            catch { /* init-only or otherwise protected setter */ }
+                        }
+                        else if (propType.IsArray && propType.GetElementType() != null)
+                        {
+                            try { property.SetValue(obj, Array.CreateInstance(propType.GetElementType(), 0)); }
+                            catch { /* init-only or otherwise protected setter */ }
+                        }
+                        else if (IsNormalizableCollectionType(propType))
+                        {
+                            var empty = CreateEmptyCollection(propType);
+                            if (empty != null)
+                            {
+                                try { property.SetValue(obj, empty); }
+                                catch { /* init-only or otherwise protected setter */ }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        NormalizeCollections(value, visited);
+                        if (propType.IsValueType)
+                        {
+                            try { property.SetValue(obj, value); }
+                            catch { /* init-only or otherwise protected setter */ }
+                        }
+                    }
+                }
+            }
+        }
+
+        static bool IsNormalizableCollectionType(Type type)
+        {
+            // Arrays are not replaced; we only replace resizable collections/dictionaries.
+            if (type.IsArray)
+                return false;
+
+            if (type.IsGenericType)
+            {
+                var genericDef = type.GetGenericTypeDefinition();
+                if (genericDef == typeof(List<>) ||
+                    genericDef == typeof(IList<>) ||
+                    genericDef == typeof(ICollection<>) ||
+                    genericDef == typeof(IEnumerable<>) ||
+                    genericDef == typeof(HashSet<>) ||
+                    genericDef == typeof(ISet<>) ||
+                    genericDef == typeof(Dictionary<,>) ||
+                    genericDef == typeof(IDictionary<,>))
+                    return true;
+            }
+
+            return typeof(System.Collections.IList).IsAssignableFrom(type) ||
+                   typeof(System.Collections.IDictionary).IsAssignableFrom(type);
+        }
+
+        static object CreateEmptyCollection(Type type)
+        {
+            try
+            {
+                if (type.IsGenericType)
+                {
+                    var genericDef = type.GetGenericTypeDefinition();
+                    var typeArgs = type.GenericTypeArguments;
+
+                    if (genericDef == typeof(List<>) ||
+                        genericDef == typeof(IList<>) ||
+                        genericDef == typeof(ICollection<>) ||
+                        genericDef == typeof(IEnumerable<>))
+                        return Activator.CreateInstance(typeof(List<>).MakeGenericType(typeArgs[0]));
+
+                    if (genericDef == typeof(HashSet<>) || genericDef == typeof(ISet<>))
+                        return Activator.CreateInstance(typeof(HashSet<>).MakeGenericType(typeArgs[0]));
+
+                    if (genericDef == typeof(Dictionary<,>) || genericDef == typeof(IDictionary<,>))
+                        return Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(typeArgs[0], typeArgs[1]));
+                }
+
+                if (typeof(System.Collections.IList).IsAssignableFrom(type))
+                    return Activator.CreateInstance(type);
+
+                if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
+                    return Activator.CreateInstance(type);
+            }
+            catch { }
+            return null;
+        }
+
         static void possibleFromFile(string filename)
         {
             
@@ -1005,6 +1213,7 @@ namespace VideoInfo
                         ObjectCreationHandling = ObjectCreationHandling.Replace
                     });
                     SharedLogger.logger.Trace($"VideoInfo/possibleFromFile: Successfully parsed {filename} as JSON.");
+                    NormalizeCollections(myDisplayConfig);
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
                     WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
@@ -1079,6 +1288,7 @@ namespace VideoInfo
                         ObjectCreationHandling = ObjectCreationHandling.Replace
                     });
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
+                    NormalizeCollections(displayConfig);
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
                     WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref displayConfig.WindowsConfig);
@@ -1101,6 +1311,7 @@ namespace VideoInfo
                         ObjectCreationHandling = ObjectCreationHandling.Replace
                     });
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
+                    NormalizeCollections(otherDisplayConfig);
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
                     WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref otherDisplayConfig.WindowsConfig);
@@ -1160,6 +1371,7 @@ namespace VideoInfo
                         ObjectCreationHandling = ObjectCreationHandling.Replace
                     });
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
+                    NormalizeCollections(displayConfig);
 
                     // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
                     WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref displayConfig.WindowsConfig);
