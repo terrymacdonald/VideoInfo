@@ -1903,14 +1903,14 @@
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationGetConfig(IGCLWrapper.PixtxPipeGetConfigDto)">
             <summary>
-            Get pixel transformation configuration as DTOs (metadata only; LUT sample values require native methods).
+            Get pixel transformation configuration as DTOs.
             </summary>
             <param name="args">Pipe get config DTO.</param>
             <returns>Pixel transformation get result DTO, or <c>null</c> if the feature is not supported on this hardware or driver.</returns>
         </member>
         <member name="M:IGCLWrapper.IGCLDisplayHelper.PixelTransformationSetConfig(IGCLWrapper.PixtxPipeSetConfigDto)">
             <summary>
-            Set pixel transformation configuration using a DTO (metadata only; LUT sample values require native methods).
+            Set pixel transformation configuration using DTOs.
             </summary>
             <param name="args">Pipe set config DTO.</param>
             <returns><c>true</c> if the setting was applied successfully; <c>false</c> if the feature is not supported on this hardware or driver.</returns>
@@ -3605,14 +3605,40 @@
             DTO for pixel transformation pipe get config (metadata only; LUT sample values require native methods).
             </summary>
         </member>
+        <member name="T:IGCLWrapper.PixtxOneDLutConfigDto">
+            <summary>
+            Managed 1D LUT payload for a pixel transformation block.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixtxThreeDLutSampleDto">
+            <summary>
+            Managed RGB sample for a 3D LUT pixel transformation block.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixtxThreeDLutConfigDto">
+            <summary>
+            Managed 3D LUT payload for a pixel transformation block.
+            </summary>
+        </member>
+        <member name="T:IGCLWrapper.PixtxMatrixConfigDto">
+            <summary>
+            Managed matrix payload for a pixel transformation block.
+            </summary>
+        </member>
         <member name="T:IGCLWrapper.PixtxBlockConfigDto">
             <summary>
-            DTO for pixel transformation block config (metadata only; LUT sample values require native methods).
+            DTO for pixel transformation block config.
+            Only the payload matching <see cref="F:IGCLWrapper.PixtxBlockConfigDto.BlockType"/> is used.
             </summary>
         </member>
         <member name="T:IGCLWrapper.PixtxPipeSetConfigDto">
             <summary>
             DTO for pixel transformation pipe set config.
+            </summary>
+        </member>
+        <member name="P:IGCLWrapper.PixtxPipeSetConfigDto.NumBlocks">
+            <summary>
+            Gets the number of managed block configurations in this request.
             </summary>
         </member>
         <member name="T:IGCLWrapper.PixelTransformationGetResultDto">
