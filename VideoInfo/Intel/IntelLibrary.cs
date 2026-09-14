@@ -75,7 +75,6 @@ namespace DisplayMagicianShared.Intel
         public CustomModeArgsDto CustomModeArgs;
         public List<CustomSourceModeDto> CustomModes;
         public LinkedDisplayAdaptersResultDto LinkedDisplayAdapters;
-        public MuxPropertiesDto MuxProperties;
         public VblankTimestampArgsDto VblankTimestamp;
         //public IntPtr ZeDeviceHandle;
         //public IntPtr ZeDriverHandle;
@@ -130,7 +129,6 @@ namespace DisplayMagicianShared.Intel
             CustomModeArgs = new CustomModeArgsDto();
             CustomModes = new List<CustomSourceModeDto>();
             LinkedDisplayAdapters = new LinkedDisplayAdaptersResultDto();
-            MuxProperties = new MuxPropertiesDto();
             VblankTimestamp = new VblankTimestampArgsDto();
             //ZeDeviceHandle = IntPtr.Zero;
             //ZeDriverHandle = IntPtr.Zero;
@@ -390,11 +388,6 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The LinkedDisplayAdapters values don't equal each other");
                 return false;
             }
-            if (!EqualityComparer<MuxPropertiesDto>.Default.Equals(MuxProperties, other.MuxProperties))
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The MuxProperties values don't equal each other");
-                return false;
-            }
             if (!EqualityComparer<VblankTimestampArgsDto>.Default.Equals(VblankTimestamp, other.VblankTimestamp))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The VblankTimestamp values don't equal each other");
@@ -438,7 +431,7 @@ namespace DisplayMagicianShared.Intel
 
             return (Name, DisplayDeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsSupportedGPUScaling, IsSupportedImageSharpening,
                 IsSupportedDisplaySettings, GetDisplaySettingsHash(DisplaySettings), ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram?.Length, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
-                DisplayProperties, /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes?.Count, LinkedDisplayAdapters, MuxProperties, 
+                DisplayProperties, /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes?.Count, LinkedDisplayAdapters,
                 VblankTimestamp, /*ZeDeviceHandle, ZeDriverHandle,*/ RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
         }
 
@@ -1518,30 +1511,6 @@ namespace DisplayMagicianShared.Intel
                         {
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting vblank timestamp for display {logDisplayId} on adapter {adapterNum}.");
                         }
-
-                        //------------------------------------
-                        // GET MUX PROPERTIES
-                        //------------------------------------
-                        try
-                        {
-                            var muxHandles = display.EnumerateMuxDevices();
-                            if (muxHandles != null && muxHandles.Length > 0)
-                            {
-                                var muxProperties = display.GetMuxProperties(muxHandles[0]);
-                                if (muxProperties.HasValue)
-                                    newDisplay.MuxProperties = muxProperties.Value;
-                                if (muxHandles.Length > 1)
-                                {
-                                    SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Multiple mux devices detected ({muxHandles.Length}); storing properties for the first one only.");
-                                }
-                            }
-                            SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Successfully got mux properties for display {logDisplayId} ({displayCount}/{displayTotalCount}) on adapter {adapterNum}");
-                        }
-                        catch (Exception ex)
-                        {
-                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting mux properties for display {logDisplayId} on adapter {adapterNum}.");
-                        }
-
 
                         // 3. Create a unique Hardware PCI ID + Target ID
                         // Format: VEN_8086&DEV_XXXX&REV_XX-PORT_X
