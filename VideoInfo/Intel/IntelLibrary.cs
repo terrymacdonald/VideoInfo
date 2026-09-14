@@ -456,6 +456,8 @@ namespace DisplayMagicianShared.Intel
         // Per-adapter video processing (media) settings
         public bool IsSupportedVideoProcessing;
         public List<VideoProcessingFeatureGetSetDto> VideoProcessingSettings;
+        public bool IsSupportedStandardColorCorrection;
+        public StandardColorCorrectionDto StandardColorCorrection;
 
         public INTEL_ADAPTER()
         {
@@ -473,6 +475,8 @@ namespace DisplayMagicianShared.Intel
             ThreeDSettings = new List<ThreeDFeatureGetSetDto>();
             IsSupportedVideoProcessing = false;
             VideoProcessingSettings = new List<VideoProcessingFeatureGetSetDto>();
+            IsSupportedStandardColorCorrection = false;
+            StandardColorCorrection = new StandardColorCorrectionDto();
         }
         public override bool Equals(object obj) => obj is INTEL_ADAPTER other && Equals(other);
         
@@ -533,12 +537,18 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The VideoProcessingSettings values don't equal each other");
                 return false;
             }
+            if (IsSupportedStandardColorCorrection != other.IsSupportedStandardColorCorrection ||
+                !StandardColorCorrection.Equals(other.StandardColorCorrection))
+            {
+                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The StandardColorCorrection values don't equal each other");
+                return false;
+            }
             return true;
         }
 
         public override int GetHashCode()
         {
-            return (AdapterID, Name, AdapterIndex, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, CombinedDisplay, IsSupportedThreeDSettings, ThreeDSettings?.Count, IsSupportedVideoProcessing, VideoProcessingSettings?.Count).GetHashCode();
+            return (AdapterID, Name, AdapterIndex, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, CombinedDisplay, IsSupportedThreeDSettings, ThreeDSettings?.Count, IsSupportedVideoProcessing, VideoProcessingSettings?.Count, IsSupportedStandardColorCorrection, StandardColorCorrection).GetHashCode();
         }
 
         public static bool operator ==(INTEL_ADAPTER lhs, INTEL_ADAPTER rhs) => lhs.Equals(rhs);
@@ -1050,39 +1060,33 @@ namespace DisplayMagicianShared.Intel
                         if (mediaCaps.HasValue && mediaCaps.Value.NumSupportedFeatures > 0)
                         {
                             newAdapter.IsSupportedVideoProcessing = true;
-                            // Attempt to read each known video processing feature. Most video processing features
-                            // are simple boolean enable/disable flags. Features that are not supported are
-                            // skipped gracefully via null return.
-                            ctl_video_processing_feature_t[] mediaFeatures = new[]
+                            var standardColorCorrection = mediaHelper.GetStandardColorCorrection();
+                            if (standardColorCorrection.HasValue)
                             {
-                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_FILM_MODE_DETECTION,
-                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_NOISE_REDUCTION,
-                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_SHARPNESS,
-                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_ADAPTIVE_CONTRAST_ENHANCEMENT,
-                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_SUPER_RESOLUTION,
-                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_STANDARD_COLOR_CORRECTION,
-                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_TOTAL_COLOR_CORRECTION,
-                                ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_SKIN_TONE_ENHANCEMENT,
-                            };
-                            foreach (var featureType in mediaFeatures)
+                                newAdapter.IsSupportedStandardColorCorrection = true;
+                                newAdapter.StandardColorCorrection = standardColorCorrection.Value;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got standard colour correction for adapter {adapterNum}");
+                            }
+                            // Query only driver-reported features, using each feature's reported value type.
+                            foreach (var mediaFeature in mediaCaps.Value.Features)
                             {
                                 try
                                 {
-                                    var getRequest = IGCLMediaHelper.CreateVideoProcessingFeatureGetRequest(featureType, ctl_property_value_type_t.CTL_PROPERTY_VALUE_TYPE_BOOL);
+                                    var getRequest = IGCLMediaHelper.CreateVideoProcessingFeatureGetRequest(mediaFeature.FeatureType, mediaFeature.ValueType);
                                     var result = mediaHelper.GetVideoProcessingFeature(getRequest);
                                     if (result.HasValue)
                                     {
                                         newAdapter.VideoProcessingSettings.Add(result.Value);
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got video processing feature {featureType} for adapter {adapterNum}");
+                                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got video processing feature {mediaFeature.FeatureType} for adapter {adapterNum}");
                                     }
                                     else
                                     {
-                                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Video processing feature {featureType} not supported for adapter {adapterNum}, skipping.");
+                                        SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Video processing feature {mediaFeature.FeatureType} not supported for adapter {adapterNum}, skipping.");
                                     }
                                 }
                                 catch (Exception ex)
                                 {
-                                    SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting video processing feature {featureType} for adapter {adapterNum}.");
+                                    SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting video processing feature {mediaFeature.FeatureType} for adapter {adapterNum}.");
                                 }
                             }
                             SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got {newAdapter.VideoProcessingSettings.Count} video processing feature(s) for adapter {adapterNum}");
@@ -2448,6 +2452,35 @@ namespace DisplayMagicianShared.Intel
                         catch (Exception ex)
                         {
                             SharedLogger.logger.Warn(ex, $"IntelLibrary/SetActiveConfigOverride: Exception applying video processing settings for adapter {adapterNum}, skipping.");
+                        }
+                    }
+
+                    if (hasStoredAdapter && storedAdapter.IsSupportedStandardColorCorrection)
+                    {
+                        try
+                        {
+                            var mediaHelper = _igclApiHelper.GetMediaHelper(adapter);
+                            var currentStandardColorCorrection = mediaHelper.GetStandardColorCorrection();
+                            if (!currentStandardColorCorrection.HasValue)
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Standard colour correction is not supported by current hardware for adapter {adapterNum}, skipping");
+                            }
+                            else if (!currentStandardColorCorrection.Value.Equals(storedAdapter.StandardColorCorrection))
+                            {
+                                if (mediaHelper.SetStandardColorCorrection(storedAdapter.StandardColorCorrection))
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set standard colour correction for adapter {adapterNum}");
+                                else
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Standard colour correction is not supported by current hardware for adapter {adapterNum}, skipping");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Standard colour correction already has the desired values for adapter {adapterNum}, skipping");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying standard colour correction for adapter {adapterNum}");
+                            success = false;
                         }
                     }
                 }
