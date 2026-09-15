@@ -1,4 +1,4 @@
-﻿using DisplayMagicianShared;
+using DisplayMagicianShared;
 using DisplayMagicianShared.AMD;
 using DisplayMagicianShared.Intel;
 using DisplayMagicianShared.NVIDIA;
@@ -539,49 +539,60 @@ namespace VideoInfo
             }
         }
 
-        static void loadFromFile(string filename, bool useADLEyefinity, int delayInMs)
+        private static bool TryLoadAndPrepareDisplayConfig(string filename, out VIDEOINFO_DISPLAY_CONFIG displayConfig)
         {
-            string json = "";
+            displayConfig = new VIDEOINFO_DISPLAY_CONFIG();
+            string json = String.Empty;
             try
             {
-                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Attempting to load the display configuration from {filename} to use it.");
+                SharedLogger.logger.Trace($"VideoInfo/TryLoadAndPrepareDisplayConfig: Attempting to load the display configuration from {filename}.");
                 json = File.ReadAllText(filename, Encoding.Unicode);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"VideoInfo/loadFromFile: ERROR - Tried to read the JSON file {filename} to memory but File.ReadAllTextthrew an exception.");
-                SharedLogger.logger.Error(ex, $"VideoInfo/loadFromFile: Tried to read the JSON file {filename} to memory but File.ReadAllTextthrew an exception.");
+                Console.WriteLine($"VideoInfo: ERROR - Tried to read the JSON file {filename} to memory but File.ReadAllText threw an exception.");
+                SharedLogger.logger.Error(ex, $"VideoInfo/TryLoadAndPrepareDisplayConfig: Tried to read the JSON file {filename} to memory but File.ReadAllText threw an exception.");
+                return false;
             }
 
-            if (!string.IsNullOrWhiteSpace(json))
+            if (String.IsNullOrWhiteSpace(json))
             {
-                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Contents exist within {filename} so trying to read them as JSON.");
-                try
-                {
-                    myDisplayConfig = JsonConvert.DeserializeObject<VIDEOINFO_DISPLAY_CONFIG>(json, new JsonSerializerSettings
-                    {
-                        MissingMemberHandling = MissingMemberHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        DefaultValueHandling = DefaultValueHandling.Include,
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        ObjectCreationHandling = ObjectCreationHandling.Replace
-                    });
-                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Successfully parsed {filename} as JSON.");
-                    NormalizeCollections(myDisplayConfig);
+                Console.WriteLine($"VideoInfo: ERROR - The {filename} profile JSON file exists but is empty.");
+                SharedLogger.logger.Error($"VideoInfo/TryLoadAndPrepareDisplayConfig: The {filename} profile JSON file exists but is empty.");
+                return false;
+            }
 
-                    // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    // Create the old adapter ID to new adapter ID map by looking at the display names of the adapters in the saved windows config and the current windows config
-                    Dictionary<ulong, ulong> adapterOldToNewMap = winLibrary.GetAdapterIdMap(ref myDisplayConfig.WindowsConfig);
-                    // Patch the display configs for NVIDIA and Windows based on the new adapter IDs
-                    nvidiaLibrary.PatchNVIDADisplayConfig(ref myDisplayConfig.NVIDIAConfig, adapterOldToNewMap);
-                    winLibrary.PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
-                }
-                catch (Exception ex)
+            try
+            {
+                SharedLogger.logger.Trace($"VideoInfo/TryLoadAndPrepareDisplayConfig: Contents exist within {filename} so trying to read them as JSON.");
+                displayConfig = JsonConvert.DeserializeObject<VIDEOINFO_DISPLAY_CONFIG>(json, new JsonSerializerSettings
                 {
-                    Console.WriteLine($"VideoInfo/loadFromFile: ERROR - Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    SharedLogger.logger.Error(ex, $"VideoInfo/loadFromFile: Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    return;
-                }
+                    MissingMemberHandling = MissingMemberHandling.Ignore,
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Include,
+                    TypeNameHandling = TypeNameHandling.Auto,
+                    ObjectCreationHandling = ObjectCreationHandling.Replace
+                });
+                NormalizeCollections(displayConfig);
+
+                Dictionary<ulong, ulong> adapterOldToNewMap = winLibrary.GetAdapterIdMap(displayConfig.WindowsConfig);
+                nvidiaLibrary.PatchNVIDADisplayConfig(ref displayConfig.NVIDIAConfig, adapterOldToNewMap);
+                winLibrary.PatchWindowsDisplayConfig(ref displayConfig.WindowsConfig, adapterOldToNewMap);
+                SharedLogger.logger.Trace($"VideoInfo/TryLoadAndPrepareDisplayConfig: Successfully parsed and prepared {filename}.");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"VideoInfo: ERROR - Tried to parse and prepare the JSON in {filename}.");
+                SharedLogger.logger.Error(ex, $"VideoInfo/TryLoadAndPrepareDisplayConfig: Tried to parse and prepare the JSON in {filename}.");
+                return false;
+            }
+        }
+
+        static void loadFromFile(string filename, bool useADLEyefinity, int delayInMs)
+        {
+            if (!TryLoadAndPrepareDisplayConfig(filename, out myDisplayConfig))
+                return;
 
                 // Check it's not in use already
                 if (!profileAlreadyInUse(myDisplayConfig))
@@ -716,7 +727,7 @@ namespace VideoInfo
                         // we enable all connected displays in Windows first just to be sure.
                         if (myDisplayConfig.NVIDIAConfig.MosaicConfig.IsMosaicEnabled)
                         {
-                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: NVIDIA Surround/Mosaic Display required – enabling all connected displays so NvAPI can see them as active outputs.");
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: NVIDIA Surround/Mosaic Display required â€“ enabling all connected displays so NvAPI can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
@@ -746,7 +757,7 @@ namespace VideoInfo
                         // we enable all connected displays in Windows first just to be sure.
                         if (myDisplayConfig.AMDConfig.IsEyefinity)
                         {
-                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: AMD Eyefinity Display required – enabling all connected displays so ADLX can see them as active outputs.");
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: AMD Eyefinity Display required â€“ enabling all connected displays so ADLX can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
@@ -775,7 +786,7 @@ namespace VideoInfo
                         // we enable all connected displays in Windows first just to be sure.
                         if (myDisplayConfig.IntelConfig.CombinedDisplayIsInUse)
                         {
-                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Intel Combined Display required – enabling all connected displays so IGCL can see them as active outputs.");
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Intel Combined Display required â€“ enabling all connected displays so IGCL can see them as active outputs.");
                             WinLibrary.EnableAllConnectedDisplays();
                             Thread.Sleep(delayInMs);
                         }
@@ -950,12 +961,6 @@ namespace VideoInfo
                     SharedLogger.logger.Info($"VideoInfo/loadFromFile: The display settings in {filename} are already installed. No need to install them again. Exiting.");
                 }
 
-            }
-            else
-            {
-                Console.WriteLine($"ERROR - The {filename} profile JSON file exists but is empty! So we're going to treat it as if it didn't exist.");
-                SharedLogger.logger.Error($"VideoInfo/loadFromFile: The {filename} profile JSON file exists but is empty! So we're going to treat it as if it didn't exist.");
-            }
         }
 
         private static string GetLibraryApplyStatus(bool isInstalled, bool isUsedByProfile, bool wasApplied, bool primaryApplySucceeded, bool overrideApplySucceeded, bool windowsApplySucceeded)
@@ -1207,45 +1212,8 @@ namespace VideoInfo
 
         static void possibleFromFile(string filename)
         {
-            
-            string json = "";
-            try
+            if (TryLoadAndPrepareDisplayConfig(filename, out myDisplayConfig))
             {
-                SharedLogger.logger.Trace($"VideoInfo/possibleFromFile: Attempting to load the display configuration from {filename} to see if it's possible.");
-                json = File.ReadAllText(filename, Encoding.Unicode);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"VideoInfo/possibleFromFile: ERROR - Tried to read the JSON file {filename} to memory but File.ReadAllTextthrew an exception.");
-                SharedLogger.logger.Error(ex, $"VideoInfo/possibleFromFile: Tried to read the JSON file {filename} to memory but File.ReadAllTextthrew an exception.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(json))
-            {
-                try
-                {
-                    SharedLogger.logger.Trace($"VideoInfo/possibleFromFile: Contents exist within {filename} so trying to read them as JSON.");
-                    myDisplayConfig = JsonConvert.DeserializeObject<VIDEOINFO_DISPLAY_CONFIG>(json, new JsonSerializerSettings
-                    {
-                        MissingMemberHandling = MissingMemberHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        DefaultValueHandling = DefaultValueHandling.Include,
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        ObjectCreationHandling = ObjectCreationHandling.Replace
-                    });
-                    SharedLogger.logger.Trace($"VideoInfo/possibleFromFile: Successfully parsed {filename} as JSON.");
-                    NormalizeCollections(myDisplayConfig);
-
-                    // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref myDisplayConfig.WindowsConfig);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"VideoInfo/possibleFromFile: ERROR - Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    SharedLogger.logger.Error(ex, $"VideoInfo/possibleFromFile: Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    return;
-                }
-
                 if (nvidiaLibrary.IsPossibleConfig(myDisplayConfig.NVIDIAConfig) && amdLibrary.IsPossibleConfig(myDisplayConfig.AMDConfig)  && intelLibrary.IsPossibleConfig(myDisplayConfig.IntelConfig) && winLibrary.IsPossibleConfig(myDisplayConfig.WindowsConfig))
                 {
                     SharedLogger.logger.Trace($"VideoInfo/possibleFromFile: The display settings in {filename} are compatible with this computer.");
@@ -1259,91 +1227,15 @@ namespace VideoInfo
                     Console.WriteLine($"The {filename} file contains a display setting that will NOT work on this computer right now.");
                     Console.WriteLine($"This may be because the required screens are turned off, or some other change has occurred on the PC.");
                 }
-
-            }
-            else
-            {
-                SharedLogger.logger.Error($"VideoInfo/possibleFromFile: The {filename} profile JSON file exists but is empty! So we're going to treat it as if it didn't exist.");
-                Console.WriteLine($"VideoInfo/possibleFromFile: The {filename} profile JSON file exists but is empty! So we're going to treat it as if it didn't exist.");
             }
         }
 
         static void equalFromFiles(string filename, string otherFilename)
         {
-            string json = ""; 
-            string otherJson = "";
-            VIDEOINFO_DISPLAY_CONFIG displayConfig = new VIDEOINFO_DISPLAY_CONFIG();
-            VIDEOINFO_DISPLAY_CONFIG otherDisplayConfig = new VIDEOINFO_DISPLAY_CONFIG();
             SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Attempting to compare the display configuration from {filename} and {otherFilename} to see if they are equal.");
-            try
+            if (TryLoadAndPrepareDisplayConfig(filename, out VIDEOINFO_DISPLAY_CONFIG displayConfig) &&
+                TryLoadAndPrepareDisplayConfig(otherFilename, out VIDEOINFO_DISPLAY_CONFIG otherDisplayConfig))
             {
-                json = File.ReadAllText(filename, Encoding.Unicode);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"VideoInfo/equalFromFile: ERROR - Tried to read the JSON file {filename} to memory but File.ReadAllTextthrew an exception.");
-                SharedLogger.logger.Error(ex, $"VideoInfo/equalFromFile: Tried to read the JSON file {filename} to memory but File.ReadAllTextthrew an exception.");
-            }
-
-            try
-            {
-                otherJson = File.ReadAllText(otherFilename, Encoding.Unicode);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"VideoInfo/equalFromFile: ERROR - Tried to read the JSON file {otherFilename} to memory but File.ReadAllTextthrew an exception.");
-                SharedLogger.logger.Error(ex, $"VideoInfo/equalFromFile: Tried to read the JSON file {otherFilename} to memory but File.ReadAllTextthrew an exception.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(json)&&!string.IsNullOrWhiteSpace(otherJson))
-            {
-                try
-                {
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Contents exist within {filename} so trying to read them as JSON.");
-                    displayConfig = JsonConvert.DeserializeObject<VIDEOINFO_DISPLAY_CONFIG>(json, new JsonSerializerSettings
-                    {
-                        MissingMemberHandling = MissingMemberHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        DefaultValueHandling = DefaultValueHandling.Include,
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        ObjectCreationHandling = ObjectCreationHandling.Replace
-                    });
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
-                    NormalizeCollections(displayConfig);
-
-                    // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref displayConfig.WindowsConfig);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"VideoInfo/equalFromFile: ERROR - Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    SharedLogger.logger.Error(ex, $"VideoInfo/equalFromFile: Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    return;
-                }
-                try
-                {
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Contents exist within {otherFilename} so trying to read them as JSON.");
-                    otherDisplayConfig = JsonConvert.DeserializeObject<VIDEOINFO_DISPLAY_CONFIG>(otherJson, new JsonSerializerSettings
-                    {
-                        MissingMemberHandling = MissingMemberHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        DefaultValueHandling = DefaultValueHandling.Include,
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        ObjectCreationHandling = ObjectCreationHandling.Replace
-                    });
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
-                    NormalizeCollections(otherDisplayConfig);
-
-                    // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref otherDisplayConfig.WindowsConfig);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"VideoInfo/equalFromFile: ERROR - Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    SharedLogger.logger.Error(ex, $"VideoInfo/equalFromFile: Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    return;
-                }
-
                 if (displayConfig.WindowsConfig.Equals(otherDisplayConfig.WindowsConfig) && displayConfig.NVIDIAConfig.Equals(otherDisplayConfig.NVIDIAConfig) && displayConfig.AMDConfig.Equals(otherDisplayConfig.AMDConfig) && displayConfig.IntelConfig.Equals(otherDisplayConfig.IntelConfig))
                 {
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and {otherFilename} are equal.");
@@ -1354,56 +1246,14 @@ namespace VideoInfo
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and {otherFilename} are NOT equal.");
                     Console.WriteLine($"The display settings in {filename} and {otherFilename} are NOT equal.");
                 }
-
-            }
-            else
-            {
-                SharedLogger.logger.Error($"VideoInfo/equalFromFile: The {filename} or {otherFilename} JSON files exist but at least one of them is empty! Cannot continue.");
-                Console.WriteLine($"VideoInfo/equalFromFile: The {filename} or {otherFilename} JSON files exist but at least one of them is empty! Cannot continue.");
             }
         }
 
         static void equalFromFiles(string filename)
         {
-            string json = "";
-            VIDEOINFO_DISPLAY_CONFIG displayConfig = new VIDEOINFO_DISPLAY_CONFIG();
             SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Attempting to compare the display configuration from {filename} and the currently active display configuration to see if they are equal.");
-            try
+            if (TryLoadAndPrepareDisplayConfig(filename, out VIDEOINFO_DISPLAY_CONFIG displayConfig))
             {
-                json = File.ReadAllText(filename, Encoding.Unicode);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"VideoInfo/equalFromFile: ERROR - Tried to read the JSON file {filename} to memory but File.ReadAllTextthrew an exception.");
-                SharedLogger.logger.Error(ex, $"VideoInfo/equalFromFile: Tried to read the JSON file {filename} to memory but File.ReadAllTextthrew an exception.");
-            }
-
-            if (!string.IsNullOrWhiteSpace(json))
-            {
-                try
-                {
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Contents exist within {filename} so trying to read them as JSON.");
-                    displayConfig = JsonConvert.DeserializeObject<VIDEOINFO_DISPLAY_CONFIG>(json, new JsonSerializerSettings
-                    {
-                        MissingMemberHandling = MissingMemberHandling.Ignore,
-                        NullValueHandling = NullValueHandling.Ignore,
-                        DefaultValueHandling = DefaultValueHandling.Include,
-                        TypeNameHandling = TypeNameHandling.Auto,
-                        ObjectCreationHandling = ObjectCreationHandling.Replace
-                    });
-                    SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Successfully parsed {filename} as JSON.");
-                    NormalizeCollections(displayConfig);
-
-                    // We have to patch the adapter IDs after we load a display config because Windows changes them after every reboot :(
-                    WinLibrary.GetLibrary().PatchWindowsDisplayConfig(ref displayConfig.WindowsConfig);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"VideoInfo/equalFromFile: ERROR - Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    SharedLogger.logger.Error(ex, $"VideoInfo/equalFromFile: Tried to parse the JSON in the {filename} but the JsonConvert threw an exception.");
-                    return;
-                }
-                
                 if (displayConfig.WindowsConfig.Equals(winLibrary.GetActiveConfig()) && 
                     displayConfig.NVIDIAConfig.Equals(nvidiaLibrary.GetActiveConfig()) && 
                     displayConfig.AMDConfig.Equals(amdLibrary.GetActiveConfig()) &&
@@ -1417,12 +1267,6 @@ namespace VideoInfo
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and the currently active display configuration are NOT equal.");
                     Console.WriteLine($"The display settings in {filename} and the currently active display configuration are NOT equal.");
                 }
-
-            }
-            else
-            {
-                SharedLogger.logger.Error($"VideoInfo/equalFromFile: The {filename} JSON file exists but is empty! Cannot continue.");
-                Console.WriteLine($"VideoInfo/equalFromFile: The {filename} JSON file exists but is empty! Cannot continue.");
             }
         }
 
