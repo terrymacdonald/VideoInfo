@@ -937,6 +937,12 @@ namespace VideoInfo
                     {
                         SharedLogger.logger.Info($"VideoInfo/loadFromFile: ProfileItem successfully applied your display profile contained within {filename}.");
                     }
+
+                    Console.WriteLine($"Display settings apply summary for {filename}:");
+                    Console.WriteLine($"  NVIDIA: {GetLibraryApplyStatus(nvidiaLibrary.IsInstalled, myDisplayConfig.NVIDIAConfig.IsInUse, applyNVIDIASettings, itWorkedforNVIDIA, itWorkedforNVIDIAOverride, itWorkedforWindows)}");
+                    Console.WriteLine($"  AMD: {GetLibraryApplyStatus(amdLibrary.IsInstalled, myDisplayConfig.AMDConfig.IsInUse, applyAMDSettings, itWorkedforAMD, itWorkedforAMDOverride, itWorkedforWindows)}");
+                    Console.WriteLine($"  Intel: {GetLibraryApplyStatus(intelLibrary.IsInstalled, myDisplayConfig.IntelConfig.IsInUse, applyIntelSettings, itWorkedforIntel, itWorkedforIntelOverride, itWorkedforWindows)}");
+                    Console.WriteLine($"  Windows: {(itWorkedforWindows ? "applied successfully" : "failed to apply")}");
                 }
                 else
                 {
@@ -950,6 +956,21 @@ namespace VideoInfo
                 Console.WriteLine($"ERROR - The {filename} profile JSON file exists but is empty! So we're going to treat it as if it didn't exist.");
                 SharedLogger.logger.Error($"VideoInfo/loadFromFile: The {filename} profile JSON file exists but is empty! So we're going to treat it as if it didn't exist.");
             }
+        }
+
+        private static string GetLibraryApplyStatus(bool isInstalled, bool isUsedByProfile, bool wasApplied, bool primaryApplySucceeded, bool overrideApplySucceeded, bool windowsApplySucceeded)
+        {
+            if (!isInstalled)
+                return "unavailable (library or compatible hardware not detected)";
+            if (!isUsedByProfile)
+                return "skipped (not used by this profile)";
+            if (!wasApplied)
+                return "skipped (profile is not applicable to the current displays)";
+            if (!primaryApplySucceeded)
+                return "failed to apply";
+            if (!windowsApplySucceeded)
+                return "partially applied (overrides skipped because Windows settings failed)";
+            return overrideApplySucceeded ? "applied successfully" : "failed while applying overrides";
         }
 
         static bool profileAlreadyInUse(VIDEOINFO_DISPLAY_CONFIG myDisplayConfig)
