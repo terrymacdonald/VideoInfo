@@ -2099,19 +2099,24 @@ namespace DisplayMagicianShared.Intel
                                 {
                                     if (!currentPixelTransformation.Value.Equals(storedSettings.PixelTransformationSettings))
                                     {
-                                        var setPixelTransformation = new PixtxPipeSetConfigDto
+                                        var pixelTransformationGroups = GroupPixelTransformationBlocksForApply(storedSettings.PixelTransformationSettings.Blocks);
+                                        var allGroupsApplied = true;
+                                        foreach (var pixelTransformationGroup in pixelTransformationGroups)
                                         {
-                                            OpertaionType = ctl_pixtx_config_opertaion_type_t.CTL_PIXTX_CONFIG_OPERTAION_TYPE_SET_CUSTOM,
-                                            Blocks = storedSettings.PixelTransformationSettings.Blocks
-                                        };
-                                        if (!display.PixelTransformationSetConfig(setPixelTransformation))
-                                        {
-                                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Pixel transformation is not supported for display {logDisplayId}, skipping");
-                                        }
-                                        else
-                                        {
+                                            var setPixelTransformation = new PixtxPipeSetConfigDto
+                                            {
+                                                OpertaionType = ctl_pixtx_config_opertaion_type_t.CTL_PIXTX_CONFIG_OPERTAION_TYPE_SET_CUSTOM,
+                                                Blocks = pixelTransformationGroup
+                                            };
+                                            if (!display.PixelTransformationSetConfig(setPixelTransformation))
+                                            {
+                                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Pixel transformation is not supported for display {logDisplayId}, skipping");
+                                                allGroupsApplied = false;
+                                                break;
+                                            }
                                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set {setPixelTransformation.Blocks.Count} pixel transformation block(s) for display {logDisplayId}");
                                         }
+                                        success &= allGroupsApplied;
                                     }
                                     else
                                     {
@@ -2964,6 +2969,33 @@ namespace DisplayMagicianShared.Intel
             displayIdentifiers.Sort();
 
             return displayIdentifiers;
+        }
+
+        /// <summary>
+        /// Groups saved pixel-transformation blocks in the same form used by Intel's
+        /// Color sample. A contiguous de-gamma/CSC/gamma sequence is submitted as one
+        /// linear CSC request; all other blocks are submitted individually.
+        /// </summary>
+        private static List<List<PixtxBlockConfigDto>> GroupPixelTransformationBlocksForApply(List<PixtxBlockConfigDto> blocks)
+        {
+            var groups = new List<List<PixtxBlockConfigDto>>();
+            for (var index = 0; index < blocks.Count;)
+            {
+                if (index + 2 < blocks.Count &&
+                    blocks[index].BlockType == ctl_pixtx_block_type_t.CTL_PIXTX_BLOCK_TYPE_1D_LUT &&
+                    blocks[index + 1].BlockType == ctl_pixtx_block_type_t.CTL_PIXTX_BLOCK_TYPE_3X3_MATRIX_AND_OFFSETS &&
+                    blocks[index + 2].BlockType == ctl_pixtx_block_type_t.CTL_PIXTX_BLOCK_TYPE_1D_LUT)
+                {
+                    groups.Add(new List<PixtxBlockConfigDto> { blocks[index], blocks[index + 1], blocks[index + 2] });
+                    index += 3;
+                    continue;
+                }
+
+                groups.Add(new List<PixtxBlockConfigDto> { blocks[index] });
+                index++;
+            }
+
+            return groups;
         }
 
     }

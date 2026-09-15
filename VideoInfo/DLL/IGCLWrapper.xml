@@ -3631,6 +3631,12 @@
             Only the payload matching <see cref="F:IGCLWrapper.PixtxBlockConfigDto.BlockType"/> is used.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.PixtxBlockConfigDto.Equals(IGCLWrapper.PixtxBlockConfigDto)">
+            <summary>
+            Compares the active transformation represented by this block. Native Size and Version
+            fields are transport headers, not part of the transformation applied to a display.
+            </summary>
+        </member>
         <member name="T:IGCLWrapper.PixtxPipeSetConfigDto">
             <summary>
             DTO for pixel transformation pipe set config.
@@ -5052,6 +5058,12 @@
             </summary>
             <param name="settings">The colour-correction settings to apply.</param>
             <returns><c>true</c> when applied; <c>false</c> when unsupported.</returns>
+        </member>
+        <member name="M:IGCLWrapper.IGCLMediaHelper.GetStandardColorCorrectionCapabilities(IGCLWrapper.ctl_video_processing_standard_color_correction_info_t@)">
+            <summary>
+            Queries the Standard Color Correction capabilities using the same one-feature
+            capability request that Intel's Media Sample uses before every SCC get or set.
+            </summary>
         </member>
         <member name="M:IGCLWrapper.IGCLMediaHelper.SetVideoProcessingFeature(IGCLWrapper.VideoProcessingFeatureGetSetDto)">
             <summary>
