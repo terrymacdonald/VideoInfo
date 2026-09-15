@@ -403,7 +403,7 @@ namespace DisplayMagicianShared.Intel
             //     SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The ZeDriverHandle values don't equal each other");
             //     return false;
             // }
-            if (Math.Abs(RefreshRateHz - other.RefreshRateHz) > 0.001)
+            if (RefreshRateHz != other.RefreshRateHz)
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The RefreshRateHz values don't equal each other");
                 return false;
@@ -2003,7 +2003,7 @@ namespace DisplayMagicianShared.Intel
                                     var sharpnessSettings = currentSettings.SharpnessSettings;
                                     if (sharpnessSettings.Enable != storedSettings.SharpnessSettings.Enable ||
                                         sharpnessSettings.FilterType != storedSettings.SharpnessSettings.FilterType ||
-                                        Math.Abs(sharpnessSettings.Intensity - storedSettings.SharpnessSettings.Intensity) > 0.001f)
+                                        sharpnessSettings.Intensity != storedSettings.SharpnessSettings.Intensity)
                                     {
                                         sharpnessSettings.Enable = storedSettings.SharpnessSettings.Enable;
                                         sharpnessSettings.FilterType = storedSettings.SharpnessSettings.FilterType;
