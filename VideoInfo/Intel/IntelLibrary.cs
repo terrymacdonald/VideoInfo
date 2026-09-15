@@ -40,6 +40,10 @@ namespace DisplayMagicianShared.Intel
         // Display-related DTOs
         public bool IsSupportedDisplaySettings;
         public DisplaySettingsDto DisplaySettings;
+        // Per-display colour pipeline. This captures the active LUT and/or matrix payload
+        // used by the display output rather than adapter-wide media colour processing.
+        public bool IsSupportedPixelTransformation;
+        public PixelTransformationGetResultDto PixelTransformationSettings;
         public ScalingSettingsDto ScalingSettings;
         public SharpnessSettingsDto SharpnessSettings;
         public RetroScalingSettingsDto RetroScalingSettings;
@@ -96,6 +100,8 @@ namespace DisplayMagicianShared.Intel
 
             IsSupportedDisplaySettings = false;
             DisplaySettings = new DisplaySettingsDto();
+            IsSupportedPixelTransformation = false;
+            PixelTransformationSettings = new PixelTransformationGetResultDto();
             ScalingSettings = new ScalingSettingsDto();
             SharpnessSettings = new SharpnessSettingsDto();
             RetroScalingSettings = new RetroScalingSettingsDto();
@@ -226,6 +232,11 @@ namespace DisplayMagicianShared.Intel
             if (!AreDisplaySettingsEqual(DisplaySettings, other.DisplaySettings))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplaySettings values don't equal each other");
+                return false;
+            }
+            if (!PixelTransformationSettings.Equals(other.PixelTransformationSettings))
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The PixelTransformationSettings values don't equal each other");
                 return false;
             }
             if (!EqualityComparer<ScalingSettingsDto>.Default.Equals(ScalingSettings, other.ScalingSettings))
@@ -430,7 +441,7 @@ namespace DisplayMagicianShared.Intel
         {
 
             return (Name, DisplayDeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsSupportedGPUScaling, IsSupportedImageSharpening,
-                IsSupportedDisplaySettings, GetDisplaySettingsHash(DisplaySettings), ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram?.Length, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
+                IsSupportedDisplaySettings, GetDisplaySettingsHash(DisplaySettings), PixelTransformationSettings, ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram?.Length, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
                 DisplayProperties, /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes?.Count, LinkedDisplayAdapters,
                 VblankTimestamp, /*ZeDeviceHandle, ZeDriverHandle,*/ RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
         }
@@ -1186,6 +1197,39 @@ namespace DisplayMagicianShared.Intel
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting display settings for display {logDisplayId} on adapter {adapterNum}.");
                         }
 
+                        // Get the active per-display colour transformation. This is separate from
+                        // the adapter-wide media video-processing features and can contain the
+                        // display's 1D/3D LUT or 3x3 colour matrix used by Intel Graphics Command Center.
+                        try
+                        {
+                            var pixelTransformationCapability = display.PixelTransformationGetConfig(PixtxPipeGetConfigDto.CreateCapabilityRequest());
+                            if (pixelTransformationCapability.HasValue)
+                            {
+                                var supportedBlocks = pixelTransformationCapability.Value.Blocks ?? new List<PixtxBlockConfigDto>();
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Pixel transformation capability for display {logDisplayId} on adapter {adapterNum}: {supportedBlocks.Count} block(s): {string.Join(", ", supportedBlocks.Select(block => $"Id={block.BlockId},Type={block.BlockType}"))}");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Pixel transformation capability is unavailable for display {logDisplayId} on adapter {adapterNum}");
+                            }
+
+                            var pixelTransformation = display.PixelTransformationGetConfig(PixtxPipeGetConfigDto.CreateCurrentRequest());
+                            if (pixelTransformation.HasValue && pixelTransformation.Value.Blocks is { Count: > 0 })
+                            {
+                                newDisplay.PixelTransformationSettings = pixelTransformation.Value;
+                                newDisplay.IsSupportedPixelTransformation = true;
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Got {pixelTransformation.Value.Blocks.Count} current pixel transformation block(s) for display {logDisplayId} on adapter {adapterNum}");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: No current pixel transformation blocks were available for display {logDisplayId} on adapter {adapterNum}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting pixel transformation settings for display {logDisplayId} on adapter {adapterNum}.");
+                        }
+
                         // Make a display name that works across reboots
                         try
                         {
@@ -1645,6 +1689,13 @@ namespace DisplayMagicianShared.Intel
                     sb.AppendLine($"  DisplaySettings: {display.DisplaySettings}");
                 }
 
+                sb.AppendLine($"  PixelTransformation: Supported={display.IsSupportedPixelTransformation} Blocks={display.PixelTransformationSettings.Blocks?.Count ?? 0}");
+                if (display.IsSupportedPixelTransformation && display.PixelTransformationSettings.Blocks != null)
+                {
+                    foreach (var block in display.PixelTransformationSettings.Blocks)
+                        sb.AppendLine($"    PixelTransformationBlock: Id={block.BlockId} Type={block.BlockType}");
+                }
+
                 // Wire Format
                 if (display.IsSupportedWireFormat)
                 {
@@ -2032,6 +2083,49 @@ namespace DisplayMagicianShared.Intel
                             catch (Exception ex)
                             {
                                 SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying Image Sharpening for display {logDisplayId}");
+                                success = false;
+                            }
+                        }
+
+                        //------------------------------------
+                        // SET PER-DISPLAY PIXEL TRANSFORMATION IF NEEDED
+                        //------------------------------------
+                        if (storedSettings.IsSupportedPixelTransformation && storedSettings.PixelTransformationSettings.Blocks is { Count: > 0 })
+                        {
+                            try
+                            {
+                                var currentPixelTransformation = display.PixelTransformationGetConfig(PixtxPipeGetConfigDto.CreateCurrentRequest());
+                                if (currentPixelTransformation.HasValue)
+                                {
+                                    if (!currentPixelTransformation.Value.Equals(storedSettings.PixelTransformationSettings))
+                                    {
+                                        var setPixelTransformation = new PixtxPipeSetConfigDto
+                                        {
+                                            OpertaionType = ctl_pixtx_config_opertaion_type_t.CTL_PIXTX_CONFIG_OPERTAION_TYPE_SET_CUSTOM,
+                                            Blocks = storedSettings.PixelTransformationSettings.Blocks
+                                        };
+                                        if (!display.PixelTransformationSetConfig(setPixelTransformation))
+                                        {
+                                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Pixel transformation is not supported for display {logDisplayId}, skipping");
+                                        }
+                                        else
+                                        {
+                                            SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Successfully set {setPixelTransformation.Blocks.Count} pixel transformation block(s) for display {logDisplayId}");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Pixel transformation already set to desired values, skipping for display {logDisplayId}");
+                                    }
+                                }
+                                else
+                                {
+                                    SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfigOverride: Pixel transformation is not available for display {logDisplayId}, skipping");
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfigOverride: Error applying pixel transformation for display {logDisplayId}");
                                 success = false;
                             }
                         }

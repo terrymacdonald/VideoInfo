@@ -5066,6 +5066,14 @@
             on the current hardware or driver, rather than a genuine API failure.
             </summary>
         </member>
+        <member name="M:IGCLWrapper.IGCLMediaHelper.InitializeCustomValueForGet(IGCLWrapper.ctl_video_processing_feature_t,System.Byte*,System.Int32)">
+            <summary>
+            Initializes the header required by IGCL when querying a CUSTOM video-processing value.
+            </summary>
+            <param name="featureType">The feature associated with the custom payload.</param>
+            <param name="pCustomValue">Pointer to the allocated custom payload.</param>
+            <param name="customValueSize">Allocated payload size.</param>
+        </member>
         <member name="M:IGCLWrapper.IGCLMediaHelper.CreateVideoProcessingFeatureGetSet">
             <summary>
             Create a video processing feature get/set struct with Size and Version initialized.
