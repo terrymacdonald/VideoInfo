@@ -1070,6 +1070,10 @@ namespace DisplayMagicianShared.Intel
                             // Query only driver-reported features, using each feature's reported value type.
                             foreach (var mediaFeature in mediaCaps.Value.Features)
                             {
+                                // Standard colour correction is saved and applied via its typed field above.
+                                if (mediaFeature.FeatureType == ctl_video_processing_feature_t.CTL_VIDEO_PROCESSING_FEATURE_STANDARD_COLOR_CORRECTION)
+                                    continue;
+
                                 try
                                 {
                                     var getRequest = IGCLMediaHelper.CreateVideoProcessingFeatureGetRequest(mediaFeature.FeatureType, mediaFeature.ValueType);
@@ -1588,12 +1592,16 @@ namespace DisplayMagicianShared.Intel
                 }
                 // Video Processing Settings
                 sb.AppendLine($"  IsSupportedVideoProcessing: {myAdapter.IsSupportedVideoProcessing}");
+                if (myAdapter.IsSupportedStandardColorCorrection)
+                {
+                    sb.AppendLine($"  StandardColorCorrection: Enabled={myAdapter.StandardColorCorrection.Enable} Brightness={myAdapter.StandardColorCorrection.Brightness} Contrast={myAdapter.StandardColorCorrection.Contrast} Hue={myAdapter.StandardColorCorrection.Hue} Saturation={myAdapter.StandardColorCorrection.Saturation}");
+                }
                 if (myAdapter.IsSupportedVideoProcessing && myAdapter.VideoProcessingSettings != null && myAdapter.VideoProcessingSettings.Count > 0)
                 {
                     sb.AppendLine($"  VideoProcessingSettings ({myAdapter.VideoProcessingSettings.Count} feature(s)):");
                     for (int i = 0; i < myAdapter.VideoProcessingSettings.Count; i++)
                     {
-                        sb.AppendLine($"    VideoProcessingFeature[{i}]: Feature={myAdapter.VideoProcessingSettings[i].FeatureType} ValueType={myAdapter.VideoProcessingSettings[i].ValueType} Value={myAdapter.VideoProcessingSettings[i].Value}");
+                        sb.AppendLine($"    VideoProcessingFeature[{i}]: Feature={myAdapter.VideoProcessingSettings[i].FeatureType} ValueType={myAdapter.VideoProcessingSettings[i].ValueType} Value={myAdapter.VideoProcessingSettings[i].Value} CustomValueBytes={myAdapter.VideoProcessingSettings[i].CustomValue?.Count ?? 0}");
                     }
                 }
                 sb.AppendLine();
