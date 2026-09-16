@@ -155,7 +155,7 @@ namespace VideoInfo
                 else if (args[0] == "load")
                 {
                     // set the defaults
-                    bool useADLEyefinity = true;
+                    bool useADLEyefinity = false;
                     int delayInMs = 500;
                     string fileToLoad = string.Empty;
                     SharedLogger.logger.Debug($"VideoInfo/Main: The load command was provided");
