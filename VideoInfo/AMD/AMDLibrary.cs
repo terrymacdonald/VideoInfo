@@ -187,7 +187,7 @@ namespace DisplayMagicianShared.AMD
          public int DisplayHeight;
          public int DisplayTopLeftX;
          public int DisplayTopLeftY;
-         public long DisplayUniqueId;
+         public ulong DisplayUniqueId;
 
          public EYEFINITY_GRID_NODE()
          {
