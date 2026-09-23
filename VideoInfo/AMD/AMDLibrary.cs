@@ -177,8 +177,8 @@ namespace DisplayMagicianShared.AMD
         public static bool operator !=(AMD_DESKTOP lhs, AMD_DESKTOP rhs) => !(lhs == rhs);
     }
 
-    /* [StructLayout(LayoutKind.Sequential)]
-     public struct EYEFINITY_GRID_NODE : IEquatable<EYEFINITY_GRID_NODE>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct EYEFINITY_GRID_NODE : IEquatable<EYEFINITY_GRID_NODE>
      {
          public long Row;
          public long Column;
@@ -247,7 +247,7 @@ namespace DisplayMagicianShared.AMD
          public static bool operator ==(EYEFINITY_GRID_NODE lhs, EYEFINITY_GRID_NODE rhs) => lhs.Equals(rhs);
 
          public static bool operator !=(EYEFINITY_GRID_NODE lhs, EYEFINITY_GRID_NODE rhs) => !(lhs == rhs);
-     }*/
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_EYEFINITY_DESKTOP : IEquatable<AMD_EYEFINITY_DESKTOP>
@@ -259,12 +259,12 @@ namespace DisplayMagicianShared.AMD
         public int SizeHeight;
         public int TopLeftX;
         public int TopLeftY;
-        //public EYEFINITY_GRID_NODE[][] Grid;
+        public List<EYEFINITY_GRID_NODE> Grid;
 
         public AMD_EYEFINITY_DESKTOP()
         {
             Orientation = ADLX_ORIENTATION.ORIENTATION_LANDSCAPE;
-            //Grid = Array.Empty<EYEFINITY_GRID_NODE[]>();
+            Grid = new List<EYEFINITY_GRID_NODE>();
         }
 
         public override bool Equals(object obj) => obj is AMD_EYEFINITY_DESKTOP other && this.Equals(other);
@@ -305,17 +305,17 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Equals: The TopLeftY values don't equal each other");
                 return false;
             }
-            /*if (Grid.SequenceEqual(other.Grid))
+            if (!Grid.SequenceEqual(other.Grid))
             {
                 SharedLogger.logger.Trace($"AMD_EYEFINITY_DESKTOP/Equals: The Grid values don't equal each other");
                 return false;
-            }*/
+            }
             return true;
         }
 
         public override int GetHashCode()
         {
-            return (Rows, Columns, Orientation, SizeWidth, SizeHeight, TopLeftX, TopLeftY).GetHashCode();
+            return (Rows, Columns, Orientation, SizeWidth, SizeHeight, TopLeftX, TopLeftY, Grid).GetHashCode();
         }
         public static bool operator ==(AMD_EYEFINITY_DESKTOP lhs, AMD_EYEFINITY_DESKTOP rhs) => lhs.Equals(rhs);
 
@@ -2336,98 +2336,43 @@ namespace DisplayMagicianShared.AMD
                         // Store the desktop type
                         newDesktop.Type = desktop.Type;
 
-                        // TODO: Process Eyefinity and Cloned desktops
-/*
                         // The the desktop is an eyefinity desktop then set the eyefinity enabled flag
                         // and also process the EyefinityDesktop layout
                         if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_EYEFINITY)
                         {
-                            isEyefinityEnabled = true;
+                            myDisplayConfig.IsEyefinity = true;
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Eyefinity desktop detected");
-                            // Get the eyefinity desktop
-
-                            // 1. Allocate a void** via SWIG
-                            SWIGTYPE_p_p_void ppVoid = ADLX.new_voidP_Ptr();
-
-                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Getting a pointer to the Eyefinity desktop object");
-                            // 2. Call QueryInterface with the IID for IADLXEyefinityDesktop to get the interface
-                            status = desktop.QueryInterface(
-                                IADLXEyefinityDesktop.IID(),
-                                ppVoid
-                            );
-
-                            if (status != ADLX_RESULT.ADLX_OK)
-                            {
-                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Error getting the ADLX display list. systemServices.GetDisplays() returned error code {status}");
-                                return CreateDefaultConfig(); ;
-                            }
-                            else
-                            {
-                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Converting pointer to the Eyefinity desktop object to an IntPtr");
-
-                                // Extract the raw IntPtr from the void** for the IADLXEyefinityDesktop
-                                IntPtr rawPtr = ADLX.voidP_Ptr_value(ppVoid);
-
-                                // Wrap it in the managed proxy
-                                //    (Constructor args may vary based on SWIG config)
-                                IADLXEyefinityDesktop eyefinityDesktop = new IADLXEyefinityDesktop(rawPtr, true);
-
-                                // Use the EyefinityDesktop object to get the Eyefinity layout
-                                SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Getting the rows and columns of the diaplay grid for the Eyefinity desktop");
-                                SWIGTYPE_p_unsigned_int pRow = ADLX.new_adlx_uintP();
-                                ADLX.adlx_uintP_assign(pRow, 0);
-                                SWIGTYPE_p_unsigned_int pCol = ADLX.new_adlx_uintP();
-                                ADLX.adlx_uintP_assign(pCol, 0);
-                                eyefinityDesktop.GridSize(pRow, pCol);
-                                myDisplayConfig.EyefinityDesktop.Rows = ADLX.adlx_uintP_value(pRow);
-                                myDisplayConfig.EyefinityDesktop.Columns = ADLX.adlx_uintP_value(pCol);
-
-                                *//*for (uint row=1; row<gridRows; row++)
+                            var topology = desktop.GetEyefinityTopology();
+                            myDisplayConfig.EyefinityDesktop.Rows = topology.Rows;
+                            myDisplayConfig.EyefinityDesktop.Columns = topology.Columns;
+                            myDisplayConfig.EyefinityDesktop.Orientation = topology.Orientation;
+                            myDisplayConfig.EyefinityDesktop.TopLeftX = topology.TopLeftX;
+                            myDisplayConfig.EyefinityDesktop.TopLeftY = topology.TopLeftY;
+                            myDisplayConfig.EyefinityDesktop.SizeWidth = topology.Width;
+                            myDisplayConfig.EyefinityDesktop.SizeHeight = topology.Height;
+                            myDisplayConfig.EyefinityDesktop.Grid = topology.Grid
+                                .Select(cell => new EYEFINITY_GRID_NODE
                                 {
-                                    for (uint col = 1; col < gridCols; col++)
-                                    {
-                                        // Get the eyefinity desktop orientation
-                                        SWIGTYPE_p_ADLX_ORIENTATION pEyefinityDisplayOrientation = ADLX.new_orientationP();
-                                        eyefinityDesktop.DisplayOrientation(row, col, pEyefinityDisplayOrientation);
-                                        ADLX_ORIENTATION eyefinityOrientation = ADLX.orientationP_value(pEyefinityDisplayOrientation);
-
-                                        // Get the display size
-                                        SWIGTYPE_p_int pEyefinityDisplayWidth= ADLX.new_intP();
-                                        SWIGTYPE_p_int pEyefinityDisplayHeight = ADLX.new_intP();
-                                        eyefinityDesktop.DisplaySize(row,col, pEyefinityDisplayWidth, pEyefinityDisplayHeight);
-                                        int eyefinityDisplayWidth = ADLX.intP_value(pEyefinityDisplayWidth);
-                                        int eyefinityDisplayHeight = ADLX.intP_value(pEyefinityDisplayHeight);
-
-                                        // Get the display location
-                                        ADLX_Point pLocation = ADLX.new_pointP();
-                                        eyefinityDesktop.DisplayTopLeft(row, col, pLocation);
-                                        ADLX_Point location = ADLX.pointP_value(pLocation);
-
-                                    }
-                                }*//*
-
-                                // Copy over the desktop level sizes so that we can match things easier in the future
-                                myDisplayConfig.EyefinityDesktop.Orientation = newDesktop.Orientation;
-                                myDisplayConfig.EyefinityDesktop.TopLeftX = newDesktop.TopLeftX;
-                                myDisplayConfig.EyefinityDesktop.TopLeftY = newDesktop.TopLeftY;
-                                myDisplayConfig.EyefinityDesktop.SizeWidth = newDesktop.SizeWidth;
-                                myDisplayConfig.EyefinityDesktop.SizeHeight = newDesktop.SizeHeight;
-
-                                // 7. Release when done
-                                eyefinityDesktop.Release();
-                                ADLX.delete_voidP_Ptr(ppVoid);
-                            }
+                                    Row = cell.Row,
+                                    Column = cell.Column,
+                                    DisplayOrientation = cell.Orientation,
+                                    DisplayWidth = cell.Width,
+                                    DisplayHeight = cell.Height,
+                                    DisplayTopLeftX = cell.TopLeftX,
+                                    DisplayTopLeftY = cell.TopLeftY,
+                                    DisplayUniqueId = cell.DisplayUniqueId
+                                })
+                                .ToList();
                         }
                         else if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_DUPLCATE)
                         {
-                            isCloned = true;
+                            myDisplayConfig.IsCloned = true;
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Cloned desktop detected");
                         }
                         else
                         {
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Single desktop detected");
                         }
-*/
                         // Release desktop interface
                         desktop.Dispose();
 
