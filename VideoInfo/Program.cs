@@ -1234,7 +1234,12 @@ namespace VideoInfo
             if (TryLoadAndPrepareDisplayConfig(filename, out VIDEOINFO_DISPLAY_CONFIG displayConfig) &&
                 TryLoadAndPrepareDisplayConfig(otherFilename, out VIDEOINFO_DISPLAY_CONFIG otherDisplayConfig))
             {
-                if (displayConfig.WindowsConfig.Equals(otherDisplayConfig.WindowsConfig) && displayConfig.NVIDIAConfig.Equals(otherDisplayConfig.NVIDIAConfig) && displayConfig.AMDConfig.Equals(otherDisplayConfig.AMDConfig) && displayConfig.IntelConfig.Equals(otherDisplayConfig.IntelConfig))
+                bool windowsConfigsEqual = displayConfig.WindowsConfig.Equals(otherDisplayConfig.WindowsConfig);
+                bool nvidiaConfigsEqual = displayConfig.NVIDIAConfig.Equals(otherDisplayConfig.NVIDIAConfig);
+                bool amdConfigsEqual = displayConfig.AMDConfig.Equals(otherDisplayConfig.AMDConfig);
+                bool intelConfigsEqual = displayConfig.IntelConfig.Equals(otherDisplayConfig.IntelConfig);
+
+                if (windowsConfigsEqual && nvidiaConfigsEqual && amdConfigsEqual && intelConfigsEqual)
                 {
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and {otherFilename} are equal.");
                     Console.WriteLine($"The display settings in {filename} and {otherFilename} are equal.");
@@ -1252,10 +1257,12 @@ namespace VideoInfo
             SharedLogger.logger.Trace($"VideoInfo/equalFromFile: Attempting to compare the display configuration from {filename} and the currently active display configuration to see if they are equal.");
             if (TryLoadAndPrepareDisplayConfig(filename, out VIDEOINFO_DISPLAY_CONFIG displayConfig))
             {
-                if (displayConfig.WindowsConfig.Equals(winLibrary.GetActiveConfig()) && 
-                    displayConfig.NVIDIAConfig.Equals(nvidiaLibrary.GetActiveConfig()) && 
-                    displayConfig.AMDConfig.Equals(amdLibrary.GetActiveConfig()) &&
-                    displayConfig.IntelConfig.Equals(intelLibrary.GetActiveConfig()))
+                bool windowsConfigsEqual = displayConfig.WindowsConfig.Equals(winLibrary.GetActiveConfig());
+                bool nvidiaConfigsEqual = displayConfig.NVIDIAConfig.Equals(nvidiaLibrary.GetActiveConfig());
+                bool amdConfigsEqual = displayConfig.AMDConfig.Equals(amdLibrary.GetActiveConfig());
+                bool intelConfigsEqual = displayConfig.IntelConfig.Equals(intelLibrary.GetActiveConfig());
+
+                if (windowsConfigsEqual && nvidiaConfigsEqual && amdConfigsEqual && intelConfigsEqual)
                 { 
                     SharedLogger.logger.Trace($"VideoInfo/equalFromFile: The display settings in {filename} and the currently active display configuration are equal.");
                     Console.WriteLine($"The display settings in {filename} and the currently active display configuration are equal.");

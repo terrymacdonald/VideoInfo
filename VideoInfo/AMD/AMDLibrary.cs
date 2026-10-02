@@ -2224,10 +2224,15 @@ namespace DisplayMagicianShared.AMD
             {
                 _activeDisplayConfig = GetActiveConfig();
                 _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
+                if (failure)
+                {
+                    SharedLogger.logger.Warn($"AMDLibrary/UpdateActiveConfig: Failed to update the connected display identifiers.");
+                    return false;
+                }
             }
             catch (Exception ex)
             {
-                SharedLogger.logger.Trace(ex, $"AMDLibrary/UpdateActiveConfig: Exception updating the currently active config");
+                SharedLogger.logger.Warn(ex, $"AMDLibrary/UpdateActiveConfig: Exception updating the currently active config.");
                 return false;
             }
 
@@ -2794,6 +2799,7 @@ namespace DisplayMagicianShared.AMD
                                             // of display targets associated with this adapter & SLS surface.
                                             if (numDisplayTargets != (slsMap.Grid.SLSGridColumn * slsMap.Grid.SLSGridRow))
                                             {
+                                                SharedLogger.logger.Warn($"AMDLibrary/GetAMDDisplayConfig: SLS map {matchingSLSMapIndex} for AMD adapter {oneAdapter.AdapterIndex} has {slsMap.Grid.SLSGridColumn} columns and {slsMap.Grid.SLSGridRow} rows, requiring {slsMap.Grid.SLSGridColumn * slsMap.Grid.SLSGridRow} targets, but ADL returned {numDisplayTargets} display targets. Eyefinity state cannot be determined from this map.");
                                                 //Number of display targets returned is not equal to the SLS grid size, so SLS can't be enabled fo this display
                                                 //myDisplayConfig.SlsConfig.IsSlsEnabled = false; // This is already set to false at the start!
                                                 break;
@@ -3080,6 +3086,10 @@ namespace DisplayMagicianShared.AMD
                                             myDisplayConfig.Adl2SlsConfig.SLSMapConfigs.Add(mySLSMapConfig);
                                         }
 
+                                    }
+                                    else if (ADLRet != ADL_STATUS.ADL_OK)
+                                    {
+                                        SharedLogger.logger.Warn($"AMDLibrary/GetAMDDisplayConfig: ADL2_Display_SLSMapIndex_Get returned ADL_STATUS {ADLRet} for AMD adapter {oneAdapter.AdapterIndex} with {numDisplayTargets} display targets. Eyefinity state could not be queried through ADL2.");
                                     }
                                     else
                                     {
@@ -3536,7 +3546,7 @@ namespace DisplayMagicianShared.AMD
                             }
                             else
                             {
-                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_SetState returned ADL_STATUS {ADLRet} when trying to set the SLSMAP with index {slsMapConfig.SLSMap.SLSMapIndex} to TRUE for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_SetState returned ADL_STATUS {ADLRet} when trying to enable SLS map {slsMapConfig.SLSMap.SLSMapIndex} for adapter {slsMapConfig.SLSMap.AdapterIndex}. Attempting to validate and create a replacement map.");
 
                                 // If we get an error with just tturning it on, then we need to actually try to created a new Eyefinity map and then enable it
                                 // If we reach this stage, then the user has discarded the AMD Eyefinity mode in AMD due to a bad UI design, and we need to work around that slight issue.
@@ -3550,11 +3560,11 @@ namespace DisplayMagicianShared.AMD
                                 ADLRet = ADLImport.ADL2_Display_SLSMapConfig_Valid(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex, slsMapConfig.SLSMap, slsMapConfig.SLSTargets.Count, slsMapConfig.SLSTargets.ToArray(), out supportedSLSLayoutImageMode, out reasonForNotSupportSLS, ADLImport.ADL_DISPLAY_SLSMAPCONFIG_CREATE_OPTION_RELATIVETO_CURRENTANGLE);
                                 if (ADLRet == ADL_STATUS.ADL_OK)
                                 {
-                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_Valid successfully validated a new SLSMAP config for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Display_SLSMapConfig_Valid completed for adapter {slsMapConfig.SLSMap.AdapterIndex}. SupportedSLSLayoutImageMode={supportedSLSLayoutImageMode}, ReasonForNotSupportSLS={reasonForNotSupportSLS}.");
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_Valid returned ADL_STATUS {ADLRet} when trying to create a new SLSMAP for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ERROR - ADL2_Display_SLSMapConfig_Valid returned ADL_STATUS {ADLRet} when trying to create a new SLSMAP for adapter {slsMapConfig.SLSMap.AdapterIndex}. SupportedSLSLayoutImageMode={supportedSLSLayoutImageMode}, ReasonForNotSupportSLS={reasonForNotSupportSLS}.");
                                     return false;
                                 }
 
