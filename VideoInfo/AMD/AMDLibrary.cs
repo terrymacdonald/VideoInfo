@@ -3675,7 +3675,8 @@ namespace DisplayMagicianShared.AMD
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully created the ADLX Eyefinity Desktop");
                                 if (!UpdateActiveConfig())
                                 {
-                                    SharedLogger.logger.Warn("AMDLibrary/SetActiveConfig: Unable to refresh the active AMD configuration after creating the ADLX Eyefinity Desktop, so skipping the layout comparison.");
+                                    SharedLogger.logger.Warn("AMDLibrary/SetActiveConfig: Unable to refresh the active AMD configuration after creating the ADLX Eyefinity Desktop, so the resulting layout cannot be verified.");
+                                    return false;
                                 }
                                 else if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
                                 {
@@ -3686,6 +3687,9 @@ namespace DisplayMagicianShared.AMD
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: This new Eyefinity layout is different from the one we originally saved with this desktop profile. If you have changed your Eyefinity Layout then you need to update this desktop profile!.");
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Saved Eyefinity layout: {DescribeEyefinityDesktop(displayConfig.EyefinityDesktop)}");
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Current Eyefinity layout: {DescribeEyefinityDesktop(ActiveDisplayConfig.EyefinityDesktop)}");
+                                    // We Err on the side of continuing the execution even if the Eyefinity layout does not match the saved configuration.
+                                    // This is just because we want to make sure that the user can continue their shortcut even if the Eyefinity layout does not match the saved configuration.
+                                    //return false;
                                 }
                                 
                             }
@@ -3782,6 +3786,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!UpdateActiveConfig())
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Unable to refresh the active AMD display configuration after destroying the ADLX Eyefinity Desktop, so the resulting layout cannot be verified.");
+                                    return false;
                                 }
                                 else if (ActiveDisplayConfig.IsEyefinity)
                                 {
