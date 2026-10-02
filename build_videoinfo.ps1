@@ -67,7 +67,6 @@ try {
     Write-Host "Please ensure .NET 10.0 SDK is installed" -ForegroundColor Yellow
     Write-Host "Download from: https://dotnet.microsoft.com/download/dotnet/10.0" -ForegroundColor Cyan
     Write-Host ""
-    Read-Host "Press Enter to exit"
     exit 1
 }
 
@@ -93,14 +92,12 @@ try {
         Write-Host ""
         Write-Host "Please install .NET 10.0 SDK from: https://dotnet.microsoft.com/download/dotnet/10.0" -ForegroundColor Cyan
         Write-Host ""
-        Read-Host "Press Enter to exit"
         exit 1
     }
 } catch {
     Write-Host ""
     Write-Host "ERROR: Failed to check .NET SDK version: $_" -ForegroundColor Red
     Write-Host ""
-    Read-Host "Press Enter to exit"
     exit 1
 }
 
@@ -116,7 +113,6 @@ $solutionPath = Join-Path $scriptRoot "VideoInfo.sln"
 
 if (-not (Test-Path $solutionPath)) {
     Write-Host "ERROR: Solution file not found: $solutionPath" -ForegroundColor Red
-    Read-Host "Press Enter to exit"
     exit 1
 }
 
@@ -135,7 +131,6 @@ try {
     Write-Host "ERROR: Failed to restore NuGet packages!" -ForegroundColor Red
     Write-Host "Error: $_" -ForegroundColor Yellow
     Write-Host ""
-    Read-Host "Press Enter to exit"
     exit 1
 }
 
@@ -171,7 +166,6 @@ try {
     Write-Host "  - Verify .NET 10.0 SDK is installed" -ForegroundColor Gray
     Write-Host "  - Check project files for errors" -ForegroundColor Gray
     Write-Host ""
-    Read-Host "Press Enter to exit"
     exit 1
 }
 
@@ -204,7 +198,6 @@ try {
     Write-Host "  - Verify .NET 10.0 SDK is installed" -ForegroundColor Gray
     Write-Host "  - Check project files for errors" -ForegroundColor Gray
     Write-Host ""
-    Read-Host "Press Enter to exit"
     exit 1
 }
 
@@ -222,4 +215,3 @@ Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  - Run from bin\\x64\\Debug or switch configuration in the script if needed" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Press Enter to exit..."
-Read-Host

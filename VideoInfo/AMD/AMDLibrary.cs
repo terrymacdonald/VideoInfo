@@ -433,7 +433,7 @@ namespace DisplayMagicianShared.AMD
             }
             if (HasDynamicContrast != other.HasDynamicContrast)
             {
-                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The HasDynamicContrast values don't equal each other");
+                SharedLogger.logger.Trace($"AMD_3DLUT_INFO/Equals: The HasDynamicContrast values don't equal each other. Saved={HasDynamicContrast}, Current={other.HasDynamicContrast}, SavedSupported={IsSupportedSCEDynamicContrast}, CurrentSupported={other.IsSupportedSCEDynamicContrast}");
                 return false;
             }
             if (CurrentDynamicContrastValue != other.CurrentDynamicContrastValue)
@@ -2265,20 +2265,18 @@ namespace DisplayMagicianShared.AMD
                 }
                 else
                 {
-                    SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Successfully got the desktop list");
                     // Iterate through the desktop list
-                    foreach (var desktop in desktopsList)
+                    for (int desktopIndex = 0; desktopIndex < desktopsList.Count; desktopIndex++)
                     {
+                        ADLXDesktop desktop = desktopsList[desktopIndex];
                         AMD_DESKTOP newDesktop = new AMD_DESKTOP();
                         var desktopDisplayList = desktop.EnumerateDisplaysForDesktop();
                         newDesktop.Displays = new List<AMD_DISPLAY>();
 
                         newDesktop.NumberOfDisplays = desktopDisplayList.Count;
-                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is {newDesktop.NumberOfDisplays}");
 
                         if (newDesktop.NumberOfDisplays > 0)
                         {
-                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is > 0, so getting list of displays");
                             // Get the list of displays that are part of this desktop
                             foreach (var display in desktopDisplayList)
                             {
@@ -2319,11 +2317,6 @@ namespace DisplayMagicianShared.AMD
                                 newDesktop.Displays.Add(newDisplay);                               
                             }
                         }
-                        else
-                        {
-                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: The number of displays that are part of this desktop is 0, so not getting list of displays. Skipping.");
-                        }
-
                         // Store the oreientation
                         newDesktop.Orientation = desktop.Orientation;
 
@@ -2332,6 +2325,7 @@ namespace DisplayMagicianShared.AMD
                         newDesktop.SizeHeight = desktop.Height;
                         newDesktop.TopLeftX = desktop.TopLeftX;
                         newDesktop.TopLeftY = desktop.TopLeftY;
+                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDesktopConfig: Desktop {desktopIndex + 1}/{desktopsList.Count}: Displays={newDesktop.NumberOfDisplays}, Orientation={newDesktop.Orientation}, Size={newDesktop.SizeWidth}x{newDesktop.SizeHeight}, Position=({newDesktop.TopLeftX},{newDesktop.TopLeftY}).");
 
                         // Store the desktop type
                         newDesktop.Type = desktop.Type;
@@ -3641,13 +3635,19 @@ namespace DisplayMagicianShared.AMD
 
                                 // Check if it matches what we want
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully created the ADLX Eyefinity Desktop");
-                                if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
+                                if (!UpdateActiveConfig())
+                                {
+                                    SharedLogger.logger.Warn("AMDLibrary/SetActiveConfig: Unable to refresh the active AMD configuration after creating the ADLX Eyefinity Desktop, so skipping the layout comparison.");
+                                }
+                                else if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
                                 {
                                     SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: This new Eyefinity layout matches the desired configuraton");
                                 }
                                 else
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: This new Eyefinity layout is different from the one we originally saved with this desktop profile. If you have changed your Eyefinity Layout then you need to update this desktop profile!.");
+                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Saved Eyefinity layout: {DescribeEyefinityDesktop(displayConfig.EyefinityDesktop)}");
+                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Current Eyefinity layout: {DescribeEyefinityDesktop(ActiveDisplayConfig.EyefinityDesktop)}");
                                 }
                                 
                             }
@@ -3731,7 +3731,11 @@ namespace DisplayMagicianShared.AMD
                                 desktopService.DestroyAllEyefinityDesktops();
                                 // Check if it matches what we want
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully destroyed the ADLX Eyefinity Desktop");
-                                if (desktopService.EnumerateDesktops().Any(d => d.Type == ADLX_DESKTOP_TYPE.DESKTOP_EYEFINITY))
+                                if (!UpdateActiveConfig())
+                                {
+                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Unable to refresh the active AMD display configuration after destroying the ADLX Eyefinity Desktop, so the resulting layout cannot be verified.");
+                                }
+                                else if (ActiveDisplayConfig.IsEyefinity)
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: There are still Eyefinity displays configured even after destroying all Eyefinity desktops! Something is wrong.");
                                     return false;                                    
@@ -4342,6 +4346,13 @@ namespace DisplayMagicianShared.AMD
             }
 
             return true;
+        }
+
+        private static string DescribeEyefinityDesktop(AMD_EYEFINITY_DESKTOP eyefinityDesktop)
+        {
+            string grid = string.Join("; ", eyefinityDesktop.Grid.Select(node =>
+                $"row={node.Row},column={node.Column},orientation={node.DisplayOrientation},size={node.DisplayWidth}x{node.DisplayHeight},position=({node.DisplayTopLeftX},{node.DisplayTopLeftY}),display={node.DisplayUniqueId}"));
+            return $"rows={eyefinityDesktop.Rows}, columns={eyefinityDesktop.Columns}, orientation={eyefinityDesktop.Orientation}, size={eyefinityDesktop.SizeWidth}x{eyefinityDesktop.SizeHeight}, position=({eyefinityDesktop.TopLeftX},{eyefinityDesktop.TopLeftY}), grid=[{grid}]";
         }
 
 
