@@ -1771,7 +1771,7 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The EyefinityDesktop values don't equal each other");
                 return false;
             }
-            if (!Displays.SequenceEqual(other.Displays))
+            if (!DictionaryEquals(Displays, other.Displays))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The Displays values don't equal each other");
                 return false;
@@ -1786,10 +1786,27 @@ namespace DisplayMagicianShared.AMD
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The DisplayIdentifiers values don't equal each other");
                 return false;
             }
-            if (!GPUs.SequenceEqual(other.GPUs))
+            if (!DictionaryEquals(GPUs, other.GPUs))
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The GPUs values don't equal each other");
                 return false;
+            }
+            return true;
+        }
+
+        private static bool DictionaryEquals<TKey, TValue>(Dictionary<TKey, TValue> left, Dictionary<TKey, TValue> right)
+            where TKey : notnull
+        {
+            if (ReferenceEquals(left, right))
+                return true;
+            if (left == null || right == null)
+                return false;
+            if (left.Count != right.Count)
+                return false;
+            foreach (var entry in left)
+            {
+                if (!right.TryGetValue(entry.Key, out var rightValue) || !EqualityComparer<TValue>.Default.Equals(entry.Value, rightValue))
+                    return false;
             }
             return true;
         }
@@ -2682,7 +2699,8 @@ namespace DisplayMagicianShared.AMD
 
                                     if (!IsValidADLReturnedArray(displayTargetBuffer, numDisplayTargets, nameof(displayTargetBuffer)))
                                     {
-                                        return myDisplayConfig;
+                                        SharedLogger.logger.Warn($"AMDLibrary/GetAMDDisplayConfig: Skipping AMD adapter {oneAdapter.AdapterIndex} because ADL returned invalid display target data.");
+                                        continue;
                                     }
 
                                     // Free the display map buffer allocated by ADL2 (we only need the display targets)
@@ -2713,8 +2731,8 @@ namespace DisplayMagicianShared.AMD
                                     }
                                     else
                                     {
-                                        // Return the default config as there are no display targets to get info from
-                                        return myDisplayConfig;
+                                        SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: AMD adapter {oneAdapter.AdapterIndex} has no display targets, so continuing to the next adapter.");
+                                        continue;
                                     }
                                 }
                                 finally
@@ -2802,7 +2820,7 @@ namespace DisplayMagicianShared.AMD
                                                 SharedLogger.logger.Warn($"AMDLibrary/GetAMDDisplayConfig: SLS map {matchingSLSMapIndex} for AMD adapter {oneAdapter.AdapterIndex} has {slsMap.Grid.SLSGridColumn} columns and {slsMap.Grid.SLSGridRow} rows, requiring {slsMap.Grid.SLSGridColumn * slsMap.Grid.SLSGridRow} targets, but ADL returned {numDisplayTargets} display targets. Eyefinity state cannot be determined from this map.");
                                                 //Number of display targets returned is not equal to the SLS grid size, so SLS can't be enabled fo this display
                                                 //myDisplayConfig.SlsConfig.IsSlsEnabled = false; // This is already set to false at the start!
-                                                break;
+                                                continue;
                                             }
 
                                             // Add the slsMap to the config we want to store
@@ -3595,19 +3613,29 @@ namespace DisplayMagicianShared.AMD
                                     return false;
                                 }
 
-                                // Make the changes permanent
-                                ADLRet = ADLImport.ADL2_Flush_Driver_Data(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex);
-                                if (ADLRet == ADL_STATUS.ADL_OK)
-                                {
-                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Flush_Driver_Data successfully saved the adapter settings as permanent for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
-                                }
-                                else
-                                {
-                                    SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ADL2_Flush_Driver_Data failed to save the adapter settings as permanent for adapter {slsMapConfig.SLSMap.AdapterIndex}. ");
-                                    return false;
-                                }
                             }
 
+                            // Make both existing-map and replacement-map changes permanent.
+                            ADLRet = ADLImport.ADL2_Flush_Driver_Data(_adlContextHandle, slsMapConfig.SLSMap.AdapterIndex);
+                            if (ADLRet == ADL_STATUS.ADL_OK)
+                            {
+                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: ADL2_Flush_Driver_Data successfully saved the adapter settings as permanent for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Error($"AMDLibrary/SetActiveConfig: ADL2_Flush_Driver_Data failed to save the adapter settings as permanent for adapter {slsMapConfig.SLSMap.AdapterIndex}.");
+                                return false;
+                            }
+                        }
+
+                        if (!UpdateActiveConfig())
+                        {
+                            SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Unable to refresh the active AMD display configuration after enabling Eyefinity through ADL2.");
+                            return false;
+                        }
+                        if (!ActiveDisplayConfig.IsEyefinity || !ActiveDisplayConfig.Adl2SlsConfig.IsSlsEnabled)
+                        {
+                            SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: ADL2 enable completed, but the refreshed configuration does not report Eyefinity as active. IsEyefinity={ActiveDisplayConfig.IsEyefinity}, IsSlsEnabled={ActiveDisplayConfig.Adl2SlsConfig.IsSlsEnabled}.");
                         }
                     }
                     else
@@ -3720,6 +3748,16 @@ namespace DisplayMagicianShared.AMD
                                     return false;
                                 }
 
+                            }
+
+                            if (!UpdateActiveConfig())
+                            {
+                                SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Unable to refresh the active AMD display configuration after disabling Eyefinity through ADL2.");
+                                return false;
+                            }
+                            if (ActiveDisplayConfig.IsEyefinity || ActiveDisplayConfig.Adl2SlsConfig.IsSlsEnabled)
+                            {
+                                SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: ADL2 disable completed, but the refreshed configuration still reports Eyefinity as active. IsEyefinity={ActiveDisplayConfig.IsEyefinity}, IsSlsEnabled={ActiveDisplayConfig.Adl2SlsConfig.IsSlsEnabled}.");
                             }
                         }
                         else
