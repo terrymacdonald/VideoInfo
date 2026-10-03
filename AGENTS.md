@@ -18,6 +18,12 @@ This file captures the essential rules and context for agents working on this Vi
 - Naming/patterns: Preserve established coding patterns and styles across this project. Ask the user for permission if you need to deviate from those styles.
 - If you need to run scripts, note that all development is being done on Windows 11 x64 machines, and within Powershell terminals. You MUST make sure that your scripts will run in a powershell environment on a Windows 11 x64 machine.
 
+## Profile Application Semantics
+- Profile application is staged. Failure to apply a required topology, such as AMD Eyefinity, NVIDIA Surround/Mosaic, Intel Combined Display, or the required Windows topology, is a fatal profile-application failure because later stages depend on that topology.
+- Individual optional display or GPU override failures, including color, scaling, FreeSync, HDCP, gamma, 3D, multimedia, and tuning settings, are warnings. Continue attempting all remaining profile settings and do not roll back successfully applied settings because one optional override failed.
+- Where an API permits it, distinguish complete success, partial success with warnings, and fatal failure. A boolean result must not be changed to report fatal failure for an isolated optional override if doing so would stop the remaining profile from being applied.
+- ADLX is the default and preferred AMD Eyefinity implementation. ADL2 Eyefinity support is legacy, less preferred, and may be removed in the future; retain it for compatibility and safety fixes, but do not expand it instead of improving the ADLX path unless the user explicitly requests that work.
+
 ## Testing Expectations
 - CRITICAL: The tests should be designed to find errors in the VideoInfo library. DO NOT PATCH TESTS SO THAT THEY RUN SUCCESSFULLY TO AVOID UNDERLYING ERRORS IN THE VideoInfo LIBRARY. THE WHOLE POINT OF TESTING IS TO FIND UNDERLYING ERRORS IN THE VideoInfo LIBRARY SO THAT THEY CAN BE FIXED.  
 - Suites: xUnit in `VideoInfo.Tests` targeting `net10.0`; hardware-aware and read-only (no tuning changes). Global xUnit parallelization is disabled.

@@ -1852,7 +1852,9 @@ namespace DisplayMagicianShared.AMD
         private ADLXSystemServicesHelper _adlxSystem;
         //private int _adlxHighestSupportedSystemVersion = 0; // Only the base SystemServices is supported in all versions of ADLX
         private AMD_DISPLAY_CONFIG? _activeDisplayConfig;
-        public List<string> _allConnectedDisplayIdentifiers;
+        public List<string> _allConnectedDisplayIdentifiers = new List<string>();
+        private bool _activeDisplayIdentifiersReadFailed = false;
+        private bool _connectedDisplayIdentifiersReadFailed = false;
         //public IntPtr hADLXBindingModule = IntPtr.Zero;
         public IntPtr hADLXModule = IntPtr.Zero;
         public const string AMD_ADLX_BINDING_DLL = "ADLXWrapper.dll";
@@ -2034,10 +2036,10 @@ namespace DisplayMagicianShared.AMD
                     _activeDisplayConfig = GetActiveConfig();
 
                     // If we failed to get the display config, then we can't continue to use the library, so we dispose of it to avoid memory leaks and exit
-                    if (_activeDisplayConfig == null)
+                    if (_activeDisplayConfig == null || _activeDisplayIdentifiersReadFailed)
                     {
                         _activeDisplayConfig = CreateDefaultConfig();
-                        SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: The active AMD Display Configuration is null. Disposing the ADLXHelper to avoid memory leaks");
+                        SharedLogger.logger.Warn($"AMDLibrary/AMDLibrary: Failed to get a complete active AMD display configuration. Disposing the ADLXHelper to avoid using incomplete display identifiers.");
                         _adlxHelper.Dispose();
                         SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Setting ADLXHelper to null");
                         _adlxHelper = null;
@@ -2055,6 +2057,11 @@ namespace DisplayMagicianShared.AMD
 
                     SharedLogger.logger.Trace($"AMDLibrary/AMDLibrary: Automatically getting the AMD Connected Display Identifiers");
                     _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
+                    _connectedDisplayIdentifiersReadFailed = failure;
+                    if (failure)
+                    {
+                        SharedLogger.logger.Warn($"AMDLibrary/AMDLibrary: Failed to get the connected AMD display identifiers. AMD profile applicability cannot be determined.");
+                    }
 
                 }
                 catch (Exception ex)
@@ -2240,7 +2247,13 @@ namespace DisplayMagicianShared.AMD
             try
             {
                 _activeDisplayConfig = GetActiveConfig();
+                if (_activeDisplayIdentifiersReadFailed)
+                {
+                    SharedLogger.logger.Warn($"AMDLibrary/UpdateActiveConfig: Failed to update the active display identifiers.");
+                    return false;
+                }
                 _allConnectedDisplayIdentifiers = GetAllConnectedDisplayIdentifiers(out bool failure);
+                _connectedDisplayIdentifiersReadFailed = failure;
                 if (failure)
                 {
                     SharedLogger.logger.Warn($"AMDLibrary/UpdateActiveConfig: Failed to update the connected display identifiers.");
@@ -2267,6 +2280,7 @@ namespace DisplayMagicianShared.AMD
         {
             // Creat empty config struct so we know there are no nulls in there to break the json serializer
             AMD_DISPLAY_CONFIG myDisplayConfig = CreateDefaultConfig();
+            _activeDisplayIdentifiersReadFailed = false;
 
             if (_initialised)
             {
@@ -2600,6 +2614,12 @@ namespace DisplayMagicianShared.AMD
 
                 // Get the display identifiers                
                 myDisplayConfig.DisplayIdentifiers = GetCurrentDisplayIdentifiers(out bool failure);
+                if (failure)
+                {
+                    _activeDisplayIdentifiersReadFailed = true;
+                    SharedLogger.logger.Warn($"AMDLibrary/GetAMDDisplayConfig: Failed to get the current AMD display identifiers. Returning a default configuration rather than an incomplete active configuration.");
+                    return CreateDefaultConfig();
+                }
 
                 // Now try to get the AMD Eyefinity layout using ADL2 (the older standard) as it is more configurable
                 if (_initialisedADL2)
@@ -2991,6 +3011,7 @@ namespace DisplayMagicianShared.AMD
 
                                         // Logic cribbed from https://github.com/elitak/amd-adl-sdk/blob/master/Sample/Eyefinity/ati_eyefinity.c
                                         // Go through each display Target
+                                        bool isSlsEnabledForAdapter = false;
                                         foreach (var displayTarget in displayTargetArray)
                                         {
                                             // Get the current Display Modes for this adapter/display combination
@@ -3091,6 +3112,7 @@ namespace DisplayMagicianShared.AMD
                                                     // we also update the main IsSLSEnabled so that it is indicated at the top level too
 
                                                     myDisplayConfig.Adl2SlsConfig.IsSlsEnabled = true;
+                                                    isSlsEnabledForAdapter = true;
                                                     SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: AMD Adapter #{oneAdapter.AdapterIndex.ToString()} has a matching SLS grid set! Eyefinity (SLS) is enabled. Setting IsSlsEnabled to true");
 
                                                 }
@@ -3099,7 +3121,7 @@ namespace DisplayMagicianShared.AMD
                                         }
 
                                         // Only Add the mySLSMapConfig to the displayConfig if SLS is enabled
-                                        if (myDisplayConfig.Adl2SlsConfig.IsSlsEnabled)
+                                        if (isSlsEnabledForAdapter)
                                         {
                                             myDisplayConfig.Adl2SlsConfig.SLSMapConfigs.Add(mySLSMapConfig);
                                         }
@@ -4461,6 +4483,12 @@ namespace DisplayMagicianShared.AMD
             {
                 SharedLogger.logger.Trace($"AMDLibrary/IsPossibleConfig: The AMD display configuration is not in use, so it has no bearing in terms of whether it can be applied now. Returning true.");
                 return true;
+            }
+
+            if (_connectedDisplayIdentifiersReadFailed)
+            {
+                SharedLogger.logger.Warn($"AMDLibrary/IsPossibleConfig: Connected AMD display identifier enumeration failed, so this configuration cannot be confirmed as possible.");
+                return false;
             }
 
             // If both display identifiers are 0 then no displays were connected via AMD and we should just return true.
