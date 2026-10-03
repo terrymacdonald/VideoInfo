@@ -448,7 +448,7 @@ namespace DisplayMagicianShared.Windows
 
         public bool Equals(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO other)
         {
-            if (!Header.Equals(other.Header))
+            if (Header.Type != other.Header.Type || Header.Size != other.Header.Size)
             {
                 SharedLogger.logger.Trace($"DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO/Equals: Header values don't equal each other. SavedAdapter={Header.AdapterId.Value}, CurrentAdapter={other.Header.AdapterId.Value}, SavedId={Header.Id}, CurrentId={other.Header.Id}, SavedType={Header.Type}, CurrentType={other.Header.Type}, SavedSize={Header.Size}, CurrentSize={other.Header.Size}");
                 return false;
@@ -473,7 +473,7 @@ namespace DisplayMagicianShared.Windows
 
         public override int GetHashCode()
         {
-            return (Header, Value, ColorEncoding, BitsPerColorChannel).GetHashCode();
+            return (Header.Type, Header.Size, Value, ColorEncoding, BitsPerColorChannel).GetHashCode();
         }
 
         public static bool operator ==(DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO lhs, DISPLAYCONFIG_GET_ADVANCED_COLOR_INFO rhs) => lhs.Equals(rhs);

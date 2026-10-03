@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using EDIDParser;
+using Newtonsoft.Json.Linq;
 using Windows.Graphics.Display;
 
 namespace DisplayMagicianShared.Intel
@@ -180,6 +181,117 @@ namespace DisplayMagicianShared.Intel
             return hash.ToHashCode();
         }
 
+        internal static bool ArePixelTransformationSettingsEqual(
+            PixelTransformationGetResultDto left,
+            PixelTransformationGetResultDto right)
+        {
+            if (!left.PipeConfig.Equals(right.PipeConfig))
+            {
+                SharedLogger.logger.Trace("INTEL_DISPLAY_WITH_SETTINGS/ArePixelTransformationSettingsEqual: The PipeConfig values don't equal each other");
+                return false;
+            }
+
+            if (ReferenceEquals(left.Blocks, right.Blocks))
+                return true;
+            if (left.Blocks == null || right.Blocks == null)
+            {
+                SharedLogger.logger.Trace("INTEL_DISPLAY_WITH_SETTINGS/ArePixelTransformationSettingsEqual: One Blocks collection is null");
+                return false;
+            }
+            if (left.Blocks.Count != right.Blocks.Count)
+            {
+                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/ArePixelTransformationSettingsEqual: Block counts don't equal each other. Saved={left.Blocks.Count}, Current={right.Blocks.Count}");
+                return false;
+            }
+
+            for (int index = 0; index < left.Blocks.Count; index++)
+            {
+                if (!ArePixelTransformationBlocksEqual(left.Blocks[index], right.Blocks[index]))
+                {
+                    SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/ArePixelTransformationSettingsEqual: Block {index} values don't equal each other. SavedId={left.Blocks[index].BlockId}, CurrentId={right.Blocks[index].BlockId}, SavedType={left.Blocks[index].BlockType}, CurrentType={right.Blocks[index].BlockType}");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool ArePixelTransformationBlocksEqual(PixtxBlockConfigDto left, PixtxBlockConfigDto right)
+        {
+            left.Size = 0;
+            left.Version = 0;
+            right.Size = 0;
+            right.Version = 0;
+            JToken leftToken = JToken.FromObject(left);
+            JToken rightToken = JToken.FromObject(right);
+            NormalizePixelTransformationBlockToken(leftToken);
+            NormalizePixelTransformationBlockToken(rightToken);
+            if (JToken.DeepEquals(leftToken, rightToken))
+                return true;
+
+            SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/ArePixelTransformationBlocksEqual: First difference: {FindFirstTokenDifference(leftToken, rightToken, "$block")}");
+            return false;
+        }
+
+        private static void NormalizePixelTransformationBlockToken(JToken token)
+        {
+            NormalizeNullCollection(token["OneDLutConfig"], "SampleValues");
+            NormalizeNullCollection(token["OneDLutConfig"], "SamplePositions");
+            NormalizeNullCollection(token["ThreeDLutConfig"], "SampleValues");
+            NormalizeNullCollection(token["MatrixConfig"], "Matrix");
+            NormalizeNullCollection(token["MatrixConfig"], "PreOffsets");
+            NormalizeNullCollection(token["MatrixConfig"], "PostOffsets");
+        }
+
+        private static void NormalizeNullCollection(JToken parent, string propertyName)
+        {
+            if (parent?[propertyName]?.Type == JTokenType.Null)
+                parent[propertyName] = new JArray();
+        }
+
+        private static string FindFirstTokenDifference(JToken left, JToken right, string path)
+        {
+            if (left.Type != right.Type)
+                return $"{path} type Saved={left.Type}, Current={right.Type}";
+
+            if (left is JObject leftObject && right is JObject rightObject)
+            {
+                foreach (JProperty leftProperty in leftObject.Properties())
+                {
+                    JToken rightValue = rightObject[leftProperty.Name];
+                    if (rightValue == null)
+                        return $"{path}.{leftProperty.Name} is missing from Current";
+                    if (!JToken.DeepEquals(leftProperty.Value, rightValue))
+                        return FindFirstTokenDifference(leftProperty.Value, rightValue, $"{path}.{leftProperty.Name}");
+                }
+                foreach (JProperty rightProperty in rightObject.Properties())
+                {
+                    if (leftObject[rightProperty.Name] == null)
+                        return $"{path}.{rightProperty.Name} is missing from Saved";
+                }
+            }
+            else if (left is JArray leftArray && right is JArray rightArray)
+            {
+                if (leftArray.Count != rightArray.Count)
+                    return $"{path}.Count Saved={leftArray.Count}, Current={rightArray.Count}";
+                for (int index = 0; index < leftArray.Count; index++)
+                {
+                    if (!JToken.DeepEquals(leftArray[index], rightArray[index]))
+                        return FindFirstTokenDifference(leftArray[index], rightArray[index], $"{path}[{index}]");
+                }
+            }
+
+            return $"{path} Saved={left.ToString(Newtonsoft.Json.Formatting.None)}, Current={right.ToString(Newtonsoft.Json.Formatting.None)}";
+        }
+
+        internal static int GetPixelTransformationSettingsHash(PixelTransformationGetResultDto settings)
+        {
+            var hash = new HashCode();
+            hash.Add(settings.PipeConfig);
+            hash.Add(settings.Blocks?.Count ?? 0);
+            return hash.ToHashCode();
+        }
+
         public override bool Equals(object obj) => obj is INTEL_DISPLAY_WITH_SETTINGS other && Equals(other);
         
         public bool Equals(INTEL_DISPLAY_WITH_SETTINGS other)
@@ -224,7 +336,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplaySettings values don't equal each other");
                 return false;
             }
-            if (!PixelTransformationSettings.Equals(other.PixelTransformationSettings))
+            if (!ArePixelTransformationSettingsEqual(PixelTransformationSettings, other.PixelTransformationSettings))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The PixelTransformationSettings values don't equal each other");
                 return false;
@@ -312,11 +424,6 @@ namespace DisplayMagicianShared.Intel
             if (!EqualityComparer<AdapterDisplayEncoderPropertiesDto>.Default.Equals(AdapterDisplayEncoderProperties, other.AdapterDisplayEncoderProperties))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The AdapterDisplayEncoderProperties values don't equal each other");
-                return false;
-            }
-            if (!DisplayProperties.Equals(other.DisplayProperties))
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayProperties values don't equal each other");
                 return false;
             }
             // if (!EqualityComparer<ctl_device_adapter_properties_t>.Default.Equals(DeviceProperties, other.DeviceProperties))
@@ -431,8 +538,8 @@ namespace DisplayMagicianShared.Intel
         {
 
             return (Name, DisplayDeviceID, IsSupportedIntegerScaling, IsSupportedGPUScaling, IsSupportedImageSharpening,
-                IsSupportedDisplaySettings, GetDisplaySettingsHash(DisplaySettings), PixelTransformationSettings, ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram?.Length, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
-                DisplayProperties, /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes?.Count, LinkedDisplayAdapters,
+                IsSupportedDisplaySettings, GetDisplaySettingsHash(DisplaySettings), GetPixelTransformationSettingsHash(PixelTransformationSettings), ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram?.Length, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties,
+                /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes?.Count, LinkedDisplayAdapters,
                 VblankTimestamp, /*ZeDeviceHandle, ZeDriverHandle,*/ RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
         }
 
@@ -508,7 +615,7 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The IsCombinedDisplay values don't equal each other");
                 return false;
             }
-            if (!CombinedDisplay.Equals(other.CombinedDisplay))
+            if (!IntelLibrary.CombinedDisplayTopologiesEqual(CombinedDisplay, other.CombinedDisplay))
             {
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The CombinedDisplay values don't equal each other");
                 return false;
@@ -544,7 +651,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (AdapterID, Name, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, CombinedDisplay, IsSupportedThreeDSettings, ThreeDSettings?.Count, IsSupportedVideoProcessing, VideoProcessingSettings?.Count, IsSupportedStandardColorCorrection, StandardColorCorrection).GetHashCode();
+            return (AdapterID, Name, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, IsSupportedThreeDSettings, ThreeDSettings?.Count, IsSupportedVideoProcessing, VideoProcessingSettings?.Count, IsSupportedStandardColorCorrection, StandardColorCorrection).GetHashCode();
         }
 
         public static bool operator ==(INTEL_ADAPTER lhs, INTEL_ADAPTER rhs) => lhs.Equals(rhs);
@@ -678,7 +785,7 @@ namespace DisplayMagicianShared.Intel
             return $"{adapterKey}-PORT_{windowsDisplayEncoderId}";
         }
 
-        private static bool CombinedDisplayTopologiesEqual(CombinedDisplayArgsDto expected, CombinedDisplayArgsDto actual)
+        internal static bool CombinedDisplayTopologiesEqual(CombinedDisplayArgsDto expected, CombinedDisplayArgsDto actual)
         {
             if (expected.NumOutputs != actual.NumOutputs ||
                 expected.CombinedDesktopWidth != actual.CombinedDesktopWidth ||
@@ -2163,7 +2270,7 @@ namespace DisplayMagicianShared.Intel
                                 var currentPixelTransformation = display.PixelTransformationGetConfig(PixtxPipeGetConfigDto.CreateCurrentRequest());
                                 if (currentPixelTransformation.HasValue)
                                 {
-                                    if (!currentPixelTransformation.Value.Equals(storedSettings.PixelTransformationSettings))
+                                    if (!INTEL_DISPLAY_WITH_SETTINGS.ArePixelTransformationSettingsEqual(currentPixelTransformation.Value, storedSettings.PixelTransformationSettings))
                                     {
                                         var pixelTransformationGroups = GroupPixelTransformationBlocksForApply(storedSettings.PixelTransformationSettings.Blocks);
                                         var allGroupsApplied = true;
