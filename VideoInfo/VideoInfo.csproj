@@ -5,8 +5,6 @@
     <AssemblyTitle>VideoInfo</AssemblyTitle>
     <Product>VideoInfo</Product>
     <Copyright>Copyright © Terry MacDonald 2025</Copyright>
-    <AssemblyVersion>1.8.5</AssemblyVersion>
-    <FileVersion>1.8.5</FileVersion>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -58,4 +56,57 @@
       <TargetPath>NVIDIAWrapper.dll</TargetPath>
     </None>
   </ItemGroup>
+
+  <Target Name="SetVersionFromGit" BeforeTargets="GetAssemblyVersion;GenerateAssemblyInfo;BeforeBuild;BeforeRebuild;CoreCompile">
+    <PropertyGroup>
+      <VersionFile>$(MSBuildProjectDirectory)\..\VERSION</VersionFile>
+    </PropertyGroup>
+
+    <ReadLinesFromFile File="$(VersionFile)" Condition="Exists('$(VersionFile)')">
+      <Output TaskParameter="Lines" ItemName="VersionFileLines" />
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+      <MajorLine Include="@(VersionFileLines)" Condition="$([System.String]::new('%(Identity)').Trim().StartsWith('MAJOR='))" />
+      <MinorLine Include="@(VersionFileLines)" Condition="$([System.String]::new('%(Identity)').Trim().StartsWith('MINOR='))" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <_RawMajor>@(MajorLine)</_RawMajor>
+      <_RawMinor>@(MinorLine)</_RawMinor>
+      <VersionMajor>$([System.String]::new('$(_RawMajor)').Replace('MAJOR=', '').Trim())</VersionMajor>
+      <VersionMinor>$([System.String]::new('$(_RawMinor)').Replace('MINOR=', '').Trim())</VersionMinor>
+      <VersionMajor Condition="'$(VersionMajor)' == ''">1</VersionMajor>
+      <VersionMinor Condition="'$(VersionMinor)' == ''">0</VersionMinor>
+      <SolutionRoot>$(MSBuildProjectDirectory)\..</SolutionRoot>
+    </PropertyGroup>
+
+    <Exec Command="git log -n 1 --format=%%H -- VERSION" ConsoleToMSBuild="true" IgnoreExitCode="true" WorkingDirectory="$(SolutionRoot)" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="LastVersionChangeHash" />
+      <Output TaskParameter="ExitCode" PropertyName="GitLogExitCode" />
+    </Exec>
+
+    <PropertyGroup>
+      <FinalHash Condition="'$(GitLogExitCode)' == '0'">$(LastVersionChangeHash)</FinalHash>
+      <GitCountCommand Condition="'$(FinalHash)' != ''">git rev-list --count $(FinalHash)..HEAD</GitCountCommand>
+      <GitCountCommand Condition="'$(FinalHash)' == ''">git rev-list --count HEAD</GitCountCommand>
+    </PropertyGroup>
+
+    <Exec Command="$(GitCountCommand)" ConsoleToMSBuild="true" IgnoreExitCode="true" WorkingDirectory="$(SolutionRoot)" StandardOutputImportance="low">
+      <Output TaskParameter="ConsoleOutput" PropertyName="GitCommitCount" />
+      <Output TaskParameter="ExitCode" PropertyName="GitCountExitCode" />
+    </Exec>
+
+    <PropertyGroup>
+      <VersionPatch Condition="'$(GitCountExitCode)' == '0' AND '$(GitCommitCount)' != ''">$(GitCommitCount)</VersionPatch>
+      <VersionPatch Condition="'$(VersionPatch)' == ''">0</VersionPatch>
+      <AppVersion>$(VersionMajor).$(VersionMinor).$(VersionPatch)</AppVersion>
+      <Version>$(AppVersion)</Version>
+      <AssemblyVersion>$(AppVersion)</AssemblyVersion>
+      <FileVersion>$(AppVersion)</FileVersion>
+      <InformationalVersion>$(AppVersion)</InformationalVersion>
+    </PropertyGroup>
+
+    <Message Text="-&gt; VideoInfo Version: $(AppVersion) (Major/Minor from file, Patch is commits since change)" Importance="high" />
+  </Target>
 </Project>

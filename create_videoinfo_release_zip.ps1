@@ -20,7 +20,7 @@ Write-Host "====================================================================
 Write-Host ""
 
 # ============================================================================
-# Versioning: MAJOR/MINOR from VERSION file, PATCH = git commit count
+# Versioning: MAJOR/MINOR from VERSION, PATCH = commits since the last VERSION change
 # ============================================================================
 Write-Host "Determining version number..." -ForegroundColor Yellow
 
@@ -37,7 +37,13 @@ $patch = 0
 try {
     $gitPath = Get-Command git -ErrorAction SilentlyContinue
     if ($gitPath) {
-        $commitCount = & git rev-list --count HEAD 2>$null
+        $lastVersionChangeHash = & git log -n 1 --format=%H -- VERSION 2>$null
+        if ($LASTEXITCODE -eq 0 -and $lastVersionChangeHash -match "^[0-9a-fA-F]+$") {
+            $commitCount = & git rev-list --count "${lastVersionChangeHash}..HEAD" 2>$null
+        }
+        else {
+            $commitCount = & git rev-list --count HEAD 2>$null
+        }
         if ($LASTEXITCODE -eq 0 -and $commitCount -match "^\d+$") {
             $patch = [int]$commitCount
         }
