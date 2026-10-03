@@ -2619,7 +2619,11 @@ namespace DisplayMagicianShared.NVIDIA
                         if (!ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
                         {
                             SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: The current display configuration does not have NVIDIA Surround (Mosaic) enabled, so we need to set a 1x1 mosaic matrix to ensure that all displays are awake.");
-                            TurnOffMosaic(delayInMs);
+                            if (!TurnOffMosaic(delayInMs))
+                            {
+                                SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: Could not prepare the displays by disabling Mosaic before applying the required topology.");
+                                return false;
+                            }
                         }
                         else
                         {
@@ -2633,7 +2637,11 @@ namespace DisplayMagicianShared.NVIDIA
                             using (var mosaicHelper = _nvapiApiHelper.GetMosaicHelper())
                             {
                                 // If we get here then the display is valid, so now we actually apply the new Mosaic Topology
-                                mosaicHelper.SetDisplayGrids(displayConfig.MosaicConfig.MosaicGridTopologies, 0);
+                                if (!mosaicHelper.SetDisplayGrids(displayConfig.MosaicConfig.MosaicGridTopologies, 0))
+                                {
+                                    SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids did not apply the required Mosaic topology.");
+                                    return false;
+                                }
                                 SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: NvAPI_Mosaic_SetDisplayGrids returned OK.");
                                 SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
                                 Thread.Sleep(delayInMs * 3);
@@ -2645,13 +2653,29 @@ namespace DisplayMagicianShared.NVIDIA
                             return false;
                         }
 
+                        if (!UpdateActiveConfig())
+                        {
+                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: Unable to refresh the active NVIDIA configuration after applying Mosaic.");
+                            return false;
+                        }
+                        if (!displayConfig.MosaicConfig.Equals(ActiveDisplayConfig.MosaicConfig))
+                        {
+                            SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: Mosaic was applied, but the active topology does not match the required saved topology.");
+                            return false;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/SetActiveConfig: Verified that the active Mosaic topology matches the required saved topology.");
+
                     }
 
                 }
                 else if (!displayConfig.MosaicConfig.IsMosaicEnabled && ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
                 {
                     // We are on a Mosaic profile now, and we need to change to a non-Mosaic profile
-                    TurnOffMosaic(delayInMs);
+                    if (!TurnOffMosaic(delayInMs))
+                    {
+                        SharedLogger.logger.Error($"NVIDIALibrary/SetActiveConfig: Failed to disable the active Mosaic topology.");
+                        return false;
+                    }
 
                 }
                 else if (!displayConfig.MosaicConfig.IsMosaicEnabled && !ActiveDisplayConfig.MosaicConfig.IsMosaicEnabled)
@@ -2685,10 +2709,16 @@ namespace DisplayMagicianShared.NVIDIA
                     {
                         try
                         {
-                            mosaicHelper.SetDisplayGrids(individualScreensTopology.Value, 0);
-                            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: NvAPI_Mosaic_SetDisplayGrids returned OK.");
-                            SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
-                            Thread.Sleep(delayInMs * 3);
+                            if (mosaicHelper.SetDisplayGrids(individualScreensTopology.Value, 0))
+                            {
+                                SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: NvAPI_Mosaic_SetDisplayGrids returned OK.");
+                                SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
+                                Thread.Sleep(delayInMs * 3);
+                            }
+                            else
+                            {
+                                SharedLogger.logger.Warn($"NVIDIALibrary/TurnOffMosaic: SetDisplayGrids did not apply the 1x1 display grids. Will try EnableCurrentTopo(false) instead.");
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -2710,7 +2740,11 @@ namespace DisplayMagicianShared.NVIDIA
                         SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Previous attempt to turn off Mosaic failed. Now trying to use EnableCurrentTopo(false) to disable Mosaic instead.");
                         try
                         {
-                            mosaicHelper.EnableCurrentTopo(false);
+                            if (!mosaicHelper.EnableCurrentTopo(false))
+                            {
+                                SharedLogger.logger.Error($"NVIDIALibrary/TurnOffMosaic: EnableCurrentTopo(false) did not disable Mosaic.");
+                                return false;
+                            }
                             SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: EnableCurrentTopo(false) returned OK.");
                             SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Waiting {delayInMs * 3} milliseconds to let the Mosaic display change take place before continuing");
                             Thread.Sleep(delayInMs * 3);
@@ -2720,6 +2754,15 @@ namespace DisplayMagicianShared.NVIDIA
                             SharedLogger.logger.Error(ex, $"NVIDIALibrary/TurnOffMosaic: Exception while trying to disable Mosaic using EnableCurrentTopo(false).");
                             return false;
                         }
+
+                        currentTopo = mosaicHelper.GetCurrentTopo();
+                        mosaicStillOn = currentTopo.HasValue && currentTopo.Value.TopoBrief.Enabled;
+                        if (mosaicStillOn)
+                        {
+                            SharedLogger.logger.Error($"NVIDIALibrary/TurnOffMosaic: Mosaic is still enabled after EnableCurrentTopo(false) completed.");
+                            return false;
+                        }
+                        SharedLogger.logger.Trace($"NVIDIALibrary/TurnOffMosaic: Verified that Mosaic is disabled after EnableCurrentTopo(false).");
                     }
                     else
                     {
@@ -3534,10 +3577,15 @@ namespace DisplayMagicianShared.NVIDIA
             // We want to check the NVIDIA profile can be used now
             SharedLogger.logger.Trace($"NVIDIALibrary/IsPossibleConfig: Testing whether the NVIDIA display configuration is possible to be used now");
 
-            if (!_initialised || !displayConfig.IsInUse)
+            if (!displayConfig.IsInUse)
             {
                 SharedLogger.logger.Trace($"NVIDIALibrary/IsPossibleConfig: The NVIDIA display configuration is not in use, so it has no bearing in terms of whether it can be applied now. Returning true.");
                 return true;
+            }
+            if (!_initialised)
+            {
+                SharedLogger.logger.Warn($"NVIDIALibrary/IsPossibleConfig: The NVIDIA display configuration is required, but the NVIDIA library is not initialized.");
+                return false;
             }
 
             // CHeck that we have all the displayConfig DisplayIdentifiers we need available now

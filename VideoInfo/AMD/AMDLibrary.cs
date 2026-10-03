@@ -1632,6 +1632,9 @@ namespace DisplayMagicianShared.AMD
     [StructLayout(LayoutKind.Sequential)]
     public struct AMD_GPU_WITH_SETTINGS : IEquatable<AMD_GPU_WITH_SETTINGS>
     {
+        public bool IsEyefinity;
+        public AMD_EYEFINITY_DESKTOP EyefinityDesktop;
+
         public bool HasThreeDSettings;
         public All3DSettingsDto ThreeDSettings;
 
@@ -1646,6 +1649,9 @@ namespace DisplayMagicianShared.AMD
 
         public AMD_GPU_WITH_SETTINGS()
         {
+            IsEyefinity = false;
+            EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
+
             HasThreeDSettings = false;
             ThreeDSettings = new All3DSettingsDto();
 
@@ -1663,6 +1669,16 @@ namespace DisplayMagicianShared.AMD
 
         public bool Equals(AMD_GPU_WITH_SETTINGS other)
         {
+            if (IsEyefinity != other.IsEyefinity)
+            {
+                SharedLogger.logger.Trace($"AMD_GPU_WITH_SETTINGS/Equals: The IsEyefinity values don't equal each other");
+                return false;
+            }
+            if (!EyefinityDesktop.Equals(other.EyefinityDesktop))
+            {
+                SharedLogger.logger.Trace($"AMD_GPU_WITH_SETTINGS/Equals: The EyefinityDesktop values don't equal each other");
+                return false;
+            }
             if (HasThreeDSettings != other.HasThreeDSettings)
             {
                 SharedLogger.logger.Trace($"AMD_GPU_WITH_SETTINGS/Equals: The HasThreeDSettings values don't equal each other");
@@ -1708,7 +1724,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return ( HasThreeDSettings, ThreeDSettings, HasVideoUpscale, VideoUpscale, HasVideoSuperResolution, VideoSuperResolution, HasManualPowerTuning, ManualPowerTuning).GetHashCode();
+            return (IsEyefinity, EyefinityDesktop, HasThreeDSettings, ThreeDSettings, HasVideoUpscale, VideoUpscale, HasVideoSuperResolution, VideoSuperResolution, HasManualPowerTuning, ManualPowerTuning).GetHashCode();
         }
 
         public static bool operator ==(AMD_GPU_WITH_SETTINGS lhs, AMD_GPU_WITH_SETTINGS rhs) => lhs.Equals(rhs);
@@ -1724,7 +1740,6 @@ namespace DisplayMagicianShared.AMD
         public bool IsCloned;
         public bool IsEyefinity;
         public List<AMD_DESKTOP> Desktops;
-        public AMD_EYEFINITY_DESKTOP EyefinityDesktop;
         public Dictionary<ulong,AMD_DISPLAY_WITH_SETTINGS> Displays;
         public AMD_SLS_CONFIG Adl2SlsConfig;
         public List<string> DisplayIdentifiers;
@@ -1736,7 +1751,6 @@ namespace DisplayMagicianShared.AMD
             IsCloned = false;
             IsEyefinity = false;
             Desktops = new List<AMD_DESKTOP>();
-            EyefinityDesktop = new AMD_EYEFINITY_DESKTOP();
             Displays = new Dictionary<ulong,AMD_DISPLAY_WITH_SETTINGS>();
             Adl2SlsConfig = new AMD_SLS_CONFIG();
             DisplayIdentifiers = new List<string>();
@@ -1764,11 +1778,6 @@ namespace DisplayMagicianShared.AMD
             if (IsEyefinity != other.IsEyefinity)
             {
                 SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The IsEyefinity values don't equal each other");
-                return false;
-            }
-            if (!EyefinityDesktop.Equals(other.EyefinityDesktop))
-            {
-                SharedLogger.logger.Trace($"AMD_DISPLAY_CONFIG/Equals: The EyefinityDesktop values don't equal each other");
                 return false;
             }
             if (!DictionaryEquals(Displays, other.Displays))
@@ -1813,7 +1822,7 @@ namespace DisplayMagicianShared.AMD
 
         public override int GetHashCode()
         {
-            return (IsInUse, IsCloned, Desktops, IsEyefinity, EyefinityDesktop, Displays, Adl2SlsConfig, DisplayIdentifiers, GPUs).GetHashCode();
+            return (IsInUse, IsCloned, Desktops, IsEyefinity, Displays, Adl2SlsConfig, DisplayIdentifiers, GPUs).GetHashCode();
         }
 
         public static bool operator ==(AMD_DISPLAY_CONFIG lhs, AMD_DISPLAY_CONFIG rhs) => lhs.Equals(rhs);
@@ -2373,14 +2382,19 @@ namespace DisplayMagicianShared.AMD
                             myDisplayConfig.IsEyefinity = true;
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Eyefinity desktop detected");
                             var topology = desktop.GetEyefinityTopology();
-                            myDisplayConfig.EyefinityDesktop.Rows = topology.Rows;
-                            myDisplayConfig.EyefinityDesktop.Columns = topology.Columns;
-                            myDisplayConfig.EyefinityDesktop.Orientation = topology.Orientation;
-                            myDisplayConfig.EyefinityDesktop.TopLeftX = topology.TopLeftX;
-                            myDisplayConfig.EyefinityDesktop.TopLeftY = topology.TopLeftY;
-                            myDisplayConfig.EyefinityDesktop.SizeWidth = topology.Width;
-                            myDisplayConfig.EyefinityDesktop.SizeHeight = topology.Height;
-                            myDisplayConfig.EyefinityDesktop.Grid = topology.Grid
+                            var desktopGpu = desktop.GetGPU();
+                            string gpuKey = GetGPUKey(desktopGpu.Identity.PNPString, $"{desktopGpu.DeviceId}_{desktopGpu.SubSystemId}_{desktopGpu.SubSystemVendorId}_{desktopGpu.RevisionId}");
+                            if (!myDisplayConfig.GPUs.TryGetValue(gpuKey, out var gpuSettings))
+                                gpuSettings = new AMD_GPU_WITH_SETTINGS();
+                            gpuSettings.IsEyefinity = true;
+                            gpuSettings.EyefinityDesktop.Rows = topology.Rows;
+                            gpuSettings.EyefinityDesktop.Columns = topology.Columns;
+                            gpuSettings.EyefinityDesktop.Orientation = topology.Orientation;
+                            gpuSettings.EyefinityDesktop.TopLeftX = topology.TopLeftX;
+                            gpuSettings.EyefinityDesktop.TopLeftY = topology.TopLeftY;
+                            gpuSettings.EyefinityDesktop.SizeWidth = topology.Width;
+                            gpuSettings.EyefinityDesktop.SizeHeight = topology.Height;
+                            gpuSettings.EyefinityDesktop.Grid = topology.Grid
                                 .Select(cell => new EYEFINITY_GRID_NODE
                                 {
                                     Row = cell.Row,
@@ -2393,6 +2407,8 @@ namespace DisplayMagicianShared.AMD
                                     DisplayUniqueId = cell.DisplayUniqueId
                                 })
                                 .ToList();
+                            myDisplayConfig.GPUs[gpuKey] = gpuSettings;
+                            SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Stored Eyefinity desktop for GPU {gpuKey}");
                         }
                         else if (newDesktop.Type == ADLX_DESKTOP_TYPE.DESKTOP_DUPLCATE)
                         {
@@ -3187,11 +3203,12 @@ namespace DisplayMagicianShared.AMD
                     var gpusFor3D = _adlxSystem.EnumerateADLXGPUs();
                     foreach (var gpu in gpusFor3D)
                     {
-                        string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                        string gpuKey = GetGPUKey(gpu.Identity.PNPString, $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}");
                         if (!myDisplayConfig.GPUs.TryGetValue(gpuKey, out var gpuSettings))
                             gpuSettings = new AMD_GPU_WITH_SETTINGS();
                         if (threeDServices.TryGetAll3DSettings(gpu.UniqueId, out var settings3D))
                         {
+                            gpuSettings.HasThreeDSettings = true;
                             gpuSettings.ThreeDSettings = settings3D;
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Read 3D settings for GPU {gpuKey}.");
                         }
@@ -3221,11 +3238,12 @@ namespace DisplayMagicianShared.AMD
                     var gpusForMm = _adlxSystem.EnumerateADLXGPUs();
                     foreach (var gpu in gpusForMm)
                     {
-                        string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                        string gpuKey = GetGPUKey(gpu.Identity.PNPString, $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}");
                         if (!myDisplayConfig.GPUs.TryGetValue(gpuKey, out var gpuSettings))
                             gpuSettings = new AMD_GPU_WITH_SETTINGS();
                         if (mmServices.TryGetVideoUpscale(gpu.UniqueId, out var videoUpscale))
                         {
+                            gpuSettings.HasVideoUpscale = true;
                             gpuSettings.VideoUpscale = videoUpscale;
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Read VideoUpscale for GPU {gpuKey}.");
                         }
@@ -3235,6 +3253,7 @@ namespace DisplayMagicianShared.AMD
                         }
                         if (mmServices.TryGetVideoSuperResolution(gpu.UniqueId, out var videoSuperResolution))
                         {
+                            gpuSettings.HasVideoSuperResolution = true;
                             gpuSettings.VideoSuperResolution = videoSuperResolution;
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Read VideoSuperResolution for GPU {gpuKey}.");
                         }
@@ -3265,11 +3284,12 @@ namespace DisplayMagicianShared.AMD
                     var gpusForPower = _adlxSystem.EnumerateADLXGPUs();
                     foreach (var gpu in gpusForPower)
                     {
-                        string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                        string gpuKey = GetGPUKey(gpu.Identity.PNPString, $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}");
                         if (!myDisplayConfig.GPUs.TryGetValue(gpuKey, out var gpuSettings))
                             gpuSettings = new AMD_GPU_WITH_SETTINGS();
                         if (powerTuningServices.TryGetManualPowerTuning(gpu.UniqueId, gpuTuningServices, out var manualPowerTuning))
                         {
+                            gpuSettings.HasManualPowerTuning = true;
                             gpuSettings.ManualPowerTuning = manualPowerTuning;
                             SharedLogger.logger.Trace($"AMDLibrary/GetAMDDisplayConfig: Read ManualPowerTuning for GPU {gpuKey}.");
                         }
@@ -3332,7 +3352,7 @@ namespace DisplayMagicianShared.AMD
                     sb.AppendLine($"PNP: {id.PNPString}");
 
                     // Per-GPU settings (3D and multimedia) from stored config
-                    string gpuKey = $"{id.DeviceId}_{id.SubSystemId}_{id.SubSystemVendorId}_{id.RevisionId}";
+                    string gpuKey = GetGPUKey(id.PNPString, $"{id.DeviceId}_{id.SubSystemId}_{id.SubSystemVendorId}_{id.RevisionId}");
                     if (displayConfig.GPUs.TryGetValue(gpuKey, out var gpuSettings))
                     {
                         if (gpuSettings.HasThreeDSettings)
@@ -3496,13 +3516,20 @@ namespace DisplayMagicianShared.AMD
 
             // Eyefinity Desktop (ADLX)
             sb.AppendLine("AMD EYEFINITY DESKTOP (ADLX)");
-            if (displayConfig.IsEyefinity)
+            List<KeyValuePair<string, AMD_GPU_WITH_SETTINGS>> eyefinityGpuSettings = displayConfig.GPUs
+                .Where(entry => entry.Value.IsEyefinity)
+                .ToList();
+            if (eyefinityGpuSettings.Count > 0)
             {
-                var ef = displayConfig.EyefinityDesktop;
-                sb.AppendLine($"  Rows: {ef.Rows} Columns: {ef.Columns}");
-                sb.AppendLine($"  Orientation: {ef.Orientation}");
-                sb.AppendLine($"  Size: {ef.SizeWidth}x{ef.SizeHeight}");
-                sb.AppendLine($"  TopLeft: ({ef.TopLeftX},{ef.TopLeftY})");
+                foreach (KeyValuePair<string, AMD_GPU_WITH_SETTINGS> entry in eyefinityGpuSettings)
+                {
+                    var ef = entry.Value.EyefinityDesktop;
+                    sb.AppendLine($"  GPU: {entry.Key}");
+                    sb.AppendLine($"    Rows: {ef.Rows} Columns: {ef.Columns}");
+                    sb.AppendLine($"    Orientation: {ef.Orientation}");
+                    sb.AppendLine($"    Size: {ef.SizeWidth}x{ef.SizeHeight}");
+                    sb.AppendLine($"    TopLeft: ({ef.TopLeftX},{ef.TopLeftY})");
+                }
             }
             else
             {
@@ -3664,7 +3691,7 @@ namespace DisplayMagicianShared.AMD
                     {
                         // Otherwise we are using the newer ADLX API to create the Eyefinity Desktop
                         SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Using the newer ADLX API to create the Eyefinity Desktop.");
-                        if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
+                        if (EyefinityConfigsEqual(displayConfig, ActiveDisplayConfig))
                         {
                             // If the Eyefinity Desktop is already set then we don't need to do anything
                             SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Eyefinity layout is exactly the same as the one we want, so skipping setting up the Eyefinity Desktop");
@@ -3700,18 +3727,16 @@ namespace DisplayMagicianShared.AMD
                                     SharedLogger.logger.Warn("AMDLibrary/SetActiveConfig: Unable to refresh the active AMD configuration after creating the ADLX Eyefinity Desktop, so the resulting layout cannot be verified.");
                                     return false;
                                 }
-                                else if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
+                                else if (EyefinityConfigsEqual(displayConfig, ActiveDisplayConfig))
                                 {
                                     SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: This new Eyefinity layout matches the desired configuraton");
                                 }
                                 else
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: This new Eyefinity layout is different from the one we originally saved with this desktop profile. If you have changed your Eyefinity Layout then you need to update this desktop profile!.");
-                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Saved Eyefinity layout: {DescribeEyefinityDesktop(displayConfig.EyefinityDesktop)}");
-                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Current Eyefinity layout: {DescribeEyefinityDesktop(ActiveDisplayConfig.EyefinityDesktop)}");
-                                    // We Err on the side of continuing the execution even if the Eyefinity layout does not match the saved configuration.
-                                    // This is just because we want to make sure that the user can continue their shortcut even if the Eyefinity layout does not match the saved configuration.
-                                    //return false;
+                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Saved per-GPU Eyefinity layouts: {DescribeEyefinityConfig(displayConfig)}");
+                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: Current per-GPU Eyefinity layouts: {DescribeEyefinityConfig(ActiveDisplayConfig)}");
+                                    return false;
                                 }
                                 
                             }
@@ -3850,7 +3875,8 @@ namespace DisplayMagicianShared.AMD
         public bool SetActiveConfigOverride(AMD_DISPLAY_CONFIG displayConfig, int delayInMs)
         {
             if (_initialised)
-            {                
+            {
+                bool success = true;
                 // Get the current list of all displays available on the system
                 var displaysList = _adlxSystem.EnumerateDisplays().ToList();
                 if (displaysList.Count == 0)
@@ -3881,6 +3907,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetColorDepth(stored.ColorDepth))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: ColorDepth is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -3901,6 +3928,7 @@ namespace DisplayMagicianShared.AMD
                             if (!display.TryApplyCustomColor(stored.CustomColorInfo.ToCustomColorDto()))
                             {
                                 SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: CustomColor is no longer supported for display {display.UniqueId}, skipping.");
+                                success = false;
                             }
                         }
                         else
@@ -3921,6 +3949,7 @@ namespace DisplayMagicianShared.AMD
                                     if (!display.TryReapplyGamma())
                                     {
                                         SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Gamma is no longer supported for display {display.UniqueId}, skipping.");
+                                        success = false;
                                     }
                                 }
                                 else
@@ -3947,6 +3976,7 @@ namespace DisplayMagicianShared.AMD
                                     if (!display.TryReapplyGamut())
                                     {
                                         SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Gamut is no longer supported for display {display.UniqueId}, skipping.");
+                                        success = false;
                                     }
                                 }
                                 else
@@ -3968,6 +3998,7 @@ namespace DisplayMagicianShared.AMD
                             if (!display.TryApplyConnectivityExperience(stored.ConnectivityExperience.ToConnectivityExperienceDto()))
                             {
                                 SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Connectivity experience is no longer supported for display {display.UniqueId}, skipping.");
+                                success = false;
                             }
                         }
                         else
@@ -3985,6 +4016,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TryReapplyThreeDLut())
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: 3DLUT is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4004,6 +4036,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetFreeSync(stored.IsEnabledFreeSync))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: FreeSync is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4027,6 +4060,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetFreeSyncColorAccuracy(stored.IsEnabledFreeSyncColorAccuracy))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: FreeSync Color Accuracy is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4050,6 +4084,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetDynamicRefreshRateControl(stored.IsEnabledDynamicRefreshRateControl))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: DRRC is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4073,6 +4108,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetDisplayBlanked(stored.IsEnabledDisplayBlanking))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Display blanking is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4096,6 +4132,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetGpuScaling(stored.IsEnabledGPUScaling))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: GPU scaling is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4119,6 +4156,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetIntegerScaling(stored.IsEnabledIntegerScaling))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Integer scaling is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4142,6 +4180,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetPixelFormat(stored.CurrentPixelFormat))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Pixel format is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4165,6 +4204,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetScalingMode(stored.CurrentScalingMode))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Scaling mode is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4188,6 +4228,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetVirtualSuperResolution(stored.IsEnabledVSR))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: VSR is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4211,6 +4252,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetHdcp(stored.IsEnabledHDCP))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: HDCP is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4234,6 +4276,7 @@ namespace DisplayMagicianShared.AMD
                                 if (!display.TrySetVariBright(stored.IsEnabledVariBright, stored.VariBrightMode))
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: VariBright is no longer supported for display {display.UniqueId}, skipping.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4256,8 +4299,8 @@ namespace DisplayMagicianShared.AMD
                     }
                     catch (Exception ex)
                     {
-                        SharedLogger.logger.Error(ex, $"AMDLibrary/SetActiveConfigOverride: Error applying settings for display {display.UniqueId}");
-                        return false;
+                        SharedLogger.logger.Warn(ex, $"AMDLibrary/SetActiveConfigOverride: Error applying optional settings for display {display.UniqueId}; continuing with the remaining displays and GPUs.");
+                        success = false;
                     }
                 }
 
@@ -4274,7 +4317,7 @@ namespace DisplayMagicianShared.AMD
                         var gpusFor3D = _adlxSystem.EnumerateADLXGPUs();
                         foreach (var gpu in gpusFor3D)
                         {
-                            string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                            string gpuKey = GetGPUKey(gpu.Identity.PNPString, $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}");
                             if (!displayConfig.GPUs.TryGetValue(gpuKey, out var storedGpu))
                             {
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No stored GPU settings for GPU {gpuKey}, skipping.");
@@ -4289,6 +4332,7 @@ namespace DisplayMagicianShared.AMD
                                 else
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to apply 3D settings for GPU {gpuKey}.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4301,6 +4345,7 @@ namespace DisplayMagicianShared.AMD
                 catch (Exception ex)
                 {
                     SharedLogger.logger.Warn(ex, "AMDLibrary/SetActiveConfigOverride: Failed to apply per-GPU 3D settings via ADLX.");
+                    success = false;
                 }
 
                 // Apply per-GPU multimedia settings
@@ -4316,7 +4361,7 @@ namespace DisplayMagicianShared.AMD
                         var gpusForMm = _adlxSystem.EnumerateADLXGPUs();
                         foreach (var gpu in gpusForMm)
                         {
-                            string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                            string gpuKey = GetGPUKey(gpu.Identity.PNPString, $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}");
                             if (!displayConfig.GPUs.TryGetValue(gpuKey, out var storedGpu))
                             {
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No stored GPU settings for GPU {gpuKey}, skipping multimedia.");
@@ -4331,6 +4376,7 @@ namespace DisplayMagicianShared.AMD
                                 else
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to set VideoUpscale enabled for GPU {gpuKey}.");
+                                    success = false;
                                 }
                                 if (storedGpu.VideoUpscale.IsEnabled)
                                 {
@@ -4341,6 +4387,7 @@ namespace DisplayMagicianShared.AMD
                                     else
                                     {
                                         SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to set VideoUpscale sharpness for GPU {gpuKey}.");
+                                        success = false;
                                     }
                                 }
                             }
@@ -4357,6 +4404,7 @@ namespace DisplayMagicianShared.AMD
                                 else
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to set VideoSuperResolution enabled for GPU {gpuKey}.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4369,6 +4417,7 @@ namespace DisplayMagicianShared.AMD
                 catch (Exception ex)
                 {
                     SharedLogger.logger.Warn(ex, "AMDLibrary/SetActiveConfigOverride: Failed to apply per-GPU multimedia settings via ADLX.");
+                    success = false;
                 }
 
                 // Apply per-GPU power tuning settings
@@ -4385,7 +4434,7 @@ namespace DisplayMagicianShared.AMD
                         var gpusForPower = _adlxSystem.EnumerateADLXGPUs();
                         foreach (var gpu in gpusForPower)
                         {
-                            string gpuKey = $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}";
+                            string gpuKey = GetGPUKey(gpu.Identity.PNPString, $"{gpu.DeviceId}_{gpu.SubSystemId}_{gpu.SubSystemVendorId}_{gpu.RevisionId}");
                             if (!displayConfig.GPUs.TryGetValue(gpuKey, out var storedGpu))
                             {
                                 SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfigOverride: No stored GPU settings for GPU {gpuKey}, skipping power tuning.");
@@ -4400,6 +4449,7 @@ namespace DisplayMagicianShared.AMD
                                 else
                                 {
                                     SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfigOverride: Failed to apply ManualPowerTuning for GPU {gpuKey}.");
+                                    success = false;
                                 }
                             }
                             else
@@ -4412,15 +4462,49 @@ namespace DisplayMagicianShared.AMD
                 catch (Exception ex)
                 {
                     SharedLogger.logger.Warn(ex, "AMDLibrary/SetActiveConfigOverride: Failed to apply per-GPU power tuning settings via ADLX.");
+                    success = false;
                 }
+
+                return success;
             }
             else
             {
                 SharedLogger.logger.Error($"AMDLibrary/SetActiveConfigOverride: ERROR - Tried to run SetActiveConfigOverride but the AMD ADLX library isn't initialised!");
                 throw new AMDLibraryException($"Tried to run SetActiveConfigOverride but the AMD ADLX library isn't initialised!");
             }
+        }
 
-            return true;
+        private static string GetGPUKey(string pnpString, string fallbackKey)
+        {
+            if (!string.IsNullOrWhiteSpace(pnpString))
+                return $"PNP:{pnpString.Trim().ToUpperInvariant()}";
+
+            SharedLogger.logger.Warn($"AMDLibrary/GetGPUKey: GPU PNP identity is unavailable; falling back to non-physical hardware identity {fallbackKey}.");
+            return $"HARDWARE:{fallbackKey}";
+        }
+
+        private static bool EyefinityConfigsEqual(AMD_DISPLAY_CONFIG left, AMD_DISPLAY_CONFIG right)
+        {
+            Dictionary<string, AMD_EYEFINITY_DESKTOP> leftEyefinity = left.GPUs
+                .Where(entry => entry.Value.IsEyefinity)
+                .ToDictionary(entry => entry.Key, entry => entry.Value.EyefinityDesktop);
+            Dictionary<string, AMD_EYEFINITY_DESKTOP> rightEyefinity = right.GPUs
+                .Where(entry => entry.Value.IsEyefinity)
+                .ToDictionary(entry => entry.Key, entry => entry.Value.EyefinityDesktop);
+
+            if (leftEyefinity.Count != rightEyefinity.Count)
+                return false;
+
+            return leftEyefinity.All(entry =>
+                rightEyefinity.TryGetValue(entry.Key, out AMD_EYEFINITY_DESKTOP rightDesktop) &&
+                entry.Value.Equals(rightDesktop));
+        }
+
+        private static string DescribeEyefinityConfig(AMD_DISPLAY_CONFIG displayConfig)
+        {
+            return string.Join(" | ", displayConfig.GPUs
+                .Where(entry => entry.Value.IsEyefinity)
+                .Select(entry => $"GPU={entry.Key}, {DescribeEyefinityDesktop(entry.Value.EyefinityDesktop)}"));
         }
 
         private static string DescribeEyefinityDesktop(AMD_EYEFINITY_DESKTOP eyefinityDesktop)
@@ -4479,10 +4563,15 @@ namespace DisplayMagicianShared.AMD
             // We want to check the AMD profile can be used now
             SharedLogger.logger.Trace($"AMDLibrary/IsPossibleConfig: Testing whether the AMD display configuration is possible to be used now");
 
-            if (!_initialised || !displayConfig.IsInUse)
+            if (!displayConfig.IsInUse)
             {
                 SharedLogger.logger.Trace($"AMDLibrary/IsPossibleConfig: The AMD display configuration is not in use, so it has no bearing in terms of whether it can be applied now. Returning true.");
                 return true;
+            }
+            if (!_initialised)
+            {
+                SharedLogger.logger.Warn($"AMDLibrary/IsPossibleConfig: The AMD display configuration is required, but the AMD library is not initialized.");
+                return false;
             }
 
             if (_connectedDisplayIdentifiersReadFailed)

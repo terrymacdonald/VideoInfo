@@ -605,7 +605,9 @@ namespace VideoInfo
                     bool itWorkedforNVIDIAOverride = false;
                     bool itWorkedforAMDOverride = false;
                     bool itWorkedforIntelOverride = false;
-                    bool errorApplyingSomething = false;
+                    bool fatalTopologyFailure = false;
+                    bool optionalOverrideWarnings = false;
+                    bool windowsApplyAttempted = false;
 
                     // Wake up all attached displays in case they have gone to sleep
                     WinLibrary.WakeUpAllDisplays(delayInMs);
@@ -627,12 +629,14 @@ namespace VideoInfo
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were NOT possible to be applied.");
+                                    SharedLogger.logger.Error($"VideoInfo/loadFromFile: The required NVIDIA display settings within {filename} are not possible with the currently connected displays.");
+                                    fatalTopologyFailure = true;
                                 }
                             }
                             else
                             {
-                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying NVIDIA display settings as no screens are connected to the NVIDIA video card.");
+                                SharedLogger.logger.Error($"VideoInfo/loadFromFile: The profile requires NVIDIA display settings but contains no NVIDIA display identifiers.");
+                                fatalTopologyFailure = true;
                             }
                         }
                         else
@@ -642,7 +646,15 @@ namespace VideoInfo
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying NVIDIA display settings as the NVIDIA library isn't installed.");
+                        if (myDisplayConfig.NVIDIAConfig.IsInUse)
+                        {
+                            SharedLogger.logger.Error($"VideoInfo/loadFromFile: The profile requires NVIDIA display settings but the NVIDIA library or compatible hardware is unavailable.");
+                            fatalTopologyFailure = true;
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying NVIDIA display settings as the NVIDIA library isn't installed.");
+                        }
                     }
 
                     if (amdLibrary.IsInstalled)
@@ -662,12 +674,14 @@ namespace VideoInfo
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were NOT possible to be applied.");
+                                    SharedLogger.logger.Error($"VideoInfo/loadFromFile: The required AMD display settings within {filename} are not possible with the currently connected displays.");
+                                    fatalTopologyFailure = true;
                                 }
                             }
                             else
                             {
-                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display settings as the AMD library isn't installed.");
+                                SharedLogger.logger.Error($"VideoInfo/loadFromFile: The profile requires AMD display settings but contains no AMD display identifiers.");
+                                fatalTopologyFailure = true;
                             }
                         }
                         else
@@ -678,7 +692,15 @@ namespace VideoInfo
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display settings as the AMD library isn't installed.");
+                        if (myDisplayConfig.AMDConfig.IsInUse)
+                        {
+                            SharedLogger.logger.Error($"VideoInfo/loadFromFile: The profile requires AMD display settings but the AMD library or compatible hardware is unavailable.");
+                            fatalTopologyFailure = true;
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying AMD display settings as the AMD library isn't installed.");
+                        }
                     }
 
                     if (intelLibrary.IsInstalled)
@@ -698,12 +720,14 @@ namespace VideoInfo
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel display settings within {filename} were NOT possible to be applied.");
+                                    SharedLogger.logger.Error($"VideoInfo/loadFromFile: The required Intel display settings within {filename} are not possible with the currently connected displays.");
+                                    fatalTopologyFailure = true;
                                 }
                             }
                             else
                             {
-                                SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying Intel display settings as no screens are connected to the Intel video card.");
+                                SharedLogger.logger.Error($"VideoInfo/loadFromFile: The profile requires Intel display settings but contains no Intel display identifiers.");
+                                fatalTopologyFailure = true;
                             }
                         }
                         else
@@ -713,11 +737,19 @@ namespace VideoInfo
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying Intel display settings as the Intel library isn't installed.");
+                        if (myDisplayConfig.IntelConfig.IsInUse)
+                        {
+                            SharedLogger.logger.Error($"VideoInfo/loadFromFile: The profile requires Intel display settings but the Intel library or compatible hardware is unavailable.");
+                            fatalTopologyFailure = true;
+                        }
+                        else
+                        {
+                            SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping applying Intel display settings as the Intel library isn't installed.");
+                        }
                     }
 
 
-                    if (applyNVIDIASettings)
+                    if (applyNVIDIASettings && !fatalTopologyFailure)
                     {
                         // If a Surround/Mosaic Display is required, all source monitors must be active
                         // before NvAPI can create it.
@@ -738,16 +770,20 @@ namespace VideoInfo
                         else
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings within {filename} were NOT applied successfully.");
-                            errorApplyingSomething = true;
+                            fatalTopologyFailure = true;
                         }
                     }
-                    else
+                    else if (!applyNVIDIASettings)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping NVIDIA Settings as they are not used in {filename}.");
                     }
+                    else
+                    {
+                        SharedLogger.logger.Warn($"VideoInfo/loadFromFile: Skipping NVIDIA topology because required profile preflight failed.");
+                    }
 
 
-                    if (applyAMDSettings)
+                    if (applyAMDSettings && !fatalTopologyFailure)
                     {
                         // If an Eyefinity Display is required, all source monitors must be active
                         // before ADLX can create it.
@@ -768,15 +804,19 @@ namespace VideoInfo
                         else
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings within {filename} were NOT applied successfully.");
-                            errorApplyingSomething = true;
+                            fatalTopologyFailure = true;
                         }
                     }
-                    else
+                    else if (!applyAMDSettings)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping AMD Settings as they are not used in {filename}.");
                     }
+                    else
+                    {
+                        SharedLogger.logger.Warn($"VideoInfo/loadFromFile: Skipping AMD topology because an earlier required topology stage failed.");
+                    }
 
-                    if (applyIntelSettings)
+                    if (applyIntelSettings && !fatalTopologyFailure)
                     {
                         // If a Combined Display is required, all source monitors must be active
                         // (CTL_DISPLAY_CONFIG_FLAG_DISPLAY_ACTIVE) before IGCL can create it.
@@ -799,17 +839,21 @@ namespace VideoInfo
                         else
                         {
                             SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel display settings within {filename} were NOT applied successfully.");
-                            errorApplyingSomething = true;
+                            fatalTopologyFailure = true;
                         }
+                    }
+                    else if (!applyIntelSettings)
+                    {
+                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping Intel Settings as they are not used in {filename}.");
                     }
                     else
                     {
-                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Skipping Intel Settings as they are not used in {filename}.");
+                        SharedLogger.logger.Warn($"VideoInfo/loadFromFile: Skipping Intel topology because an earlier required topology stage failed.");
                     }
 
                     // If any AMD, NVIDIA or Intel settings were applied, then we need to update our windows layout to make sure it
                     // matches current reality.
-                    if ((intelLibrary.IsInstalled && itWorkedforIntel) || (amdLibrary.IsInstalled && itWorkedforAMD) || (nvidiaLibrary.IsInstalled && itWorkedforNVIDIA))
+                    if (!fatalTopologyFailure && ((intelLibrary.IsInstalled && itWorkedforIntel) || (amdLibrary.IsInstalled && itWorkedforAMD) || (nvidiaLibrary.IsInstalled && itWorkedforNVIDIA)))
                     {
                         WinLibrary.EnableAllConnectedDisplays();
                         Thread.Sleep(delayInMs); // Give it a second to wake up the displays
@@ -822,9 +866,19 @@ namespace VideoInfo
                     // Then let's try to also apply the windows changes
                     // Note: we are unable to check if the Windows CCD display config is possible, as it won't match if either the current display config is a Mosaic config,
                     // or if the display config we want to change to is a Mosaic config. So we just have to assume that it will work!
-                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Attempting to apply Windows display config from {filename}...");
-                    itWorkedforWindows = winLibrary.SetActiveConfig(myDisplayConfig.WindowsConfig, delayInMs);
-                    Thread.Sleep(delayInMs);
+                    if (!fatalTopologyFailure)
+                    {
+                        SharedLogger.logger.Trace($"VideoInfo/loadFromFile: Attempting to apply Windows display config from {filename}...");
+                        windowsApplyAttempted = true;
+                        itWorkedforWindows = winLibrary.SetActiveConfig(myDisplayConfig.WindowsConfig, delayInMs);
+                        Thread.Sleep(delayInMs);
+                        if (!itWorkedforWindows)
+                            fatalTopologyFailure = true;
+                    }
+                    else
+                    {
+                        SharedLogger.logger.Error($"VideoInfo/loadFromFile: Skipping the dependent Windows display configuration because a required vendor topology could not be applied.");
+                    }
                     if (itWorkedforWindows)
                     {
                         SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Windows CCD display settings within {filename} were applied correctly, so now attempting to apply any overrides.");
@@ -842,8 +896,8 @@ namespace VideoInfo
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The NVIDIA display settings that override windows within {filename} were NOT applied correctly.");
-                                    errorApplyingSomething = true;
+                                    SharedLogger.logger.Warn($"VideoInfo/loadFromFile: Some optional NVIDIA display overrides within {filename} were not applied correctly.");
+                                    optionalOverrideWarnings = true;
                                 }
                             }
                             else
@@ -876,8 +930,8 @@ namespace VideoInfo
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The AMD display settings that override windows within {filename} were NOT applied correctly.");
-                                    errorApplyingSomething = true;
+                                    SharedLogger.logger.Warn($"VideoInfo/loadFromFile: Some optional AMD display overrides within {filename} were not applied correctly.");
+                                    optionalOverrideWarnings = true;
                                 }
                             }
                             else
@@ -910,8 +964,8 @@ namespace VideoInfo
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Trace($"VideoInfo/loadFromFile: The Intel display settings that override windows within {filename} were NOT applied correctly.");
-                                    errorApplyingSomething = true;
+                                    SharedLogger.logger.Warn($"VideoInfo/loadFromFile: Some optional Intel display overrides within {filename} were not applied correctly.");
+                                    optionalOverrideWarnings = true;
                                 }
                             }
                             else
@@ -938,9 +992,13 @@ namespace VideoInfo
                     }
 
                     // Give the final error if there are any
-                    if (errorApplyingSomething)
+                    if (fatalTopologyFailure)
                     {
                         SharedLogger.logger.Info($"VideoInfo/loadFromFile: ProfileItem was unable to successfully apply your display profile within {filename}.");
+                    }
+                    else if (optionalOverrideWarnings)
+                    {
+                        SharedLogger.logger.Info($"VideoInfo/loadFromFile: ProfileItem applied your display profile within {filename} with optional-setting warnings.");
                     }
                     else
                     {
@@ -951,7 +1009,7 @@ namespace VideoInfo
                     Console.WriteLine($"  NVIDIA: {GetLibraryApplyStatus(nvidiaLibrary.IsInstalled, myDisplayConfig.NVIDIAConfig.IsInUse, applyNVIDIASettings, itWorkedforNVIDIA, itWorkedforNVIDIAOverride, itWorkedforWindows)}");
                     Console.WriteLine($"  AMD: {GetLibraryApplyStatus(amdLibrary.IsInstalled, myDisplayConfig.AMDConfig.IsInUse, applyAMDSettings, itWorkedforAMD, itWorkedforAMDOverride, itWorkedforWindows)}");
                     Console.WriteLine($"  Intel: {GetLibraryApplyStatus(intelLibrary.IsInstalled, myDisplayConfig.IntelConfig.IsInUse, applyIntelSettings, itWorkedforIntel, itWorkedforIntelOverride, itWorkedforWindows)}");
-                    Console.WriteLine($"  Windows: {(itWorkedforWindows ? "applied successfully" : "failed to apply")}");
+                    Console.WriteLine($"  Windows: {(itWorkedforWindows ? "applied successfully" : windowsApplyAttempted ? "failed to apply" : "skipped because a required vendor topology failed")}");
                 }
                 else
                 {
@@ -968,12 +1026,12 @@ namespace VideoInfo
             if (!isUsedByProfile)
                 return "skipped (not used by this profile)";
             if (!wasApplied)
-                return "skipped (profile is not applicable to the current displays)";
+                return "failed (required profile is not applicable to the current displays)";
             if (!primaryApplySucceeded)
                 return "failed to apply";
             if (!windowsApplySucceeded)
                 return "partially applied (overrides skipped because Windows settings failed)";
-            return overrideApplySucceeded ? "applied successfully" : "failed while applying overrides";
+            return overrideApplySucceeded ? "applied successfully" : "applied with optional-setting warnings";
         }
 
         static bool profileAlreadyInUse(VIDEOINFO_DISPLAY_CONFIG myDisplayConfig)

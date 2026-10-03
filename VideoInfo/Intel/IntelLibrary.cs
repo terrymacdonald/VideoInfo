@@ -678,6 +678,48 @@ namespace DisplayMagicianShared.Intel
             return $"{adapterKey}-PORT_{windowsDisplayEncoderId}";
         }
 
+        private static bool CombinedDisplayTopologiesEqual(CombinedDisplayArgsDto expected, CombinedDisplayArgsDto actual)
+        {
+            if (expected.NumOutputs != actual.NumOutputs ||
+                expected.CombinedDesktopWidth != actual.CombinedDesktopWidth ||
+                expected.CombinedDesktopHeight != actual.CombinedDesktopHeight)
+            {
+                SharedLogger.logger.Trace("IntelLibrary/CombinedDisplayTopologiesEqual: Combined display output count or desktop dimensions differ.");
+                return false;
+            }
+
+            if (expected.ChildInfos == null || actual.ChildInfos == null ||
+                expected.ChildInfos.Count != actual.ChildInfos.Count)
+            {
+                SharedLogger.logger.Trace("IntelLibrary/CombinedDisplayTopologiesEqual: Combined display child counts differ or child information is unavailable.");
+                return false;
+            }
+
+            List<CombinedDisplayChildInfoDto> unmatchedActualChildren = new List<CombinedDisplayChildInfoDto>(actual.ChildInfos);
+            foreach (CombinedDisplayChildInfoDto expectedChildValue in expected.ChildInfos)
+            {
+                CombinedDisplayChildInfoDto expectedChild = expectedChildValue;
+                expectedChild.DisplayOutputWindowsDisplayEncoderId = 0;
+
+                int matchIndex = unmatchedActualChildren.FindIndex(actualChildValue =>
+                {
+                    CombinedDisplayChildInfoDto actualChild = actualChildValue;
+                    actualChild.DisplayOutputWindowsDisplayEncoderId = 0;
+                    return expectedChild.Equals(actualChild);
+                });
+
+                if (matchIndex < 0)
+                {
+                    SharedLogger.logger.Trace("IntelLibrary/CombinedDisplayTopologiesEqual: A saved child layout was not found in the active Combined Display topology.");
+                    return false;
+                }
+
+                unmatchedActualChildren.RemoveAt(matchIndex);
+            }
+
+            return unmatchedActualChildren.Count == 0;
+        }
+
         public IntelLibrary()
         {
             _activeDisplayConfig = CreateDefaultConfig();
@@ -1796,7 +1838,7 @@ namespace DisplayMagicianShared.Intel
                     {
                         SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: New display layout requires a Combined Display on adapter {adapterNum}");
 
-                        if (currentCombinedDisplay.HasValue && currentCombinedDisplay.Value.Equals(desiredAdapter.CombinedDisplay))
+                        if (currentCombinedDisplay.HasValue && CombinedDisplayTopologiesEqual(desiredAdapter.CombinedDisplay, currentCombinedDisplay.Value))
                         {
                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout matches desired configuration, skipping");
                             continue;
@@ -1846,9 +1888,7 @@ namespace DisplayMagicianShared.Intel
                         {
                             var updatedCombinedDisplay = adapter.GetCombinedDisplay();
                             if (updatedCombinedDisplay.HasValue &&
-                                updatedCombinedDisplay.Value.NumOutputs == desiredAdapter.CombinedDisplay.NumOutputs &&
-                                updatedCombinedDisplay.Value.CombinedDesktopWidth == desiredAdapter.CombinedDisplay.CombinedDesktopWidth &&
-                                updatedCombinedDisplay.Value.CombinedDesktopHeight == desiredAdapter.CombinedDisplay.CombinedDesktopHeight)
+                                CombinedDisplayTopologiesEqual(desiredAdapter.CombinedDisplay, updatedCombinedDisplay.Value))
                             {
                                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: This new Combined Display layout matches the desired configuration.");
                             }
@@ -2660,10 +2700,15 @@ namespace DisplayMagicianShared.Intel
         {
             SharedLogger.logger.Trace($"IntelLibrary/IsPossibleConfig: Testing whether the Intel display configuration is possible to be used now");
 
-            if (!_initialised || !displayConfig.IsInUse)
+            if (!displayConfig.IsInUse)
             {
                 SharedLogger.logger.Trace($"IntelLibrary/IsPossibleConfig: The Intel display configuration is not in use, so it has no bearing in terms of whether it can be applied now. Returning true.");
                 return true;
+            }
+            if (!_initialised)
+            {
+                SharedLogger.logger.Warn($"IntelLibrary/IsPossibleConfig: The Intel display configuration is required, but the Intel library is not initialized.");
+                return false;
             }
 
             // If both display identifiers are 0 then no displays were connected via Intel and we should just return true.
