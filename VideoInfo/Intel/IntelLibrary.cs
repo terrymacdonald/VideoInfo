@@ -194,16 +194,6 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayDeviceID values don't equal each other");
                 return false;
             }
-            if (DisplayIndex != other.DisplayIndex)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The DisplayIndex values don't equal each other");
-                return false;
-            }
-            if (AdapterIndex != other.AdapterIndex)
-            {
-                SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The AdapterIndex values don't equal each other");
-                return false;
-            }
             if (Edid.Length != other.Edid.Length || !Edid.SequenceEqual(other.Edid))
             {
                 SharedLogger.logger.Trace($"INTEL_DISPLAY_WITH_SETTINGS/Equals: The Edid values don't equal each other");
@@ -440,7 +430,7 @@ namespace DisplayMagicianShared.Intel
         public override int GetHashCode()
         {
 
-            return (Name, DisplayDeviceID, DisplayIndex, AdapterIndex, IsSupportedIntegerScaling, IsSupportedGPUScaling, IsSupportedImageSharpening,
+            return (Name, DisplayDeviceID, IsSupportedIntegerScaling, IsSupportedGPUScaling, IsSupportedImageSharpening,
                 IsSupportedDisplaySettings, GetDisplaySettingsHash(DisplaySettings), PixelTransformationSettings, ScalingSettings, SharpnessSettings, RetroScalingSettings, IsSupportedDynamicContrastEnhancement, DynamicContrastEnhancement, DynamicContrastEnhancementHistogram?.Length, PowerOptimizationSettings, LaceConfig, SoftwarePsrSettings, GenlockArgs, IsSupportedIntelArcSync, IntelArcSyncMonitorParams, AdapterDisplayEncoderProperties, 
                 DisplayProperties, /*DeviceProperties,*/ DeviceID, DisplayTiming, WireFormat, Brightness, ScalingCaps, SharpnessCaps, RetroScalingCaps, PowerOptimizationCaps, IntelArcSyncProfile, CustomModeArgs, CustomModes?.Count, LinkedDisplayAdapters,
                 VblankTimestamp, /*ZeDeviceHandle, ZeDriverHandle,*/ RefreshRateHz, ResolutionWidth, ResolutionHeight, IsActive).GetHashCode();
@@ -503,11 +493,6 @@ namespace DisplayMagicianShared.Intel
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The Name values don't equal each other");
                 return false;
             }   
-            if (AdapterIndex != other.AdapterIndex)
-            {
-                SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The AdapterIndex values don't equal each other");
-                return false;
-            }
             if (!AdapterProperties.Equals(other.AdapterProperties))
             {
                 SharedLogger.logger.Trace($"INTEL_ADAPTER/Equals: The AdapterProperties values don't equal each other");
@@ -559,7 +544,7 @@ namespace DisplayMagicianShared.Intel
 
         public override int GetHashCode()
         {
-            return (AdapterID, Name, AdapterIndex, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, CombinedDisplay, IsSupportedThreeDSettings, ThreeDSettings?.Count, IsSupportedVideoProcessing, VideoProcessingSettings?.Count, IsSupportedStandardColorCorrection, StandardColorCorrection).GetHashCode();
+            return (AdapterID, Name, AdapterProperties, CombinedDisplayIsSupported, IsCombinedDisplay, CombinedDisplay, IsSupportedThreeDSettings, ThreeDSettings?.Count, IsSupportedVideoProcessing, VideoProcessingSettings?.Count, IsSupportedStandardColorCorrection, StandardColorCorrection).GetHashCode();
         }
 
         public static bool operator ==(INTEL_ADAPTER lhs, INTEL_ADAPTER rhs) => lhs.Equals(rhs);
@@ -682,6 +667,16 @@ namespace DisplayMagicianShared.Intel
         const uint IGCL_IMPL_MAJOR = 1;
         const uint IGCL_IMPL_MINOR = 1;
         const uint IGCL_VERSION = (IGCL_IMPL_MAJOR << 16) | (IGCL_IMPL_MINOR & 0x0000FFFF);
+
+        private static string GetAdapterKey(DeviceAdapterPropertiesDto adapterProperties)
+        {
+            return $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&SUBSYS_{adapterProperties.PciSubsysVendorId:X4}{adapterProperties.PciSubsysId:X4}&REV_{adapterProperties.RevId:X2}&BDF_{adapterProperties.AdapterBdf.Bus:X2}_{adapterProperties.AdapterBdf.Device:X2}_{adapterProperties.AdapterBdf.Function:X1}";
+        }
+
+        private static string GetDisplayKey(string adapterKey, uint windowsDisplayEncoderId)
+        {
+            return $"{adapterKey}-PORT_{windowsDisplayEncoderId}";
+        }
 
         public IntelLibrary()
         {
@@ -943,7 +938,7 @@ namespace DisplayMagicianShared.Intel
                     adapterNum++;
                     // Get adapter properties
                     var adapterProperties = adapter.GetProperties();
-                    var adapterDeviceID = $"{adapterProperties.PciVendorId:X4}_{adapterProperties.PciDeviceId:X4}_{adapterProperties.PciSubsysVendorId:X4}_{adapterProperties.PciSubsysId:X4}_{adapterProperties.RevId:X2}";
+                    string adapterDeviceID = GetAdapterKey(adapterProperties);
 
                     SharedLogger.logger.Trace($"IntelLibrary/GetIntelDisplayConfig: Processing Intel GPU adapter {adapterNum}({adapterProperties.Name}), PCI Device ID: 0x{adapterProperties.PciDeviceId:X4}, device type {adapterProperties.DeviceType} ({adapterNum}/{adapterTotalCount}");                    
 
@@ -952,6 +947,7 @@ namespace DisplayMagicianShared.Intel
                     INTEL_ADAPTER newAdapter = new INTEL_ADAPTER();
                     newAdapter.AdapterID = adapterDeviceID;
                     newAdapter.Name = adapter.Name;
+                    newAdapter.AdapterIndex = (uint)(adapterNum - 1);
                     newAdapter.AdapterProperties = adapterProperties;                    
 
                     //------------------------------------
@@ -1164,6 +1160,8 @@ namespace DisplayMagicianShared.Intel
 
 
                         // Set basic info                     
+                        newDisplay.AdapterIndex = (uint)(adapterNum - 1);
+                        newDisplay.DisplayIndex = (uint)(displayCount - 1);
                         newDisplay.DisplayProperties = displayProperties;
                         // Derive connector type gating booleans.
                         // isDisplayPort / isHdmi gate protocol-specific features (Arc Sync = DP/HDMI VRR, HDMI quality, etc.).
@@ -1564,10 +1562,8 @@ namespace DisplayMagicianShared.Intel
                             SharedLogger.logger.Error(ex, $"IntelLibrary/GetIntelDisplayConfig: Exception getting vblank timestamp for display {logDisplayId} on adapter {adapterNum}.");
                         }
 
-                        // 3. Create a unique Hardware PCI ID + Target ID
-                        // Format: VEN_8086&DEV_XXXX&REV_XX-PORT_X
-                        
-                        newDisplay.DisplayDeviceID = $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId}";
+                        // 3. Create a unique physical adapter + target ID.
+                        newDisplay.DisplayDeviceID = GetDisplayKey(adapterDeviceID, displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId);
 
                         // Add display to configuration
                         myDisplayConfig.Displays.Add(newDisplay.DisplayDeviceID, newDisplay);
@@ -1760,16 +1756,24 @@ namespace DisplayMagicianShared.Intel
                 }
 
                 int adapterNum = 0;
+                HashSet<string> matchedAdapterKeys = new HashSet<string>();
                 foreach (var adapter in adapters)
                 {
                     adapterNum++;
 
                     var adapterProperties = adapter.GetProperties();
-                    string adapterDeviceID = $"{adapterProperties.PciVendorId:X4}_{adapterProperties.PciDeviceId:X4}_{adapterProperties.PciSubsysVendorId:X4}_{adapterProperties.PciSubsysId:X4}_{adapterProperties.RevId:X2}";
+                    string adapterDeviceID = GetAdapterKey(adapterProperties);
 
                     if (!displayConfig.PhysicalAdapters.TryGetValue(adapterDeviceID, out INTEL_ADAPTER desiredAdapter))
                     {
                         SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: No stored settings found for adapter {adapterDeviceID}, skipping");
+                        continue;
+                    }
+
+                    matchedAdapterKeys.Add(adapterDeviceID);
+                    if (!desiredAdapter.CombinedDisplayIsSupported)
+                    {
+                        SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display was not supported for adapter {adapterDeviceID} when the profile was captured, skipping");
                         continue;
                     }
 
@@ -1781,7 +1785,7 @@ namespace DisplayMagicianShared.Intel
                     catch (Exception ex)
                     {
                         SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfig: Exception getting Combined Display settings for adapter {adapterNum}.");
-                        continue;
+                        return false;
                     }
 
 
@@ -1850,12 +1854,14 @@ namespace DisplayMagicianShared.Intel
                             }
                             else
                             {
-                                SharedLogger.logger.Warn($"IntelLibrary/SetActiveConfig: This new Combined Display layout is different from the one originally saved. You may need to update this desktop profile.");
+                                SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: The required Combined Display layout on adapter {adapterNum} does not match the saved topology.");
+                                return false;
                             }
                         }
                         catch (Exception ex)
                         {
                             SharedLogger.logger.Error(ex, $"IntelLibrary/SetActiveConfig: Exception verifying Combined Display settings for adapter {adapterNum}.");
+                            return false;
                         }
                     }
                     else
@@ -1871,6 +1877,15 @@ namespace DisplayMagicianShared.Intel
                             {
                                 adapter.SetCombinedDisplay(disableCombinedDisplayArgs);
                                 SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Disabled the current Intel Combined Display on adapter {adapterNum} as it is not needed in the new display layout");
+                                Thread.Sleep(delayInMs);
+
+                                CombinedDisplayArgsDto? updatedCombinedDisplay = adapter.GetCombinedDisplay();
+                                if (updatedCombinedDisplay.HasValue && updatedCombinedDisplay.Value.NumOutputs > 1)
+                                {
+                                    SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Combined Display is still enabled on adapter {adapterNum} after it was disabled.");
+                                    return false;
+                                }
+                                SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Verified that Combined Display is disabled on adapter {adapterNum}");
                             }
                             catch (Exception ex)
                             {
@@ -1882,6 +1897,15 @@ namespace DisplayMagicianShared.Intel
                         {
                             SharedLogger.logger.Trace($"IntelLibrary/SetActiveConfig: Combined Display layout is not currently in use and is NOT required, so leaving things as they are.");
                         }
+                    }
+                }
+
+                foreach (KeyValuePair<string, INTEL_ADAPTER> savedAdapter in displayConfig.PhysicalAdapters)
+                {
+                    if (savedAdapter.Value.IsCombinedDisplay && !matchedAdapterKeys.Contains(savedAdapter.Key))
+                    {
+                        SharedLogger.logger.Error($"IntelLibrary/SetActiveConfig: Required Combined Display adapter {savedAdapter.Key} is not available in the current system.");
+                        return false;
                     }
                 }
             }
@@ -1928,6 +1952,8 @@ namespace DisplayMagicianShared.Intel
                         continue;
                     }
 
+                    string adapterDeviceId = GetAdapterKey(adapterProperties);
+
                     var displays = adapter.EnumerateDisplayOutputs();
                     if (displays == null || displays.Count == 0)
                     {
@@ -1959,7 +1985,7 @@ namespace DisplayMagicianShared.Intel
                             continue;
                         }
                     
-                        string displayDeviceId = $"VEN_{adapterProperties.PciVendorId:X4}&DEV_{adapterProperties.PciDeviceId:X4}&REV_{adapterProperties.RevId:X2}-PORT_{displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId}";
+                        string displayDeviceId = GetDisplayKey(adapterDeviceId, displayProperties.OsDisplayEncoderHandle.WindowsDisplayEncoderId);
 
                         if (!displayConfig.Displays.TryGetValue(displayDeviceId, out INTEL_DISPLAY_WITH_SETTINGS storedSettings))
                         {
@@ -2469,7 +2495,6 @@ namespace DisplayMagicianShared.Intel
                     }
 
                     // Compute the adapter device ID to look up stored adapter settings
-                    string adapterDeviceId = $"{adapterProperties.PciVendorId:X4}_{adapterProperties.PciDeviceId:X4}_{adapterProperties.PciSubsysVendorId:X4}_{adapterProperties.PciSubsysId:X4}_{adapterProperties.RevId:X2}";
                     bool hasStoredAdapter = displayConfig.PhysicalAdapters.TryGetValue(adapterDeviceId, out INTEL_ADAPTER storedAdapter);
 
                     //------------------------------------

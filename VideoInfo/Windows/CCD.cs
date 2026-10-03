@@ -742,7 +742,7 @@ namespace DisplayMagicianShared.Windows
                 RefreshRate.Equals(other.RefreshRate) &&
                 ScanLineOrdering.Equals(other.ScanLineOrdering) &&
                 TargetAvailable == other.TargetAvailable &&
-                StatusFlags.Equals(StatusFlags);
+                StatusFlags.Equals(other.StatusFlags);
 
         public override int GetHashCode()
         {

@@ -1266,6 +1266,8 @@ namespace DisplayMagicianShared.Windows
             windowsDisplayConfig.TaskbarPositions = TaskbarHelper.GetTaskbarPositions();
 
             // Store the active paths and modes in our display config object
+            Array.Resize(ref paths, pathCount);
+            Array.Resize(ref modes, modeCount);
             windowsDisplayConfig.DisplayConfigPaths = paths;
             windowsDisplayConfig.DisplayConfigModes = modes;
             windowsDisplayConfig.GdiDisplaySettings = GetGdiDisplaySettings();

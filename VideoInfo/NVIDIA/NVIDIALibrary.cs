@@ -904,7 +904,7 @@ namespace DisplayMagicianShared.NVIDIA
                     return false;
                 }
 
-                if (!PhysicalAdapters.SequenceEqual(other.PhysicalAdapters))
+                if (!CollectionComparer.EqualButDifferentOrder(PhysicalAdapters, other.PhysicalAdapters))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The PhysicalAdapters dictionaries don't match!");
                     return false;
@@ -916,13 +916,13 @@ namespace DisplayMagicianShared.NVIDIA
                     return false;
                 }
 
-                if (!DRSSettings.SequenceEqual(other.DRSSettings))
+                if (!CollectionComparer.EqualButDifferentOrder(DRSSettings, other.DRSSettings))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DRSSettings lists don't match!");
                     return false;
                 }
 
-                if (!DisplayIdentifiers.SequenceEqual(other.DisplayIdentifiers))
+                if (!CollectionComparer.EqualButDifferentOrder(DisplayIdentifiers, other.DisplayIdentifiers))
                 {
                     SharedLogger.logger.Debug($"NVIDIA_DISPLAY_CONFIG/Equals: The DisplayIdentifiers lists don't match!");
                     return false;
