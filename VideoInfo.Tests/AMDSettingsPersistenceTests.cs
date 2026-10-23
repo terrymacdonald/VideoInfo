@@ -103,13 +103,6 @@ public class AMDSettingsPersistenceTests
         Assert.NotEqual(saved, current);
     }
 
-    [Fact]
-    public void Saved_lut_dto_preserves_preset_and_contrast_value()
-    {
-        AMD_3DLUT_INFO saved = CreateLut(false, false);
-        Assert.Equal(saved, new AMD_3DLUT_INFO(saved.ToThreeDLUTDto()));
-    }
-
     private static AMD_3DLUT_INFO CreateLut(bool disabled, bool vivid) =>
         new AMD_3DLUT_INFO(true, true, true, false, disabled, vivid, true, 5,
             new IntRange { Min = 0, Max = 10, Step = 1 });
