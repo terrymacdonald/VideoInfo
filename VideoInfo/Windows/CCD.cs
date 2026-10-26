@@ -560,12 +560,30 @@ namespace DisplayMagicianShared.Windows
 
         public override bool Equals(object obj) => obj is DISPLAYCONFIG_RATIONAL other && this.Equals(other);
         public bool Equals(DISPLAYCONFIG_RATIONAL other)
-            => Numerator == other.Numerator &&
-                Denominator == other.Denominator;
+            => ForComparison().Equals(other.ForComparison());
 
         public override int GetHashCode()
         {
-            return (Numerator, Denominator).GetHashCode();
+            return ForComparison().GetHashCode();
+        }
+
+        private (uint Numerator, uint Denominator) ForComparison()
+        {
+            // Preserve zero-denominator values exactly.
+            if (Denominator == 0)
+                return (Numerator, Denominator);
+
+            // Find the greatest common divisor.
+            uint a = Numerator;
+            uint b = Denominator;
+            while (b != 0)
+            {
+                uint remainder = a % b;
+                a = b;
+                b = remainder;
+            }
+
+            return (Numerator / a, Denominator / a);
         }
         public static bool operator ==(DISPLAYCONFIG_RATIONAL lhs, DISPLAYCONFIG_RATIONAL rhs) => lhs.Equals(rhs);
 
