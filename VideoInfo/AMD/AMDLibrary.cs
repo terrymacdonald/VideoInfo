@@ -3675,21 +3675,30 @@ namespace DisplayMagicianShared.AMD
                                     return false;
                                 }
 
-                                // Check if it matches what we want
-                                SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: Successfully created the ADLX Eyefinity Desktop");
-                                if (displayConfig.EyefinityDesktop.Equals(ActiveDisplayConfig.EyefinityDesktop))
+                                // Allow the display change to settle before reading it back.
+                                if (delayInMs > 0)
+                                    Thread.Sleep(delayInMs);
+
+                                AMD_DISPLAY_CONFIG resultingConfig = GetActiveConfig();
+                                if (!resultingConfig.IsEyefinity)
                                 {
-                                    SharedLogger.logger.Trace($"AMDLibrary/SetActiveConfig: This new Eyefinity layout matches the desired configuraton");
+                                    SharedLogger.logger.Error("AMDLibrary/SetActiveConfig: ADLX returned from Eyefinity creation, but the refreshed AMD configuration contains no Eyefinity desktop.");
+                                    return false;
+                                }
+
+                                if (displayConfig.EyefinityDesktop.Equals(resultingConfig.EyefinityDesktop))
+                                {
+                                    SharedLogger.logger.Trace("AMDLibrary/SetActiveConfig: The refreshed Eyefinity layout matches the saved profile.");
                                 }
                                 else
                                 {
-                                    SharedLogger.logger.Warn($"AMDLibrary/SetActiveConfig: This new Eyefinity layout is different from the one we originally saved with this desktop profile. If you have changed your Eyefinity Layout then you need to update this desktop profile!.");
+                                    SharedLogger.logger.Warn("AMDLibrary/SetActiveConfig: Eyefinity is active, but its current layout differs from the saved profile. The Windows display configuration has not yet been applied.");
                                 }
                                 
                             }
                             catch (Exception ex)
                             {
-                                SharedLogger.logger.Error(ex, "AMDLibrary/SetActiveConfig: Exception occurred while trying to create the Eyefinity Desktop using ADLX");
+                                SharedLogger.logger.Error(ex, "AMDLibrary/SetActiveConfig: Exception occurred while trying to create or read back the Eyefinity Desktop using ADLX");
                                 return false;
                             }
                         }
